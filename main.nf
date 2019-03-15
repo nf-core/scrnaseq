@@ -1,11 +1,11 @@
 #!/usr/bin/env nextflow
 /*
 ========================================================================================
-                         nf-core/scatacseq
+                         nf-core/scrnaseq
 ========================================================================================
- nf-core/scatacseq Analysis Pipeline.
+ nf-core/scrnaseq Analysis Pipeline.
  #### Homepage / Documentation
- https://github.com/nf-core/scatacseq
+ https://github.com/nf-core/scrnaseq
 ----------------------------------------------------------------------------------------
 */
 
@@ -19,7 +19,7 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run nf-core/scatacseq --reads '*_R{1,2}.fastq.gz' -profile docker
+    nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' -profile docker
 
     Mandatory arguments:
       --reads                       Path to input data (must be surrounded with quotes)
@@ -161,10 +161,10 @@ checkHostname()
 def create_workflow_summary(summary) {
     def yaml_file = workDir.resolve('workflow_summary_mqc.yaml')
     yaml_file.text  = """
-    id: 'nf-core-scatacseq-summary'
+    id: 'nf-core-scrnaseq-summary'
     description: " - this information is collected when the pipeline is started."
-    section_name: 'nf-core/scatacseq Workflow Summary'
-    section_href: 'https://github.com/nf-core/scatacseq'
+    section_name: 'nf-core/scrnaseq Workflow Summary'
+    section_href: 'https://github.com/nf-core/scrnaseq'
     plot_type: 'html'
     data: |
         <dl class=\"dl-horizontal\">
@@ -249,8 +249,7 @@ process get_software_versions {
 
           """
           bioawk -c gff '$feature=="transcript" {print $group}' \\
-          ${gtf} | awk -F ' ' '{print substr($4,2,length($4)-3) "\t" substr($2,2,length($2)-3)}' \\
-          - > txp2gene.tsv
+          ${gtf} | awk -F ' ' '{print substr($4,2,length($4)-3) "\t" substr($2,2,length($2)-3)}' > txp2gene.tsv
           """
       }
   }
@@ -335,9 +334,9 @@ process output_documentation {
 workflow.onComplete {
 
     // Set up the e-mail variables
-    def subject = "[nf-core/scatacseq] Successful: $workflow.runName"
+    def subject = "[nf-core/scrnaseq] Successful: $workflow.runName"
     if(!workflow.success){
-      subject = "[nf-core/scatacseq] FAILED: $workflow.runName"
+      subject = "[nf-core/scrnaseq] FAILED: $workflow.runName"
     }
     def email_fields = [:]
     email_fields['version'] = workflow.manifest.version
@@ -370,12 +369,12 @@ workflow.onComplete {
         if (workflow.success) {
             mqc_report = multiqc_report.getVal()
             if (mqc_report.getClass() == ArrayList){
-                log.warn "[nf-core/scatacseq] Found multiple reports from process 'multiqc', will use only one"
+                log.warn "[nf-core/scrnaseq] Found multiple reports from process 'multiqc', will use only one"
                 mqc_report = mqc_report[0]
             }
         }
     } catch (all) {
-        log.warn "[nf-core/scatacseq] Could not attach MultiQC report to summary email"
+        log.warn "[nf-core/scrnaseq] Could not attach MultiQC report to summary email"
     }
 
     // Render the TXT template
@@ -401,11 +400,11 @@ workflow.onComplete {
           if( params.plaintext_email ){ throw GroovyException('Send plaintext e-mail, not HTML') }
           // Try to send HTML e-mail using sendmail
           [ 'sendmail', '-t' ].execute() << sendmail_html
-          log.info "[nf-core/scatacseq] Sent summary e-mail to $params.email (sendmail)"
+          log.info "[nf-core/scrnaseq] Sent summary e-mail to $params.email (sendmail)"
         } catch (all) {
           // Catch failures and try with plaintext
           [ 'mail', '-s', subject, params.email ].execute() << email_txt
-          log.info "[nf-core/scatacseq] Sent summary e-mail to $params.email (mail)"
+          log.info "[nf-core/scrnaseq] Sent summary e-mail to $params.email (mail)"
         }
     }
 
@@ -424,10 +423,10 @@ workflow.onComplete {
     c_green = params.monochrome_logs ? '' : "\033[0;32m";
     c_red = params.monochrome_logs ? '' : "\033[0;31m";
     if(workflow.success){
-        log.info "${c_purple}[nf-core/scatacseq]${c_green} Pipeline complete${c_reset}"
+        log.info "${c_purple}[nf-core/scrnaseq]${c_green} Pipeline complete${c_reset}"
     } else {
         checkHostname()
-        log.info "${c_purple}[nf-core/scatacseq]${c_red} Pipeline completed with errors${c_reset}"
+        log.info "${c_purple}[nf-core/scrnaseq]${c_red} Pipeline completed with errors${c_reset}"
     }
 
 }
@@ -451,7 +450,7 @@ def nfcoreHeader(){
     ${c_blue}  |\\ | |__  __ /  ` /  \\ |__) |__         ${c_yellow}}  {${c_reset}
     ${c_blue}  | \\| |       \\__, \\__/ |  \\ |___     ${c_green}\\`-._,-`-,${c_reset}
                                             ${c_green}`._,._,\'${c_reset}
-    ${c_purple}  nf-core/scatacseq v${workflow.manifest.version}${c_reset}
+    ${c_purple}  nf-core/scrnaseq v${workflow.manifest.version}${c_reset}
     ${c_dim}----------------------------------------------------${c_reset}
     """.stripIndent()
 }

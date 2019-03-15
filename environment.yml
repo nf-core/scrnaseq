@@ -13,5 +13,6 @@ dependencies:
   - conda-forge::salmon=0.13.1
   - bioconda::r-seurat
   - bioconda::bioconductor-isee
-  - bioconductor-tximeta
+  - bioconda::bioconductor-tximeta
   - conda-forge::r-markdown=0.8
+  - bioconda::bioawk

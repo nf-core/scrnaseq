@@ -256,7 +256,7 @@ process get_software_versions {
 
 
 /*
- * STEP 2 - Run alevin
+ * STEP 3 - Run alevin
  */
 process alevin {
     tag "$name"
@@ -281,7 +281,7 @@ process alevin {
 
 
 /*
- * STEP 3 - MultiQC
+ * STEP 4 - MultiQC
  */
 process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
@@ -309,7 +309,7 @@ process multiqc {
 
 
 /*
- * STEP 4 - Output Description HTML
+ * STEP 5 - Output Description HTML
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'

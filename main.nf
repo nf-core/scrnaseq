@@ -1,11 +1,11 @@
 #!/usr/bin/env nextflow
 /*
 ========================================================================================
-                         nf-core/scrnaseq
+                         nf-core/scatacseq
 ========================================================================================
- nf-core/scrnaseq Analysis Pipeline.
+ nf-core/scatacseq Analysis Pipeline.
  #### Homepage / Documentation
- https://github.com/nf-core/scrnaseq
+ https://github.com/nf-core/scatacseq
 ----------------------------------------------------------------------------------------
 */
 
@@ -19,7 +19,7 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' -profile docker
+    nextflow run nf-core/scatacseq --reads '*_R{1,2}.fastq.gz' -profile docker
 
     Mandatory arguments:
       --reads                       Path to input data (must be surrounded with quotes)
@@ -27,11 +27,12 @@ def helpMessage() {
                                     Available: conda, docker, singularity, awsbatch, test and more.
 
     Options:
-      --genome                      Name of iGenomes reference
-      --singleEnd                   Specifies that the input is single end reads
+      --salmon_index                Path to Salmon index (for use with alevin)
+      --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
-      --fasta                       Path to Fasta reference
+      --fasta                       Path to Fasta reference file
+      --gtf                         Path to gtf file
 
     Other options:
       --outdir                      The output directory where the results will be saved
@@ -55,10 +56,6 @@ if (params.help){
     exit 0
 }
 
-// Check if genome exists in the config file
-if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
-    exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
-}
 
 // TODO nf-core: Add any reference files that are needed
 // Configurable reference genomes
@@ -67,12 +64,19 @@ if ( params.fasta ){
     fasta = file(params.fasta)
     if( !fasta.exists() ) exit 1, "Fasta file not found: ${params.fasta}"
 }
-//
-// NOTE - THIS IS NOT USED IN THIS PIPELINE, EXAMPLE ONLY
-// If you want to use the above in a process, define the following:
-//   input:
-//   file fasta from fasta
-//
+
+txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
+if ( params.txp2gene ){
+    txp2gene = file(params.txp2gene)
+    if( !txp2gene.exists() ) exit 1, "txp2gene file not found: ${params.fasta}"
+}
+
+gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
+if ( params.gtf ){
+    gtf = file(params.gtf)
+    if( !gtf.exists() ) exit 1, "gtf file not found: ${params.gtf}"
+}
+
 
 
 // Has the run name been specified by the user?
@@ -111,13 +115,13 @@ if(params.readPaths){
             .from(params.readPaths)
             .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
             .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-            .into { read_files_fastqc; read_files_trimming }
+            .into { read_files_alevin }
     }
 } else {
     Channel
         .fromFilePairs( params.reads, size: params.singleEnd ? 1 : 2 )
         .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
-        .into { read_files_fastqc; read_files_trimming }
+        .into { read_files_alevin }
 }
 
 
@@ -157,10 +161,10 @@ checkHostname()
 def create_workflow_summary(summary) {
     def yaml_file = workDir.resolve('workflow_summary_mqc.yaml')
     yaml_file.text  = """
-    id: 'nf-core-scrnaseq-summary'
+    id: 'nf-core-scatacseq-summary'
     description: " - this information is collected when the pipeline is started."
-    section_name: 'nf-core/scrnaseq Workflow Summary'
-    section_href: 'https://github.com/nf-core/scrnaseq'
+    section_name: 'nf-core/scatacseq Workflow Summary'
+    section_href: 'https://github.com/nf-core/scatacseq'
     plot_type: 'html'
     data: |
         <dl class=\"dl-horizontal\">
@@ -185,7 +189,7 @@ process get_software_versions {
     """
     echo $workflow.manifest.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
-    fastqc --version > v_fastqc.txt
+    salmon --version > v_salmon.txt
     multiqc --version > v_multiqc.txt
     scrape_software_versions.py > software_versions_mqc.yaml
     """
@@ -194,29 +198,91 @@ process get_software_versions {
 
 
 /*
- * STEP 1 - FastQC
+ * STEP 1 - Make_index
  */
-process fastqc {
+ if (params.salmon_index) {
+     Channel
+         .fromPath(params.salmon_index)
+         .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
+         .into { salmon_index }
+ } else {
+     process build_salmon_index {
+         tag "$fasta"
+         publishDir "${params.outdir}/salmon_index", mode: 'copy'
+
+         input:
+         file fasta
+         file gtf
+
+         output:
+         file "salmon_index" into salmon_index_alevin
+
+         script:
+
+         """
+         salmon index -i salmon_index -k 31 --gencode -p 4 -t ${fasta}
+         """
+     }
+ }
+
+
+ /*
+  * STEP 2 - Make txp2gene
+  */
+  if (params.gtf) {
+      Channel
+          .fromPath(params.gtf)
+          .ifEmpty { exit 1, "gtf file not found: ${params.gtf}" }
+          .into { gtf }
+  } else {
+      process build_txp2gene {
+          tag "$gtf"
+          publishDir "${params.outdir}/salmon_index", mode: 'copy'
+
+          input:
+          file gtf
+
+          output:
+          file "txp2gene.tsv" into txp2gene_alevin
+
+          script:
+
+          """
+          bioawk -c gff '$feature=="transcript" {print $group}' \\
+          ${gtf} | awk -F ' ' '{print substr($4,2,length($4)-3) "\t" substr($2,2,length($2)-3)}' \\
+          - > txp2gene.tsv
+          """
+      }
+  }
+
+
+/*
+ * STEP 2 - Run alevin
+ */
+process alevin {
     tag "$name"
-    publishDir "${params.outdir}/fastqc", mode: 'copy',
-        saveAs: {filename -> filename.indexOf(".zip") > 0 ? "zips/$filename" : "$filename"}
+    publishDir "${params.outdir}/alevin", mode: 'copy',
 
     input:
-    set val(name), file(reads) from read_files_fastqc
+    set val(name), file(reads) from read_files_alevin
+    set salmon_index_alevin
+    set txp2gene_alevin
+
 
     output:
-    file "*_fastqc.{zip,html}" into fastqc_results
+    file "*.gz" into gene_matrix
+    file "*.txt" into matrix_names
 
     script:
     """
-    fastqc -q $reads
+    salmon alevin -lISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i ${salmon_index_alevin} -o ${name}_alevin_results -p ${task.cpus} --tgMap ${txp2gene_alevin}
     """
 }
 
 
 
 /*
- * STEP 2 - MultiQC
+ * STEP 3 - MultiQC
  */
 process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
@@ -244,7 +310,7 @@ process multiqc {
 
 
 /*
- * STEP 3 - Output Description HTML
+ * STEP 4 - Output Description HTML
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'
@@ -269,9 +335,9 @@ process output_documentation {
 workflow.onComplete {
 
     // Set up the e-mail variables
-    def subject = "[nf-core/scrnaseq] Successful: $workflow.runName"
+    def subject = "[nf-core/scatacseq] Successful: $workflow.runName"
     if(!workflow.success){
-      subject = "[nf-core/scrnaseq] FAILED: $workflow.runName"
+      subject = "[nf-core/scatacseq] FAILED: $workflow.runName"
     }
     def email_fields = [:]
     email_fields['version'] = workflow.manifest.version
@@ -304,12 +370,12 @@ workflow.onComplete {
         if (workflow.success) {
             mqc_report = multiqc_report.getVal()
             if (mqc_report.getClass() == ArrayList){
-                log.warn "[nf-core/scrnaseq] Found multiple reports from process 'multiqc', will use only one"
+                log.warn "[nf-core/scatacseq] Found multiple reports from process 'multiqc', will use only one"
                 mqc_report = mqc_report[0]
             }
         }
     } catch (all) {
-        log.warn "[nf-core/scrnaseq] Could not attach MultiQC report to summary email"
+        log.warn "[nf-core/scatacseq] Could not attach MultiQC report to summary email"
     }
 
     // Render the TXT template
@@ -335,11 +401,11 @@ workflow.onComplete {
           if( params.plaintext_email ){ throw GroovyException('Send plaintext e-mail, not HTML') }
           // Try to send HTML e-mail using sendmail
           [ 'sendmail', '-t' ].execute() << sendmail_html
-          log.info "[nf-core/scrnaseq] Sent summary e-mail to $params.email (sendmail)"
+          log.info "[nf-core/scatacseq] Sent summary e-mail to $params.email (sendmail)"
         } catch (all) {
           // Catch failures and try with plaintext
           [ 'mail', '-s', subject, params.email ].execute() << email_txt
-          log.info "[nf-core/scrnaseq] Sent summary e-mail to $params.email (mail)"
+          log.info "[nf-core/scatacseq] Sent summary e-mail to $params.email (mail)"
         }
     }
 
@@ -358,10 +424,10 @@ workflow.onComplete {
     c_green = params.monochrome_logs ? '' : "\033[0;32m";
     c_red = params.monochrome_logs ? '' : "\033[0;31m";
     if(workflow.success){
-        log.info "${c_purple}[nf-core/scrnaseq]${c_green} Pipeline complete${c_reset}"
+        log.info "${c_purple}[nf-core/scatacseq]${c_green} Pipeline complete${c_reset}"
     } else {
         checkHostname()
-        log.info "${c_purple}[nf-core/scrnaseq]${c_red} Pipeline completed with errors${c_reset}"
+        log.info "${c_purple}[nf-core/scatacseq]${c_red} Pipeline completed with errors${c_reset}"
     }
 
 }
@@ -385,7 +451,7 @@ def nfcoreHeader(){
     ${c_blue}  |\\ | |__  __ /  ` /  \\ |__) |__         ${c_yellow}}  {${c_reset}
     ${c_blue}  | \\| |       \\__, \\__/ |  \\ |___     ${c_green}\\`-._,-`-,${c_reset}
                                             ${c_green}`._,._,\'${c_reset}
-    ${c_purple}  nf-core/scrnaseq v${workflow.manifest.version}${c_reset}
+    ${c_purple}  nf-core/scatacseq v${workflow.manifest.version}${c_reset}
     ${c_dim}----------------------------------------------------${c_reset}
     """.stripIndent()
 }

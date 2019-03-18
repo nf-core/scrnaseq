@@ -239,17 +239,13 @@ process get_software_versions {
           tag "$gtf"
           publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-          input:
-          file gtf
-
           output:
           file "txp2gene.tsv" into txp2gene_alevin
 
           script:
 
           """
-          bioawk -c gff '$feature=="transcript" {print $group}' \\
-          ${gtf} | awk -F ' ' '{print substr($4,2,length($4)-3) "\t" substr($2,2,length($2)-3)}' > txp2gene.tsv
+          bioawk -c gff '$feature=="transcript" {print $group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
           """
       }
   }
@@ -260,7 +256,7 @@ process get_software_versions {
  */
 process alevin {
     tag "$name"
-    publishDir "${params.outdir}/alevin", mode: 'copy',
+    publishDir "${params.outdir}/alevin", mode: 'copy'
 
     input:
     set val(name), file(reads) from read_files_alevin

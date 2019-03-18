@@ -132,7 +132,8 @@ summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
 summary['Fasta Ref']        = params.fasta
-summary['Data Type']        = params.singleEnd ? 'Single-End' : 'Paired-End'
+summary['Salmon Index']        = params.salmon_index
+summary['txp2gene']        = params.txp2gene
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
@@ -204,7 +205,7 @@ process get_software_versions {
      Channel
          .fromPath(params.salmon_index)
          .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
-         .into { salmon_index }
+         .into { salmon_index_alevin }
  } else {
      process build_salmon_index {
          tag "$fasta"
@@ -285,7 +286,6 @@ process multiqc {
     input:
     file multiqc_config from ch_multiqc_config
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
-    file ('fastqc/*') from fastqc_results.collect().ifEmpty([])
     file ('software_versions/*') from software_versions_yaml
     file workflow_summary from create_workflow_summary(summary)
 

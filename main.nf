@@ -56,28 +56,32 @@ if (params.help){
     exit 0
 }
 
+params.salmon_index = params.genome ? params.genomes[ params.genome ].salmon_index ?: false : false
+params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
+params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
+params.readPaths = params.readPaths? params.readPaths: false
 
-// TODO nf-core: Add any reference files that are needed
-// Configurable reference genomes
-fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
-if ( params.fasta ){
-    fasta = file(params.fasta)
-    if( !fasta.exists() ) exit 1, "Fasta file not found: ${params.fasta}"
+if( params.gtf ){
+    Channel
+        .fromPath(params.gtf)
+        .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
+        .into { gtf_alevin }
 }
 
-txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
-if ( params.txp2gene ){
-    txp2gene = file(params.txp2gene)
-    if( !txp2gene.exists() ) exit 1, "txp2gene file not found: ${params.fasta}"
+if( params.fasta ){
+    Channel
+        .fromPath(params.fasta)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
+        .into { fasta_alevin }
 }
 
-gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
-if ( params.gtf ){
-    gtf = file(params.gtf)
-    if( !gtf.exists() ) exit 1, "gtf file not found: ${params.gtf}"
+if (params.salmon_index) {
+    Channel
+        .fromPath(params.salmon_index)
+        .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
+        .into { salmon_index_alevin }
 }
-
-
 
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
@@ -103,25 +107,18 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
 /*
  * Create a channel for input read files
  */
-if(params.readPaths){
-    if(params.singleEnd){
-        Channel
-            .from(params.readPaths)
-            .map { row -> [ row[0], [file(row[1][0])]] }
-            .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-            .into { read_files_fastqc; read_files_trimming }
-    } else {
-        Channel
-            .from(params.readPaths)
-            .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
-            .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
+
+ if(params.readPaths){
+         Channel
+             .from(params.readPaths)
+             .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
+             .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
+             .into { read_files_alevin }
+     } else {
+         Channel
+            .fromFilePairs( params.reads, size: 2 )
+            .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
             .into { read_files_alevin }
-    }
-} else {
-    Channel
-        .fromFilePairs( params.reads, size: params.singleEnd ? 1 : 2 )
-        .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
-        .into { read_files_alevin }
 }
 
 
@@ -132,6 +129,8 @@ summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
 summary['Fasta Ref']        = params.fasta
+summary['gtf Ref']        = params.gtf
+summary['Aligner']        = params.aligner
 summary['Salmon Index']        = params.salmon_index
 summary['txp2gene']        = params.txp2gene
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
@@ -201,19 +200,14 @@ process get_software_versions {
 /*
  * STEP 1 - Make_index
  */
- if (params.salmon_index) {
-     Channel
-         .fromPath(params.salmon_index)
-         .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
-         .into { salmon_index_alevin }
- } else {
-     process build_salmon_index {
+if(!params.salmon_index){
+      process build_salmon_index {
          tag "$fasta"
          publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
          input:
-         file fasta
-         file gtf
+         file fasta from fasta_alevin
+
 
          output:
          file "salmon_index" into salmon_index_alevin
@@ -221,7 +215,7 @@ process get_software_versions {
          script:
 
          """
-         salmon index -i salmon_index -k 31 --gencode -p 4 -t ${fasta}
+         salmon index -i salmon_index -k 31 -p 4 -t $fasta
          """
      }
  }
@@ -230,15 +224,13 @@ process get_software_versions {
  /*
   * STEP 2 - Make txp2gene
   */
-  if (params.gtf) {
-      Channel
-          .fromPath(params.gtf)
-          .ifEmpty { exit 1, "gtf file not found: ${params.gtf}" }
-          .into { gtf }
-  } else {
-      process build_txp2gene {
+if(!params.txp2gene_alevin){
+   process build_txp2gene {
           tag "$gtf"
-          publishDir "${params.outdir}/salmon_index", mode: 'copy'
+          publishDir "${params.outdir}", mode: 'copy'
+
+          input:
+          file gtf from gtf_alevin
 
           output:
           file "txp2gene.tsv" into txp2gene_alevin
@@ -246,23 +238,24 @@ process get_software_versions {
           script:
 
           """
-          bioawk -c gff '$feature=="transcript" {print $group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
+          bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
           """
       }
-  }
+}
 
 
 /*
  * STEP 3 - Run alevin
  */
-process alevin {
+
+process run_alevin {
     tag "$name"
     publishDir "${params.outdir}/alevin", mode: 'copy'
 
     input:
     set val(name), file(reads) from read_files_alevin
-    set salmon_index_alevin
-    set txp2gene_alevin
+    file index from salmon_index_alevin.collect()
+    file txp2gene from txp2gene_alevin.collect()
 
 
     output:
@@ -271,11 +264,10 @@ process alevin {
 
     script:
     """
-    salmon alevin -lISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i ${salmon_index_alevin} -o ${name}_alevin_results -p ${task.cpus} --tgMap ${txp2gene_alevin}
+    salmon alevin -lISR -1 $reads[0] -2 $reads[1] --chromium -i $salmon_index_alevin -o $name_alevin_results -p ${task.cpus} --tgMap $txp2gene_alevin
     """
-}
 
-
+  }
 
 /*
  * STEP 4 - MultiQC

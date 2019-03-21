@@ -7,12 +7,11 @@ channels:
   - defaults
 dependencies:
   # TODO nf-core: Add required software dependencies here
-  - conda-forge::python=3.5.4
-  - bioconda::fastqc=0.11.8
-  - bioconda::multiqc=1.7
-  - conda-forge::salmon=0.13.1
+  - conda-forge::python
+  - bioconda::multiqc
+  - bioconda::salmon
   - bioconda::r-seurat
   - bioconda::bioconductor-isee
   - bioconda::bioconductor-tximeta
-  - conda-forge::r-markdown=0.8
+  - conda-forge::r-markdown
   - bioconda::bioawk

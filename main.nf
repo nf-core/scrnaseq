@@ -118,7 +118,7 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
          Channel
             .fromFilePairs( params.reads, size: 2 )
             .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
-            .into { read_files_alevin }
+            .set { read_files_alevin }
 }
 
 
@@ -215,7 +215,7 @@ if(!params.salmon_index){
          script:
 
          """
-         salmon index -i salmon_index -k 31 -p 4 -t $fasta
+         salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
          """
      }
  }
@@ -248,23 +248,43 @@ if(!params.txp2gene_alevin){
  * STEP 3 - Run alevin
  */
 
-process run_alevin {
+  process run_alevin {
     tag "$name"
     publishDir "${params.outdir}/alevin", mode: 'copy'
 
     input:
     set val(name), file(reads) from read_files_alevin
-    file index from salmon_index_alevin.collect()
-    file txp2gene from txp2gene_alevin.collect()
+    file index from salmon_index_alevin
+    file txp2gene from txp2gene_alevin
 
 
     output:
-    file "*.gz" into gene_matrix
-    file "*.txt" into matrix_names
+    file "${name}_alevin_results" into alevin_results
 
     script:
     """
-    salmon alevin -lISR -1 $reads[0] -2 $reads[1] --chromium -i $salmon_index_alevin -o $name_alevin_results -p ${task.cpus} --tgMap $txp2gene_alevin
+    salmon alevin -lISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i $index -o ${name}_alevin_results -p ${task.cpus} --tgMap $txp2gene
+    """
+  }
+
+
+ /*
+  * STEP 4 - Run alevin qc
+  */
+
+  process run_alevin_qc {
+    tag "${alevin_results.baseName - '.qc'}"
+    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+
+    input:
+    file result from alevin_results
+
+    output:
+    file "${name}_alevin_results" into alevin_results
+
+    script:
+    """
+    alevin_qc.r $result
     """
 
   }
@@ -272,27 +292,27 @@ process run_alevin {
 /*
  * STEP 4 - MultiQC
  */
-process multiqc {
-    publishDir "${params.outdir}/MultiQC", mode: 'copy'
-
-    input:
-    file multiqc_config from ch_multiqc_config
-    // TODO nf-core: Add in log files from your new processes for MultiQC to find!
-    file ('software_versions/*') from software_versions_yaml
-    file workflow_summary from create_workflow_summary(summary)
-
-    output:
-    file "*multiqc_report.html" into multiqc_report
-    file "*_data"
-
-    script:
-    rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
-    rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-    // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
-    """
-    multiqc -f $rtitle $rfilename --config $multiqc_config .
-    """
-}
+// process multiqc {
+//     publishDir "${params.outdir}/MultiQC", mode: 'copy'
+//
+//     input:
+//     file multiqc_config from ch_multiqc_config
+//     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
+//     file ('software_versions/*') from software_versions_yaml
+//     file workflow_summary from create_workflow_summary(summary)
+//
+//     output:
+//     file "*multiqc_report.html" into multiqc_report
+//     file "*_data"
+//
+//     script:
+//     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
+//     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
+//     // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
+//     """
+//     multiqc -f $rtitle $rfilename --config $multiqc_config .
+//     """
+// }
 
 
 

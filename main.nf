@@ -273,22 +273,25 @@ if(!params.txp2gene_alevin){
   * STEP 4 - Run alevin qc
   */
 
-  // process run_alevin_qc {
-  //   tag "$name"
-  //   publishDir "${params.outdir}/alevin_qc", mode: 'copy'
-  //
-  //   input:
-  //   file result from alevin_results
-  //
-  //   output:
-  //   file "${name}_alevin_results" into alevin_results
-  //
-  //   script:
-  //   """
-  //   alevin_qc.r $result
-  //   """
-  //
-  // }
+  process run_alevin_qc {
+    tag "$prefix"
+    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+
+    input:
+    file result from alevin_results
+
+    output:
+    file "${name}_alevinqc_results" into alevinqc_results
+
+    script:
+
+    prefix = result.toString() - '_alevin_results'
+
+    """
+    alevin_qc.r $result ${prefix} $result
+    """
+
+  }
 
 /*
  * STEP 4 - MultiQC

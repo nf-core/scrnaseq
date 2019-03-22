@@ -29,6 +29,7 @@ def helpMessage() {
     Options:
       --salmon_index                Path to Salmon index (for use with alevin)
       --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
+      --alevin_qc                   Perform alevinQC analysis
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
       --fasta                       Path to Fasta reference file
@@ -116,7 +117,7 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
              .into { read_files_alevin }
      } else {
          Channel
-            .fromFilePairs( params.reads, size: 2 )
+            .fromFilePairs( params.reads )
             .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
             .set { read_files_alevin }
 }
@@ -254,8 +255,8 @@ if(!params.txp2gene_alevin){
 
     input:
     set val(name), file(reads) from read_files_alevin
-    file index from salmon_index_alevin
-    file txp2gene from txp2gene_alevin
+    file index from salmon_index_alevin.collect()
+    file txp2gene from txp2gene_alevin.collect()
 
 
     output:
@@ -263,7 +264,7 @@ if(!params.txp2gene_alevin){
 
     script:
     """
-    salmon alevin -lISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i $index -o ${name}_alevin_results -p ${task.cpus} --tgMap $txp2gene
+    salmon alevin -l ISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
     """
   }
 
@@ -272,22 +273,22 @@ if(!params.txp2gene_alevin){
   * STEP 4 - Run alevin qc
   */
 
-  process run_alevin_qc {
-    tag "${alevin_results.baseName - '.qc'}"
-    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
-
-    input:
-    file result from alevin_results
-
-    output:
-    file "${name}_alevin_results" into alevin_results
-
-    script:
-    """
-    alevin_qc.r $result
-    """
-
-  }
+  // process run_alevin_qc {
+  //   tag "$name"
+  //   publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+  //
+  //   input:
+  //   file result from alevin_results
+  //
+  //   output:
+  //   file "${name}_alevin_results" into alevin_results
+  //
+  //   script:
+  //   """
+  //   alevin_qc.r $result
+  //   """
+  //
+  // }
 
 /*
  * STEP 4 - MultiQC

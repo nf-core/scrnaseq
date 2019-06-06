@@ -25,11 +25,13 @@ def helpMessage() {
       --reads                       Path to input data (must be surrounded with quotes)
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, awsbatch, test and more.
+      --type                        Name of droplet technology e.g. "--type 10x"
 
     Options:
       --salmon_index                Path to Salmon index (for use with alevin)
       --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
       --alevin_qc                   Perform alevinQC analysis
+      --tenx_version                Version of 10x chemistry, e.g. "--tenx_version V2" or "--tenx_version V3"
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
       --fasta                       Path to Fasta reference file
@@ -63,21 +65,30 @@ params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : fals
 params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
 params.readPaths = params.readPaths? params.readPaths: false
 
+if (params.aligner != 'star' && params.aligner != 'alevin'){
+    exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin'"
+}
+if( params.star_index && params.aligner == 'star' ){
+    star_index = Channel
+        .fromPath(params.star_index)
+        .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
+}
+
 if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into { gtf_alevin }
+        .into { gtf_alevin; gtf_makeSTARindex }
 }
 
 if( params.fasta ){
     Channel
         .fromPath(params.fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
-        .into { fasta_alevin }
+        .into { fasta_alevin, fasta_makeSTARindex }
 }
 
-if (params.salmon_index) {
+if (params.aligner == 'alevin' && params.salmon_index) {
     Channel
         .fromPath(params.salmon_index)
         .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
@@ -122,6 +133,22 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
             .set { read_files_alevin }
 }
 
+
+tenx_folder = "$baseDir/assets/10x_barcode_whitelists/"
+
+if (params.tenx_version == "V1"){
+  Channel.from("$tenx_folder/737K-april-2014_rc.txt")
+         .ifEmpty{ exit 1, "Cannot find 10x V1 barcode whitelist: $tenx_folder/737K-april-2014_rc.txt" }
+         .set{ barcode_whitelist }
+} else if (params.tenx_version == "V2"){
+  Channel.from("$tenx_folder/737K-august-2016.txt")
+         .ifEmpty{ exit 1, "Cannot find 10x V1 barcode whitelist: $tenx_folder/737K-august-2016.txt" }
+         .set{ barcode_whitelist }
+} else if (params.tenx_versionn == "V3"){
+  Channel.from("$tenx_folder/3M-february-2018.txt.gz")
+         .ifEmpty{ exit 1, "Cannot find 10x V1 barcode whitelist: $tenx_folder/3M-february-2018.txt.gz" }
+         .set{ barcode_whitelist }
+}
 
 // Header log info
 log.info nfcoreHeader()
@@ -191,6 +218,7 @@ process get_software_versions {
     echo $workflow.manifest.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
     salmon --version > v_salmon.txt
+    STAR --version &> v_star.txt
     multiqc --version > v_multiqc.txt
     scrape_software_versions.py > software_versions_mqc.yaml
     """
@@ -222,10 +250,39 @@ if(!params.salmon_index){
  }
 
 
+ if(params.aligner == 'star' && !params.star_index && params.fasta){
+     process makeSTARindex {
+         label 'high_memory'
+         tag "$fasta"
+         publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
+                    saveAs: { params.saveReference ? it : null }, mode: 'copy'
+
+         input:
+         file fasta from fasta_makeSTARindex
+         file gtf from gtf_makeSTARindex
+
+         output:
+         file "star" into star_index
+
+         script:
+         def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
+         """
+         mkdir star
+         STAR \\
+             --runMode genomeGenerate \\
+             --runThreadN ${task.cpus} \\
+             --sjdbGTFfile $gtf \\
+             --genomeDir star/ \\
+             --genomeFastaFiles $fasta \\
+             $avail_mem
+         """
+     }
+ }
+
  /*
   * STEP 2 - Make txp2gene
   */
-if(!params.txp2gene_alevin){
+if(params.aligner == 'alevin' && !params.txp2gene_alevin){
    process build_txp2gene {
           tag "$gtf"
           publishDir "${params.outdir}", mode: 'copy'
@@ -248,7 +305,7 @@ if(!params.txp2gene_alevin){
 /*
  * STEP 3 - Run alevin
  */
-
+if (params.aligner == 'alevin'){
   process run_alevin {
     tag "$name"
     publishDir "${params.outdir}/alevin", mode: 'copy'
@@ -267,6 +324,68 @@ if(!params.txp2gene_alevin){
     salmon alevin -l ISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
     """
   }
+}
+
+
+if(params.aligner == 'star'){
+    hisat_stdout = Channel.from(false)
+    process star {
+        tag "$prefix"
+        publishDir "${params.outdir}/STAR", mode: 'copy',
+            saveAs: {filename ->
+                if (filename.indexOf(".bam") == -1) "logs/$filename"
+                else if (!params.saveAlignedIntermediates && filename == "where_are_my_files.txt") filename
+                else if (params.saveAlignedIntermediates && filename != "where_are_my_files.txt") filename
+                else null
+            }
+
+        input:
+        // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
+        set samplename, file(reads) from trimmed_reads
+        file index from star_index.collect()
+        file gtf from gtf_star.collect()
+        file wherearemyfiles from ch_where_star.collect()
+
+        output:
+        set file("*Log.final.out"), file ('*.bam') into star_aligned
+        file "*.out" into alignment_logs
+        file "*SJ.out.tab"
+        file "*Log.out" into star_log
+        file "where_are_my_files.txt"
+        file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
+
+        script:
+        prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
+        def star_mem = task.memory ?: params.star_memory ?: false
+        def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
+
+        seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
+        cdna_read = reads[0]
+        barcode_read = reads[1]
+        """
+        STAR --genomeDir $index \\
+             --sjdbGTFfile $gtf \\
+             --readFilesIn $barcode_read $cdna_read  \\
+             --runThreadN ${task.cpus} \\
+             --twopassMode Basic \\
+             --outWigType bedGraph \\
+             --outSAMtype BAM SortedByCoordinate $avail_mem \\
+             --readFilesCommand zcat \\
+             --runDirPerm All_RWX \\
+             --outFileNamePrefix $prefix $seqCenter \\
+             --soloType Droplet \\
+             --soloCBwhitelist $barcode_whitelist
+      """
+
+
+    }
+    // Filter removes all 'aligned' channels that fail the check
+    star_aligned
+        .filter { logs, bams -> check_log(logs) }
+        .flatMap {  logs, bams -> bams }
+    .into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
+}
+
 
 
  /*

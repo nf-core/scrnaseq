@@ -13,6 +13,9 @@
   * [`-profile`](#-profile)
   * [`--reads`](#--reads)
   * [`--singleEnd`](#--singleend)
+* [Cellular barcodes](#cellular-barcodes)
+  * [`--type` to specify droplet type](#--type-to-specify-droplet-type)
+  * [`--tenx_version` (using cellranger barcodes)](#--tenx_version-cellranger-barcodes)
 * [Reference genomes](#reference-genomes)
   * [`--genome` (using iGenomes)](#--genome-using-igenomes)
   * [`--fasta`](#--fasta)
@@ -132,6 +135,21 @@ By default, the pipeline expects paired-end data. If you have single-end data, y
 
 It is not possible to run a mixture of single-end and paired-end files in one run.
 
+## Cellular barcodes
+
+### `--type` to specify droplet type
+
+Currently, only 10X Genomics' chromium chemistry is supported. Drop-Seq, inDrop, etc may be supported in the future.
+
+### `--tenx_version` (using cellranger barcodes)
+
+To specify which chemistry (and thus barcode whitelist) to use, use the `--tenx_version` flag. For example, to specify V3 chemistry (the default), use `--tenx_version V3`.
+
+These files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.
+
+* V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`
+* V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`
+* V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`
 
 ## Reference genomes
 

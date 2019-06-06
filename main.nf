@@ -31,7 +31,7 @@ def helpMessage() {
       --salmon_index                Path to Salmon index (for use with alevin)
       --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
       --alevin_qc                   Perform alevinQC analysis
-      --tenx_version                Version of 10x chemistry, e.g. "--tenx_version V2" or "--tenx_version V3"
+      --chemistry                Version of 10x chemistry, e.g. "--chemistry V2" or "--chemistry V3"
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
       --fasta                       Path to Fasta reference file
@@ -85,7 +85,7 @@ if( params.fasta ){
     Channel
         .fromPath(params.fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
-        .into { fasta_alevin, fasta_makeSTARindex }
+        .into { fasta_alevin; fasta_makeSTARindex }
 }
 
 if (params.aligner == 'alevin' && params.salmon_index) {
@@ -134,20 +134,13 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
 }
 
 
-tenx_folder = "$baseDir/assets/10x_barcode_whitelists/"
+whitelist_folder = "$baseDir/assets/whitelist/"
 
-if (params.tenx_version == "V1"){
-  Channel.from("$tenx_folder/737K-april-2014_rc.txt")
-         .ifEmpty{ exit 1, "Cannot find 10x V1 barcode whitelist: $tenx_folder/737K-april-2014_rc.txt" }
-         .set{ barcode_whitelist }
-} else if (params.tenx_version == "V2"){
-  Channel.from("$tenx_folder/737K-august-2016.txt")
-         .ifEmpty{ exit 1, "Cannot find 10x V1 barcode whitelist: $tenx_folder/737K-august-2016.txt" }
-         .set{ barcode_whitelist }
-} else if (params.tenx_versionn == "V3"){
-  Channel.from("$tenx_folder/3M-february-2018.txt.gz")
-         .ifEmpty{ exit 1, "Cannot find 10x V1 barcode whitelist: $tenx_folder/3M-february-2018.txt.gz" }
-         .set{ barcode_whitelist }
+if (params.type == "10x"){
+  barcode_filename = "$whitelist_folder/${params.type}_${params.chemistry}_barcode_whitelist.txt.gz"
+  Channel.fromPath(barcode_filename)
+         .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
+         .set{ barcode_whitelist_gzipped }
 }
 
 // Header log info
@@ -224,12 +217,29 @@ process get_software_versions {
     """
 }
 
+if (params.type == '10x') {
+    process unzip_10x_barcodes {
+       tag "${params.chemistry}"
+       publishDir "${params.outdir}/salmon_index", mode: 'copy'
+
+       input:
+       file gzipped from barcode_whitelist_gzipped
+
+       output:
+       file "$gzipped.simpleName" into barcode_whitelist
+
+       script:
+       """
+       gunzip -c $gzipped > $gzipped.simpleName
+       """
+   }
+}
 
 
 /*
  * STEP 1 - Make_index
  */
-if(!params.salmon_index){
+ if (!params.salmon_index){
       process build_salmon_index {
          tag "$fasta"
          publishDir "${params.outdir}/salmon_index", mode: 'copy'
@@ -328,7 +338,6 @@ if (params.aligner == 'alevin'){
 
 
 if(params.aligner == 'star'){
-    hisat_stdout = Channel.from(false)
     process star {
         tag "$prefix"
         publishDir "${params.outdir}/STAR", mode: 'copy',
@@ -415,27 +424,28 @@ if(params.aligner == 'star'){
 /*
  * STEP 4 - MultiQC
  */
-// process multiqc {
-//     publishDir "${params.outdir}/MultiQC", mode: 'copy'
-//
-//     input:
-//     file multiqc_config from ch_multiqc_config
-//     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
-//     file ('software_versions/*') from software_versions_yaml
-//     file workflow_summary from create_workflow_summary(summary)
-//
-//     output:
-//     file "*multiqc_report.html" into multiqc_report
-//     file "*_data"
-//
-//     script:
-//     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
-//     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-//     // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
-//     """
-//     multiqc -f $rtitle $rfilename --config $multiqc_config .
-//     """
-// }
+process multiqc {
+    publishDir "${params.outdir}/MultiQC", mode: 'copy'
+
+    input:
+    file multiqc_config from ch_multiqc_config
+    // TODO nf-core: Add in log files from your new processes for MultiQC to find!
+    file ('software_versions/*') from software_versions_yaml
+    file workflow_summary from create_workflow_summary(summary)
+
+    output:
+    file "*multiqc_report.html" into multiqc_report
+    file "*_data"
+
+    script:
+    rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
+    rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
+    // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
+    """
+    multiqc -f $rtitle $rfilename --config $multiqc_config \
+      -m custom_content -m salmon -m star .
+    """
+}
 
 
 

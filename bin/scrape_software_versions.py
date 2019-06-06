@@ -7,11 +7,15 @@ import re
 regexes = {
     'nf-core/scrnaseq': ['v_pipeline.txt', r"(\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
+    'STAR': ['v_star.txt', r"(\S+)"],
+    'Salmon': ['v_salmon.txt', r"salmon (\S+)"],
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
 }
 results = OrderedDict()
 results['nf-core/scrnaseq'] = '<span style="color:#999999;\">N/A</span>'
 results['Nextflow'] = '<span style="color:#999999;\">N/A</span>'
+results['STAR'] = '<span style="color:#999999;\">N/A</span>'
+results['Salmon'] = '<span style="color:#999999;\">N/A</span>'
 results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'
 
 # Search each file using its regex

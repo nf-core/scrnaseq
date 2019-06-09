@@ -15,3 +15,4 @@ dependencies:
   - conda-forge::r-markdown=0.9
   - bioconda::bioawk=1.0
   - bioconda::bioconductor-alevinqc=1.0.0
+  - bioconda::bioconductor-tximport=1.12.0

@@ -9,22 +9,30 @@
 [![Docker](https://img.shields.io/docker/automated/nfcore/scrnaseq.svg)](https://hub.docker.com/r/nfcore/scrnaseq)
 
 ## Introduction
-The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker / singularity containers making installation trivial and results highly reproducible.
-
+The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
 
 ## Documentation
+
 The nf-core/scrnaseq pipeline comes with documentation about the pipeline, found in the `docs/` directory:
 
-1. [Installation](docs/installation.md)
+1. [Installation](https://nf-co.re/usage/installation)
 2. Pipeline configuration
-    * [Local installation](docs/configuration/local.md)
-    * [Adding your own system](docs/configuration/adding_your_own.md)
-    * [Reference genomes](docs/configuration/reference_genomes.md)  
+    * [Local installation](https://nf-co.re/usage/local_installation)
+    * [Adding your own system config](https://nf-co.re/usage/adding_own_config)
+    * [Reference genomes](https://nf-co.re/usage/reference_genomes)
 3. [Running the pipeline](docs/usage.md)
 4. [Output and how to interpret the results](docs/output.md)
-5. [Troubleshooting](docs/troubleshooting.md)
+5. [Troubleshooting](https://nf-co.re/usage/troubleshooting)
 
 <!-- TODO nf-core: Add a brief overview of what the pipeline does and how it works -->
 
 ## Credits
-nf-core/scrnaseq was originally written by Peter J. Bailey.
+
+nf-core/scrnaseq was originally written by Peter J Bailey, Alexander Peltzer.
+
+## Citation
+
+<!-- If you use nf-core/scrnaseq for your analysis, please cite it as follows: -->
+
+You can cite the `nf-core` pre-print as follows:  
+Ewels PA, Peltzer A, Fillinger S, Alneberg JA, Patel H, Wilm A, Garcia MU, Di Tommaso P, Nahnsen S. **nf-core: Community curated bioinformatics pipelines**. *bioRxiv*. 2019. p. 610741. [doi: 10.1101/610741](https://www.biorxiv.org/content/10.1101/610741v1).

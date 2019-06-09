@@ -28,7 +28,7 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline, found
 
 ## Credits
 
-nf-core/scrnaseq was originally written by Peter J Bailey, Alexander Peltzer.
+nf-core/scrnaseq was originally written by [Peter J. Bailey](https://github.com/PeterBailey) with some help from [Olga Botvinnik](https://github.com/olgabot) and [Alex Peltzer](https://github.com/apeltzer).
 
 ## Citation
 

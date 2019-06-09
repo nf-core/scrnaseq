@@ -33,5 +33,10 @@ data: |
     <dl class="dl-horizontal">
 ''')
 for k,v in results.items():
-    print("        <dt>{}</dt><dd>{}</dd>".format(k,v))
+    print("        <dt>{}</dt><dd><samp>{}</samp></dd>".format(k,v))
 print ("    </dl>")
+
+# Write out regexes as csv file:
+with open('software_versions.csv', 'w') as f:
+    for k,v in results.items():
+        f.write("{}\t{}\n".format(k,v))

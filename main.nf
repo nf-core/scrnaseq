@@ -95,10 +95,11 @@ if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
 if( workflow.profile == 'awsbatch') {
   // AWSBatch sanity checking
   if (!params.awsqueue || !params.awsregion) exit 1, "Specify correct --awsqueue and --awsregion parameters on AWSBatch!"
-  if (!workflow.workDir.startsWith('s3') || !params.outdir.startsWith('s3')) exit 1, "Specify S3 URLs for workDir and outdir parameters on AWSBatch!"
-  // Check workDir/outdir paths to be S3 buckets if running on AWSBatch
+  // Check outdir paths to be S3 buckets if running on AWSBatch
   // related: https://github.com/nextflow-io/nextflow/issues/813
-  if (!workflow.workDir.startsWith('s3:') || !params.outdir.startsWith('s3:')) exit 1, "Workdir or Outdir not on S3 - specify S3 Buckets for each to run on AWSBatch!"
+  if (!params.outdir.startsWith('s3:')) exit 1, "Outdir not on S3 - specify S3 Bucket to run on AWSBatch!"
+  // Prevent trace files to be stored on S3 since S3 does not support rolling files.
+  if (workflow.tracedir.startsWith('s3:')) exit 1, "Specify a local tracedir or run without trace! S3 cannot be used for tracefiles."
 }
 
 // Stage config files
@@ -126,6 +127,7 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
 // Header log info
 log.info nfcoreHeader()
 def summary = [:]
+if(workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
@@ -181,9 +183,15 @@ ${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style
  * Parse software version numbers
  */
 process get_software_versions {
+    publishDir "${params.outdir}/pipeline_info", mode: 'copy',
+    saveAs: {filename ->
+        if (filename.indexOf(".csv") > 0) filename
+        else null
+    }
 
     output:
     file 'software_versions_mqc.yaml' into software_versions_yaml
+    file "software_versions.csv"
 
     script:
     // TODO nf-core: Get all tools to print their version number here
@@ -434,8 +442,15 @@ workflow.onComplete {
     c_purple = params.monochrome_logs ? '' : "\033[0;35m";
     c_green = params.monochrome_logs ? '' : "\033[0;32m";
     c_red = params.monochrome_logs ? '' : "\033[0;31m";
+
+    if (workflow.stats.ignoredCountFmt > 0 && workflow.success) {
+      log.info "${c_purple}Warning, pipeline completed, but with errored process(es) ${c_reset}"
+      log.info "${c_red}Number of ignored errored process(es) : ${workflow.stats.ignoredCountFmt} ${c_reset}"
+      log.info "${c_green}Number of successfully ran process(es) : ${workflow.stats.succeedCountFmt} ${c_reset}"
+    }
+
     if(workflow.success){
-        log.info "${c_purple}[nf-core/scrnaseq]${c_green} Pipeline complete${c_reset}"
+        log.info "${c_purple}[nf-core/scrnaseq]${c_green} Pipeline completed successfully${c_reset}"
     } else {
         checkHostname()
         log.info "${c_purple}[nf-core/scrnaseq]${c_red} Pipeline completed with errors${c_reset}"

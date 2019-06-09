@@ -9,10 +9,11 @@
 [![Docker](https://img.shields.io/docker/automated/nfcore/scrnaseq.svg)](https://hub.docker.com/r/nfcore/scrnaseq)
 
 ## Introduction
+
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker / singularity containers making installation trivial and results highly reproducible.
 
-
 ## Documentation
+
 The nf-core/scrnaseq pipeline comes with documentation about the pipeline, found in the `docs/` directory:
 
 1. [Installation](docs/installation.md)
@@ -27,4 +28,5 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline, found
 <!-- TODO nf-core: Add a brief overview of what the pipeline does and how it works -->
 
 ## Credits
-nf-core/scrnaseq was originally written by Peter J. Bailey.
+
+nf-core/scrnaseq was originally written by [Peter J. Bailey](https://github.com/PeterBailey) with some help from [Alex Peltzer](https://github.com/apeltzer).

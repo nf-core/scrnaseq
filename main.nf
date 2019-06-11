@@ -31,7 +31,8 @@ def helpMessage() {
       --salmon_index                Path to Salmon index (for use with alevin)
       --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
       --alevin_qc                   Perform alevinQC analysis
-      --chemistry                Version of 10x chemistry, e.g. "--chemistry V2" or "--chemistry V3"
+      --chemistry                   Version of 10x chemistry, e.g. "--chemistry V2" or "--chemistry V3"
+      --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
       --fasta                       Path to Fasta reference file
@@ -141,6 +142,10 @@ if (params.type == "10x"){
   Channel.fromPath(barcode_filename)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
+} else if (params.barcode_whitelist){
+  Channel.fromPath(params.barcode_whitelist)
+         .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
+         .set{ barcode_whitelist }
 }
 
 
@@ -218,47 +223,52 @@ process get_software_versions {
     """
 }
 
-if (params.type == '10x') {
-    process unzip_10x_barcodes {
-       tag "${params.chemistry}"
-       publishDir "${params.outdir}/salmon_index", mode: 'copy'
+process unzip_10x_barcodes {
+   tag "${params.chemistry}"
+   publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-       input:
-       file gzipped from barcode_whitelist_gzipped
+   when:
+   params.type == '10x'
 
-       output:
-       file "$gzipped.simpleName" into barcode_whitelist
+   input:
+   file gzipped from barcode_whitelist_gzipped
 
-       script:
-       """
-       gunzip -c $gzipped > $gzipped.simpleName
-       """
-   }
+   output:
+   file "$gzipped.simpleName" into barcode_whitelist
+
+   script:
+   """
+   gunzip -c $gzipped > $gzipped.simpleName
+   """
 }
+
 
 
 /*
  * STEP 1 - Make_index
  */
- if (!params.salmon_index){
-      process build_salmon_index {
-         tag "$fasta"
-         publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-         input:
-         file fasta from fasta_alevin
+process build_salmon_index {
+   tag "$fasta"
+   publishDir "${params.outdir}/salmon_index", mode: 'copy'
+
+   when:
+   params.aligner == 'alevin' && !params.salmon_index
+
+   input:
+   file fasta from fasta_alevin
 
 
-         output:
-         file "salmon_index" into salmon_index_alevin
+   output:
+   file "salmon_index" into salmon_index_alevin
 
-         script:
+   script:
 
-         """
-         salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
-         """
-     }
- }
+   """
+   salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
+   """
+}
+
 
 
  if(params.aligner == 'star' && !params.star_index && params.fasta){

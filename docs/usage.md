@@ -151,6 +151,10 @@ These files were copied out of 10x Genomics' [cellranger](https://github.com/10X
 * V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`
 * V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`
 
+### `--barcode_whitelist` for custom barcode whitelist
+
+If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.
+
 ## Reference genomes
 
 The pipeline config files come bundled with paths to the illumina iGenomes reference index files. If running with docker or AWS, the configuration is set up to use the [AWS-iGenomes](https://ewels.github.io/AWS-iGenomes/) resource.

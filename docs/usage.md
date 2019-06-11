@@ -141,9 +141,9 @@ It is not possible to run a mixture of single-end and paired-end files in one ru
 
 Currently, only 10X Genomics' chromium chemistry is supported. Drop-Seq, inDrop, etc may be supported in the future.
 
-### `--tenx_version` (using cellranger barcodes)
+### `--chemistry` (using cellranger barcodes)
 
-To specify which chemistry (and thus barcode whitelist) to use, use the `--tenx_version` flag. For example, to specify V3 chemistry (the default), use `--tenx_version V3`.
+To specify which chemistry (and thus barcode whitelist) to use, use the `--chemistry` flag. For example, to specify V3 chemistry (the default, as it is compatible with V2), use `--chemistry V3`.
 
 These files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.
 

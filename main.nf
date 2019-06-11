@@ -341,7 +341,7 @@ if (params.aligner == 'alevin'){
 if(params.aligner == 'star'){
     process star {
         tag "$prefix"
-        publishDir "${params.outdir}/STAR", mode: 'copy',
+        publishDir "${params.outdir}/STAR", mode: 'copy'
 
         input:
         // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)

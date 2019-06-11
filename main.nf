@@ -293,23 +293,25 @@ if (params.type == '10x') {
  /*
   * STEP 2 - Make txp2gene
   */
-if(params.aligner == 'alevin' && !params.txp2gene_alevin){
-   process build_txp2gene {
-          tag "$gtf"
-          publishDir "${params.outdir}", mode: 'copy'
 
-          input:
-          file gtf from gtf_alevin
+process build_txp2gene {
+      tag "$gtf"
+      publishDir "${params.outdir}", mode: 'copy'
 
-          output:
-          file "txp2gene.tsv" into txp2gene_alevin
+      when:
+      params.aligner == 'alevin' && !params.txp2gene_alevin
 
-          script:
+      input:
+      file gtf from gtf_alevin
 
-          """
-          bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
-          """
-      }
+      output:
+      file "txp2gene.tsv" into txp2gene_alevin
+
+      script:
+
+      """
+      bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
+      """
 }
 
 

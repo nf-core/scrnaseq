@@ -271,34 +271,36 @@ process build_salmon_index {
 
 
 
- if(params.aligner == 'star' && !params.star_index && params.fasta){
-     process makeSTARindex {
-         label 'high_memory'
-         tag "$fasta"
-         publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
-                    saveAs: { params.saveReference ? it : null }, mode: 'copy'
+process makeSTARindex {
+     label 'high_memory'
+     tag "$fasta"
+     publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
+                saveAs: { params.saveReference ? it : null }, mode: 'copy'
 
-         input:
-         file fasta from fasta_makeSTARindex
-         file gtf from gtf_makeSTARindex
+     when:
+     params.aligner == 'star' && !params.star_index && params.fasta
 
-         output:
-         file "star" into star_index
+     input:
+     file fasta from fasta_makeSTARindex
+     file gtf from gtf_makeSTARindex
 
-         script:
-         def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
-         """
-         mkdir star
-         STAR \\
-             --runMode genomeGenerate \\
-             --runThreadN ${task.cpus} \\
-             --sjdbGTFfile $gtf \\
-             --genomeDir star/ \\
-             --genomeFastaFiles $fasta \\
-             $avail_mem
-         """
-     }
- }
+     output:
+     file "star" into star_index
+
+     script:
+     def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
+     """
+     mkdir star
+     STAR \\
+         --runMode genomeGenerate \\
+         --runThreadN ${task.cpus} \\
+         --sjdbGTFfile $gtf \\
+         --genomeDir star/ \\
+         --genomeFastaFiles $fasta \\
+         $avail_mem
+     """
+}
+
 
  /*
   * STEP 2 - Make txp2gene

@@ -316,79 +316,80 @@ if(params.aligner == 'alevin' && !params.txp2gene_alevin){
 /*
  * STEP 3 - Run alevin
  */
-if (params.aligner == 'alevin'){
-  process run_alevin {
-    tag "$name"
-    publishDir "${params.outdir}/alevin", mode: 'copy'
+process run_alevin {
+  tag "$name"
+  publishDir "${params.outdir}/alevin", mode: 'copy'
+
+  when:
+  params.aligner == "alevin"
+
+  input:
+  set val(name), file(reads) from read_files_alevin
+  file index from salmon_index_alevin.collect()
+  file txp2gene from txp2gene_alevin.collect()
+
+
+  output:
+  file "${name}_alevin_results" into alevin_results
+
+  script:
+  """
+  salmon alevin -l ISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
+  """
+}
+
+
+
+process star {
+    tag "$prefix"
+    publishDir "${params.outdir}/STAR", mode: 'copy'
+
+    when:
+    params.aligner == "star"
 
     input:
-    set val(name), file(reads) from read_files_alevin
-    file index from salmon_index_alevin.collect()
-    file txp2gene from txp2gene_alevin.collect()
-
+    // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
+    set val(samplename), file(reads) from read_files_star
+    file index from star_index.collect()
+    file gtf from gtf_star.collect()
 
     output:
-    file "${name}_alevin_results" into alevin_results
+    set file("*Log.final.out"), file ('*.bam') into star_aligned
+    file "*.out" into alignment_logs
+    file "*SJ.out.tab"
+    file "*Log.out" into star_log
+    file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
 
     script:
+    prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
+    def star_mem = task.memory ?: params.star_memory ?: false
+    def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
+
+    seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
+    cdna_read = reads[0]
+    barcode_read = reads[1]
     """
-    salmon alevin -l ISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
-    """
-  }
+    STAR --genomeDir $index \\
+         --sjdbGTFfile $gtf \\
+         --readFilesIn $barcode_read $cdna_read  \\
+         --runThreadN ${task.cpus} \\
+         --twopassMode Basic \\
+         --outWigType bedGraph \\
+         --outSAMtype BAM SortedByCoordinate $avail_mem \\
+         --readFilesCommand zcat \\
+         --runDirPerm All_RWX \\
+         --outFileNamePrefix $prefix $seqCenter \\
+         --soloType Droplet \\
+         --soloCBwhitelist $barcode_whitelist
+  """
+
+
 }
-
-
-if(params.aligner == 'star'){
-    process star {
-        tag "$prefix"
-        publishDir "${params.outdir}/STAR", mode: 'copy'
-
-        input:
-        // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
-        set val(samplename), file(reads) from read_files_star
-        file index from star_index.collect()
-        file gtf from gtf_star.collect()
-        file wherearemyfiles from ch_where_star.collect()
-
-        output:
-        set file("*Log.final.out"), file ('*.bam') into star_aligned
-        file "*.out" into alignment_logs
-        file "*SJ.out.tab"
-        file "*Log.out" into star_log
-        file "where_are_my_files.txt"
-        file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
-
-        script:
-        prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
-        def star_mem = task.memory ?: params.star_memory ?: false
-        def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
-
-        seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
-        cdna_read = reads[0]
-        barcode_read = reads[1]
-        """
-        STAR --genomeDir $index \\
-             --sjdbGTFfile $gtf \\
-             --readFilesIn $barcode_read $cdna_read  \\
-             --runThreadN ${task.cpus} \\
-             --twopassMode Basic \\
-             --outWigType bedGraph \\
-             --outSAMtype BAM SortedByCoordinate $avail_mem \\
-             --readFilesCommand zcat \\
-             --runDirPerm All_RWX \\
-             --outFileNamePrefix $prefix $seqCenter \\
-             --soloType Droplet \\
-             --soloCBwhitelist $barcode_whitelist
-      """
-
-
-    }
-    // Filter removes all 'aligned' channels that fail the check
-    star_aligned
-        .filter { logs, bams -> check_log(logs) }
-        .flatMap {  logs, bams -> bams }
-    .into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
-}
+// Filter removes all 'aligned' channels that fail the check
+star_aligned
+    .filter { logs, bams -> check_log(logs) }
+    .flatMap {  logs, bams -> bams }
+.into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
 
 
 
@@ -399,6 +400,9 @@ if(params.aligner == 'star'){
   process run_alevin_qc {
     tag "$prefix"
     publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+
+    when:
+    params.aligner == "alevin"
 
     input:
     file result from alevin_results

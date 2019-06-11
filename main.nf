@@ -78,7 +78,7 @@ if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into { gtf_alevin; gtf_makeSTARindex }
+        .into { gtf_alevin; gtf_makeSTARindex; gtf_star }
 }
 
 if( params.fasta ){
@@ -125,12 +125,12 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
              .from(params.readPaths)
              .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
              .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-             .into { read_files_alevin }
+             .into { read_files_alevin; read_files_star }
      } else {
          Channel
             .fromFilePairs( params.reads )
             .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
-            .set { read_files_alevin }
+            .set { read_files_alevin; read_files_star }
 }
 
 
@@ -142,6 +142,7 @@ if (params.type == "10x"){
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
 }
+
 
 // Header log info
 log.info nfcoreHeader()
@@ -341,16 +342,10 @@ if(params.aligner == 'star'){
     process star {
         tag "$prefix"
         publishDir "${params.outdir}/STAR", mode: 'copy',
-            saveAs: {filename ->
-                if (filename.indexOf(".bam") == -1) "logs/$filename"
-                else if (!params.saveAlignedIntermediates && filename == "where_are_my_files.txt") filename
-                else if (params.saveAlignedIntermediates && filename != "where_are_my_files.txt") filename
-                else null
-            }
 
         input:
         // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
-        set samplename, file(reads) from trimmed_reads
+        set val(samplename), file(reads) from read_files_star
         file index from star_index.collect()
         file gtf from gtf_star.collect()
         file wherearemyfiles from ch_where_star.collect()

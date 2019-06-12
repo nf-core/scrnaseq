@@ -16,3 +16,4 @@ dependencies:
   - conda-forge::r-markdown
   - bioconda::bioawk
   - bioconda::star=2.7.1a
+  - samtools=1.9

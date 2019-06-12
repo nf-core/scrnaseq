@@ -469,6 +469,7 @@ process multiqc {
     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     file ('software_versions/*') from software_versions_yaml
     file workflow_summary from create_workflow_summary(summary)
+    file ('STAR/*') from star_log.collect().ifEmpty([])
 
     output:
     file "*multiqc_report.html" into multiqc_report

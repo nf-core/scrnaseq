@@ -347,8 +347,11 @@ process run_alevin {
   file "${name}_alevin_results" into alevin_results
 
   script:
+  read1 = reads[0]
+  read2 = reads[1]
   """
-  salmon alevin -l ISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
+  salmon alevin -l ISR -1 ${read1} -2 ${read2} \
+    --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
   """
 }
 

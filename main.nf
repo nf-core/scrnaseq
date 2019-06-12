@@ -355,6 +355,8 @@ process run_alevin {
 
 
 process star {
+    label 'high_memory'
+
     tag "$prefix"
     publishDir "${params.outdir}/STAR", mode: 'copy'
 

@@ -353,7 +353,26 @@ process run_alevin {
 }
 
 
-
+// Function that checks the alignment rate of the STAR output
+// and returns true if the alignment passed and otherwise false
+skipped_poor_alignment = []
+def check_log(logs) {
+    def percent_aligned = 0;
+    logs.eachLine { line ->
+        if ((matcher = line =~ /Uniquely mapped reads %\s*\|\s*([\d\.]+)%/)) {
+            percent_aligned = matcher[0][1]
+        }
+    }
+    logname = logs.getBaseName() - 'Log.final'
+    if(percent_aligned.toFloat() <= '5'.toFloat() ){
+        log.info "#################### VERY POOR ALIGNMENT RATE! IGNORING FOR FURTHER DOWNSTREAM ANALYSIS! ($logname)    >> ${percent_aligned}% <<"
+        skipped_poor_alignment << logname
+        return false
+    } else {
+        log.info "          Passed alignment > star ($logname)   >> ${percent_aligned}% <<"
+        return true
+    }
+}
 process star {
     label 'high_memory'
 

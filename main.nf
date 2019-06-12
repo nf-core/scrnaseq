@@ -398,7 +398,9 @@ process star {
          --outFileNamePrefix $prefix $seqCenter \\
          --soloType Droplet \\
          --soloCBwhitelist $whitelist
-  """
+
+    samtools index ${prefix}Aligned.sortedByCoord.out.bam
+    """
 
 
 }

@@ -366,6 +366,7 @@ process star {
     set val(samplename), file(reads) from read_files_star
     file index from star_index.collect()
     file gtf from gtf_star.collect()
+    file whitelist from barcode_whitelist.collect()
 
     output:
     set file("*Log.final.out"), file ('*.bam') into star_aligned
@@ -394,7 +395,7 @@ process star {
          --runDirPerm All_RWX \\
          --outFileNamePrefix $prefix $seqCenter \\
          --soloType Droplet \\
-         --soloCBwhitelist $barcode_whitelist
+         --soloCBwhitelist $whitelist
   """
 
 

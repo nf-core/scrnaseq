@@ -6,10 +6,5 @@ test_alevin:
 test_star:
 	nextflow run main.nf -profile test,docker --aligner star
 
-docker_build:
+docker:
 	docker build -t nfcore/scrnaseq:dev .
-
-docker_push:
-	sudo docker login
-	sudo docker push nfcore/scrnaseq:dev
-	docker images

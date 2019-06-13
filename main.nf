@@ -167,10 +167,11 @@ def summary = [:]
 summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
-summary['Fasta Ref']        = params.fasta
+if(params.genome_fasta)         summary['Genome Fasta Ref']        = params.genome_fasta
+if(params.transcriptome_fasta)  summary['Transcriptome Fasta Ref']        = params.transcriptome_fasta
 summary['gtf Ref']        = params.gtf
 summary['Aligner']        = params.aligner
-summary['Salmon Index']        = params.salmon_index
+if (params.salmon_index)        summary['Salmon Index']        = params.salmon_index
 summary['txp2gene']        = params.txp2gene
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
@@ -277,8 +278,9 @@ process extract_transcriptome {
 
    script:
    transcriptome_fasta = "${genome_fasta.simpleName}.transcriptome.fa"
+   // -F to preserve all GTF attributes in the fasta ID
    """
-   gffread $gtf -w $transcriptome_fasta -g $genome_fasta
+   gffread -F $gtf -w $transcriptome_fasta -g $genome_fasta
    """
 }
 

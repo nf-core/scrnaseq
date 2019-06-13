@@ -344,7 +344,7 @@ process run_alevin {
 
 
   output:
-  file "${name}_alevin_results" into alevin_results
+  file "${name}_alevin_results" into alevin_results, alevin_logs
 
   script:
   read1 = reads[0]
@@ -473,6 +473,7 @@ process multiqc {
     file ('software_versions/*') from software_versions_yaml
     file workflow_summary from create_workflow_summary(summary)
     file ('STAR/*') from star_log.collect().ifEmpty([])
+    file ('alevin/*') from alevin_logs.collect().ifEmpty([])
 
     output:
     file "*multiqc_report.html" into multiqc_report

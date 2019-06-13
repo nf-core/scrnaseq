@@ -35,9 +35,9 @@ def helpMessage() {
       --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
-      --genome_fasta                Path to Fasta reference file
+      --fasta                       Path to **genome** Fasta reference file
       --gtf                         Path to gtf file
-      --transcriptome_fasta         Path to Fasta transcriptome reference file
+      --transcriptome               Path to **transcriptome** Fasta reference file
 
     Other options:
       --outdir                      The output directory where the results will be saved
@@ -62,8 +62,8 @@ if (params.help){
 }
 
 params.salmon_index = params.genome ? params.genomes[ params.genome ].salmon_index ?: false : false
-params.genome_fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
-params.transcriptome_fasta = params.genome ? params.genomes[ params.genome ].transcriptome ?: false : false
+params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+params.transcriptome = params.genome ? params.genomes[ params.genome ].transcriptome ?: false : false
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
 params.readPaths = params.readPaths? params.readPaths: false
@@ -84,20 +84,24 @@ if( params.gtf ){
         .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star }
 }
 
-if( params.genome_fasta ){
+if (!params.fasta && !params.transcriptome){
+  exit 1, "Neither of --fasta or --transcriptome provided! At least one must be provided to quantify genes"
+}
+
+if( params.fasta ){
     Channel
-        .fromPath(params.genome_fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
+        .fromPath(params.fasta)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
         .into { genome_fasta_extract_transcriptome ; genome_fasta_makeSTARindex }
 }
 
-if( params.transcriptome_fasta ){
-  if( params.aligner == "star" && !params.genome_fasta) {
+if( params.transcriptome ){
+  if( params.aligner == "star" && !params.fasta) {
     exit 1, "Transcriptome-only alignment is not valid with the aligner: ${params.aligner}. Transcriptome-only alignment is only valid with '--aligner alevin'"
   }
     Channel
-        .fromPath(params.genome_fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
+        .fromPath(params.transcriptome)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.transcriptome}" }
         .set { transcriptome_fasta_alevin }
 }
 
@@ -167,8 +171,8 @@ def summary = [:]
 summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
-if(params.genome_fasta)         summary['Genome Fasta Ref']        = params.genome_fasta
-if(params.transcriptome_fasta)  summary['Transcriptome Fasta Ref']        = params.transcriptome_fasta
+if(params.fasta)         summary['Genome Fasta Ref']        = params.genome_fasta
+if(params.transcriptome)  summary['Transcriptome Fasta Ref']        = params.transcriptome_fasta
 summary['gtf Ref']        = params.gtf
 summary['Aligner']        = params.aligner
 if (params.salmon_index)        summary['Salmon Index']        = params.salmon_index

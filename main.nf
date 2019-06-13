@@ -35,8 +35,9 @@ def helpMessage() {
       --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
-      --fasta                       Path to Fasta reference file
+      --genome_fasta                Path to Fasta reference file
       --gtf                         Path to gtf file
+      --transcriptome_fasta         Path to Fasta transcriptome reference file
 
     Other options:
       --outdir                      The output directory where the results will be saved
@@ -61,7 +62,8 @@ if (params.help){
 }
 
 params.salmon_index = params.genome ? params.genomes[ params.genome ].salmon_index ?: false : false
-params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+params.genome_fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+params.transcriptome_fasta = params.genome ? params.genomes[ params.genome ].transcriptome ?: false : false
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
 params.readPaths = params.readPaths? params.readPaths: false
@@ -79,14 +81,24 @@ if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into { gtf_alevin; gtf_makeSTARindex; gtf_star }
+        .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star }
 }
 
-if( params.fasta ){
+if( params.genome_fasta ){
     Channel
-        .fromPath(params.fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
-        .into { fasta_alevin; fasta_makeSTARindex }
+        .fromPath(params.genome_fasta)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
+        .into { genome_fasta_extract_transcriptome ; genome_fasta_makeSTARindex }
+}
+
+if( params.transcriptome_fasta ){
+  if( params.aligner == "star" && !params.genome_fasta) {
+    exit 1, "Transcriptome-only alignment is not valid with the aligner: ${params.aligner}. Transcriptome-only alignment is only valid with '--aligner alevin'"
+  }
+    Channel
+        .fromPath(params.genome_fasta)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
+        .set { transcriptome_fasta_alevin }
 }
 
 if (params.aligner == 'alevin' && params.salmon_index) {
@@ -245,6 +257,33 @@ process unzip_10x_barcodes {
 
 
 /*
+ * Preprocessing - Extract transcriptome fasta from genome fasta
+ */
+
+process extract_transcriptome {
+   tag "$fasta"
+   publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
+
+   when:
+   !params.transcriptome && params.aligner == 'alevin' && !params.salmon_index
+
+   input:
+   file genome_fasta from genome_fasta_extract_transcriptome
+   file gtf from gtf_extract_transcriptome
+
+
+   output:
+   file transcriptome_fasta into transcriptome_fasta_alevin
+
+   script:
+   transcriptome_fasta = "${genome_fasta.simpleName}.transcriptome.fa"
+   """
+   gffread $gtf -w $transcriptome_fasta -g $genome_fasta
+   """
+}
+
+
+/*
  * STEP 1 - Make_index
  */
 
@@ -256,7 +295,7 @@ process build_salmon_index {
    params.aligner == 'alevin' && !params.salmon_index
 
    input:
-   file fasta from fasta_alevin
+   file fasta from transcriptome_fasta_alevin
 
 
    output:
@@ -281,7 +320,7 @@ process makeSTARindex {
      params.aligner == 'star' && !params.star_index && params.fasta
 
      input:
-     file fasta from fasta_makeSTARindex
+     file fasta from genome_fasta_makeSTARindex
      file gtf from gtf_makeSTARindex
 
      output:

@@ -282,13 +282,12 @@ process extract_transcriptome {
 
 
    output:
-   file transcriptome_fasta into transcriptome_fasta_alevin
+   file "${genome_fasta.simpleName}.transcriptome.fa" into transcriptome_fasta_alevin
 
    script:
-   transcriptome_fasta = "${genome_fasta.simpleName}.transcriptome.fa"
    // -F to preserve all GTF attributes in the fasta ID
    """
-   gffread -F $gtf -w $transcriptome_fasta -g $genome_fasta
+   gffread -F $gtf -w "${genome_fasta.simpleName}.transcriptome.fa" -g $genome_fasta
    """
 }
 

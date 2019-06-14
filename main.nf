@@ -84,6 +84,10 @@ if( params.gtf ){
         .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star }
 }
 
+if (!params.gtf && !params.txp2gene){
+  exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene')"
+}
+
 if (!params.fasta && !params.transcript_fasta){
   exit 1, "Neither of --fasta or --transcriptome provided! At least one must be provided to quantify genes"
 }

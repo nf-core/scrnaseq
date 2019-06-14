@@ -176,7 +176,7 @@ summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
 if(params.fasta)         summary['Genome Fasta Ref']        = params.genome_fasta
-if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.transcript_fasta_fasta
+if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.transcript_fasta
 summary['gtf Ref']        = params.gtf
 summary['Aligner']        = params.aligner
 if (params.salmon_index)        summary['Salmon Index']        = params.salmon_index

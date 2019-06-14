@@ -269,27 +269,30 @@ process unzip_10x_barcodes {
  * Preprocessing - Extract transcriptome fasta from genome fasta
  */
 
-process extract_transcriptome {
-   tag "$fasta"
-   publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
+if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_index){
+  process extract_transcriptome {
+     tag "$fasta"
+     publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
 
-   when:
-   !params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_index
-
-   input:
-   file genome_fasta from genome_fasta_extract_transcriptome
-   file gtf from gtf_extract_transcriptome
+     when:
 
 
-   output:
-   file "${genome_fasta.simpleName}.transcriptome.fa" into transcriptome_fasta_alevin
+     input:
+     file genome_fasta from genome_fasta_extract_transcriptome
+     file gtf from gtf_extract_transcriptome
 
-   script:
-   // -F to preserve all GTF attributes in the fasta ID
-   """
-   gffread -F $gtf -w "${genome_fasta.simpleName}.transcriptome.fa" -g $genome_fasta
-   """
+
+     output:
+     file "${genome_fasta.simpleName}.transcriptome.fa" into transcriptome_fasta_alevin
+
+     script:
+     // -F to preserve all GTF attributes in the fasta ID
+     """
+     gffread -F $gtf -w "${genome_fasta.simpleName}.transcriptome.fa" -g $genome_fasta
+     """
+  }
 }
+
 
 
 /*

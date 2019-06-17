@@ -175,7 +175,7 @@ def summary = [:]
 summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
-if(params.fasta)         summary['Genome Fasta Ref']        = params.genome_fasta
+if(params.fasta)         summary['Genome Fasta Ref']        = params.fasta
 if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.transcript_fasta
 summary['gtf Ref']        = params.gtf
 summary['Aligner']        = params.aligner
@@ -200,7 +200,7 @@ if(params.email) {
   summary['E-mail Address']  = params.email
   summary['MultiQC maxsize'] = params.maxMultiqcEmailFileSize
 }
-log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
+log.info summary.collect { k,v -> "${k.padRight(26)}: $v" }.join("\n")
 log.info "\033[2m----------------------------------------------------\033[0m"
 
 // Check the hostnames against configured profiles
@@ -273,9 +273,6 @@ if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_ind
   process extract_transcriptome {
      tag "$fasta"
      publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
-
-     when:
-
 
      input:
      file genome_fasta from genome_fasta_extract_transcriptome
@@ -489,28 +486,28 @@ star_aligned
   * STEP 4 - Run alevin qc
   */
 
-  process run_alevin_qc {
-    tag "$prefix"
-    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
-
-    when:
-    params.aligner == "alevin"
-
-    input:
-    file result from alevin_results
-
-    output:
-    file "${name}_alevinqc_results" into alevinqc_results
-
-    script:
-
-    prefix = result.toString() - '_alevin_results'
-
-    """
-    alevin_qc.r $result ${prefix} $result
-    """
-
-  }
+  // process run_alevin_qc {
+  //   tag "$prefix"
+  //   publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+  //
+  //   when:
+  //   params.aligner == "alevin"
+  //
+  //   input:
+  //   file result from alevin_results
+  //
+  //   output:
+  //   file "${name}_alevinqc_results" into alevinqc_results
+  //
+  //   script:
+  //
+  //   prefix = result.toString() - '_alevin_results'
+  //
+  //   """
+  //   alevin_qc.r $result ${prefix} $result
+  //   """
+  //
+  // }
 
 /*
  * STEP 4 - MultiQC

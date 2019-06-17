@@ -15,3 +15,4 @@ dependencies:
   - bioconda::bioconductor-tximeta
   - conda-forge::r-markdown
   - bioconda::bioawk
+  - bioconda::kallisto

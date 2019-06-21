@@ -70,6 +70,9 @@ params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : fals
 params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
 params.readPaths = params.readPaths? params.readPaths: false
 
+println params
+
+
 if (params.aligner != 'star' && params.aligner != 'alevin'){
     exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin'"
 }
@@ -84,10 +87,12 @@ if( params.gtf ){
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
         .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star }
+} else if (params.aligner == 'star'){
+  exit 1, "Must provide either a GTF file ('--gtf') to align with STAR"
 }
 
 if (!params.gtf && !params.txp2gene){
-  exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene')"
+  exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
 }
 
 if (!params.fasta && !params.transcript_fasta){

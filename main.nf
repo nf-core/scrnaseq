@@ -61,6 +61,8 @@ if (params.help){
     exit 0
 }
 
+println params
+
 params.salmon_index = params.genome ? params.genomes[ params.genome ].salmon_index ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.transcript_fasta = params.genome ? params.genomes[ params.genome ].transcript_fasta ?: false : false

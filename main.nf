@@ -63,6 +63,11 @@ if (params.help){
 
 println params
 
+// Check if genome exists in the config file
+if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
+    exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
+}
+
 params.salmon_index = params.genome ? params.genomes[ params.genome ].salmon_index ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.transcript_fasta = params.genome ? params.genomes[ params.genome ].transcript_fasta ?: false : false

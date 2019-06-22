@@ -1,18 +1,20 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: nf-core-scatacseq-1.0dev
+name: nf-core-scrnaseq-1.0dev
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  # TODO nf-core: Add required software dependencies here
-  - conda-forge::python
-  - bioconda::multiqc
-  - bioconda::salmon
-  - bioconda::r-seurat
-  - bioconda::bioconductor-isee
-  - bioconda::bioconductor-tximeta
-  - conda-forge::r-markdown
-  - bioconda::bioawk
-  - bioconda::kallisto
+  - conda-forge::python=3.7.3
+  - bioconda::multiqc=1.7
+  - bioconda::salmon=0.14.0
+  - bioconda::r-seurat=3.0.1
+  - bioconda::bioconductor-isee=1.2.0
+  - bioconda::bioconductor-tximeta=1.0.3
+  - conda-forge::r-markdown=0.9
+  - bioconda::bioawk=1.0
+  - bioconda::bioconductor-alevinqc=1.0.0
+  - bioconda::bioconductor-tximport=1.12.0
+  - bioconda::kallisto=0.42.0
+  - bioconda::bustools=0.39.2

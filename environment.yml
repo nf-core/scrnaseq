@@ -16,3 +16,5 @@ dependencies:
   - bioconda::bioawk=1.0
   - bioconda::bioconductor-alevinqc=1.0.0
   - bioconda::bioconductor-tximport=1.12.0
+  - bioconda::kallisto=0.42.0
+  - bioconda::bustools=0.39.2

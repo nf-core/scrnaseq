@@ -78,8 +78,8 @@ params.readPaths = params.readPaths? params.readPaths: false
 println params
 
 
-if (params.aligner != 'star' && params.aligner != 'alevin'){
-    exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin'"
+if (params.aligner != 'star' && params.aligner != 'alevin' && params.aligner != 'kallisto'){
+    exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin', 'kallisto'"
 }
 if( params.star_index && params.aligner == 'star' ){
     star_index = Channel

@@ -1,6 +1,6 @@
 # nf-core/scrnaseq
 
-**Pipeline for processing of 10xGenomics single cell rnaseq data**.
+**A pipeline for the processing of single-cell rnaseq data**.
 
 [![Build Status](https://travis-ci.com/nf-core/scrnaseq.svg?branch=master)](https://travis-ci.com/nf-core/scrnaseq)
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.32.0-brightgreen.svg)](https://www.nextflow.io/)
@@ -10,6 +10,12 @@
 
 ## Introduction
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
+
+Work in progress - this is a community effort in building a pipeline capable to support:
+
+* Alevin + AlevinQC
+* STARSolo
+* Kallisto + BUStools
 
 ## Documentation
 

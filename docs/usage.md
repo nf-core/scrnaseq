@@ -13,6 +13,9 @@
   * [`-profile`](#-profile)
   * [`--reads`](#--reads)
   * [`--singleEnd`](#--singleend)
+* [Cellular barcodes](#cellular-barcodes)
+  * [`--type` to specify droplet type](#--type-to-specify-droplet-type)
+  * [`--tenx_version` (using cellranger barcodes)](#--tenx_version-cellranger-barcodes)
 * [Reference genomes](#reference-genomes)
   * [`--genome` (using iGenomes)](#--genome-using-igenomes)
   * [`--fasta`](#--fasta)
@@ -101,7 +104,7 @@ If `-profile` is not specified at all the pipeline will be run locally and expec
   * Pulls software from dockerhub: [`nfcore/scrnaseq`](http://hub.docker.com/r/nfcore/scrnaseq/)
 * `singularity`
   * A generic configuration profile to be used with [Singularity](http://singularity.lbl.gov/)
-  * Pulls software from DockerHub
+  * Pulls software from DockerHub: [`nfcore/scrnaseq`](http://hub.docker.com/r/nfcore/scrnaseq/)
 * `test`
   * A profile with a complete configuration for automated testing
   * Includes links to test data so needs no other parameters
@@ -132,6 +135,25 @@ By default, the pipeline expects paired-end data. If you have single-end data, y
 
 It is not possible to run a mixture of single-end and paired-end files in one run.
 
+## Cellular barcodes
+
+### `--type` to specify droplet type
+
+Currently, only 10X Genomics' chromium chemistry is supported. Drop-Seq, inDrop, etc may be supported in the future.
+
+### `--chemistry` (using cellranger barcodes)
+
+To specify which chemistry (and thus barcode whitelist) to use, use the `--chemistry` flag. For example, to specify V3 chemistry (the default, as it is compatible with V2), use `--chemistry V3`.
+
+These files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.
+
+* V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`
+* V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`
+* V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`
+
+### `--barcode_whitelist` for custom barcode whitelist
+
+If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.
 
 ## Reference genomes
 
@@ -190,7 +212,7 @@ Wherever process-specific requirements are set in the pipeline, the default valu
 
 If you are likely to be running `nf-core` pipelines regularly it may be a good idea to request that your custom config file is uploaded to the `nf-core/configs` git repository. Before you do this please can you test that the config file works with your pipeline of choice using the `-c` parameter (see definition below). You can then create a pull request to the `nf-core/configs` repository with the addition of your config file, associated documentation file (see examples in [`nf-core/configs/docs`](https://github.com/nf-core/configs/tree/master/docs)), and amending [`nfcore_custom.config`](https://github.com/nf-core/configs/blob/master/nfcore_custom.config) to include your custom profile.
 
-If you have any questions or issues please send us a message on [`Slack`](https://nf-core-invite.herokuapp.com/).
+If you have any questions or issues please send us a message on [Slack](https://nf-core-invite.herokuapp.com/).
 
 ## AWS Batch specific parameters
 Running the pipeline on AWS Batch requires a couple of specific parameters to be set according to your AWS Batch configuration. Please use the `-awsbatch` profile and then specify all of the following parameters.

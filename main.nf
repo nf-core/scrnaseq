@@ -534,6 +534,71 @@ star_aligned
     .flatMap {  logs, bams -> bams }
 .into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
 
+// Run Kallisto bus
+
+process kallisto {
+  tag "$name"
+  publishDir "${params.outdir}/kallisto/raw_bus", mode: 'copy'
+
+  when:
+  params.aligner == "kallisto"
+
+  input:
+  set val(name), file(reads) from read_files_kallisto
+  file index from kallisto_index.collect()
+
+  output:
+  file "${name}_bus_output" into kallisto_bus_to_sort
+
+  script:
+  """
+  kallisto bus -i $index -o ${name}_bus_output/ -x ${params.type}${params.chemistry} -t ${task.cpus} $reads[0] $reads[1]
+  """
+}
+
+process bustools_correct_sort{
+  tag "$bus"
+  publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
+
+  when:
+  params.aligner == "kallisto"
+
+  input:
+  file bus from kallisto_bus_to_sort
+
+  output:
+  file bus into kallisto_corr_sort_to_count
+
+  script:
+  """
+  bustools correct -w ${barcode_filename} -p ${bus}/output.bus | \
+  bustools sort -T tmp/ -t ${task.cpus} -o ${bus}/output.correct.sort.bus
+  """
+}
+
+process bustools_count{
+  tag "$bus"
+  publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
+
+  when:
+  params.aligner == 'kallisto'
+
+  input: 
+  file bus from kallisto_corr_sort_to_count
+  file t2g from kallisto_gene_map.collect()
+
+  output:
+  file "${bus}_eqcount"
+  file "${bus}_genecount"
+
+  script:
+  """
+  mkdir -p ${bus}_eqcount
+  mkdir -p ${bus}_genecount
+  bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.correct.sort.bus
+  bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.correct.sort.bus
+  """
+}
 
 
  /*

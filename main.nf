@@ -552,7 +552,7 @@ process kallisto {
 
   script:
   """
-  kallisto bus -i $index -o ${name}_bus_output/ -x ${params.type}${params.chemistry} -t ${task.cpus} $reads[0] $reads[1]
+  kallisto bus -i $index -o ${name}_bus_output/ -x ${params.type}${params.chemistry} -t ${task.cpus} $reads
   """
 }
 

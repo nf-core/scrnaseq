@@ -76,15 +76,18 @@ params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : fals
 params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
 params.readPaths = params.readPaths? params.readPaths: false
 
+//Check if one of the available aligners is used (alevin, kallisto, star)
 if (params.aligner != 'star' && params.aligner != 'alevin' && params.aligner != 'kallisto'){
     exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin', 'kallisto'"
 }
+//Check if STAR index is supplied properly
 if( params.star_index && params.aligner == 'star' ){
     star_index = Channel
         .fromPath(params.star_index)
         .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
 }
 
+//Check if GTF is supplied properly 
 if( params.gtf ){
     Channel
         .fromPath(params.gtf)
@@ -94,14 +97,17 @@ if( params.gtf ){
   exit 1, "Must provide a GTF file ('--gtf') to align with STAR"
 }
 
+//Check if TXP2Gene is provided for Alevin
 if (!params.gtf && !params.txp2gene){
   exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
 }
 
+//Check if a transcriptome FastA or at least a Genome FastA is provided!
 if (!params.fasta && !params.transcript_fasta){
   exit 1, "Neither of --fasta or --transcriptome provided! At least one must be provided to quantify genes"
 }
 
+//Setup FastA channels
 if( params.fasta ){
     Channel
         .fromPath(params.fasta)
@@ -109,6 +115,7 @@ if( params.fasta ){
         .into { genome_fasta_extract_transcriptome ; genome_fasta_makeSTARindex }
 }
 
+//Setup Transcript FastA channels
 if( params.transcript_fasta ){
   if( params.aligner == "star" && !params.fasta) {
     exit 1, "Transcriptome-only alignment is not valid with the aligner: ${params.aligner}. Transcriptome-only alignment is only valid with '--aligner alevin'"
@@ -119,6 +126,7 @@ if( params.transcript_fasta ){
         .into { transcriptome_fasta_alevin; transcriptome_fasta_kallisto }
 }
 
+//Setup channel for salmon index if specified
 if (params.aligner == 'alevin' && params.salmon_index) {
     Channel
         .fromPath(params.salmon_index)
@@ -165,9 +173,10 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
             .into { read_files_alevin; read_files_star; read_files_kallisto }
 }
 
-
+//Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"
 
+//Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
 if (params.type == "10x"){
   barcode_filename = "$whitelist_folder/${params.type}_${params.chemistry}_barcode_whitelist.txt.gz"
   Channel.fromPath(barcode_filename)
@@ -192,7 +201,7 @@ if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.
 summary['gtf Ref']        = params.gtf
 summary['Aligner']        = params.aligner
 if (params.salmon_index)        summary['Salmon Index']        = params.salmon_index
-summary['txp2gene']        = params.txp2gene
+summary['Alevin TXP2Gene']        = params.txp2gene
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
@@ -258,6 +267,7 @@ process get_software_versions {
     salmon --version > v_salmon.txt
     STAR --version &> v_star.txt
     multiqc --version > v_multiqc.txt
+    kallisto 
     scrape_software_versions.py > software_versions_mqc.yaml
     """
 }

@@ -25,15 +25,19 @@ def helpMessage() {
       --reads                       Path to input data (must be surrounded with quotes)
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, awsbatch, test and more.
+      --type                        Name of droplet technology e.g. "--type 10x"
 
     Options:
       --salmon_index                Path to Salmon index (for use with alevin)
       --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
       --alevin_qc                   Perform alevinQC analysis
+      --chemistry                   Version of 10x chemistry, e.g. "--chemistry V2" or "--chemistry V3"
+      --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
-      --fasta                       Path to Fasta reference file
+      --fasta                       Path to **genome** Fasta reference file
       --gtf                         Path to gtf file
+      --transcript_fasta            Path to **transcriptome** Fasta reference file
 
     Other options:
       --outdir                      The output directory where the results will be saved
@@ -57,27 +61,67 @@ if (params.help){
     exit 0
 }
 
+println params
+
+// Check if genome exists in the config file
+if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
+    exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
+}
+
 params.salmon_index = params.genome ? params.genomes[ params.genome ].salmon_index ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+params.transcript_fasta = params.genome ? params.genomes[ params.genome ].transcript_fasta ?: false : false
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
 params.readPaths = params.readPaths? params.readPaths: false
+
+println params
+
+
+if (params.aligner != 'star' && params.aligner != 'alevin'){
+    exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin'"
+}
+if( params.star_index && params.aligner == 'star' ){
+    star_index = Channel
+        .fromPath(params.star_index)
+        .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
+}
 
 if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into { gtf_alevin }
+        .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star }
+} else if (params.aligner == 'star'){
+  exit 1, "Must provide either a GTF file ('--gtf') to align with STAR"
+}
+
+if (!params.gtf && !params.txp2gene){
+  exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
+}
+
+if (!params.fasta && !params.transcript_fasta){
+  exit 1, "Neither of --fasta or --transcriptome provided! At least one must be provided to quantify genes"
 }
 
 if( params.fasta ){
     Channel
         .fromPath(params.fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
-        .into { fasta_alevin }
+        .into { genome_fasta_extract_transcriptome ; genome_fasta_makeSTARindex }
 }
 
-if (params.salmon_index) {
+if( params.transcript_fasta ){
+  if( params.aligner == "star" && !params.fasta) {
+    exit 1, "Transcriptome-only alignment is not valid with the aligner: ${params.aligner}. Transcriptome-only alignment is only valid with '--aligner alevin'"
+  }
+    Channel
+        .fromPath(params.transcript_fasta)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
+        .set { transcriptome_fasta_alevin }
+}
+
+if (params.aligner == 'alevin' && params.salmon_index) {
     Channel
         .fromPath(params.salmon_index)
         .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
@@ -115,12 +159,26 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
              .from(params.readPaths)
              .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
              .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-             .into { read_files_alevin }
+             .into { read_files_alevin; read_files_star }
      } else {
          Channel
             .fromFilePairs( params.reads )
             .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
-            .set { read_files_alevin }
+            .into { read_files_alevin; read_files_star }
+}
+
+
+whitelist_folder = "$baseDir/assets/whitelist/"
+
+if (params.type == "10x"){
+  barcode_filename = "$whitelist_folder/${params.type}_${params.chemistry}_barcode_whitelist.txt.gz"
+  Channel.fromPath(barcode_filename)
+         .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
+         .set{ barcode_whitelist_gzipped }
+} else if (params.barcode_whitelist){
+  Channel.fromPath(params.barcode_whitelist)
+         .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
+         .set{ barcode_whitelist }
 }
 
 
@@ -131,10 +189,11 @@ if(workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
-summary['Fasta Ref']        = params.fasta
+if(params.fasta)         summary['Genome Fasta Ref']        = params.fasta
+if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.transcript_fasta
 summary['gtf Ref']        = params.gtf
 summary['Aligner']        = params.aligner
-summary['Salmon Index']        = params.salmon_index
+if (params.salmon_index)        summary['Salmon Index']        = params.salmon_index
 summary['txp2gene']        = params.txp2gene
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
@@ -155,7 +214,7 @@ if(params.email) {
   summary['E-mail Address']  = params.email
   summary['MultiQC maxsize'] = params.maxMultiqcEmailFileSize
 }
-log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
+log.info summary.collect { k,v -> "${k.padRight(26)}: $v" }.join("\n")
 log.info "\033[2m----------------------------------------------------\033[0m"
 
 // Check the hostnames against configured profiles
@@ -199,9 +258,56 @@ process get_software_versions {
     echo $workflow.manifest.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
     salmon --version > v_salmon.txt
+    STAR --version &> v_star.txt
     multiqc --version > v_multiqc.txt
     scrape_software_versions.py > software_versions_mqc.yaml
     """
+}
+
+process unzip_10x_barcodes {
+   tag "${params.chemistry}"
+   publishDir "${params.outdir}/salmon_index", mode: 'copy'
+
+   when:
+   params.type == '10x'
+
+   input:
+   file gzipped from barcode_whitelist_gzipped
+
+   output:
+   file "$gzipped.simpleName" into barcode_whitelist
+
+   script:
+   """
+   gunzip -c $gzipped > $gzipped.simpleName
+   """
+}
+
+
+
+/*
+ * Preprocessing - Extract transcriptome fasta from genome fasta
+ */
+
+if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_index){
+  process extract_transcriptome {
+     tag "$fasta"
+     publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
+
+     input:
+     file genome_fasta from genome_fasta_extract_transcriptome
+     file gtf from gtf_extract_transcriptome
+
+
+     output:
+     file "${genome_fasta.simpleName}.transcriptome.fa" into transcriptome_fasta_alevin
+
+     script:
+     // -F to preserve all GTF attributes in the fasta ID
+     """
+     gffread -F $gtf -w "${genome_fasta.simpleName}.transcriptome.fa" -g $genome_fasta
+     """
+  }
 }
 
 
@@ -209,122 +315,247 @@ process get_software_versions {
 /*
  * STEP 1 - Make_index
  */
-if(!params.salmon_index){
-      process build_salmon_index {
-         tag "$fasta"
-         publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-         input:
-         file fasta from fasta_alevin
+process build_salmon_index {
+   tag "$fasta"
+   publishDir "${params.outdir}/salmon_index", mode: 'copy'
+
+   when:
+   params.aligner == 'alevin' && !params.salmon_index
+
+   input:
+   file fasta from transcriptome_fasta_alevin
 
 
-         output:
-         file "salmon_index" into salmon_index_alevin
+   output:
+   file "salmon_index" into salmon_index_alevin
 
-         script:
+   script:
 
-         """
-         salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
-         """
-     }
- }
+   """
+   salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
+   """
+}
+
+
+
+process makeSTARindex {
+     label 'high_memory'
+     tag "$fasta"
+     publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
+                saveAs: { params.saveReference ? it : null }, mode: 'copy'
+
+     when:
+     params.aligner == 'star' && !params.star_index && params.fasta
+
+     input:
+     file fasta from genome_fasta_makeSTARindex
+     file gtf from gtf_makeSTARindex
+
+     output:
+     file "star" into star_index
+
+     script:
+     def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
+     """
+     mkdir star
+     STAR \\
+         --runMode genomeGenerate \\
+         --runThreadN ${task.cpus} \\
+         --sjdbGTFfile $gtf \\
+         --genomeDir star/ \\
+         --genomeFastaFiles $fasta \\
+         $avail_mem
+     """
+}
 
 
  /*
   * STEP 2 - Make txp2gene
   */
-if(!params.txp2gene_alevin){
-   process build_txp2gene {
-          tag "$gtf"
-          publishDir "${params.outdir}", mode: 'copy'
 
-          input:
-          file gtf from gtf_alevin
+process build_txp2gene {
+      tag "$gtf"
+      publishDir "${params.outdir}", mode: 'copy'
 
-          output:
-          file "txp2gene.tsv" into txp2gene_alevin
+      when:
+      params.aligner == 'alevin' && !params.txp2gene_alevin
 
-          script:
+      input:
+      file gtf from gtf_alevin
 
-          """
-          bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
-          """
-      }
+      output:
+      file "txp2gene.tsv" into txp2gene_alevin
+
+      script:
+
+      """
+      bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
+      """
 }
 
 
 /*
  * STEP 3 - Run alevin
  */
+process run_alevin {
+  tag "$name"
+  publishDir "${params.outdir}/alevin", mode: 'copy'
 
-  process run_alevin {
-    tag "$name"
-    publishDir "${params.outdir}/alevin", mode: 'copy'
+  when:
+  params.aligner == "alevin"
+
+  input:
+  set val(name), file(reads) from read_files_alevin
+  file index from salmon_index_alevin.collect()
+  file txp2gene from txp2gene_alevin.collect()
+
+
+  output:
+  file "${name}_alevin_results" into alevin_results, alevin_logs
+
+  script:
+  read1 = reads[0]
+  read2 = reads[1]
+  """
+  salmon alevin -l ISR -1 ${read1} -2 ${read2} \
+    --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
+  """
+}
+
+
+// Function that checks the alignment rate of the STAR output
+// and returns true if the alignment passed and otherwise false
+skipped_poor_alignment = []
+def check_log(logs) {
+    def percent_aligned = 0;
+    logs.eachLine { line ->
+        if ((matcher = line =~ /Uniquely mapped reads %\s*\|\s*([\d\.]+)%/)) {
+            percent_aligned = matcher[0][1]
+        }
+    }
+    logname = logs.getBaseName() - 'Log.final'
+    if(percent_aligned.toFloat() <= '5'.toFloat() ){
+        log.info "#################### VERY POOR ALIGNMENT RATE! IGNORING FOR FURTHER DOWNSTREAM ANALYSIS! ($logname)    >> ${percent_aligned}% <<"
+        skipped_poor_alignment << logname
+        return false
+    } else {
+        log.info "          Passed alignment > star ($logname)   >> ${percent_aligned}% <<"
+        return true
+    }
+}
+process star {
+    label 'high_memory'
+
+    tag "$prefix"
+    publishDir "${params.outdir}/STAR", mode: 'copy'
+
+    when:
+    params.aligner == "star"
 
     input:
-    set val(name), file(reads) from read_files_alevin
-    file index from salmon_index_alevin.collect()
-    file txp2gene from txp2gene_alevin.collect()
-
+    // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
+    set val(samplename), file(reads) from read_files_star
+    file index from star_index.collect()
+    file gtf from gtf_star.collect()
+    file whitelist from barcode_whitelist.collect()
 
     output:
-    file "${name}_alevin_results" into alevin_results
+    set file("*Log.final.out"), file ('*.bam') into star_aligned
+    file "*.out" into alignment_logs
+    file "*SJ.out.tab"
+    file "*Log.out" into star_log
+    file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
 
     script:
+    prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
+    def star_mem = task.memory ?: params.star_memory ?: false
+    def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
+
+    seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
+    cdna_read = reads[0]
+    barcode_read = reads[1]
     """
-    salmon alevin -l ISR -1 ${reads[0]} -2 ${reads[1]} --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
+    STAR --genomeDir $index \\
+         --sjdbGTFfile $gtf \\
+         --readFilesIn $barcode_read $cdna_read  \\
+         --runThreadN ${task.cpus} \\
+         --twopassMode Basic \\
+         --outWigType bedGraph \\
+         --outSAMtype BAM SortedByCoordinate $avail_mem \\
+         --readFilesCommand zcat \\
+         --runDirPerm All_RWX \\
+         --outFileNamePrefix $prefix $seqCenter \\
+         --soloType Droplet \\
+         --soloCBwhitelist $whitelist
+
+    samtools index ${prefix}Aligned.sortedByCoord.out.bam
     """
-  }
+
+
+}
+// Filter removes all 'aligned' channels that fail the check
+star_aligned
+    .filter { logs, bams -> check_log(logs) }
+    .flatMap {  logs, bams -> bams }
+.into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
+
 
 
  /*
   * STEP 4 - Run alevin qc
   */
 
-  process run_alevin_qc {
-    tag "$prefix"
-    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
-
-    input:
-    file result from alevin_results
-
-    output:
-    file "${name}_alevinqc_results" into alevinqc_results
-
-    script:
-
-    prefix = result.toString() - '_alevin_results'
-
-    """
-    alevin_qc.r $result ${prefix} $result
-    """
-
-  }
+  // process run_alevin_qc {
+  //   tag "$prefix"
+  //   publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+  //
+  //   when:
+  //   params.aligner == "alevin"
+  //
+  //   input:
+  //   file result from alevin_results
+  //
+  //   output:
+  //   file "${name}_alevinqc_results" into alevinqc_results
+  //
+  //   script:
+  //
+  //   prefix = result.toString() - '_alevin_results'
+  //
+  //   """
+  //   alevin_qc.r $result ${prefix} $result
+  //   """
+  //
+  // }
 
 /*
  * STEP 4 - MultiQC
  */
-// process multiqc {
-//     publishDir "${params.outdir}/MultiQC", mode: 'copy'
-//
-//     input:
-//     file multiqc_config from ch_multiqc_config
-//     // TODO nf-core: Add in log files from your new processes for MultiQC to find!
-//     file ('software_versions/*') from software_versions_yaml
-//     file workflow_summary from create_workflow_summary(summary)
-//
-//     output:
-//     file "*multiqc_report.html" into multiqc_report
-//     file "*_data"
-//
-//     script:
-//     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
-//     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-//     // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
-//     """
-//     multiqc -f $rtitle $rfilename --config $multiqc_config .
-//     """
-// }
+process multiqc {
+    publishDir "${params.outdir}/MultiQC", mode: 'copy'
+
+    input:
+    file multiqc_config from ch_multiqc_config
+    // TODO nf-core: Add in log files from your new processes for MultiQC to find!
+    file ('software_versions/*') from software_versions_yaml
+    file workflow_summary from create_workflow_summary(summary)
+    file ('STAR/*') from star_log.collect().ifEmpty([])
+    file ('alevin/*') from alevin_logs.collect().ifEmpty([])
+
+    output:
+    file "*multiqc_report.html" into multiqc_report
+    file "*_data"
+
+    script:
+    rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
+    rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
+    // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
+    """
+    multiqc -f $rtitle $rfilename --config $multiqc_config \
+      -m custom_content -m salmon -m star .
+    """
+}
 
 
 

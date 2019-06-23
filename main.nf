@@ -183,7 +183,7 @@ if (params.type == "10x"){
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
-         .set{ barcode_whitelist }
+         .set{ barcode_whitelist_star; barcode_whitelist_kallisto }
 }
 
 
@@ -282,7 +282,7 @@ process unzip_10x_barcodes {
    file gzipped from barcode_whitelist_gzipped
 
    output:
-   file "$gzipped.simpleName" into barcode_whitelist
+   file "$gzipped.simpleName" into (barcode_whitelist_star, barcode_whitelist_kallisto)
 
    script:
    """
@@ -499,7 +499,7 @@ process star {
     set val(samplename), file(reads) from read_files_star
     file index from star_index.collect()
     file gtf from gtf_star.collect()
-    file whitelist from barcode_whitelist.collect()
+    file whitelist from barcode_whitelist_star.collect()
 
     output:
     set file("*Log.final.out"), file ('*.bam') into star_aligned
@@ -572,6 +572,7 @@ process bustools_correct_sort{
 
   input:
   file bus from kallisto_bus_to_sort
+  file whitelist from barcode_whitelist_kallisto.collect()
 
   output:
   file bus into kallisto_corr_sort_to_count
@@ -581,6 +582,12 @@ process bustools_correct_sort{
   bustools correct -w ${barcode_filename} -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -
   """
 }
+
+/*
+* Former code
+  
+
+*/
 
 process bustools_count{
   tag "$bus"

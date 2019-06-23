@@ -26,12 +26,13 @@ def helpMessage() {
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, awsbatch, test and more.
       --type                        Name of droplet technology e.g. "--type 10x"
+      --aligner                     Name of the tool to use for scRNA (pseudo-) alignment. Available are: "alevin", "star", "kallisto"
 
     Options:
       --salmon_index                Path to Salmon index (for use with alevin)
       --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
       --alevin_qc                   Perform alevinQC analysis
-      --chemistry                   Version of 10x chemistry, e.g. "--chemistry V2" or "--chemistry V3"
+      --chemistry                   Version of 10x chemistry, e.g. "--chemistry v2" or "--chemistry v3"
       --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
@@ -74,9 +75,6 @@ params.transcript_fasta = params.genome ? params.genomes[ params.genome ].transc
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
 params.readPaths = params.readPaths? params.readPaths: false
-
-println params
-
 
 if (params.aligner != 'star' && params.aligner != 'alevin' && params.aligner != 'kallisto'){
     exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin', 'kallisto'"

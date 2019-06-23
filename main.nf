@@ -558,6 +558,7 @@ process kallisto {
 
   output:
   file "${name}_bus_output" into kallisto_bus_to_sort
+  file ".command.log" into kallisto_log_for_multiqc
 
   script:
   """
@@ -656,6 +657,7 @@ process multiqc {
     file workflow_summary from create_workflow_summary(summary)
     file ('STAR/*') from star_log.collect().ifEmpty([])
     file ('alevin/*') from alevin_logs.collect().ifEmpty([])
+    file ('kallisto/*') from kallisto_log_for_multiqc.collect().ifEmpty([])
 
     output:
     file "*multiqc_report.html" into multiqc_report
@@ -664,10 +666,9 @@ process multiqc {
     script:
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-    // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
     """
     multiqc -f $rtitle $rfilename --config $multiqc_config \
-      -m custom_content -m salmon -m star .
+      -m custom_content -m salmon -m star -m kallisto .
     """
 }
 

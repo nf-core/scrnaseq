@@ -258,15 +258,15 @@ process get_software_versions {
     file "software_versions.csv"
 
     script:
-    // TODO nf-core: Get all tools to print their version number here
     """
-    echo $workflow.manifest.version > v_pipeline.txt
-    echo $workflow.nextflow.version > v_nextflow.txt
-    salmon --version > v_salmon.txt
-    STAR --version &> v_star.txt
-    multiqc --version > v_multiqc.txt
-    kallisto version > v_kallisto.txt
-    bustools > v_bustools.txt
+    echo $workflow.manifest.version &> v_pipeline.txt
+    echo $workflow.nextflow.version &> v_nextflow.txt
+    salmon --version &> v_salmon.txt 2>&1 || true
+    STAR --version &> v_star.txt 2>&1 || true
+    multiqc --version &> v_multiqc.txt 2>&1 || true
+    kallisto version &> v_kallisto.txt 2>&1 || true
+    bustools &> v_bustools.txt 2>&1 || true
+    
     scrape_software_versions.py > software_versions_mqc.yaml
     """
 }

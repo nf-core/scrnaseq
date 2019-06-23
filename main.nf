@@ -265,7 +265,8 @@ process get_software_versions {
     salmon --version > v_salmon.txt
     STAR --version &> v_star.txt
     multiqc --version > v_multiqc.txt
-    kallisto 
+    kallisto version > v_kallisto.txt
+    bustools > v_bustools.txt
     scrape_software_versions.py > software_versions_mqc.yaml
     """
 }

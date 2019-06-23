@@ -118,14 +118,14 @@ if( params.transcript_fasta ){
     Channel
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
-        .set { transcriptome_fasta_alevin }
+        .into { transcriptome_fasta_alevin; transcriptome_fasta_kallisto }
 }
 
 if (params.aligner == 'alevin' && params.salmon_index) {
     Channel
         .fromPath(params.salmon_index)
         .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
-        .into { salmon_index_alevin }
+        .set { salmon_index_alevin }
 }
 
 // Has the run name been specified by the user?
@@ -289,7 +289,7 @@ process unzip_10x_barcodes {
  * Preprocessing - Extract transcriptome fasta from genome fasta
  */
 
-if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_index){
+if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')){
   process extract_transcriptome {
      tag "$fasta"
      publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'

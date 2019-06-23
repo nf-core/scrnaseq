@@ -571,8 +571,7 @@ process bustools_correct_sort{
 
   script:
   """
-  bustools correct -w ${barcode_filename} -p ${bus}/output.bus | \
-  bustools sort -T tmp/ -t ${task.cpus} -o ${bus}/output.correct.sort.bus
+  bustools correct -w ${barcode_filename} -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -
   """
 }
 

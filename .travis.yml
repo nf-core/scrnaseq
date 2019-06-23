@@ -40,4 +40,4 @@ script:
   - markdownlint ${TRAVIS_BUILD_DIR} -c ${TRAVIS_BUILD_DIR}/.github/markdownlint.yml
   # Run the pipeline with the test profile
   #- nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker
-  - nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker --aligner 'kallisto'
+  - nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker --aligner 'kallisto' --chemistry 'V2'

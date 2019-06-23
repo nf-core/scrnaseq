@@ -91,9 +91,9 @@ if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star }
+        .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star; gtf_gene_map }
 } else if (params.aligner == 'star'){
-  exit 1, "Must provide either a GTF file ('--gtf') to align with STAR"
+  exit 1, "Must provide a GTF file ('--gtf') to align with STAR"
 }
 
 if (!params.gtf && !params.txp2gene){
@@ -159,12 +159,12 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
              .from(params.readPaths)
              .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
              .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-             .into { read_files_alevin; read_files_star }
+             .into { read_files_alevin; read_files_star; read_files_kallisto}
      } else {
          Channel
             .fromFilePairs( params.reads )
             .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
-            .into { read_files_alevin; read_files_star }
+            .into { read_files_alevin; read_files_star; read_files_kallisto }
 }
 
 
@@ -300,7 +300,7 @@ if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_ind
 
 
      output:
-     file "${genome_fasta.simpleName}.transcriptome.fa" into transcriptome_fasta_alevin
+     file "${genome_fasta.simpleName}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
 
      script:
      // -F to preserve all GTF attributes in the fasta ID
@@ -309,8 +309,6 @@ if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_ind
      """
   }
 }
-
-
 
 /*
  * STEP 1 - Make_index
@@ -336,8 +334,6 @@ process build_salmon_index {
    salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
    """
 }
-
-
 
 process makeSTARindex {
      label 'high_memory'
@@ -369,6 +365,44 @@ process makeSTARindex {
      """
 }
 
+process build_kallisto_index {
+   tag "$fasta"
+   publishDir "${params.outdir}/kallisto_index", mode: 'copy'
+
+   when:
+   params.aligner == 'kallisto' && !params.kallisto_index
+
+   input:
+   file fasta from transcriptome_fasta_kallisto
+
+   output:
+   file "${base}.idx" into kallisto_index
+
+   script:
+   base="${fasta.baseName}"
+   """
+   kallisto index -i ${base}.idx -k 31 $fasta
+   """
+}
+
+process build_gene_map{
+  tag "$gtf"
+  publishDir "${params.outdir}/kallisto_gene_map", mode: 'copy'
+
+  when:
+  params.aligner == 'kallisto' && !params.kallisto_gene_map
+
+  input:
+  file gtf from gtf_gene_map 
+
+  output:
+  file "transcripts_to_genes.txt" into kallisto_gene_map
+
+  script:
+  """
+  cat $gtf | t2g.py > transcripts_to_genes.txt
+  """
+}
 
  /*
   * STEP 2 - Make txp2gene

@@ -203,6 +203,7 @@ summary['Droplet Technology'] = params.type
 summary['Chemistry Version'] = params.chemistry
 summary['Alevin TXP2Gene']        = params.txp2gene
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
+if(params.aligner == 'kallisto') summary['BUSTools Correct'] = params.bustools_correct
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
 summary['Launch dir']       = workflow.launchDir
@@ -581,8 +582,9 @@ process bustools_correct_sort{
   file bus into kallisto_corr_sort_to_count
 
   script:
+  correct = params.bustools_correct ? "bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -" : "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
   """
-  bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -
+  $correct
   """
 }
 

@@ -26,12 +26,13 @@ def helpMessage() {
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, awsbatch, test and more.
       --type                        Name of droplet technology e.g. "--type 10x"
+      --aligner                     Name of the tool to use for scRNA (pseudo-) alignment. Available are: "alevin", "star", "kallisto"
 
     Options:
       --salmon_index                Path to Salmon index (for use with alevin)
       --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
       --alevin_qc                   Perform alevinQC analysis
-      --chemistry                   Version of 10x chemistry, e.g. "--chemistry V2" or "--chemistry V3"
+      --chemistry                   Version of 10x chemistry, e.g. "--chemistry v2" or "--chemistry v3"
       --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
@@ -61,8 +62,6 @@ if (params.help){
     exit 0
 }
 
-println params
-
 // Check if genome exists in the config file
 if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
     exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
@@ -75,35 +74,38 @@ params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : fals
 params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
 params.readPaths = params.readPaths? params.readPaths: false
 
-println params
-
-
-if (params.aligner != 'star' && params.aligner != 'alevin'){
-    exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin'"
+//Check if one of the available aligners is used (alevin, kallisto, star)
+if (params.aligner != 'star' && params.aligner != 'alevin' && params.aligner != 'kallisto'){
+    exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin', 'kallisto'"
 }
+//Check if STAR index is supplied properly
 if( params.star_index && params.aligner == 'star' ){
     star_index = Channel
         .fromPath(params.star_index)
         .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
 }
 
+//Check if GTF is supplied properly 
 if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star }
+        .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star; gtf_gene_map }
 } else if (params.aligner == 'star'){
-  exit 1, "Must provide either a GTF file ('--gtf') to align with STAR"
+  exit 1, "Must provide a GTF file ('--gtf') to align with STAR"
 }
 
+//Check if TXP2Gene is provided for Alevin
 if (!params.gtf && !params.txp2gene){
   exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
 }
 
+//Check if a transcriptome FastA or at least a Genome FastA is provided!
 if (!params.fasta && !params.transcript_fasta){
   exit 1, "Neither of --fasta or --transcriptome provided! At least one must be provided to quantify genes"
 }
 
+//Setup FastA channels
 if( params.fasta ){
     Channel
         .fromPath(params.fasta)
@@ -111,6 +113,7 @@ if( params.fasta ){
         .into { genome_fasta_extract_transcriptome ; genome_fasta_makeSTARindex }
 }
 
+//Setup Transcript FastA channels
 if( params.transcript_fasta ){
   if( params.aligner == "star" && !params.fasta) {
     exit 1, "Transcriptome-only alignment is not valid with the aligner: ${params.aligner}. Transcriptome-only alignment is only valid with '--aligner alevin'"
@@ -118,14 +121,15 @@ if( params.transcript_fasta ){
     Channel
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
-        .set { transcriptome_fasta_alevin }
+        .into { transcriptome_fasta_alevin; transcriptome_fasta_kallisto }
 }
 
+//Setup channel for salmon index if specified
 if (params.aligner == 'alevin' && params.salmon_index) {
     Channel
         .fromPath(params.salmon_index)
         .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
-        .into { salmon_index_alevin }
+        .set { salmon_index_alevin }
 }
 
 // Has the run name been specified by the user?
@@ -159,17 +163,18 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
              .from(params.readPaths)
              .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
              .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-             .into { read_files_alevin; read_files_star }
+             .into { read_files_alevin; read_files_star; read_files_kallisto}
      } else {
          Channel
             .fromFilePairs( params.reads )
             .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
-            .into { read_files_alevin; read_files_star }
+            .into { read_files_alevin; read_files_star; read_files_kallisto }
 }
 
-
+//Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"
 
+//Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
 if (params.type == "10x"){
   barcode_filename = "$whitelist_folder/${params.type}_${params.chemistry}_barcode_whitelist.txt.gz"
   Channel.fromPath(barcode_filename)
@@ -178,7 +183,7 @@ if (params.type == "10x"){
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
-         .set{ barcode_whitelist }
+         .set{ barcode_whitelist_star; barcode_whitelist_kallisto }
 }
 
 
@@ -194,8 +199,11 @@ if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.
 summary['gtf Ref']        = params.gtf
 summary['Aligner']        = params.aligner
 if (params.salmon_index)        summary['Salmon Index']        = params.salmon_index
-summary['txp2gene']        = params.txp2gene
+summary['Droplet Technology'] = params.type
+summary['Chemistry Version'] = params.chemistry
+summary['Alevin TXP2Gene']        = params.txp2gene
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
+if(params.aligner == 'kallisto') summary['BUSTools Correct'] = params.bustools_correct
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
 summary['Launch dir']       = workflow.launchDir
@@ -253,13 +261,15 @@ process get_software_versions {
     file "software_versions.csv"
 
     script:
-    // TODO nf-core: Get all tools to print their version number here
     """
-    echo $workflow.manifest.version > v_pipeline.txt
-    echo $workflow.nextflow.version > v_nextflow.txt
-    salmon --version > v_salmon.txt
-    STAR --version &> v_star.txt
-    multiqc --version > v_multiqc.txt
+    echo $workflow.manifest.version &> v_pipeline.txt
+    echo $workflow.nextflow.version &> v_nextflow.txt
+    salmon --version &> v_salmon.txt 2>&1 || true
+    STAR --version &> v_star.txt 2>&1 || true
+    multiqc --version &> v_multiqc.txt 2>&1 || true
+    kallisto version &> v_kallisto.txt 2>&1 || true
+    bustools &> v_bustools.txt 2>&1 || true
+    
     scrape_software_versions.py > software_versions_mqc.yaml
     """
 }
@@ -275,7 +285,7 @@ process unzip_10x_barcodes {
    file gzipped from barcode_whitelist_gzipped
 
    output:
-   file "$gzipped.simpleName" into barcode_whitelist
+   file "$gzipped.simpleName" into (barcode_whitelist_star, barcode_whitelist_kallisto)
 
    script:
    """
@@ -289,7 +299,7 @@ process unzip_10x_barcodes {
  * Preprocessing - Extract transcriptome fasta from genome fasta
  */
 
-if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_index){
+if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')){
   process extract_transcriptome {
      tag "$fasta"
      publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
@@ -300,7 +310,7 @@ if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_ind
 
 
      output:
-     file "${genome_fasta.simpleName}.transcriptome.fa" into transcriptome_fasta_alevin
+     file "${genome_fasta.simpleName}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
 
      script:
      // -F to preserve all GTF attributes in the fasta ID
@@ -309,8 +319,6 @@ if (!params.transcript_fasta && params.aligner == 'alevin' && !params.salmon_ind
      """
   }
 }
-
-
 
 /*
  * STEP 1 - Make_index
@@ -336,8 +344,6 @@ process build_salmon_index {
    salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
    """
 }
-
-
 
 process makeSTARindex {
      label 'high_memory'
@@ -369,6 +375,44 @@ process makeSTARindex {
      """
 }
 
+process build_kallisto_index {
+   tag "$fasta"
+   publishDir "${params.outdir}/kallisto_index", mode: 'copy'
+
+   when:
+   params.aligner == 'kallisto' && !params.kallisto_index
+
+   input:
+   file fasta from transcriptome_fasta_kallisto
+
+   output:
+   file "${base}.idx" into kallisto_index
+
+   script:
+   base="${fasta.baseName}"
+   """
+   kallisto index -i ${base}.idx -k 31 $fasta
+   """
+}
+
+process build_gene_map{
+  tag "$gtf"
+  publishDir "${params.outdir}/kallisto_gene_map", mode: 'copy'
+
+  when:
+  params.aligner == 'kallisto' && !params.kallisto_gene_map
+
+  input:
+  file gtf from gtf_gene_map 
+
+  output:
+  file "transcripts_to_genes.txt" into kallisto_gene_map
+
+  script:
+  """
+  cat $gtf | t2g.py > transcripts_to_genes.txt
+  """
+}
 
  /*
   * STEP 2 - Make txp2gene
@@ -458,7 +502,7 @@ process star {
     set val(samplename), file(reads) from read_files_star
     file index from star_index.collect()
     file gtf from gtf_star.collect()
-    file whitelist from barcode_whitelist.collect()
+    file whitelist from barcode_whitelist_star.collect()
 
     output:
     set file("*Log.final.out"), file ('*.bam') into star_aligned
@@ -500,6 +544,79 @@ star_aligned
     .flatMap {  logs, bams -> bams }
 .into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
 
+// Run Kallisto bus
+
+process kallisto {
+  tag "$name"
+  publishDir "${params.outdir}/kallisto/raw_bus", mode: 'copy'
+
+  when:
+  params.aligner == "kallisto"
+
+  input:
+  set val(name), file(reads) from read_files_kallisto
+  file index from kallisto_index.collect()
+
+  output:
+  file "${name}_bus_output" into kallisto_bus_to_sort
+  file ".command.log" into kallisto_log_for_multiqc
+
+  script:
+  """
+  kallisto bus -i $index -o ${name}_bus_output/ -x ${params.type}${params.chemistry} -t ${task.cpus} $reads
+  """
+}
+
+process bustools_correct_sort{
+  tag "$bus"
+  publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
+
+  when:
+  params.aligner == "kallisto"
+
+  input:
+  file bus from kallisto_bus_to_sort
+  file whitelist from barcode_whitelist_kallisto.collect()
+
+  output:
+  file bus into kallisto_corr_sort_to_count
+
+  script:
+  correct = params.bustools_correct ? "bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -" : "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
+  """
+  $correct
+  """
+}
+
+/*
+* Former code
+  
+
+*/
+
+process bustools_count{
+  tag "$bus"
+  publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
+
+  when:
+  params.aligner == 'kallisto'
+
+  input: 
+  file bus from kallisto_corr_sort_to_count
+  file t2g from kallisto_gene_map.collect()
+
+  output:
+  file "${bus}_eqcount"
+  file "${bus}_genecount"
+
+  script:
+  """
+  mkdir -p ${bus}_eqcount
+  mkdir -p ${bus}_genecount
+  bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.correct.sort.bus
+  bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.correct.sort.bus
+  """
+}
 
 
  /*
@@ -542,6 +659,7 @@ process multiqc {
     file workflow_summary from create_workflow_summary(summary)
     file ('STAR/*') from star_log.collect().ifEmpty([])
     file ('alevin/*') from alevin_logs.collect().ifEmpty([])
+    file ('kallisto/*') from kallisto_log_for_multiqc.collect().ifEmpty([])
 
     output:
     file "*multiqc_report.html" into multiqc_report
@@ -550,10 +668,9 @@ process multiqc {
     script:
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-    // TODO nf-core: Specify which MultiQC modules to use with -m for a faster run time
     """
     multiqc -f $rtitle $rfilename --config $multiqc_config \
-      -m custom_content -m salmon -m star .
+      -m custom_content -m salmon -m star -m kallisto .
     """
 }
 

@@ -175,7 +175,7 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
 whitelist_folder = "$baseDir/assets/whitelist/"
 
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
-if (params.type == "10x"){
+if (params.type == "10x" && !params.barcode_whitelist){
   barcode_filename = "$whitelist_folder/${params.type}_${params.chemistry}_barcode_whitelist.txt.gz"
   Channel.fromPath(barcode_filename)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
@@ -183,7 +183,7 @@ if (params.type == "10x"){
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
-         .set{ barcode_whitelist_star; barcode_whitelist_kallisto }
+         .into{ barcode_whitelist_star; barcode_whitelist_kallisto }
 }
 
 
@@ -274,12 +274,10 @@ process get_software_versions {
     """
 }
 
+if(params.type == '10x' && !params.barcode_whitelist){
 process unzip_10x_barcodes {
    tag "${params.chemistry}"
    publishDir "${params.outdir}/salmon_index", mode: 'copy'
-
-   when:
-   params.type == '10x'
 
    input:
    file gzipped from barcode_whitelist_gzipped
@@ -291,6 +289,7 @@ process unzip_10x_barcodes {
    """
    gunzip -c $gzipped > $gzipped.simpleName
    """
+}
 }
 
 
@@ -580,6 +579,7 @@ process kallisto {
 
 process bustools_correct_sort{
   tag "$bus"
+  label 'high_memory'
   publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
 
   when:

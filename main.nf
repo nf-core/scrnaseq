@@ -85,7 +85,7 @@ if( params.star_index && params.aligner == 'star' ){
         .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
 }
 
-//Check if GTF is supplied properly 
+//Check if GTF is supplied properly
 if( params.gtf ){
     Channel
         .fromPath(params.gtf)
@@ -269,7 +269,7 @@ process get_software_versions {
     multiqc --version &> v_multiqc.txt 2>&1 || true
     kallisto version &> v_kallisto.txt 2>&1 || true
     bustools &> v_bustools.txt 2>&1 || true
-    
+
     scrape_software_versions.py > software_versions_mqc.yaml
     """
 }
@@ -345,55 +345,58 @@ process build_salmon_index {
    """
 }
 
-process makeSTARindex {
-     label 'high_memory'
+if (params.aligner == 'star' && !params.star_index && params.fasta){
+  process makeSTARindex {
+       label 'high_memory'
+       tag "$fasta"
+       publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
+                  saveAs: { params.saveReference ? it : null }, mode: 'copy'
+
+       input:
+       file fasta from genome_fasta_makeSTARindex
+       file gtf from gtf_makeSTARindex
+
+       output:
+       file "star" into star_index
+
+       script:
+       def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
+       """
+       mkdir star
+       STAR \\
+           --runMode genomeGenerate \\
+           --runThreadN ${task.cpus} \\
+           --sjdbGTFfile $gtf \\
+           --genomeDir star/ \\
+           --genomeFastaFiles $fasta \\
+           $avail_mem
+       """
+  }
+}
+
+
+if (params.aligner == 'kallisto' && !params.kallisto_index){
+  process build_kallisto_index {
      tag "$fasta"
-     publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
-                saveAs: { params.saveReference ? it : null }, mode: 'copy'
+     publishDir "${params.outdir}/kallisto_index", mode: 'copy'
 
      when:
-     params.aligner == 'star' && !params.star_index && params.fasta
+
 
      input:
-     file fasta from genome_fasta_makeSTARindex
-     file gtf from gtf_makeSTARindex
+     file fasta from transcriptome_fasta_kallisto
 
      output:
-     file "star" into star_index
+     file "${base}.idx" into kallisto_index
 
      script:
-     def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
+     base="${fasta.baseName}"
      """
-     mkdir star
-     STAR \\
-         --runMode genomeGenerate \\
-         --runThreadN ${task.cpus} \\
-         --sjdbGTFfile $gtf \\
-         --genomeDir star/ \\
-         --genomeFastaFiles $fasta \\
-         $avail_mem
+     kallisto index -i ${base}.idx -k 31 $fasta
      """
+  }
 }
 
-process build_kallisto_index {
-   tag "$fasta"
-   publishDir "${params.outdir}/kallisto_index", mode: 'copy'
-
-   when:
-   params.aligner == 'kallisto' && !params.kallisto_index
-
-   input:
-   file fasta from transcriptome_fasta_kallisto
-
-   output:
-   file "${base}.idx" into kallisto_index
-
-   script:
-   base="${fasta.baseName}"
-   """
-   kallisto index -i ${base}.idx -k 31 $fasta
-   """
-}
 
 process build_gene_map{
   tag "$gtf"
@@ -403,7 +406,7 @@ process build_gene_map{
   params.aligner == 'kallisto' && !params.kallisto_gene_map
 
   input:
-  file gtf from gtf_gene_map 
+  file gtf from gtf_gene_map
 
   output:
   file "transcripts_to_genes.txt" into kallisto_gene_map
@@ -434,7 +437,7 @@ process build_txp2gene {
       script:
 
       """
-      bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
+      genome_fasta_makeSTARindex -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
       """
 }
 
@@ -590,7 +593,7 @@ process bustools_correct_sort{
 
 /*
 * Former code
-  
+
 
 */
 
@@ -601,7 +604,7 @@ process bustools_count{
   when:
   params.aligner == 'kallisto'
 
-  input: 
+  input:
   file bus from kallisto_corr_sort_to_count
   file t2g from kallisto_gene_map.collect()
 

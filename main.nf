@@ -397,25 +397,24 @@ if (params.aligner == 'kallisto' && !params.kallisto_index){
   }
 }
 
+if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
+  process build_gene_map{
+    tag "$gtf"
+    publishDir "${params.outdir}/kallisto_gene_map", mode: 'copy'
 
-process build_gene_map{
-  tag "$gtf"
-  publishDir "${params.outdir}/kallisto_gene_map", mode: 'copy'
+    input:
+    file gtf from gtf_gene_map
 
-  when:
-  params.aligner == 'kallisto' && !params.kallisto_gene_map
+    output:
+    file "transcripts_to_genes.txt" into kallisto_gene_map
 
-  input:
-  file gtf from gtf_gene_map
-
-  output:
-  file "transcripts_to_genes.txt" into kallisto_gene_map
-
-  script:
-  """
-  cat $gtf | t2g.py > transcripts_to_genes.txt
-  """
+    script:
+    """
+    cat $gtf | t2g.py > transcripts_to_genes.txt
+    """
+  }
 }
+
 
  /*
   * STEP 2 - Make txp2gene
@@ -491,62 +490,64 @@ def check_log(logs) {
         return true
     }
 }
-process star {
-    label 'high_memory'
 
-    tag "$prefix"
-    publishDir "${params.outdir}/STAR", mode: 'copy'
+if (params.aligner == "star"){
+  process star {
+      label 'high_memory'
 
-    when:
-    params.aligner == "star"
+      tag "$prefix"
+      publishDir "${params.outdir}/STAR", mode: 'copy'
 
-    input:
-    // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
-    set val(samplename), file(reads) from read_files_star
-    file index from star_index.collect()
-    file gtf from gtf_star.collect()
-    file whitelist from barcode_whitelist_star.collect()
+      when:
+      params.aligner == "star"
 
-    output:
-    set file("*Log.final.out"), file ('*.bam') into star_aligned
-    file "*.out" into alignment_logs
-    file "*SJ.out.tab"
-    file "*Log.out" into star_log
-    file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
+      input:
+      // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
+      set val(samplename), file(reads) from read_files_star
+      file index from star_index.collect()
+      file gtf from gtf_star.collect()
+      file whitelist from barcode_whitelist_star.collect()
 
-    script:
-    prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
-    def star_mem = task.memory ?: params.star_memory ?: false
-    def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
+      output:
+      set file("*Log.final.out"), file ('*.bam') into star_aligned
+      file "*.out" into alignment_logs
+      file "*SJ.out.tab"
+      file "*Log.out" into star_log
+      file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
 
-    seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
-    cdna_read = reads[0]
-    barcode_read = reads[1]
-    """
-    STAR --genomeDir $index \\
-         --sjdbGTFfile $gtf \\
-         --readFilesIn $barcode_read $cdna_read  \\
-         --runThreadN ${task.cpus} \\
-         --twopassMode Basic \\
-         --outWigType bedGraph \\
-         --outSAMtype BAM SortedByCoordinate $avail_mem \\
-         --readFilesCommand zcat \\
-         --runDirPerm All_RWX \\
-         --outFileNamePrefix $prefix $seqCenter \\
-         --soloType Droplet \\
-         --soloCBwhitelist $whitelist
+      script:
+      prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
+      def star_mem = task.memory ?: params.star_memory ?: false
+      def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
 
-    samtools index ${prefix}Aligned.sortedByCoord.out.bam
-    """
+      seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
+      cdna_read = reads[0]
+      barcode_read = reads[1]
+      """
+      STAR --genomeDir $index \\
+           --sjdbGTFfile $gtf \\
+           --readFilesIn $barcode_read $cdna_read  \\
+           --runThreadN ${task.cpus} \\
+           --twopassMode Basic \\
+           --outWigType bedGraph \\
+           --outSAMtype BAM SortedByCoordinate $avail_mem \\
+           --readFilesCommand zcat \\
+           --runDirPerm All_RWX \\
+           --outFileNamePrefix $prefix $seqCenter \\
+           --soloType Droplet \\
+           --soloCBwhitelist $whitelist
+
+      samtools index ${prefix}Aligned.sortedByCoord.out.bam
+      """
 
 
-}
-// Filter removes all 'aligned' channels that fail the check
-star_aligned
-    .filter { logs, bams -> check_log(logs) }
-    .flatMap {  logs, bams -> bams }
-.into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
-
+  }
+  // Filter removes all 'aligned' channels that fail the check
+  star_aligned
+      .filter { logs, bams -> check_log(logs) }
+      .flatMap {  logs, bams -> bams }
+  .into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
+} 
 // Run Kallisto bus
 
 process kallisto {

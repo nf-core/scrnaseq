@@ -594,9 +594,7 @@ process bustools_correct_sort{
 
   script:
   if (params.bustools_correct){
-    correct = "bustools correct -w $whitelist -p ${bus}/output.bus \\
-                  | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G \\
-                      -o ${bus}/output.correct.sort.bus -"
+    correct = "bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -"
   } else {
     correct = "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
   }

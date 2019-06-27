@@ -547,7 +547,9 @@ if (params.aligner == "star"){
       .filter { logs, bams -> check_log(logs) }
       .flatMap {  logs, bams -> bams }
   .into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
-} 
+} else {
+  star_log = Channel.empty()
+}
 // Run Kallisto bus
 
 process kallisto {

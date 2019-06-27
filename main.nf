@@ -569,7 +569,12 @@ process kallisto {
 
   script:
   """
-  kallisto bus -i $index -o ${name}_bus_output/ -x ${params.type}${params.chemistry} -t ${task.cpus} $reads
+  kallisto bus \\
+      -i $index \\
+      -o ${name}_bus_output/ \\
+      -x ${params.type}${params.chemistry} \\
+      -t ${task.cpus} \\
+      $reads
   """
 }
 
@@ -588,7 +593,13 @@ process bustools_correct_sort{
   file bus into kallisto_corr_sort_to_count
 
   script:
-  correct = params.bustools_correct ? "bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -" : "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
+  if (params.bustools_correct){
+    correct = "bustools correct -w $whitelist -p ${bus}/output.bus \\
+                  | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G \\
+                      -o ${bus}/output.correct.sort.bus -"
+  } else {
+    correct = "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
+  }
   """
   $correct
   """

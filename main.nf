@@ -564,7 +564,7 @@ process kallisto {
 
   output:
   file "${name}_bus_output" into kallisto_bus_to_sort
-  file ".command.log" into kallisto_log_for_multiqc
+  file "${name}_kallisto.log" into kallisto_log_for_multiqc
 
   script:
   """
@@ -573,7 +573,7 @@ process kallisto {
       -o ${name}_bus_output/ \\
       -x ${params.type}${params.chemistry} \\
       -t ${task.cpus} \\
-      $reads
+      $reads | tee ${name}_kallisto.log
   """
 }
 

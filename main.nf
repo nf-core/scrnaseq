@@ -300,7 +300,7 @@ process unzip_10x_barcodes {
 
 if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')){
   process extract_transcriptome {
-     tag "$fasta"
+     tag "${genome_fasta_extract_transcriptome.simpleName}"
      publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
 
      input:
@@ -323,26 +323,28 @@ if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner ==
  * STEP 1 - Make_index
  */
 
-process build_salmon_index {
-   tag "$fasta"
-   publishDir "${params.outdir}/salmon_index", mode: 'copy'
+if(params.aligner == 'alevin' && !params.salmon_index){
+  process build_salmon_index {
+     tag "$fasta"
+     publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-   when:
-   params.aligner == 'alevin' && !params.salmon_index
+     when:
+     params.aligner == 'alevin' && !params.salmon_index
 
-   input:
-   file fasta from transcriptome_fasta_alevin
+     input:
+     file fasta from transcriptome_fasta_alevin
 
+     output:
+     file "salmon_index" into salmon_index_alevin
 
-   output:
-   file "salmon_index" into salmon_index_alevin
+     script:
 
-   script:
-
-   """
-   salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
-   """
+     """
+     salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
+     """
+  }
 }
+
 
 if (params.aligner == 'star' && !params.star_index && params.fasta){
   process makeSTARindex {
@@ -415,58 +417,64 @@ if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
 }
 
 
- /*
-  * STEP 2 - Make txp2gene
-  */
 
-process build_txp2gene {
-      tag "$gtf"
-      publishDir "${params.outdir}", mode: 'copy'
 
-      when:
-      params.aligner == 'alevin' && !params.txp2gene_alevin
+if (params.aligner == 'alevin'){
+  /*
+   * STEP 2 - Make txp2gene
+   */
 
-      input:
-      file gtf from gtf_alevin
+ process build_txp2gene {
+       tag "$gtf"
+       publishDir "${params.outdir}", mode: 'copy'
 
-      output:
-      file "txp2gene.tsv" into txp2gene_alevin
+       when:
+       params.aligner == 'alevin' && !params.txp2gene_alevin
 
-      script:
+       input:
+       file gtf from gtf_alevin
 
-      """
-      genome_fasta_makeSTARindex -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
-      """
+       output:
+       file "txp2gene.tsv" into txp2gene_alevin
+
+       script:
+
+       """
+       genome_fasta_makeSTARindex -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
+       """
+ }
+
+  /*
+   * STEP 3 - Run alevin
+   */
+  process run_alevin {
+    tag "$name"
+    publishDir "${params.outdir}/alevin", mode: 'copy'
+
+    when:
+    params.aligner == "alevin"
+
+    input:
+    set val(name), file(reads) from read_files_alevin
+    file index from salmon_index_alevin.collect()
+    file txp2gene from txp2gene_alevin.collect()
+
+
+    output:
+    file "${name}_alevin_results" into alevin_results, alevin_logs
+
+    script:
+    read1 = reads[0]
+    read2 = reads[1]
+    """
+    salmon alevin -l ISR -1 ${read1} -2 ${read2} \
+      --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
+    """
+  }
+} else {
+  alevin_logs = Channel.empty()
 }
 
-
-/*
- * STEP 3 - Run alevin
- */
-process run_alevin {
-  tag "$name"
-  publishDir "${params.outdir}/alevin", mode: 'copy'
-
-  when:
-  params.aligner == "alevin"
-
-  input:
-  set val(name), file(reads) from read_files_alevin
-  file index from salmon_index_alevin.collect()
-  file txp2gene from txp2gene_alevin.collect()
-
-
-  output:
-  file "${name}_alevin_results" into alevin_results, alevin_logs
-
-  script:
-  read1 = reads[0]
-  read2 = reads[1]
-  """
-  salmon alevin -l ISR -1 ${read1} -2 ${read2} \
-    --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
-  """
-}
 
 
 // Function that checks the alignment rate of the STAR output
@@ -551,83 +559,88 @@ if (params.aligner == "star"){
 }
 // Run Kallisto bus
 
-process kallisto {
-  tag "$name"
-  publishDir "${params.outdir}/kallisto/raw_bus", mode: 'copy'
+if (params.aligner == 'kallisto'){
+  process kallisto {
+    tag "$name"
+    publishDir "${params.outdir}/kallisto/raw_bus", mode: 'copy'
 
-  when:
-  params.aligner == "kallisto"
+    when:
+    params.aligner == "kallisto"
 
-  input:
-  set val(name), file(reads) from read_files_kallisto
-  file index from kallisto_index.collect()
+    input:
+    set val(name), file(reads) from read_files_kallisto
+    file index from kallisto_index.collect()
 
-  output:
-  file "${name}_bus_output" into kallisto_bus_to_sort
-  file "${name}_kallisto.log" into kallisto_log_for_multiqc
+    output:
+    file "${name}_bus_output" into kallisto_bus_to_sort
+    file "${name}_kallisto.log" into kallisto_log_for_multiqc
 
-  script:
-  """
-  kallisto bus \\
-      -i $index \\
-      -o ${name}_bus_output/ \\
-      -x ${params.type}${params.chemistry} \\
-      -t ${task.cpus} \\
-      $reads | tee ${name}_kallisto.log
-  """
+    script:
+    """
+    kallisto bus \\
+        -i $index \\
+        -o ${name}_bus_output/ \\
+        -x ${params.type}${params.chemistry} \\
+        -t ${task.cpus} \\
+        $reads | tee ${name}_kallisto.log
+    """
+  }
+
+  process bustools_correct_sort{
+    tag "$bus"
+    label 'high_memory'
+    publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
+
+    when:
+    params.aligner == "kallisto"
+
+    input:
+    file bus from kallisto_bus_to_sort
+    file whitelist from barcode_whitelist_kallisto.collect()
+
+    output:
+    file bus into kallisto_corr_sort_to_count
+
+    script:
+    correct = params.bustools_correct ? "bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -" : "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
+    """
+    $correct
+    """
+  }
+
+  /*
+  * Former code
+
+
+  */
+
+  process bustools_count{
+    tag "$bus"
+    publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
+
+    when:
+    params.aligner == 'kallisto'
+
+    input:
+    file bus from kallisto_corr_sort_to_count
+    file t2g from kallisto_gene_map.collect()
+
+    output:
+    file "${bus}_eqcount"
+    file "${bus}_genecount"
+
+    script:
+    """
+    mkdir -p ${bus}_eqcount
+    mkdir -p ${bus}_genecount
+    bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.correct.sort.bus
+    bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.correct.sort.bus
+    """
+  }
+} else {
+  kallisto_log_for_multiqc = Channel.empty()
 }
 
-process bustools_correct_sort{
-  tag "$bus"
-  label 'high_memory'
-  publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
-
-  when:
-  params.aligner == "kallisto"
-
-  input:
-  file bus from kallisto_bus_to_sort
-  file whitelist from barcode_whitelist_kallisto.collect()
-
-  output:
-  file bus into kallisto_corr_sort_to_count
-
-  script:
-  correct = params.bustools_correct ? "bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -" : "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
-  """
-  $correct
-  """
-}
-
-/*
-* Former code
-
-
-*/
-
-process bustools_count{
-  tag "$bus"
-  publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
-
-  when:
-  params.aligner == 'kallisto'
-
-  input:
-  file bus from kallisto_corr_sort_to_count
-  file t2g from kallisto_gene_map.collect()
-
-  output:
-  file "${bus}_eqcount"
-  file "${bus}_genecount"
-
-  script:
-  """
-  mkdir -p ${bus}_eqcount
-  mkdir -p ${bus}_genecount
-  bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.correct.sort.bus
-  bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.correct.sort.bus
-  """
-}
 
 
  /*

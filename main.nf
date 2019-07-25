@@ -283,11 +283,11 @@ process unzip_10x_barcodes {
    file gzipped from barcode_whitelist_gzipped
 
    output:
-   file "$gzipped.simpleName" into (barcode_whitelist_star, barcode_whitelist_kallisto)
+   file "${gzipped.simpleName}" into (barcode_whitelist_star, barcode_whitelist_kallisto)
 
    script:
    """
-   gunzip -c $gzipped > $gzipped.simpleName
+   gunzip -c $gzipped > ${gzipped.simpleName}
    """
 }
 }

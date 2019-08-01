@@ -8,6 +8,7 @@ channels:
 dependencies:
   - conda-forge::python=3.7.3
   - bioconda::multiqc=1.7
+  - matplotlib=3.0.3        # Current 3.1.0 build incompatible with multiqc=1.7
   - bioconda::salmon=0.14.0
   - bioconda::r-seurat=3.0.1
   - bioconda::bioconductor-isee=1.2.0

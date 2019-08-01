@@ -300,7 +300,7 @@ process unzip_10x_barcodes {
 
 if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')){
   process extract_transcriptome {
-     tag "${genome_fasta_extract_transcriptome.simpleName}"
+     tag "${genome_fasta_extract_transcriptome}"
      publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
 
      input:
@@ -309,12 +309,12 @@ if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner ==
 
 
      output:
-     file "${genome_fasta.simpleName}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
+     file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
 
      script:
      // -F to preserve all GTF attributes in the fasta ID
      """
-     gffread -F $gtf -w "${genome_fasta.simpleName}.transcriptome.fa" -g $genome_fasta
+     gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
      """
   }
 }
@@ -416,9 +416,6 @@ if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
   }
 }
 
-
-
-
 if (params.aligner == 'alevin'){
   /*
    * STEP 2 - Make txp2gene
@@ -440,7 +437,7 @@ if (params.aligner == 'alevin'){
        script:
 
        """
-       genome_fasta_makeSTARindex -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
+       bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
        """
  }
 

@@ -15,7 +15,7 @@ dependencies:
   - bioconda::bioconductor-tximeta=1.0.3
   - conda-forge::r-markdown=0.9
   - bioconda::bioawk=1.0
-  #- bioconda::bioconductor-alevinqc=1.0.0
+  #- bioconda::bioconductor-alevinqc=1.0.0 ###need to wait for this to finish R 3.6 availability on bioconda
   - bioconda::bioconductor-tximport=1.10.1
   - bioconda::star=2.7.1a
   - samtools=1.9

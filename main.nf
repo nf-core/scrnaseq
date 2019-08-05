@@ -642,6 +642,7 @@ if (params.aligner == 'kallisto'){
 
  /*
   * STEP 4 - Run alevin qc
+  * Will have to wait until Bioconda recipe is available for this
   */
 
   // process run_alevin_qc {

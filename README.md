@@ -1,4 +1,4 @@
-# nf-core/scrnaseq
+# ![nf-core/scrnaseq](docs/images/nfcore-scrnaseq_logo.png)
 
 **Pipeline for processing of 10xGenomics single cell rnaseq data**.
 

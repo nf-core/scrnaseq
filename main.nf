@@ -410,8 +410,11 @@ if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
     file "transcripts_to_genes.txt" into kallisto_gene_map
 
     script:
+    unzip = "${gtf.endsWith(".gz")}" ? "gunzip -f ${gtf}" : ""
+    name = "${gtf.endsWith(".gz")}" ? "${gtf.baseName}" : "${gtf}" 
     """
-    cat $gtf | t2g.py > transcripts_to_genes.txt
+    $unzip
+    cat $name | t2g.py > transcripts_to_genes.txt
     """
   }
 }
@@ -644,28 +647,28 @@ if (params.aligner == 'kallisto'){
   * STEP 4 - Run alevin qc
   */
 
-  process run_alevin_qc {
-    tag "$prefix"
-    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+  // process run_alevin_qc {
+  //   tag "$prefix"
+  //   publishDir "${params.outdir}/alevin_qc", mode: 'copy'
   
-    when:
-    params.aligner == "alevin"
+  //   when:
+  //   params.aligner == "alevin"
   
-    input:
-    file result from alevin_results
+  //   input:
+  //   file result from alevin_results
   
-    output:
-    file "${name}_alevinqc_results" into alevinqc_results
+  //   output:
+  //   file "${name}_alevinqc_results" into alevinqc_results
   
-    script:
+  //   script:
   
-    prefix = result.toString() - '_alevin_results'
+  //   prefix = result.toString() - '_alevin_results'
   
-    """
-    alevin_qc.r $result ${prefix} $result
-    """
+  //   """
+  //   alevin_qc.r $result ${prefix} $result
+  //   """
   
-  }
+  // }
 
 /*
  * STEP 4 - MultiQC

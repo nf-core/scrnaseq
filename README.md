@@ -33,6 +33,6 @@ nf-core/scrnaseq was originally written by [Peter J. Bailey](https://github.com/
 You can cite the `nf-core` pre-print as follows:  
 Ewels PA, Peltzer A, Fillinger S, Alneberg JA, Patel H, Wilm A, Garcia MU, Di Tommaso P, Nahnsen S. **nf-core: Community curated bioinformatics pipelines**. *bioRxiv*. 2019. p. 610741. [doi: 10.1101/610741](https://www.biorxiv.org/content/10.1101/610741v1).
 
-The basic benchmarks that were used as motivation for incorporating the three available modular workflows based on Kallisto+Bustools, STARsolo and Salmon Alevin / AlevinQC were all benchmarked in [this publication](https://www.biorxiv.org/content/10.1101/673285v2). 
+The basic benchmarks that were used as motivation for incorporating the three available modular workflows based on Kallisto+Bustools, STARsolo and Salmon Alevin / AlevinQC were all benchmarked in [this publication](https://www.biorxiv.org/content/10.1101/673285v2).
 
 We offer all three paths for the processing of scRNAseq data so it remains up to the user to decide which pipeline workflow is chosen for a particular analysis question.

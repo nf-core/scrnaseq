@@ -614,10 +614,17 @@ if (params.aligner == 'kallisto'){
     file bus into (kallisto_corr_sort_to_count, kallisto_corr_sort_to_metrics)
 
     script:
+    if(params.bustools_correct) {
+      correct = "bustools correct -w $whitelist -o ${bus}/output.corrected.bus ${bus}/output.bus"
+      sort_file = "${bus}/output.corrected.bus"
+    } else {
+      correct = ""
+      sort_file = "${bus}/output.bus"
+    }
     """
-    bustools correct -w $whitelist -o ${bus}/output.corrected.bus ${bus}/output.bus
+    $correct    
     mkdir -p tmp
-    bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.corrected.sort.bus ${bus}/output.corrected.bus
+    bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.corrected.sort.bus $sort_file
     """
   }
 

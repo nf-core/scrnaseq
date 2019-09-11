@@ -34,6 +34,7 @@ def helpMessage() {
       --alevin_qc                   Perform alevinQC analysis
       --chemistry                   Version of 10x chemistry, e.g. "--chemistry v2" or "--chemistry v3"
       --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
+      --kallisto_gene_map           A gene map used for bustools correction of BUS files created by Kallisto
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
       --fasta                       Path to **genome** Fasta reference file
@@ -202,6 +203,7 @@ if (params.salmon_index)        summary['Salmon Index']        = params.salmon_i
 summary['Droplet Technology'] = params.type
 summary['Chemistry Version'] = params.chemistry
 summary['Alevin TXP2Gene']        = params.txp2gene
+summary['Kallisto Gene Map']        = params.kallisto_gene_map
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(params.aligner == 'kallisto') summary['BUSTools Correct'] = params.bustools_correct
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"

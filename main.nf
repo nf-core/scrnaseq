@@ -391,9 +391,12 @@ if (params.aligner == 'kallisto' && !params.kallisto_index){
      file "${base}.idx" into kallisto_index
 
      script:
-     base="${fasta.baseName}"
+     unzip = "${fasta.endsWith(".gz")}" ? "gunzip -f ${fasta}" : ""
+     name = "${fasta.endsWith(".gz")}" ? "${fasta.baseName}" : "${fasta}" 
+
      """
-     kallisto index -i ${base}.idx -k 31 $fasta
+     $unzip
+     kallisto index -i ${name}.idx -k 31 $name
      """
   }
 }
@@ -414,7 +417,7 @@ if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
     name = "${gtf.endsWith(".gz")}" ? "${gtf.baseName}" : "${gtf}" 
     """
     $unzip
-    cat $name | t2g.py > transcripts_to_genes.txt
+    cat $name | t2g.py --use_version > transcripts_to_genes.txt
     """
   }
 }

@@ -20,5 +20,5 @@ dependencies:
   - bioconda::star=2.7.2b
   - samtools=1.9
   - gffread=0.11.4
-  - bioconda::kallisto=0.46.0-0
+  - bioconda::kallisto-0.46.0
   - bioconda::bustools=0.39.3

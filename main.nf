@@ -602,7 +602,7 @@ if (params.aligner == 'kallisto'){
     file whitelist from barcode_whitelist_kallisto.collect()
 
     output:
-    file bus into kallisto_corr_sort_to_count
+    file bus into (kallisto_corr_sort_to_count, kallisto_corr_sort_to_metrics)
 
     script:
     """
@@ -634,6 +634,25 @@ if (params.aligner == 'kallisto'){
     mkdir -p ${bus}_genecount
     bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.corrected.sort.bus
     bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.corrected.sort.bus
+    """
+  }
+
+  process bustools_inspect{
+    tag "$bus"
+    publishDir "${params.outdir}/kallisto/bustools_metrics", mode: "copy"
+
+    when:
+    params.aligner == 'kallisto'
+
+    input:
+    file bus from kallisto_corr_sort_to_metrics
+
+    output:
+    file "${bus}.json"
+
+    script:
+    """
+    bustools inspect -o ${bus}.json ${bus}/output.corrected.sort.bus
     """
   }
 } else {

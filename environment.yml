@@ -20,5 +20,5 @@ dependencies:
   - bioconda::star=2.7.2b
   - samtools=1.9
   - gffread=0.11.4
-  - bioconda::kallisto-0.46.0
-  - bioconda::bustools=0.39.3
+  - bioconda::kallisto=0.46.0=hb6a4e58_0
+  - bioconda::bustools=0.39.2 #can't bump because of hdf5

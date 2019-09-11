@@ -4,14 +4,6 @@ services: docker
 cache: pip
 jdk: openjdk8
 
-
-
-  # Run the pipeline with the test profile
-  - nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker
-  - nextflow run ${TRAVIS_BUILD_DIR} -profile test_kallisto,docker 
-  - nextflow run ${TRAVIS_BUILD_DIR} -profile test_star,docker
-
-
 matrix:
   fast_finish: true
   include:
@@ -40,10 +32,10 @@ before_install:
   # PRs to master are only ok if coming from dev branch
   - '[ $TRAVIS_PULL_REQUEST = "false" ] || [ $TRAVIS_BRANCH != "master" ] || ([ $TRAVIS_PULL_REQUEST_SLUG = $TRAVIS_REPO_SLUG ] && [ $TRAVIS_PULL_REQUEST_BRANCH = "dev" ])'
   # Pull the docker image first so the test doesn't wait for this
-  - docker pull nfcore/rnaseq:dev
+  - docker pull nfcore/scrnaseq:dev
   # Fake the tag locally so that the pipeline runs properly
   # Looks weird when this is :dev to :dev, but makes sense when testing code for a release (:dev to :1.0.1)
-  - docker tag nfcore/rnaseq:dev nfcore/rnaseq:dev
+  - docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:dev
 
 install:
   # Install Nextflow

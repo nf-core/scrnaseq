@@ -388,7 +388,7 @@ if (params.aligner == 'kallisto' && !params.kallisto_index){
      file fasta from transcriptome_fasta_kallisto
 
      output:
-     file "${base}.idx" into kallisto_index
+     file "${fasta.baseName}.idx" into kallisto_index
 
      script:
      unzip = "${fasta.endsWith(".gz")}" ? "gunzip -f ${fasta}" : ""
@@ -606,8 +606,9 @@ if (params.aligner == 'kallisto'){
 
     script:
     """
-    bustools correct -w $whitelist ${bus}/output.bus -o ${bus}/output.corrected.bus
-    bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.corrected.bus
+    bustools correct -w $whitelist -o ${bus}/output.corrected.bus ${bus}/output.bus
+    mkdir -p tmp
+    bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.corrected.sort.bus ${bus}/output.corrected.bus
     """
   }
 
@@ -631,8 +632,8 @@ if (params.aligner == 'kallisto'){
     """
     mkdir -p ${bus}_eqcount
     mkdir -p ${bus}_genecount
-    bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.correct.sort.bus
-    bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.correct.sort.bus
+    bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.corrected.sort.bus
+    bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.corrected.sort.bus
     """
   }
 } else {

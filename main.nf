@@ -646,6 +646,25 @@ if (params.aligner == 'kallisto'){
     """
   }
 
+  process bustools_inspect{
+    tag "$bus"
+    publishDir "${params.outdir}/kallisto/bustools_metrics", mode: "copy"
+
+    when:
+    params.aligner == 'kallisto'
+
+    input:
+    file bus from kallisto_corr_sort_to_metrics
+
+    output:
+    file "${bus}.json"
+
+    script:
+    """
+    bustools inspect -o ${bus}.json ${bus}/output.corrected.sort.bus
+    """
+  }
+  
 } else {
   kallisto_log_for_multiqc = Channel.empty()
 }

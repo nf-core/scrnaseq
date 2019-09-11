@@ -602,17 +602,12 @@ if (params.aligner == 'kallisto'){
     file bus into kallisto_corr_sort_to_count
 
     script:
-    correct = params.bustools_correct ? "bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -" : "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
     """
-    $correct
+    bustools correct -w $whitelist ${bus}/output.bus -o ${bus}/output.corrected.bus
+    bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.corrected.bus
     """
   }
 
-  /*
-  * Former code
-
-
-  */
 
   process bustools_count{
     tag "$bus"

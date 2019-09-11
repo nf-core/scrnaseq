@@ -33,8 +33,8 @@ def create_transcript_list(input, use_name = True, use_version = False):
                 if 'transcript_version' not in d or 'gene_version' not in d:
                     continue
 
-                # tid += '.' + d['transcript_version']
-                # gid += '.' + d['gene_version']
+                tid += '.' + d['transcript_version']
+                gid += '.' + d['gene_version']
             gname = None
             if use_name:
                 if 'gene_name' not in d:

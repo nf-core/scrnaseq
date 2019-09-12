@@ -13,12 +13,18 @@
   * [`-profile`](#-profile)
   * [`--reads`](#--reads)
   * [`--singleEnd`](#--singleend)
+  * [`--aligner`](#--aligner)
 * [Cellular barcodes](#cellular-barcodes)
   * [`--type` to specify droplet type](#--type-to-specify-droplet-type)
   * [`--tenx_version` (using cellranger barcodes)](#--tenx_version-cellranger-barcodes)
 * [Reference genomes](#reference-genomes)
   * [`--genome` (using iGenomes)](#--genome-using-igenomes)
   * [`--fasta`](#--fasta)
+  * [`--gtf`](#--gtf)
+  * [`--transcript_fasta`](#--transcript_fasta)
+  * [`--salmon_index`](#--salmon_index)
+  * [`--txp2gene`](#--txp2gene)
+  * [`--kallisto_gene_map`](#--kallisto_gene_map)
   * [`--igenomesIgnore`](#--igenomesignore)
 * [Job resources](#job-resources)
   * [Automatic resubmission](#automatic-resubmission)
@@ -146,31 +152,12 @@ The workflow can handle three types of methods:
 
 To choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`.
 
-### `--salmon_index`
 
-This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.
-
-### `--txp2gene`
-
-This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.
-
-> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.
 
 ### `--alevin_qc`
 
 Specify this if you want to have the AlevinQC module generate QC results for Alevin workflow output.
 
-### `--kallisto_gene_map`
-
-Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.
-
-### `--gtf`
-
-Specify a valid GTF file for the workflow here.
-
-### `--transcript_fasta`
-
-If you intend to skip the generation of a transcriptomic FastA file, you can use this parameter to supply a transcriptomic FastA file here. If you don't specify this, it will be automatically generated from the supplied genomics FastA file utilizing the GTF annotation subsequently.
 
 ## Cellular barcodes
 
@@ -237,6 +224,28 @@ If you prefer, you can specify the full path to your reference genome when you r
 ```
 
 > Note that you need to specify either a `--genome` or `--fasta` when running the STARsolo workflow. The Kallisto and Alevin workflows can utilize a `--transcript_fasta` instead, whereas STAR needs a genomic FastA file as input in all cases. 
+
+### `--gtf`
+
+Specify a valid GTF file for the workflow here.
+
+### `--transcript_fasta`
+
+If you intend to skip the generation of a transcriptomic FastA file, you can use this parameter to supply a transcriptomic FastA file here. If you don't specify this, it will be automatically generated from the supplied genomics FastA file utilizing the GTF annotation subsequently.
+
+### `--salmon_index`
+
+This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.
+
+### `--txp2gene`
+
+This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.
+
+> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.
+
+### `--kallisto_gene_map`
+
+Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.
 
 ### `--igenomesIgnore`
 

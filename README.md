@@ -1,12 +1,20 @@
 # ![nf-core/scrnaseq](docs/images/nfcore-scrnaseq_logo.png)
 
-**Pipeline for processing of 10xGenomics single cell rnaseq data**.
+**A fully automated Nextflow pipeline for 10xGenomics single cell rnaseq data**.
+
+[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.32.0-brightgreen.svg)](https://www.nextflow.io/)
+[![nf-core](https://img.shields.io/badge/nf--core-pipeline-brightgreen.svg)](https://nf-co.re/)
 
 [![Build Status](https://travis-ci.com/nf-core/scrnaseq.svg?branch=master)](https://travis-ci.com/nf-core/scrnaseq)
-[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.32.0-brightgreen.svg)](https://www.nextflow.io/)
+[![GitHub Actions CI Status](https://github.com/nf-core/scrnaseq/workflows/scrnaseq%20CI/badge.svg)](https://github.com/nf-core/scrnaseq/actions)
+[![GitHub Actions Linting Status](https://github.com/nf-core/scrnaseq/workflows/scrnaseq%20linting/badge.svg)](https://github.com/nf-core/scrnaseq/actions)
+
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/)
 [![Docker](https://img.shields.io/docker/automated/nfcore/scrnaseq.svg)](https://hub.docker.com/r/nfcore/scrnaseq)
+[![Install with Singularity](https://img.shields.io/badge/use%20with-singularity-purple.svg)](https://www.sylabs.io/docs/)
+
+[![Join us on Slack](https://img.shields.io/badge/slack-nfcore/scrnaseq-blue.svg)](https://nfcore.slack.com/messages/CHN5BV5DW)
 
 ## Introduction
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
@@ -26,13 +34,13 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline, found
 
 ## Credits
 
-nf-core/scrnaseq was originally written by [Peter J. Bailey](https://github.com/PeterBailey) with some help from [Olga Botvinnik](https://github.com/olgabot) and [Alex Peltzer](https://github.com/apeltzer).
+The `nf-core/scrnaseq` was initiated by [Peter J. Bailey](https://github.com/PeterBailey) (Salmon Alevin, AlevinQC) with major contributions from [Olga Botvinnik](https://github.com/olgabot) (STARsolo, Testdata) and [Alex Peltzer](https://github.com/apeltzer) (Kallisto/BusTools workflow).
 
 ## Citation
 
 You can cite the `nf-core` pre-print as follows:  
 Ewels PA, Peltzer A, Fillinger S, Alneberg JA, Patel H, Wilm A, Garcia MU, Di Tommaso P, Nahnsen S. **nf-core: Community curated bioinformatics pipelines**. *bioRxiv*. 2019. p. 610741. [doi: 10.1101/610741](https://www.biorxiv.org/content/10.1101/610741v1).
 
-The basic benchmarks that were used as motivation for incorporating the three available modular workflows based on Kallisto+Bustools, STARsolo and Salmon Alevin / AlevinQC were all benchmarked in [this publication](https://www.biorxiv.org/content/10.1101/673285v2).
+The basic benchmarks that were used as motivation for incorporating the three available modular workflows can be found in [this publication](https://www.biorxiv.org/content/10.1101/673285v2).
 
 We offer all three paths for the processing of scRNAseq data so it remains up to the user to decide which pipeline workflow is chosen for a particular analysis question.

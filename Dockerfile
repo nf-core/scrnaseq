@@ -1,5 +1,5 @@
 FROM nfcore/base
-LABEL authors="Peter J Bailey, Alexander Peltzer" \
+LABEL authors="Peter J Bailey, Alexander Peltzer, Olga Botvinnik" \
       description="Docker image containing all requirements for nf-core/scrnaseq pipeline"
 
 COPY environment.yml /

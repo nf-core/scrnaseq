@@ -381,7 +381,7 @@ if (params.aligner == 'star' && !params.star_index && params.fasta){
 if (params.aligner == 'kallisto' && !params.kallisto_index){
   process build_kallisto_index {
      tag "$fasta"
-     publishDir "${params.outdir}/kallisto_index", mode: 'copy'
+     publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
 
      when:
 
@@ -410,7 +410,7 @@ if (params.aligner == 'kallisto' && !params.kallisto_index){
 if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
   process build_gene_map{
     tag "$gtf"
-    publishDir "${params.outdir}/kallisto_gene_map", mode: 'copy'
+    publishDir "${params.outdir}/kallisto/kallisto_gene_map", mode: 'copy'
 
     input:
     file gtf from gtf_gene_map
@@ -482,7 +482,7 @@ if (params.aligner == 'alevin'){
     read2 = reads[1]
     """
     salmon alevin -l ISR -1 ${read1} -2 ${read2} \
-      --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
+      --chromium -i $index -o ${name}_alevin_results -p ${task.cpus} --tgMap $txp2gene --dumpFeatures –-dumpMtx
     """
   }
 } else {
@@ -682,6 +682,7 @@ if (params.aligner == 'kallisto'){
 
  /*
   * STEP 4 - Run alevin qc
+  * We have to wait for an update : https://github.com/csoneson/alevinQC/issues/8 
   */
 
   // process run_alevin_qc {

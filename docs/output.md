@@ -10,9 +10,9 @@ and processes data using the following steps:
 
 ## Kallisto & Bustools Results
 
-See [Kallisto](https://pachterlab.github.io/kallisto/about) for details about Kallisto and [Bustools](https://bustools.github.io/) for more information on BusTools. 
+See [Kallisto](https://pachterlab.github.io/kallisto/about) for details about Kallisto and [Bustools](https://bustools.github.io/) for more information on BusTools.
 
-The pipeline can analyze data from single cell rnaseq experiments and generates a set of folders with respective outputs from various steps of the analysis. For a detailed summary what the pipeline does specifically, please follow the [excellent tutorial](https://www.kallistobus.tools/getting_started.html) that also describes specific steps for downstream analysis of the generated matrices. 
+The pipeline can analyze data from single cell rnaseq experiments and generates a set of folders with respective outputs from various steps of the analysis. For a detailed summary what the pipeline does specifically, please follow the [excellent tutorial](https://www.kallistobus.tools/getting_started.html) that also describes specific steps for downstream analysis of the generated matrices.
 
 **Output directory: `results/kallisto`**
 
@@ -25,9 +25,7 @@ The pipeline can analyze data from single cell rnaseq experiments and generates 
     * `eqcount`: Containing the Transcript Compatibility Count (TCC) Matrix (`tcc.mtx`)
     * `genecount`: Containing the Gene Count Matrix (`gene.mtx`)
 
-For details on how to load these into R and perform further downstream analysis, please refer to the [BusTools HowTo](https://github.com/BUStools/getting_started/blob/master/getting_started.ipynb). 
-
-
+For details on how to load these into R and perform further downstream analysis, please refer to the [BusTools HowTo](https://github.com/BUStools/getting_started/blob/master/getting_started.ipynb).
 
 ## MultiQC
 

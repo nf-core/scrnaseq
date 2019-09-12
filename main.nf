@@ -11,7 +11,6 @@
 
 
 def helpMessage() {
-    // TODO nf-core: Add to this help message with new command line parameters
     log.info nfcoreHeader()
     log.info"""
 
@@ -197,7 +196,6 @@ log.info nfcoreHeader()
 def summary = [:]
 if(workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
-// TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
 if(params.fasta)         summary['Genome Fasta Ref']        = params.fasta
 if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.transcript_fasta
@@ -298,8 +296,6 @@ process unzip_10x_barcodes {
 }
 }
 
-
-
 /*
  * Preprocessing - Extract transcriptome fasta from genome fasta
  */
@@ -332,6 +328,7 @@ if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner ==
 if(params.aligner == 'alevin' && !params.salmon_index){
   process build_salmon_index {
      tag "$fasta"
+     label 'low_memory'
      publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
      when:
@@ -385,6 +382,7 @@ if (params.aligner == 'star' && !params.star_index && params.fasta){
 if (params.aligner == 'kallisto' && !params.kallisto_index){
   process build_kallisto_index {
      tag "$fasta"
+     label 'mid_memory'
      publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
 
      when:
@@ -467,6 +465,7 @@ if (params.aligner == 'alevin'){
    */
   process run_alevin {
     tag "$name"
+    label 'high_memory'
     publishDir "${params.outdir}/alevin", mode: 'copy'
 
     when:
@@ -527,7 +526,6 @@ if (params.aligner == "star"){
       params.aligner == "star"
 
       input:
-      // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
       set val(samplename), file(reads) from read_files_star
       file index from star_index.collect()
       file gtf from gtf_star.collect()
@@ -580,6 +578,7 @@ if (params.aligner == "star"){
 if (params.aligner == 'kallisto'){
   process kallisto {
     tag "$name"
+    label 'mid_memory'
     publishDir "${params.outdir}/kallisto/raw_bus", mode: 'copy'
 
     when:
@@ -606,7 +605,7 @@ if (params.aligner == 'kallisto'){
 
   process bustools_correct_sort{
     tag "$bus"
-    label 'high_memory'
+    label 'mid_memory'
     publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
 
     when:
@@ -637,6 +636,7 @@ if (params.aligner == 'kallisto'){
 
   process bustools_count{
     tag "$bus"
+    label 'mid_memory'
     publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
 
     when:
@@ -720,7 +720,6 @@ process multiqc {
 
     input:
     file multiqc_config from ch_multiqc_config
-    // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     file ('software_versions/*') from software_versions_yaml
     file workflow_summary from create_workflow_summary(summary)
     file ('STAR/*') from star_log.collect().ifEmpty([])
@@ -796,7 +795,6 @@ workflow.onComplete {
     email_fields['summary']['Nextflow Build'] = workflow.nextflow.build
     email_fields['summary']['Nextflow Compile Timestamp'] = workflow.nextflow.timestamp
 
-    // TODO nf-core: If not using MultiQC, strip out this code (including params.maxMultiqcEmailFileSize)
     // On success try attach the multiqc report
     def mqc_report = null
     try {

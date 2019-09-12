@@ -11,8 +11,10 @@ matrix:
     env: NXF_VER='0.32.0' SUITE=test FLAGS=
     language: java
     jdk: openjdk8
+  - name: "Latest Nextflow version, regular test suite with Salmon Alevin"
+    env: NXF_VER='' SUITE=test FLAGS=
   - name: "Latest Nextflow version, test suite with Kallisto and Bustools"
-    env: NXF_VER='' SUITE=test_kallisto FLAGS=
+    env: NXF_VER='' SUITE=test_kallisto FLAGS='--bustools_correct false'
   - name: "Latest Nextflow version, test suite with STAR aligner"
     env: NXF_VER='' SUITE=test_star FLAGS=
   - name: "Lint the pipeline code"

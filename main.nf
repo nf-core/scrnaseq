@@ -41,6 +41,10 @@ def helpMessage() {
       --gtf                         Path to gtf file
       --transcript_fasta            Path to **transcriptome** Fasta reference file
 
+    Skipping Options:
+      --skip_bustools               Skips generation of BUS output in the Kallisto workflow
+      --bustools_correct            When set to `false`, skips bus correction step in Kallisto workflow
+
     Other options:
       --outdir                      The output directory where the results will be saved
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
@@ -606,7 +610,7 @@ if (params.aligner == 'kallisto'){
     publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
 
     when:
-    params.aligner == "kallisto"
+    params.aligner == "kallisto" && !params.skip_bustools
 
     input:
     file bus from kallisto_bus_to_sort
@@ -636,7 +640,7 @@ if (params.aligner == 'kallisto'){
     publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
 
     when:
-    params.aligner == 'kallisto'
+    params.aligner == 'kallisto' && !params.skip_bustools
 
     input:
     file bus from kallisto_corr_sort_to_count
@@ -660,7 +664,7 @@ if (params.aligner == 'kallisto'){
     publishDir "${params.outdir}/kallisto/bustools_metrics", mode: "copy"
 
     when:
-    params.aligner == 'kallisto'
+    params.aligner == 'kallisto' && !params.skip_bustools
 
     input:
     file bus from kallisto_corr_sort_to_metrics

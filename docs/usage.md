@@ -152,12 +152,9 @@ The workflow can handle three types of methods:
 
 To choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`.
 
-
-
 ### `--alevin_qc`
 
 Specify this if you want to have the AlevinQC module generate QC results for Alevin workflow output.
-
 
 ## Cellular barcodes
 
@@ -223,7 +220,7 @@ If you prefer, you can specify the full path to your reference genome when you r
 --fasta '[path to Fasta reference]'
 ```
 
-> Note that you need to specify either a `--genome` or `--fasta` when running the STARsolo workflow. The Kallisto and Alevin workflows can utilize a `--transcript_fasta` instead, whereas STAR needs a genomic FastA file as input in all cases. 
+> Note that you need to specify either a `--genome` or `--fasta` when running the STARsolo workflow. The Kallisto and Alevin workflows can utilize a `--transcript_fasta` instead, whereas STAR needs a genomic FastA file as input in all cases.
 
 ### `--gtf`
 

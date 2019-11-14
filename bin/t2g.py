@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #This was downloaded on 2019-06-23 from https://github.com/bustools/getting_started/releases/ 
 #All credit goes to the original authors from the Kallisto/BUStools team!
+#Licence probably BSD-2 as the main BusTools tools are licenced in the same type - please refer to the authors of this for more information
+
 import sys, argparse
 
 def create_transcript_list(input, use_name = True, use_version = False):
@@ -33,8 +35,8 @@ def create_transcript_list(input, use_name = True, use_version = False):
                 if 'transcript_version' not in d or 'gene_version' not in d:
                     continue
 
-                # tid += '.' + d['transcript_version']
-                # gid += '.' + d['gene_version']
+                tid += '.' + d['transcript_version']
+                gid += '.' + d['gene_version']
             gname = None
             if use_name:
                 if 'gene_name' not in d:

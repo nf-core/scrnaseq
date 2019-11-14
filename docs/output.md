@@ -2,28 +2,30 @@
 
 This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
 
-<!-- TODO nf-core: Write this documentation describing your workflow's output -->
-
 ## Pipeline overview
 The pipeline is built using [Nextflow](https://www.nextflow.io/)
 and processes data using the following steps:
 
-* [FastQC](#fastqc) - read quality control
 * [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
 
-## FastQC
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your reads. It provides information about the quality score distribution across your reads, the per base sequence content (%T/A/G/C). You get information about adapter contamination and other overrepresented sequences.
+## Kallisto & Bustools Results
 
-For further reading and documentation see the [FastQC help](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+See [Kallisto](https://pachterlab.github.io/kallisto/about) for details about Kallisto and [Bustools](https://bustools.github.io/) for more information on BusTools.
 
-> **NB:** The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality. To see how your reads look after trimming, look at the FastQC reports in the `trim_galore` directory.
+The pipeline can analyze data from single cell rnaseq experiments and generates a set of folders with respective outputs from various steps of the analysis. For a detailed summary what the pipeline does specifically, please follow the [excellent tutorial](https://www.kallistobus.tools/getting_started.html) that also describes specific steps for downstream analysis of the generated matrices.
 
-**Output directory: `results/fastqc`**
+**Output directory: `results/kallisto`**
 
-* `sample_fastqc.html`
-  * FastQC report, containing quality metrics for your untrimmed raw fastq files
-* `zips/sample_fastqc.zip`
-  * zip file containing the FastQC report, tab-delimited data file and plot images
+* `kallisto_gene_map`
+  * Contains the converted GTF gene map that is used by BusTools for downstream analysis
+* `kallisto_index`
+  * Contains the index of the supplied (genome/transcriptome) FastA file
+* `bustools_counts`
+  * Contains two subdirectories
+    * `eqcount`: Containing the Transcript Compatibility Count (TCC) Matrix (`tcc.mtx`)
+    * `genecount`: Containing the Gene Count Matrix (`gene.mtx`)
+
+For details on how to load these into R and perform further downstream analysis, please refer to the [BusTools HowTo](https://github.com/BUStools/getting_started/blob/master/getting_started.ipynb).
 
 ## MultiQC
 

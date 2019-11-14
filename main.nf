@@ -11,7 +11,6 @@
 
 
 def helpMessage() {
-    // TODO nf-core: Add to this help message with new command line parameters
     log.info nfcoreHeader()
     log.info"""
 
@@ -34,11 +33,16 @@ def helpMessage() {
       --alevin_qc                   Perform alevinQC analysis
       --chemistry                   Version of 10x chemistry, e.g. "--chemistry v2" or "--chemistry v3"
       --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
+      --kallisto_gene_map           A gene map used for bustools correction of BUS files created by Kallisto
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
       --fasta                       Path to **genome** Fasta reference file
       --gtf                         Path to gtf file
       --transcript_fasta            Path to **transcriptome** Fasta reference file
+
+    Skipping Options:
+      --skip_bustools               Skips generation of BUS output in the Kallisto workflow
+      --bustools_correct            When set to `false`, skips bus correction step in Kallisto workflow
 
     Other options:
       --outdir                      The output directory where the results will be saved
@@ -192,7 +196,6 @@ log.info nfcoreHeader()
 def summary = [:]
 if(workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
-// TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
 if(params.fasta)         summary['Genome Fasta Ref']        = params.fasta
 if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.transcript_fasta
@@ -202,6 +205,7 @@ if (params.salmon_index)        summary['Salmon Index']        = params.salmon_i
 summary['Droplet Technology'] = params.type
 summary['Chemistry Version'] = params.chemistry
 summary['Alevin TXP2Gene']        = params.txp2gene
+summary['Kallisto Gene Map']        = params.kallisto_gene_map
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(params.aligner == 'kallisto') summary['BUSTools Correct'] = params.bustools_correct
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
@@ -292,8 +296,6 @@ process unzip_10x_barcodes {
 }
 }
 
-
-
 /*
  * Preprocessing - Extract transcriptome fasta from genome fasta
  */
@@ -326,6 +328,7 @@ if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner ==
 if(params.aligner == 'alevin' && !params.salmon_index){
   process build_salmon_index {
      tag "$fasta"
+     label 'low_memory'
      publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
      when:
@@ -379,7 +382,8 @@ if (params.aligner == 'star' && !params.star_index && params.fasta){
 if (params.aligner == 'kallisto' && !params.kallisto_index){
   process build_kallisto_index {
      tag "$fasta"
-     publishDir "${params.outdir}/kallisto_index", mode: 'copy'
+     label 'mid_memory'
+     publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
 
      when:
 
@@ -388,12 +392,19 @@ if (params.aligner == 'kallisto' && !params.kallisto_index){
      file fasta from transcriptome_fasta_kallisto
 
      output:
-     file "${base}.idx" into kallisto_index
+     file "${name}.idx" into kallisto_index
 
      script:
-     base="${fasta.baseName}"
+     if("${fasta}".endsWith('.gz')){
+      name = "${fasta.baseName}"
+      unzip = "gunzip -f ${fasta}"
+     } else {
+      unzip = ""
+      name = "${fasta}"
+     }
      """
-     kallisto index -i ${base}.idx -k 31 $fasta
+     $unzip
+     kallisto index -i ${name}.idx -k 31 $name
      """
   }
 }
@@ -401,7 +412,7 @@ if (params.aligner == 'kallisto' && !params.kallisto_index){
 if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
   process build_gene_map{
     tag "$gtf"
-    publishDir "${params.outdir}/kallisto_gene_map", mode: 'copy'
+    publishDir "${params.outdir}/kallisto/kallisto_gene_map", mode: 'copy'
 
     input:
     file gtf from gtf_gene_map
@@ -410,8 +421,16 @@ if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
     file "transcripts_to_genes.txt" into kallisto_gene_map
 
     script:
+    if("${gtf}".endsWith('.gz')){
+      name = "${gtf.baseName}"
+      unzip = "gunzip -f ${gtf}"
+    } else {
+      unzip = ""
+      name = "${gtf}"
+    }
     """
-    cat $gtf | t2g.py > transcripts_to_genes.txt
+    $unzip
+    cat $name | t2g.py --use_version > transcripts_to_genes.txt
     """
   }
 }
@@ -446,6 +465,7 @@ if (params.aligner == 'alevin'){
    */
   process run_alevin {
     tag "$name"
+    label 'high_memory'
     publishDir "${params.outdir}/alevin", mode: 'copy'
 
     when:
@@ -465,7 +485,7 @@ if (params.aligner == 'alevin'){
     read2 = reads[1]
     """
     salmon alevin -l ISR -1 ${read1} -2 ${read2} \
-      --chromium -i $index -o ${name}_alevin_results -p 5 --tgMap $txp2gene --dumpFeatures
+      --chromium -i $index -o ${name}_alevin_results -p ${task.cpus} --tgMap $txp2gene --dumpFeatures –-dumpMtx
     """
   }
 } else {
@@ -506,7 +526,6 @@ if (params.aligner == "star"){
       params.aligner == "star"
 
       input:
-      // TODO (Nurlan Kerimov):  change the prefix to samplename in the future (did not do it because there is no test environment for changes)
       set val(samplename), file(reads) from read_files_star
       file index from star_index.collect()
       file gtf from gtf_star.collect()
@@ -559,6 +578,7 @@ if (params.aligner == "star"){
 if (params.aligner == 'kallisto'){
   process kallisto {
     tag "$name"
+    label 'mid_memory'
     publishDir "${params.outdir}/kallisto/raw_bus", mode: 'copy'
 
     when:
@@ -585,38 +605,42 @@ if (params.aligner == 'kallisto'){
 
   process bustools_correct_sort{
     tag "$bus"
-    label 'high_memory'
+    label 'mid_memory'
     publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
 
     when:
-    params.aligner == "kallisto"
+    params.aligner == "kallisto" && !params.skip_bustools
 
     input:
     file bus from kallisto_bus_to_sort
     file whitelist from barcode_whitelist_kallisto.collect()
 
     output:
-    file bus into kallisto_corr_sort_to_count
+    file bus into (kallisto_corr_sort_to_count, kallisto_corr_sort_to_metrics)
 
     script:
-    correct = params.bustools_correct ? "bustools correct -w $whitelist -p ${bus}/output.bus | bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus -" : "bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.correct.sort.bus ${bus}/output.bus"
+    if(params.bustools_correct) {
+      correct = "bustools correct -w $whitelist -o ${bus}/output.corrected.bus ${bus}/output.bus"
+      sort_file = "${bus}/output.corrected.bus"
+    } else {
+      correct = ""
+      sort_file = "${bus}/output.bus"
+    }
     """
-    $correct
+    $correct    
+    mkdir -p tmp
+    bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.corrected.sort.bus $sort_file
     """
   }
 
-  /*
-  * Former code
-
-
-  */
 
   process bustools_count{
     tag "$bus"
+    label 'mid_memory'
     publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
 
     when:
-    params.aligner == 'kallisto'
+    params.aligner == 'kallisto' && !params.skip_bustools
 
     input:
     file bus from kallisto_corr_sort_to_count
@@ -630,10 +654,30 @@ if (params.aligner == 'kallisto'){
     """
     mkdir -p ${bus}_eqcount
     mkdir -p ${bus}_genecount
-    bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.correct.sort.bus
-    bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.correct.sort.bus
+    bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.corrected.sort.bus
+    bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.corrected.sort.bus
     """
   }
+
+  process bustools_inspect{
+    tag "$bus"
+    publishDir "${params.outdir}/kallisto/bustools_metrics", mode: "copy"
+
+    when:
+    params.aligner == 'kallisto' && !params.skip_bustools
+
+    input:
+    file bus from kallisto_corr_sort_to_metrics
+
+    output:
+    file "${bus}.json"
+
+    script:
+    """
+    bustools inspect -o ${bus}.json ${bus}/output.corrected.sort.bus
+    """
+  }
+  
 } else {
   kallisto_log_for_multiqc = Channel.empty()
 }
@@ -642,30 +686,30 @@ if (params.aligner == 'kallisto'){
 
  /*
   * STEP 4 - Run alevin qc
-  * Will have to wait until Bioconda recipe is available for this
+  * We have to wait for an update : https://github.com/csoneson/alevinQC/issues/8 
   */
 
   // process run_alevin_qc {
   //   tag "$prefix"
   //   publishDir "${params.outdir}/alevin_qc", mode: 'copy'
-  //
+  
   //   when:
   //   params.aligner == "alevin"
-  //
+  
   //   input:
   //   file result from alevin_results
-  //
+  
   //   output:
   //   file "${name}_alevinqc_results" into alevinqc_results
-  //
+  
   //   script:
-  //
+  
   //   prefix = result.toString() - '_alevin_results'
-  //
+  
   //   """
   //   alevin_qc.r $result ${prefix} $result
   //   """
-  //
+  
   // }
 
 /*
@@ -676,7 +720,6 @@ process multiqc {
 
     input:
     file multiqc_config from ch_multiqc_config
-    // TODO nf-core: Add in log files from your new processes for MultiQC to find!
     file ('software_versions/*') from software_versions_yaml
     file workflow_summary from create_workflow_summary(summary)
     file ('STAR/*') from star_log.collect().ifEmpty([])
@@ -752,7 +795,6 @@ workflow.onComplete {
     email_fields['summary']['Nextflow Build'] = workflow.nextflow.build
     email_fields['summary']['Nextflow Compile Timestamp'] = workflow.nextflow.timestamp
 
-    // TODO nf-core: If not using MultiQC, strip out this code (including params.maxMultiqcEmailFileSize)
     // On success try attach the multiqc report
     def mqc_report = null
     try {
@@ -813,9 +855,9 @@ workflow.onComplete {
     c_green = params.monochrome_logs ? '' : "\033[0;32m";
     c_red = params.monochrome_logs ? '' : "\033[0;31m";
 
-    if (workflow.stats.ignoredCountFmt > 0 && workflow.success) {
+    if (workflow.stats.ignoredCount > 0 && workflow.success) {
       log.info "${c_purple}Warning, pipeline completed, but with errored process(es) ${c_reset}"
-      log.info "${c_red}Number of ignored errored process(es) : ${workflow.stats.ignoredCountFmt} ${c_reset}"
+      log.info "${c_red}Number of ignored errored process(es) : ${workflow.stats.ignoredCount} ${c_reset}"
       log.info "${c_green}Number of successfully ran process(es) : ${workflow.stats.succeedCountFmt} ${c_reset}"
     }
 

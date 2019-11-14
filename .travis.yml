@@ -6,7 +6,7 @@ jdk: openjdk8
 
 before_install:
   # PRs to master are only ok if coming from dev branch
-  - '[ $TRAVIS_PULL_REQUEST = "false" ] || [ $TRAVIS_BRANCH != "master" ] || ([ $TRAVIS_PULL_REQUEST_SLUG = $TRAVIS_REPO_SLUG ] && [ $TRAVIS_PULL_REQUEST_BRANCH = "dev" ])'
+  - '[ $TRAVIS_PULL_REQUEST = "false" ] || [ $TRAVIS_BRANCH != "master" ] || ([ $TRAVIS_PULL_REQUEST_SLUG = $TRAVIS_REPO_SLUG ] && ([ $TRAVIS_PULL_REQUEST_BRANCH = "dev" ] || [ $TRAVIS_PULL_REQUEST_BRANCH = "patch" ]))'
   # Pull the docker image first so the test doesn't wait for this
   - docker pull nfcore/scrnaseq:dev
   # Fake the tag locally so that the pipeline runs properly
@@ -50,6 +50,9 @@ matrix:
     python: '3.6'
 
 
+env:
+  - NXF_VER='19.10.0' # Specify a minimum NF version that should be tested and work
+  - NXF_VER='' # Plus: get the latest NF version and check that it works
 
 script:
   # Run Test Profiles

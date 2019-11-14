@@ -42,7 +42,7 @@ matrix:
     env: NXF_VER='' SUITE=test_star FLAGS=
   - name: "Lint the pipeline code"
     python: '3.6'
-    env: NXF_VER='0.32.0'
+    env: NXF_VER='19.10.0'
     jdk: openjdk8  
     script: nf-core lint ${TRAVIS_BUILD_DIR}
   - name: "Lint the documentation"

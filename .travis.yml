@@ -1,8 +1,11 @@
 sudo: required
 language: python
-services: docker
-cache: pip
 jdk: openjdk8
+services: docker
+python: '3.6'
+cache: pip
+matrix:
+  fast_finish: true
 
 before_install:
   # PRs to master are only ok if coming from dev branch
@@ -18,42 +21,27 @@ install:
   - mkdir /tmp/nextflow && cd /tmp/nextflow
   - wget -qO- get.nextflow.io | bash
   - sudo ln -s /tmp/nextflow/nextflow /usr/local/bin/nextflow
+  # Install nf-core/tools
+  - pip install --upgrade pip
+  - pip install nf-core
+  # Install Conda 
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  - bash Miniconda3-latest-Linux-x86_64.sh -b -f -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
   # Reset
   - mkdir ${TRAVIS_BUILD_DIR}/tests && cd ${TRAVIS_BUILD_DIR}/tests
   # Install markdownlint-cli
   - sudo apt-get install npm && npm install -g markdownlint-cli
-  # Install nf-core/tools
-  - pip install --upgrade pip
-  - pip install nf-core
-
-
-matrix:
-  fast_finish: true
-  include:
-  - name: "Minimum Nextflow version, regular test suite with Salmon Alevin"
-    env: NXF_VER='19.10.0' SUITE=test FLAGS=
-    language: java
-    jdk: openjdk8
-  - name: "Latest Nextflow version, regular test suite with Salmon Alevin"
-    env: NXF_VER='' SUITE=test FLAGS=
-  - name: "Latest Nextflow version, test suite with Kallisto and Bustools"
-    env: NXF_VER='' SUITE=test_kallisto FLAGS='--bustools_correct false'
-  - name: "Latest Nextflow version, test suite with STAR aligner"
-    env: NXF_VER='' SUITE=test_star FLAGS=
-  - name: "Lint the pipeline code"
-    python: '3.6'
-    env: NXF_VER='19.10.0'
-    jdk: openjdk8  
-    script: nf-core lint ${TRAVIS_BUILD_DIR}
-  - name: "Lint the documentation"
-    script: markdownlint ${TRAVIS_BUILD_DIR} -c ${TRAVIS_BUILD_DIR}/.github/markdownlint.yml
-    python: '3.6'
-
 
 env:
-  - NXF_VER='19.10.0' # Specify a minimum NF version that should be tested and work
-  - NXF_VER='' # Plus: get the latest NF version and check that it works
+  - NXF_VER='19.10.0' NXF_ANSI_LOG=0
+  - NXF_VER='' NXF_ANSI_LOG=0 
 
 script:
-  # Run Test Profiles
-  - nextflow run ${TRAVIS_BUILD_DIR} -profile ${SUITE},docker ${FLAGS}
+  # Lint the pipeline code
+  - nf-core lint ${TRAVIS_BUILD_DIR}
+  - markdownlint ${TRAVIS_BUILD_DIR} -c ${TRAVIS_BUILD_DIR}/.github/markdownlint.yml
+  # REFERENCE: Run the basic pipeline with the test profile
+  - nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker ${FLAGS}
+  - nextflow run ${TRAVIS_BUILD_DIR} -profile test_kallisto,docker ${FLAGS}
+  - nextflow run ${TRAVIS_BUILD_DIR} -profile test_star,docker ${FLAGS}

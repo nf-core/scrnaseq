@@ -490,6 +490,7 @@ if (params.aligner == 'alevin'){
   }
 } else {
   alevin_logs = Channel.empty()
+  alevin_results = Channel.empty()
 }
 
 
@@ -680,6 +681,7 @@ if (params.aligner == 'kallisto'){
   
 } else {
   kallisto_log_for_multiqc = Channel.empty()
+  alevin_results = Channel.empty()
 }
 
 
@@ -689,28 +691,28 @@ if (params.aligner == 'kallisto'){
   * We have to wait for an update : https://github.com/csoneson/alevinQC/issues/8 
   */
 
-  // process run_alevin_qc {
-  //   tag "$prefix"
-  //   publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+  process run_alevin_qc {
+    tag "$prefix"
+    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
   
-  //   when:
-  //   params.aligner == "alevin"
+    when:
+    params.aligner == "alevin"
   
-  //   input:
-  //   file result from alevin_results
+    input:
+    file result from alevin_results
   
-  //   output:
-  //   file "${name}_alevinqc_results" into alevinqc_results
+    output:
+    file "${name}_alevinqc_results" into alevinqc_results
   
-  //   script:
+    script:
   
-  //   prefix = result.toString() - '_alevin_results'
+    prefix = result.toString() - '_alevin_results'
   
-  //   """
-  //   alevin_qc.r $result ${prefix} $result
-  //   """
+    """
+    alevin_qc.r $result ${prefix} $result
+    """
   
-  // }
+  }
 
 /*
  * STEP 4 - MultiQC

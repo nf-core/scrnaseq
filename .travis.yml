@@ -43,5 +43,4 @@ script:
   - markdownlint ${TRAVIS_BUILD_DIR} -c ${TRAVIS_BUILD_DIR}/.github/markdownlint.yml
   # REFERENCE: Run the basic pipeline with the test profile
   - nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker ${FLAGS}
-  - nextflow run ${TRAVIS_BUILD_DIR} -profile test_kallisto,docker ${FLAGS}
-  - nextflow run ${TRAVIS_BUILD_DIR} -profile test_star,docker ${FLAGS}
+  # All other tests run via GithUB Actions now

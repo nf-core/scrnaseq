@@ -2,7 +2,7 @@
 
 **A fully automated Nextflow pipeline for 10xGenomics single cell rnaseq data**.
 
-[![Build Status](https://travis-ci.com/nf-core/scrnaseq.svg?branch=master)](https://travis-ci.com/nf-core/scrnaseq)
+[![Build Status](https://github.com/nf-core/scrnaseq/workflows/scrnaseq%20CI/badge.svg)](https://github.com/nf-core/scrnaseq/workflows/scrnaseq%20CI/badge.svg)
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A519.10.0-brightgreen.svg)](https://www.nextflow.io/)
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/)

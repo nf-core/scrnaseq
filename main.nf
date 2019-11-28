@@ -71,12 +71,6 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
     exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
 }
 
-params.salmon_index = params.genome ? params.genomes[ params.genome ].salmon_index ?: false : false
-params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
-params.transcript_fasta = params.genome ? params.genomes[ params.genome ].transcript_fasta ?: false : false
-params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
-params.txp2gene = params.genome ? params.genomes[ params.genome ].txp2gene ?: false : false
-params.readPaths = params.readPaths? params.readPaths: false
 
 //Check if one of the available aligners is used (alevin, kallisto, star)
 if (params.aligner != 'star' && params.aligner != 'alevin' && params.aligner != 'kallisto'){

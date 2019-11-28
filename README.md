@@ -12,6 +12,7 @@
 [![Join us on Slack](https://img.shields.io/badge/slack-nfcore/scrnaseq-blue.svg)](https://nfcore.slack.com/messages/CHN5BV5DW)
 
 ## Introduction
+
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
 
 ## Documentation

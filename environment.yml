@@ -21,3 +21,4 @@ dependencies:
   - gffread=0.11.6
   - bioconda::kallisto=0.46.0
   - bioconda::bustools=0.39.4
+  - font-ttf-source-code-pro=2.030 #Required for fonts in alevinQC

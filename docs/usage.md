@@ -2,8 +2,6 @@
 
 ## Table of contents
 
-<!-- Install Atom plugin markdown-toc-auto for this ToC to auto-update on save -->
-<!-- TOC START min:2 max:3 link:true asterisk:true update:true -->
 * [nf-core/scrnaseq: Usage](#nf-corescrnaseq-usage)
   * [Table of contents](#table-of-contents)
   * [Introduction](#introduction)
@@ -13,7 +11,6 @@
   * [Main arguments](#main-arguments)
     * [`-profile`](#profile)
     * [`--reads`](#reads)
-    * [`--single_end`](#singleend)
     * [`--aligner`](#aligner)
     * [`--alevin_qc`](#alevinqc)
   * [Cellular barcodes](#cellular-barcodes)
@@ -49,7 +46,6 @@
     * [`--plaintext_email`](#plaintextemail)
     * [`--monochrome_logs`](#monochromelogs)
     * [`--multiqc_config`](#multiqcconfig)
-<!-- TOC END -->
 
 ## Introduction
 
@@ -134,16 +130,6 @@ Please note the following requirements:
 3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.
 
 If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
-
-### `--single_end`
-
-By default, the pipeline expects paired-end data. If you have single-end data, you need to specify `--singleEnd` on the command line when you launch the pipeline. A normal glob pattern, enclosed in quotation marks, can then be used for `--reads`. For example:
-
-```bash
---singleEnd --reads '*.fastq'
-```
-
-It is not possible to run a mixture of single-end and paired-end files in one run.
 
 ### `--aligner`
 

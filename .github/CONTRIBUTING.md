@@ -6,7 +6,7 @@ We try to manage the required tasks for nf-core/scrnaseq using GitHub issues, yo
 
 However, don't be put off by this template - other more general issues and suggestions are welcome! Contributions to the code are even more welcome ;)
 
-> If you need help using or modifying nf-core/scrnaseq then the best place to ask is on the pipeline channel on [Slack](https://nf-core-invite.herokuapp.com/).
+> If you need help using or modifying nf-core/scrnaseq then the best place to ask is on the pipeline channel on [Slack](https://nfcore.slack.com/channels/scrnaseq).
 
 ## Contribution workflow
 
@@ -46,4 +46,4 @@ These tests are run both with the latest available version of Nextflow and also 
 
 ## Getting help
 
-For further information/help, please consult the [nf-core/scrnaseq documentation](https://github.com/nf-core/scrnaseq#documentation) and don't hesitate to get in touch on the pipeline channel on [Slack](https://nf-core-invite.herokuapp.com/).
+For further information/help, please consult the [nf-core/scrnaseq documentation](https://github.com/nf-core/scrnaseq#documentation) and don't hesitate to get in touch on the pipeline channel on [Slack](https://nfcore.slack.com/channels/scrnaseq).

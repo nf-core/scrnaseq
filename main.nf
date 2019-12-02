@@ -204,17 +204,20 @@ def summary = [:]
 if(workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
 summary['Reads']            = params.reads
-if(params.fasta)         summary['Genome Fasta Ref']        = params.fasta
-if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.transcript_fasta
+if(params.fasta)         summary['Genome Reference']        = params.fasta
+if(params.transcriptome_fasta)  summary['Transcriptome Reference']        = params.transcriptome_fasta
 summary['GTF Reference']        = params.gtf
+summary['Save Reference?'] = params.save_reference
 summary['Aligner']        = params.aligner
 if (params.salmon_index)        summary['Salmon Index']        = params.salmon_index
+if (params.star_index) summary['STARsolo Index'] = params.star_index
+if (params.kallisto_index) summary['Kallisto Index'] = params.kallisto_index
 summary['Droplet Technology'] = params.type
 summary['Chemistry Version'] = params.chemistry
-summary['Alevin TXP2Gene']        = params.txp2gene
-summary['Kallisto Gene Map']        = params.kallisto_gene_map
-summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
+if (params.aligner == 'alevin') summary['Alevin TXP2Gene']        = params.txp2gene
+if (params.aligner == 'kallisto') summary['Kallisto Gene Map']        = params.kallisto_gene_map
 if(params.aligner == 'kallisto') summary['BUSTools Correct'] = params.bustools_correct
+summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
 summary['Launch dir']       = workflow.launchDir

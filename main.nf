@@ -181,7 +181,8 @@ if (params.type == "10x" && !params.barcode_whitelist){
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
-         .into{ barcode_whitelist_star; barcode_whitelist_kallisto }
+         .into{ barcode_whitelist_star; barcode_whitelist_kallisto; barcode_whitelist_alevinqc }
+  barcode_whitelist_gzipped = Channel.empty()
 }
 
 
@@ -272,7 +273,9 @@ process get_software_versions {
     """
 }
 
-
+/*
+* Preprocessing - Unzip 10X barcodes if they are supplied compressed
+*/ 
 process unzip_10x_barcodes {
     tag "${params.chemistry}"
     publishDir "${params.outdir}/salmon_index", mode: 'copy'
@@ -281,7 +284,7 @@ process unzip_10x_barcodes {
     file gzipped from barcode_whitelist_gzipped
 
     output:
-    file "${gzipped.simpleName}" into (barcode_whitelist_star, barcode_whitelist_kallisto)
+    file "${gzipped.simpleName}" into (barcode_whitelist_star_unzip, barcode_whitelist_kallisto_unzip, barcode_whitelist_alevinqc_unzip)
 
     when: params.type == '10x' && !params.barcode_whitelist
 
@@ -297,7 +300,7 @@ process unzip_10x_barcodes {
  */
 
 process extract_transcriptome {
-    tag "${genome_fasta_extract_transcriptome}"
+    tag "${genome_fasta}"
     publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
 
     input:
@@ -372,7 +375,9 @@ process makeSTARindex {
     """
 }
 
-
+/*
+* Preprocessing - Generate Kallisto Index if not supplied via --kallisto_index
+*/ 
 process build_kallisto_index {
     tag "$fasta"
     label 'mid_memory'
@@ -400,6 +405,9 @@ process build_kallisto_index {
     """
 }
 
+/*
+* Preprocessing - Generate a Kallisto Gene Map if not supplied via --kallisto_gene_map
+*/ 
 process build_gene_map{
     tag "$gtf"
     publishDir "${params.outdir}/kallisto/kallisto_gene_map", mode: 'copy'
@@ -428,9 +436,8 @@ process build_gene_map{
 
 
 /*
- * STEP 2 - Make txp2gene
+* Preprocessing - Generate TXP2Gene if not supplied via --txp2gene_alevin
 */
-
 process build_txp2gene {
     tag "$gtf"
     publishDir "${params.outdir}", mode: 'copy'
@@ -451,10 +458,10 @@ process build_txp2gene {
     """
 }
 
-  /*
-   * STEP 3 - Run alevin
-   */
-process run_alevin {
+/*
+* Run Salmon Alevin
+*/
+process alevin {
     tag "$name"
     label 'high_memory'
     publishDir "${params.outdir}/alevin", mode: 'copy'
@@ -479,17 +486,12 @@ process run_alevin {
       --chromium -i $index -o ${name}_alevin_results -p ${task.cpus} --tgMap $txp2gene --dumpFeatures –-dumpMtx
     """
 }
-// } else {
-//   alevin_logs = Channel.empty()
-//   alevin_results = Channel.empty()
-// }
-
 
 /*
- * STEP X - Run alevin qc
- */
+* Run Alevin QC 
+*/
 
-process run_alevin_qc {
+process alevin_qc {
     tag "$prefix"
     publishDir "${params.outdir}/alevin_qc", mode: 'copy'
   
@@ -498,16 +500,63 @@ process run_alevin_qc {
   
     input:
     file result from alevin_results
+    file whitelist from barcode_whitelist_alevinqc.mix(barcode_whitelist_alevinqc_unzip).collect()
   
     output:
-    file "${name}_alevinqc_results" into alevinqc_results
+    file "${result}" into alevinqc_results
   
     script:
-  
     prefix = result.toString() - '_alevin_results'
-  
     """
+    mv $whitelist ${result}/alevin/whitelist.txt
     alevin_qc.r $result ${prefix} $result
+    """
+}
+
+process star {
+    label 'high_memory'
+
+    tag "$prefix"
+    publishDir "${params.outdir}/STAR", mode: 'copy'
+
+    input:
+    set val(samplename), file(reads) from read_files_star
+    file index from star_index.collect()
+    file gtf from gtf_star.collect()
+    file whitelist from barcode_whitelist_star.mix(barcode_whitelist_star_unzip).collect()
+
+    output:
+    set file("*Log.final.out"), file ('*.bam') into star_aligned
+    file "*.out" into alignment_logs
+    file "*SJ.out.tab"
+    file "*Log.out" into star_log
+    file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
+
+    when: params.aligner == 'star'
+
+    script:
+    prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
+    def star_mem = task.memory ?: params.star_memory ?: false
+    def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
+
+    seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
+    cdna_read = reads[0]
+    barcode_read = reads[1]
+    """
+    STAR --genomeDir $index \\
+          --sjdbGTFfile $gtf \\
+          --readFilesIn $barcode_read $cdna_read  \\
+          --runThreadN ${task.cpus} \\
+          --twopassMode Basic \\
+          --outWigType bedGraph \\
+          --outSAMtype BAM SortedByCoordinate $avail_mem \\
+          --readFilesCommand zcat \\
+          --runDirPerm All_RWX \\
+          --outFileNamePrefix $prefix $seqCenter \\
+          --soloType Droplet \\
+          --soloCBwhitelist $whitelist
+
+    samtools index ${prefix}Aligned.sortedByCoord.out.bam
     """
 }
 
@@ -532,63 +581,15 @@ def check_log(logs) {
     }
 }
 
-if (params.aligner == "star"){
-  process star {
-      label 'high_memory'
+// Filter removes all 'aligned' channels that fail the check
+star_aligned
+    .filter { logs, bams -> check_log(logs) }
+    .flatMap {  logs, bams -> bams }
+.into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
 
-      tag "$prefix"
-      publishDir "${params.outdir}/STAR", mode: 'copy'
-
-      input:
-      set val(samplename), file(reads) from read_files_star
-      file index from star_index.collect()
-      file gtf from gtf_star.collect()
-      file whitelist from barcode_whitelist_star.collect()
-
-      output:
-      set file("*Log.final.out"), file ('*.bam') into star_aligned
-      file "*.out" into alignment_logs
-      file "*SJ.out.tab"
-      file "*Log.out" into star_log
-      file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
-
-      script:
-      prefix = reads[0].toString() - ~/(_R1)?(_trimmed)?(_val_1)?(\.fq)?(\.fastq)?(\.gz)?$/
-      def star_mem = task.memory ?: params.star_memory ?: false
-      def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
-
-      seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
-      cdna_read = reads[0]
-      barcode_read = reads[1]
-      """
-      STAR --genomeDir $index \\
-           --sjdbGTFfile $gtf \\
-           --readFilesIn $barcode_read $cdna_read  \\
-           --runThreadN ${task.cpus} \\
-           --twopassMode Basic \\
-           --outWigType bedGraph \\
-           --outSAMtype BAM SortedByCoordinate $avail_mem \\
-           --readFilesCommand zcat \\
-           --runDirPerm All_RWX \\
-           --outFileNamePrefix $prefix $seqCenter \\
-           --soloType Droplet \\
-           --soloCBwhitelist $whitelist
-
-      samtools index ${prefix}Aligned.sortedByCoord.out.bam
-      """
-
-
-  }
-  // Filter removes all 'aligned' channels that fail the check
-  star_aligned
-      .filter { logs, bams -> check_log(logs) }
-      .flatMap {  logs, bams -> bams }
-  .into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
-} else {
-  star_log = Channel.empty()
-}
-
-// Run Kallisto bus
+/*
+* Run Kallisto Workflow
+*/
 process kallisto {
     tag "$name"
     label 'mid_memory'
@@ -614,7 +615,9 @@ process kallisto {
         $reads | tee ${name}_kallisto.log
     """
 }
-
+/*
+* Run BUSTools Correct / Sort on Kallisto Output
+*/
 process bustools_correct_sort{
     tag "$bus"
     label 'mid_memory'
@@ -622,7 +625,7 @@ process bustools_correct_sort{
 
     input:
     file bus from kallisto_bus_to_sort
-    file whitelist from barcode_whitelist_kallisto.collect()
+    file whitelist from barcode_whitelist_kallisto.mix(barcode_whitelist_kallisto_unzip).collect()
 
     output:
     file bus into (kallisto_corr_sort_to_count, kallisto_corr_sort_to_metrics)
@@ -644,6 +647,9 @@ process bustools_correct_sort{
     """
 }
 
+/*
+* Run BUSTools count on sorted/corrected output from Kallisto|Bus 
+*/
 process bustools_count{
     tag "$bus"
     label 'mid_memory'
@@ -666,6 +672,10 @@ process bustools_count{
     """
 }
 
+/*
+* Run Bustools inspect
+*/
+
 process bustools_inspect{
     tag "$bus"
     publishDir "${params.outdir}/kallisto/bustools_metrics", mode: "copy"
@@ -681,14 +691,9 @@ process bustools_inspect{
     bustools inspect -o ${bus}.json ${bus}/output.corrected.sort.bus
     """
 }
-  
-// } else {
-//   kallisto_log_for_multiqc = Channel.empty()
-//   alevin_results = Channel.empty()
-// }
 
 /*
- * STEP 4 - MultiQC
+ * Run MultiQC on results / logfiles 
  */
 process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
@@ -714,10 +719,8 @@ process multiqc {
     """
 }
 
-
-
 /*
- * STEP 5 - Output Description HTML
+ * Output Description HTML
  */
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'
@@ -733,8 +736,6 @@ process output_documentation {
     markdown_to_html.r $output_docs results_description.html
     """
 }
-
-
 
 /*
  * Completion e-mail notification

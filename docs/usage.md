@@ -66,7 +66,7 @@ NXF_OPTS='-Xms1g -Xmx4g'
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' --type '10x' --aligner 'kallisto' --barcode_whitelist 10xv2.whitelist.txt --fasta human.fasta --gtf human.gtf -profile docker
+nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' --type '10x' --barcode_whitelist 10xv2.whitelist.txt --fasta human.fasta --gtf human.gtf -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -223,7 +223,7 @@ If you prefer, you can specify the full path to your reference genome when you r
 --fasta '[path to Fasta reference]'
 ```
 
-> Note that you need to specify either a `--genome` or `--fasta` when running the STARsolo workflow. The Kallisto and Alevin workflows can utilize a `--transcript_fasta` instead, whereas STAR needs a genomic FastA file as input in all cases.
+> Note that you need to specify either a `--genome` or `--fasta` when running the STARsolo workflow. The Kallisto and Alevin workflows can utilize a `--transcript_fasta` instead, whereas STAR needs a genomic fasta file as input in all cases.
 
 ### `--gtf`
 
@@ -231,7 +231,7 @@ Specify a valid GTF file for the workflow here.
 
 ### `--transcript_fasta`
 
-If you intend to skip the generation of a transcriptomic FastA file, you can use this parameter to supply a transcriptomic FastA file here. If you don't specify this, it will be automatically generated from the supplied genomics FastA file utilizing the GTF annotation subsequently.
+If you intend to skip the generation of a transcriptomic fasta file, you can use this parameter to supply a transcriptomic fasta file here. If you don't specify this, it will be automatically generated from the supplied genomics fasta file utilizing the GTF annotation subsequently.
 
 ### `--salmon_index`
 

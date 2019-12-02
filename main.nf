@@ -145,7 +145,7 @@ if( workflow.profile == 'awsbatch') {
   // related: https://github.com/nextflow-io/nextflow/issues/813
   if (!params.outdir.startsWith('s3:')) exit 1, "Outdir not on S3 - specify S3 Bucket to run on AWSBatch!"
   // Prevent trace files to be stored on S3 since S3 does not support rolling files.
-  if (workflow.tracedir.startsWith('s3:')) exit 1, "Specify a local tracedir or run without trace! S3 cannot be used for tracefiles."
+  if (params.tracedir.startsWith('s3:')) exit 1, "Specify a local tracedir or run without trace! S3 cannot be used for tracefiles."
 }
 
 // Stage config files
@@ -272,164 +272,164 @@ process get_software_versions {
     """
 }
 
-if(params.type == '10x' && !params.barcode_whitelist){
-    process unzip_10x_barcodes {
-      tag "${params.chemistry}"
-      publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-      input:
-      file gzipped from barcode_whitelist_gzipped
+process unzip_10x_barcodes {
+    tag "${params.chemistry}"
+    publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-      output:
-      file "${gzipped.simpleName}" into (barcode_whitelist_star, barcode_whitelist_kallisto)
+    input:
+    file gzipped from barcode_whitelist_gzipped
 
-      script:
-      """
-      gunzip -c $gzipped > ${gzipped.simpleName}
-      """
-    }
+    output:
+    file "${gzipped.simpleName}" into (barcode_whitelist_star, barcode_whitelist_kallisto)
+
+    when: params.type == '10x' && !params.barcode_whitelist
+
+    script:
+    """
+    gunzip -c $gzipped > ${gzipped.simpleName}
+    """
 }
+
 
 /*
  * Preprocessing - Extract transcriptome fasta from genome fasta
  */
 
-if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')){
-    process extract_transcriptome {
-      tag "${genome_fasta_extract_transcriptome}"
-      publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
+process extract_transcriptome {
+    tag "${genome_fasta_extract_transcriptome}"
+    publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
 
-      input:
-      file genome_fasta from genome_fasta_extract_transcriptome
-      file gtf from gtf_extract_transcriptome
+    input:
+    file genome_fasta from genome_fasta_extract_transcriptome
+    file gtf from gtf_extract_transcriptome
 
+    output:
+    file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
 
-      output:
-      file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
-
-      script:
-      // -F to preserve all GTF attributes in the fasta ID
-      """
-      gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
-      """
-    }
+    when: !params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')
+    script:
+    // -F to preserve all GTF attributes in the fasta ID
+    """
+    gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
+    """
 }
 
 /*
  * STEP 1 - Make_index
  */
 
-if(params.aligner == 'alevin' && !params.salmon_index){
-    process build_salmon_index {
-      tag "$fasta"
-      label 'low_memory'
-      publishDir "${params.outdir}/salmon_index", mode: 'copy'
+process build_salmon_index {
+    tag "$fasta"
+    label 'low_memory'
+    publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-      when:
-      params.aligner == 'alevin' && !params.salmon_index
+    when:
+    params.aligner == 'alevin' && !params.salmon_index
 
-      input:
-      file fasta from transcriptome_fasta_alevin
+    input:
+    file fasta from transcriptome_fasta_alevin
 
-      output:
-      file "salmon_index" into salmon_index_alevin
+    output:
+    file "salmon_index" into salmon_index_alevin
 
-      script:
+    when: params.aligner == 'alevin' && !params.salmon_index
 
-      """
-      salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
-      """
-    }
+    script:
+    """
+    salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
+    """
 }
 
 
-if (params.aligner == 'star' && !params.star_index && params.fasta){
-    process makeSTARindex {
-        label 'high_memory'
-        tag "$fasta"
-        publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
-                    saveAs: { params.saveReference ? it : null }, mode: 'copy'
+//Create a STAR index if not supplied via --star_index
+process makeSTARindex {
+    label 'high_memory'
+    tag "$fasta"
+    publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
+                saveAs: { params.saveReference ? it : null }, mode: 'copy'
 
-        input:
-        file fasta from genome_fasta_makeSTARindex
-        file gtf from gtf_makeSTARindex
+    input:
+    file fasta from genome_fasta_makeSTARindex
+    file gtf from gtf_makeSTARindex
 
-        output:
-        file "star" into star_index
+    output:
+    file "star" into star_index
 
-        script:
-        def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
-        """
-        mkdir star
-        STAR \\
-            --runMode genomeGenerate \\
-            --runThreadN ${task.cpus} \\
-            --sjdbGTFfile $gtf \\
-            --genomeDir star/ \\
-            --genomeFastaFiles $fasta \\
-            $avail_mem
-        """
-    }
+    when: params.aligner == 'star' && !params.star_index && params.fasta
+
+    script:
+    def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
+    """
+    mkdir star
+    STAR \\
+        --runMode genomeGenerate \\
+        --runThreadN ${task.cpus} \\
+        --sjdbGTFfile $gtf \\
+        --genomeDir star/ \\
+        --genomeFastaFiles $fasta \\
+        $avail_mem
+    """
 }
 
 
-if (params.aligner == 'kallisto' && !params.kallisto_index){
-    process build_kallisto_index {
-      tag "$fasta"
-      label 'mid_memory'
-      publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
+process build_kallisto_index {
+    tag "$fasta"
+    label 'mid_memory'
+    publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
 
-      input:
-      file fasta from transcriptome_fasta_kallisto
+    input:
+    file fasta from transcriptome_fasta_kallisto
 
-      output:
-      file "${name}.idx" into kallisto_index
+    output:
+    file "${name}.idx" into kallisto_index
 
-      script:
-      if("${fasta}".endsWith('.gz')){
-        name = "${fasta.baseName}"
-        unzip = "gunzip -f ${fasta}"
-      } else {
-        unzip = ""
-        name = "${fasta}"
-      }
-      """
-      $unzip
-      kallisto index -i ${name}.idx -k 31 $name
-      """
+    when: params.aligner == 'kallisto' && !params.kallisto_index
+
+    script:
+    if("${fasta}".endsWith('.gz')){
+      name = "${fasta.baseName}"
+      unzip = "gunzip -f ${fasta}"
+    } else {
+      unzip = ""
+      name = "${fasta}"
     }
+    """
+    $unzip
+    kallisto index -i ${name}.idx -k 31 $name
+    """
 }
 
-if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
-    process build_gene_map{
-      tag "$gtf"
-      publishDir "${params.outdir}/kallisto/kallisto_gene_map", mode: 'copy'
+process build_gene_map{
+    tag "$gtf"
+    publishDir "${params.outdir}/kallisto/kallisto_gene_map", mode: 'copy'
 
-      input:
-      file gtf from gtf_gene_map
+    input:
+    file gtf from gtf_gene_map
 
-      output:
-      file "transcripts_to_genes.txt" into kallisto_gene_map
+    output:
+    file "transcripts_to_genes.txt" into kallisto_gene_map
 
-      script:
-      if("${gtf}".endsWith('.gz')){
-        name = "${gtf.baseName}"
-        unzip = "gunzip -f ${gtf}"
-      } else {
-        unzip = ""
-        name = "${gtf}"
-      }
-      """
-      $unzip
-      cat $name | t2g.py --use_version > transcripts_to_genes.txt
-      """
+    when: params.aligner == 'kallisto' && !params.kallisto_gene_map
+
+    script:
+    if("${gtf}".endsWith('.gz')){
+      name = "${gtf.baseName}"
+      unzip = "gunzip -f ${gtf}"
+    } else {
+      unzip = ""
+      name = "${gtf}"
     }
+    """
+    $unzip
+    cat $name | t2g.py --use_version > transcripts_to_genes.txt
+    """
 }
 
-if (params.aligner == 'alevin'){
-  /*
-   * STEP 2 - Make txp2gene
-   */
+
+/*
+ * STEP 2 - Make txp2gene
+*/
 
 process build_txp2gene {
     tag "$gtf"
@@ -479,9 +479,36 @@ process run_alevin {
       --chromium -i $index -o ${name}_alevin_results -p ${task.cpus} --tgMap $txp2gene --dumpFeatures –-dumpMtx
     """
 }
-} else {
-  alevin_logs = Channel.empty()
-  alevin_results = Channel.empty()
+// } else {
+//   alevin_logs = Channel.empty()
+//   alevin_results = Channel.empty()
+// }
+
+
+/*
+ * STEP X - Run alevin qc
+ */
+
+process run_alevin_qc {
+    tag "$prefix"
+    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+  
+    when:
+    params.aligner == "alevin"
+  
+    input:
+    file result from alevin_results
+  
+    output:
+    file "${name}_alevinqc_results" into alevinqc_results
+  
+    script:
+  
+    prefix = result.toString() - '_alevin_results'
+  
+    """
+    alevin_qc.r $result ${prefix} $result
+    """
 }
 
 // Function that checks the alignment rate of the STAR output
@@ -622,8 +649,6 @@ process bustools_count{
     label 'mid_memory'
     publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
 
-    when: !params.skip_bustools
-
     input:
     file bus from kallisto_corr_sort_to_count
     file t2g from kallisto_gene_map.collect()
@@ -645,9 +670,6 @@ process bustools_inspect{
     tag "$bus"
     publishDir "${params.outdir}/kallisto/bustools_metrics", mode: "copy"
 
-    when:
-    params.aligner == 'kallisto' && !params.skip_bustools
-
     input:
     file bus from kallisto_corr_sort_to_metrics
 
@@ -664,35 +686,6 @@ process bustools_inspect{
 //   kallisto_log_for_multiqc = Channel.empty()
 //   alevin_results = Channel.empty()
 // }
-
-
-
- /*
-  * STEP 4 - Run alevin qc
-  * We have to wait for an update : https://github.com/csoneson/alevinQC/issues/8 
-  */
-
-process run_alevin_qc {
-    tag "$prefix"
-    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
-  
-    when:
-    params.aligner == "alevin"
-  
-    input:
-    file result from alevin_results
-  
-    output:
-    file "${name}_alevinqc_results" into alevinqc_results
-  
-    script:
-  
-    prefix = result.toString() - '_alevin_results'
-  
-    """
-    alevin_qc.r $result ${prefix} $result
-    """
-}
 
 /*
  * STEP 4 - MultiQC

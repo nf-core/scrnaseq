@@ -1,6 +1,7 @@
 # nf-core/scrnaseq: Usage
 
 ## Table of contents
+
 * [nf-core/scrnaseq: Usage](#nf-corescrnaseq-usage)
   * [Table of contents](#table-of-contents)
   * [Introduction](#introduction)

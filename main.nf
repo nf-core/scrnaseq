@@ -273,21 +273,21 @@ process get_software_versions {
 }
 
 if(params.type == '10x' && !params.barcode_whitelist){
-process unzip_10x_barcodes {
-   tag "${params.chemistry}"
-   publishDir "${params.outdir}/salmon_index", mode: 'copy'
+    process unzip_10x_barcodes {
+      tag "${params.chemistry}"
+      publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-   input:
-   file gzipped from barcode_whitelist_gzipped
+      input:
+      file gzipped from barcode_whitelist_gzipped
 
-   output:
-   file "${gzipped.simpleName}" into (barcode_whitelist_star, barcode_whitelist_kallisto)
+      output:
+      file "${gzipped.simpleName}" into (barcode_whitelist_star, barcode_whitelist_kallisto)
 
-   script:
-   """
-   gunzip -c $gzipped > ${gzipped.simpleName}
-   """
-}
+      script:
+      """
+      gunzip -c $gzipped > ${gzipped.simpleName}
+      """
+    }
 }
 
 /*
@@ -295,24 +295,24 @@ process unzip_10x_barcodes {
  */
 
 if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')){
-  process extract_transcriptome {
-     tag "${genome_fasta_extract_transcriptome}"
-     publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
+    process extract_transcriptome {
+      tag "${genome_fasta_extract_transcriptome}"
+      publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
 
-     input:
-     file genome_fasta from genome_fasta_extract_transcriptome
-     file gtf from gtf_extract_transcriptome
+      input:
+      file genome_fasta from genome_fasta_extract_transcriptome
+      file gtf from gtf_extract_transcriptome
 
 
-     output:
-     file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
+      output:
+      file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
 
-     script:
-     // -F to preserve all GTF attributes in the fasta ID
-     """
-     gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
-     """
-  }
+      script:
+      // -F to preserve all GTF attributes in the fasta ID
+      """
+      gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
+      """
+    }
 }
 
 /*
@@ -320,56 +320,56 @@ if (!params.transcript_fasta && (params.aligner == 'alevin' || params.aligner ==
  */
 
 if(params.aligner == 'alevin' && !params.salmon_index){
-  process build_salmon_index {
-     tag "$fasta"
-     label 'low_memory'
-     publishDir "${params.outdir}/salmon_index", mode: 'copy'
+    process build_salmon_index {
+      tag "$fasta"
+      label 'low_memory'
+      publishDir "${params.outdir}/salmon_index", mode: 'copy'
 
-     when:
-     params.aligner == 'alevin' && !params.salmon_index
+      when:
+      params.aligner == 'alevin' && !params.salmon_index
 
-     input:
-     file fasta from transcriptome_fasta_alevin
+      input:
+      file fasta from transcriptome_fasta_alevin
 
-     output:
-     file "salmon_index" into salmon_index_alevin
+      output:
+      file "salmon_index" into salmon_index_alevin
 
-     script:
+      script:
 
-     """
-     salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
-     """
-  }
+      """
+      salmon index -i salmon_index --gencode -k 31 -p 4 -t $fasta
+      """
+    }
 }
 
 
 if (params.aligner == 'star' && !params.star_index && params.fasta){
-  process makeSTARindex {
-       label 'high_memory'
-       tag "$fasta"
-       publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
-                  saveAs: { params.saveReference ? it : null }, mode: 'copy'
+    process makeSTARindex {
+        label 'high_memory'
+        tag "$fasta"
+        publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
+                    saveAs: { params.saveReference ? it : null }, mode: 'copy'
 
-       input:
-       file fasta from genome_fasta_makeSTARindex
-       file gtf from gtf_makeSTARindex
+        input:
+        file fasta from genome_fasta_makeSTARindex
+        file gtf from gtf_makeSTARindex
 
-       output:
-       file "star" into star_index
+        output:
+        file "star" into star_index
 
-       script:
-       def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
-       """
-       mkdir star
-       STAR \\
-           --runMode genomeGenerate \\
-           --runThreadN ${task.cpus} \\
-           --sjdbGTFfile $gtf \\
-           --genomeDir star/ \\
-           --genomeFastaFiles $fasta \\
-           $avail_mem
-       """
-  }
+        script:
+        def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
+        """
+        mkdir star
+        STAR \\
+            --runMode genomeGenerate \\
+            --runThreadN ${task.cpus} \\
+            --sjdbGTFfile $gtf \\
+            --genomeDir star/ \\
+            --genomeFastaFiles $fasta \\
+            $avail_mem
+        """
+    }
 }
 
 

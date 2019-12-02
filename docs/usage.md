@@ -1,7 +1,6 @@
 # nf-core/scrnaseq: Usage
 
 ## Table of contents
-
 * [nf-core/scrnaseq: Usage](#nf-corescrnaseq-usage)
   * [Table of contents](#table-of-contents)
   * [Introduction](#introduction)
@@ -12,19 +11,25 @@
     * [`-profile`](#profile)
     * [`--reads`](#reads)
     * [`--aligner`](#aligner)
-    * [`--alevin_qc`](#alevinqc)
-  * [Cellular barcodes](#cellular-barcodes)
-    * [`--type` to specify droplet type](#type-to-specify-droplet-type)
-    * [`--chemistry` (using cellranger barcodes)](#chemistry-using-cellranger-barcodes)
-    * [`--barcode_whitelist` for custom barcode whitelist](#barcodewhitelist-for-custom-barcode-whitelist)
+      * [Alevin](#alevin)
+        * [`--salmon_index`](#salmonindex)
+        * [`--txp2gene_alevin`](#txp2genealevin)
+      * [STARSolo](#starsolo)
+        * [`--star_index`](#starindex)
+      * [Kallisto | BUStools](#kallisto--bustools)
+        * [`--bustools_correct`](#bustoolscorrect)
+        * [`--kallisto_gene_map`](#kallistogenemap)
+        * [`--kallisto_index`](#kallistoindex)
+    * [Cellular barcodes](#cellular-barcodes)
+      * [`--type` to specify droplet type](#type-to-specify-droplet-type)
+      * [`--chemistry` (using cellranger barcodes)](#chemistry-using-cellranger-barcodes)
+      * [`--barcode_whitelist` for custom barcode whitelist](#barcodewhitelist-for-custom-barcode-whitelist)
   * [Reference genomes](#reference-genomes)
     * [`--genome` (using iGenomes)](#genome-using-igenomes)
     * [`--fasta`](#fasta)
     * [`--gtf`](#gtf)
-    * [`--transcript_fasta`](#transcriptfasta)
-    * [`--salmon_index`](#salmonindex)
-    * [`--txp2gene`](#txp2gene)
-    * [`--kallisto_gene_map`](#kallistogenemap)
+    * [`--transcriptome_fasta`](#transcriptomefasta)
+    * [`--save_reference`](#savereference)
     * [`--igenomes_ignore`](#igenomesignore)
   * [Job resources](#job-resources)
     * [Automatic resubmission](#automatic-resubmission)
@@ -141,17 +146,47 @@ The workflow can handle three types of methods:
 
 To choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option.
 
-### `--alevin_qc`
+#### Alevin
 
-Specify this if you want to have the AlevinQC module generate QC results for Alevin workflow output.
+##### `--salmon_index`
 
-## Cellular barcodes
+This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.
 
-### `--type` to specify droplet type
+##### `--txp2gene_alevin`
+
+This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.
+
+> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.
+
+#### STARSolo
+
+##### `--star_index`
+
+Specify a path to the precomputed STAR index.
+
+> NB: This has to be computed with STAR Version 2.7 or later.
+
+#### Kallisto | BUStools
+
+##### `--bustools_correct`
+
+If set to false, skip the correct steps after mapping with Kallisto.  
+
+##### `--kallisto_gene_map`
+
+Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.
+
+##### `--kallisto_index`
+
+Specify a path to the precomputed Kallist index.
+
+### Cellular barcodes
+
+#### `--type` to specify droplet type
 
 Currently, only 10X Genomics' chromium chemistry is supported. Drop-Seq, inDrop, etc may be supported in the future.
 
-### `--chemistry` (using cellranger barcodes)
+#### `--chemistry` (using cellranger barcodes)
 
 To specify which chemistry (and thus barcode whitelist) to use, use the `--chemistry` flag. For example, to specify V3 chemistry (the default, as it is compatible with V2), use `--chemistry V3`.
 
@@ -161,7 +196,7 @@ These files were copied out of 10x Genomics' [cellranger](https://github.com/10X
 * V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`
 * V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`
 
-### `--barcode_whitelist` for custom barcode whitelist
+#### `--barcode_whitelist` for custom barcode whitelist
 
 If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.
 
@@ -215,23 +250,13 @@ If you prefer, you can specify the full path to your reference genome when you r
 
 Specify a valid GTF file for the workflow here.
 
-### `--transcript_fasta`
+### `--transcriptome_fasta`
 
 If you intend to skip the generation of a transcriptomic fasta file, you can use this parameter to supply a transcriptomic fasta file here. If you don't specify this, it will be automatically generated from the supplied genomics fasta file utilizing the GTF annotation subsequently.
 
-### `--salmon_index`
+### `--save_reference`
 
-This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.
-
-### `--txp2gene`
-
-This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.
-
-> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.
-
-### `--kallisto_gene_map`
-
-Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.
+Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.
 
 ### `--igenomes_ignore`
 

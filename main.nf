@@ -30,7 +30,6 @@ def helpMessage() {
     Options:
       --salmon_index                Path to Salmon index (for use with alevin)
       --txp2gene                    Path to transcript to gene mapping file (for use with alevin)
-      --alevin_qc                   Perform alevinQC analysis
       --chemistry                   Version of 10x chemistry, e.g. "--chemistry v2" or "--chemistry v3"
       --barcode_whitelist           Custom file of whitelisted barcodes (plain text, uncompressed)
       --kallisto_gene_map           A gene map used for bustools correction of BUS files created by Kallisto
@@ -284,7 +283,7 @@ process get_software_versions {
 */ 
 process unzip_10x_barcodes {
     tag "${params.chemistry}"
-    publishDir "${params.outdir}/salmon_index", mode: 'copy'
+    publishDir "${params.outdir}/reference_data/barcodes", mode: 'copy'
 
     input:
     file gzipped from barcode_whitelist_gzipped
@@ -307,7 +306,7 @@ process unzip_10x_barcodes {
 
 process extract_transcriptome {
     tag "${genome_fasta}"
-    publishDir "${params.outdir}/extract_transcriptome", mode: 'copy'
+    publishDir "${params.outdir}/reference_data/extract_transcriptome", mode: 'copy'
 
     input:
     file genome_fasta from genome_fasta_extract_transcriptome
@@ -331,7 +330,8 @@ process extract_transcriptome {
 process build_salmon_index {
     tag "$fasta"
     label 'low_memory'
-    publishDir "${params.outdir}/salmon_index", mode: 'copy'
+    publishDir path: { params.save_reference ? "${params.outdir}/reference_genome/salmon_index" : params.outdir },
+                saveAs: { params.save_reference ? it : null }, mode: 'copy'
 
     when:
     params.aligner == 'alevin' && !params.salmon_index
@@ -355,8 +355,8 @@ process build_salmon_index {
 process makeSTARindex {
     label 'high_memory'
     tag "$fasta"
-    publishDir path: { params.saveReference ? "${params.outdir}/reference_genome" : params.outdir },
-                saveAs: { params.saveReference ? it : null }, mode: 'copy'
+    publishDir path: { params.save_reference ? "${params.outdir}/reference_genome/star_index" : params.outdir },
+                saveAs: { params.save_reference ? it : null }, mode: 'copy'
 
     input:
     file fasta from genome_fasta_makeSTARindex
@@ -387,8 +387,8 @@ process makeSTARindex {
 process build_kallisto_index {
     tag "$fasta"
     label 'mid_memory'
-    publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
-
+    publishDir path: { params.save_reference ? "${params.outdir}/reference_genome/kallisto_index" : params.outdir },
+                saveAs: { params.save_reference ? it : null }, mode: 'copy'
     input:
     file fasta from transcriptome_fasta_kallisto.mix(transcriptome_fasta_kallisto_extr)
 
@@ -446,7 +446,7 @@ process build_gene_map{
 */
 process build_txp2gene {
     tag "$gtf"
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}/reference_data/alevin/", mode: 'copy'
 
     when:
     params.aligner == 'alevin' && !params.txp2gene_alevin
@@ -470,7 +470,7 @@ process build_txp2gene {
 process alevin {
     tag "$name"
     label 'high_memory'
-    publishDir "${params.outdir}/alevin", mode: 'copy'
+    publishDir "${params.outdir}/alevin/alevin", mode: 'copy'
 
     when:
     params.aligner == "alevin"
@@ -499,7 +499,7 @@ process alevin {
 
 process alevin_qc {
     tag "$prefix"
-    publishDir "${params.outdir}/alevin_qc", mode: 'copy'
+    publishDir "${params.outdir}/alevin/alevin_qc", mode: 'copy'
   
     when:
     params.aligner == "alevin"
@@ -545,7 +545,7 @@ process star {
     def star_mem = task.memory ?: params.star_memory ?: false
     def avail_mem = star_mem ? "--limitBAMsortRAM ${star_mem.toBytes() - 100000000}" : ''
 
-    seqCenter = params.seqCenter ? "--outSAMattrRGline ID:$prefix 'CN:$params.seqCenter'" : ''
+    seq_center = params.seq_center ? "--outSAMattrRGline ID:$prefix 'CN:$params.seq_center'" : ''
     cdna_read = reads[0]
     barcode_read = reads[1]
     """
@@ -558,7 +558,7 @@ process star {
           --outSAMtype BAM SortedByCoordinate $avail_mem \\
           --readFilesCommand zcat \\
           --runDirPerm All_RWX \\
-          --outFileNamePrefix $prefix $seqCenter \\
+          --outFileNamePrefix $prefix $seq_center \\
           --soloType Droplet \\
           --soloCBwhitelist $whitelist
 

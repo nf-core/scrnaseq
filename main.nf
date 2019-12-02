@@ -122,6 +122,9 @@ if( params.transcript_fasta ){
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
         .into { transcriptome_fasta_alevin; transcriptome_fasta_kallisto }
+} else {
+  transcriptome_fasta_alevin = Channel.empty()
+  transcriptome_fasta_kallisto = Channel.empty()
 }
 
 //Setup channel for salmon index if specified
@@ -167,7 +170,7 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
      } else {
          Channel
             .fromFilePairs( params.reads )
-            .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --single_end on the command line." }
+            .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\n" }
             .into { read_files_alevin; read_files_star; read_files_kallisto }
 }
 
@@ -180,6 +183,7 @@ if (params.type == "10x" && !params.barcode_whitelist){
   Channel.fromPath(barcode_filename)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
+  Channel.empty().into{ barcode_whitelist_star; barcode_whitelist_kallisto; barcode_whitelist_alevinqc }
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
@@ -196,7 +200,7 @@ summary['Run Name']         = custom_runName ?: workflow.runName
 summary['Reads']            = params.reads
 if(params.fasta)         summary['Genome Fasta Ref']        = params.fasta
 if(params.transcript_fasta)  summary['Transcriptome Fasta Ref']        = params.transcript_fasta
-summary['gtf Ref']        = params.gtf
+summary['GTF Reference']        = params.gtf
 summary['Aligner']        = params.aligner
 if (params.salmon_index)        summary['Salmon Index']        = params.salmon_index
 summary['Droplet Technology'] = params.type

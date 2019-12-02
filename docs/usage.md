@@ -18,6 +18,7 @@
         * [`--star_index`](#starindex)
       * [Kallisto | BUStools](#kallisto--bustools)
         * [`--bustools_correct`](#bustoolscorrect)
+        * [`--skip_bustools`](#skipbustools)
         * [`--kallisto_gene_map`](#kallistogenemap)
         * [`--kallisto_index`](#kallistoindex)
     * [Cellular barcodes](#cellular-barcodes)
@@ -170,7 +171,11 @@ Specify a path to the precomputed STAR index.
 
 ##### `--bustools_correct`
 
-If set to false, skip the correct steps after mapping with Kallisto.  
+If set to false, skip the correct steps after mapping with Kallisto.
+
+##### `--skip_bustools`
+
+When supplied, skip BUStools entirely.
 
 ##### `--kallisto_gene_map`
 

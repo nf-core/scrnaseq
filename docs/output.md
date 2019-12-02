@@ -7,7 +7,13 @@ This document describes the output produced by the pipeline. Most of the plots a
 The pipeline is built using [Nextflow](https://www.nextflow.io/)
 and processes data using the following steps:
 
-
+* [nf-core/scrnaseq: Output](#nf-corescrnaseq-output)
+  * [Pipeline overview](#pipeline-overview)
+  * [Kallisto & Bustools Results](#kallisto--bustools-results)
+  * [STARsolo](#starsolo)
+  * [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
+  * [Other output data](#other-output-data)
+  * [MultiQC](#multiqc)
 
 ## Kallisto & Bustools Results
 

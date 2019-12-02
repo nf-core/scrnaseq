@@ -109,8 +109,10 @@ if( params.fasta ){
         .fromPath(params.fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
         .into { genome_fasta_extract_transcriptome ; genome_fasta_makeSTARindex }
+} else {
+  genome_fasta_extract_transcriptome = Channel.empty()
+  genome_fasta_makeSTARindex = Channel.empty()
 }
-
 //Setup Transcript FastA channels
 if( params.transcript_fasta ){
   if( params.aligner == "star" && !params.fasta) {
@@ -308,7 +310,7 @@ process extract_transcriptome {
     file gtf from gtf_extract_transcriptome
 
     output:
-    file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin, transcriptome_fasta_kallisto)
+    file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin_extr, transcriptome_fasta_kallisto_extr)
 
     when: !params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')
     script:
@@ -331,7 +333,7 @@ process build_salmon_index {
     params.aligner == 'alevin' && !params.salmon_index
 
     input:
-    file fasta from transcriptome_fasta_alevin
+    file fasta from transcriptome_fasta_alevin.mix(transcriptome_fasta_alevin_extr)
 
     output:
     file "salmon_index" into salmon_index_alevin
@@ -384,7 +386,7 @@ process build_kallisto_index {
     publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
 
     input:
-    file fasta from transcriptome_fasta_kallisto
+    file fasta from transcriptome_fasta_kallisto.mix(transcriptome_fasta_kallisto_extr)
 
     output:
     file "${name}.idx" into kallisto_index

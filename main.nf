@@ -374,59 +374,56 @@ if (params.aligner == 'star' && !params.star_index && params.fasta){
 
 
 if (params.aligner == 'kallisto' && !params.kallisto_index){
-  process build_kallisto_index {
-     tag "$fasta"
-     label 'mid_memory'
-     publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
+    process build_kallisto_index {
+      tag "$fasta"
+      label 'mid_memory'
+      publishDir "${params.outdir}/kallisto/kallisto_index", mode: 'copy'
 
-     when:
+      input:
+      file fasta from transcriptome_fasta_kallisto
 
+      output:
+      file "${name}.idx" into kallisto_index
 
-     input:
-     file fasta from transcriptome_fasta_kallisto
-
-     output:
-     file "${name}.idx" into kallisto_index
-
-     script:
-     if("${fasta}".endsWith('.gz')){
-      name = "${fasta.baseName}"
-      unzip = "gunzip -f ${fasta}"
-     } else {
-      unzip = ""
-      name = "${fasta}"
-     }
-     """
-     $unzip
-     kallisto index -i ${name}.idx -k 31 $name
-     """
-  }
+      script:
+      if("${fasta}".endsWith('.gz')){
+        name = "${fasta.baseName}"
+        unzip = "gunzip -f ${fasta}"
+      } else {
+        unzip = ""
+        name = "${fasta}"
+      }
+      """
+      $unzip
+      kallisto index -i ${name}.idx -k 31 $name
+      """
+    }
 }
 
 if (params.aligner == 'kallisto' && !params.kallisto_gene_map){
-  process build_gene_map{
-    tag "$gtf"
-    publishDir "${params.outdir}/kallisto/kallisto_gene_map", mode: 'copy'
+    process build_gene_map{
+      tag "$gtf"
+      publishDir "${params.outdir}/kallisto/kallisto_gene_map", mode: 'copy'
 
-    input:
-    file gtf from gtf_gene_map
+      input:
+      file gtf from gtf_gene_map
 
-    output:
-    file "transcripts_to_genes.txt" into kallisto_gene_map
+      output:
+      file "transcripts_to_genes.txt" into kallisto_gene_map
 
-    script:
-    if("${gtf}".endsWith('.gz')){
-      name = "${gtf.baseName}"
-      unzip = "gunzip -f ${gtf}"
-    } else {
-      unzip = ""
-      name = "${gtf}"
+      script:
+      if("${gtf}".endsWith('.gz')){
+        name = "${gtf.baseName}"
+        unzip = "gunzip -f ${gtf}"
+      } else {
+        unzip = ""
+        name = "${gtf}"
+      }
+      """
+      $unzip
+      cat $name | t2g.py --use_version > transcripts_to_genes.txt
+      """
     }
-    """
-    $unzip
-    cat $name | t2g.py --use_version > transcripts_to_genes.txt
-    """
-  }
 }
 
 if (params.aligner == 'alevin'){
@@ -434,30 +431,30 @@ if (params.aligner == 'alevin'){
    * STEP 2 - Make txp2gene
    */
 
- process build_txp2gene {
-       tag "$gtf"
-       publishDir "${params.outdir}", mode: 'copy'
+process build_txp2gene {
+    tag "$gtf"
+    publishDir "${params.outdir}", mode: 'copy'
 
-       when:
-       params.aligner == 'alevin' && !params.txp2gene_alevin
+    when:
+    params.aligner == 'alevin' && !params.txp2gene_alevin
 
-       input:
-       file gtf from gtf_alevin
+    input:
+    file gtf from gtf_alevin
 
-       output:
-       file "txp2gene.tsv" into txp2gene_alevin
+    output:
+    file "txp2gene.tsv" into txp2gene_alevin
 
-       script:
+    script:
 
-       """
-       bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
-       """
- }
+    """
+    bioawk -c gff '\$feature=="transcript" {print \$group}' $gtf | awk -F ' ' '{print substr(\$4,2,length(\$4)-3) "\t" substr(\$2,2,length(\$2)-3)}' > txp2gene.tsv
+    """
+}
 
   /*
    * STEP 3 - Run alevin
    */
-  process run_alevin {
+process run_alevin {
     tag "$name"
     label 'high_memory'
     publishDir "${params.outdir}/alevin", mode: 'copy'
@@ -481,13 +478,11 @@ if (params.aligner == 'alevin'){
     salmon alevin -l ISR -1 ${read1} -2 ${read2} \
       --chromium -i $index -o ${name}_alevin_results -p ${task.cpus} --tgMap $txp2gene --dumpFeatures –-dumpMtx
     """
-  }
+}
 } else {
   alevin_logs = Channel.empty()
   alevin_results = Channel.empty()
 }
-
-
 
 // Function that checks the alignment rate of the STAR output
 // and returns true if the alignment passed and otherwise false
@@ -516,9 +511,6 @@ if (params.aligner == "star"){
 
       tag "$prefix"
       publishDir "${params.outdir}/STAR", mode: 'copy'
-
-      when:
-      params.aligner == "star"
 
       input:
       set val(samplename), file(reads) from read_files_star
@@ -568,16 +560,12 @@ if (params.aligner == "star"){
 } else {
   star_log = Channel.empty()
 }
-// Run Kallisto bus
 
-if (params.aligner == 'kallisto'){
-  process kallisto {
+// Run Kallisto bus
+process kallisto {
     tag "$name"
     label 'mid_memory'
     publishDir "${params.outdir}/kallisto/raw_bus", mode: 'copy'
-
-    when:
-    params.aligner == "kallisto"
 
     input:
     set val(name), file(reads) from read_files_kallisto
@@ -586,6 +574,8 @@ if (params.aligner == 'kallisto'){
     output:
     file "${name}_bus_output" into kallisto_bus_to_sort
     file "${name}_kallisto.log" into kallisto_log_for_multiqc
+
+    when: params.aligner == 'kallisto'
 
     script:
     """
@@ -596,15 +586,12 @@ if (params.aligner == 'kallisto'){
         -t ${task.cpus} \\
         $reads | tee ${name}_kallisto.log
     """
-  }
+}
 
-  process bustools_correct_sort{
+process bustools_correct_sort{
     tag "$bus"
     label 'mid_memory'
     publishDir "${params.outdir}/kallisto/sort_bus", mode: 'copy'
-
-    when:
-    params.aligner == "kallisto" && !params.skip_bustools
 
     input:
     file bus from kallisto_bus_to_sort
@@ -612,6 +599,8 @@ if (params.aligner == 'kallisto'){
 
     output:
     file bus into (kallisto_corr_sort_to_count, kallisto_corr_sort_to_metrics)
+
+    when: !params.skip_bustools
 
     script:
     if(params.bustools_correct) {
@@ -626,16 +615,14 @@ if (params.aligner == 'kallisto'){
     mkdir -p tmp
     bustools sort -T tmp/ -t ${task.cpus} -m ${task.memory.toGiga()}G -o ${bus}/output.corrected.sort.bus $sort_file
     """
-  }
+}
 
-
-  process bustools_count{
+process bustools_count{
     tag "$bus"
     label 'mid_memory'
     publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
 
-    when:
-    params.aligner == 'kallisto' && !params.skip_bustools
+    when: !params.skip_bustools
 
     input:
     file bus from kallisto_corr_sort_to_count
@@ -652,9 +639,9 @@ if (params.aligner == 'kallisto'){
     bustools count -o ${bus}_eqcount/tcc -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt ${bus}/output.corrected.sort.bus
     bustools count -o ${bus}_genecount/gene -g $t2g -e ${bus}/matrix.ec -t ${bus}/transcripts.txt --genecounts ${bus}/output.corrected.sort.bus
     """
-  }
+}
 
-  process bustools_inspect{
+process bustools_inspect{
     tag "$bus"
     publishDir "${params.outdir}/kallisto/bustools_metrics", mode: "copy"
 
@@ -671,12 +658,12 @@ if (params.aligner == 'kallisto'){
     """
     bustools inspect -o ${bus}.json ${bus}/output.corrected.sort.bus
     """
-  }
-  
-} else {
-  kallisto_log_for_multiqc = Channel.empty()
-  alevin_results = Channel.empty()
 }
+  
+// } else {
+//   kallisto_log_for_multiqc = Channel.empty()
+//   alevin_results = Channel.empty()
+// }
 
 
 
@@ -685,7 +672,7 @@ if (params.aligner == 'kallisto'){
   * We have to wait for an update : https://github.com/csoneson/alevinQC/issues/8 
   */
 
-  process run_alevin_qc {
+process run_alevin_qc {
     tag "$prefix"
     publishDir "${params.outdir}/alevin_qc", mode: 'copy'
   
@@ -705,8 +692,7 @@ if (params.aligner == 'kallisto'){
     """
     alevin_qc.r $result ${prefix} $result
     """
-  
-  }
+}
 
 /*
  * STEP 4 - MultiQC

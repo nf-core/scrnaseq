@@ -4,48 +4,51 @@
 
 <!-- Install Atom plugin markdown-toc-auto for this ToC to auto-update on save -->
 <!-- TOC START min:2 max:3 link:true asterisk:true update:true -->
-* [Table of contents](#table-of-contents)
-* [Introduction](#introduction)
-* [Running the pipeline](#running-the-pipeline)
-  * [Updating the pipeline](#updating-the-pipeline)
-  * [Reproducibility](#reproducibility)
-* [Main arguments](#main-arguments)
-  * [`-profile`](#-profile)
-  * [`--reads`](#--reads)
-  * [`--singleEnd`](#--singleend)
-  * [`--aligner`](#--aligner)
-* [Cellular barcodes](#cellular-barcodes)
-  * [`--type` to specify droplet type](#--type-to-specify-droplet-type)
-  * [`--tenx_version` (using cellranger barcodes)](#--tenx_version-cellranger-barcodes)
-* [Reference genomes](#reference-genomes)
-  * [`--genome` (using iGenomes)](#--genome-using-igenomes)
-  * [`--fasta`](#--fasta)
-  * [`--gtf`](#--gtf)
-  * [`--transcript_fasta`](#--transcript_fasta)
-  * [`--salmon_index`](#--salmon_index)
-  * [`--txp2gene`](#--txp2gene)
-  * [`--kallisto_gene_map`](#--kallisto_gene_map)
-  * [`--igenomesIgnore`](#--igenomesignore)
-* [Job resources](#job-resources)
-  * [Automatic resubmission](#automatic-resubmission)
-  * [Custom resource requests](#custom-resource-requests)
-* [AWS Batch specific parameters](#aws-batch-specific-parameters)
-  * [`--awsqueue`](#--awsqueue)
-  * [`--awsregion`](#--awsregion)
-* [Other command line parameters](#other-command-line-parameters)
-  * [`--outdir`](#--outdir)
-  * [`--email`](#--email)
-  * [`-name`](#-name)
-  * [`-resume`](#-resume)
-  * [`-c`](#-c)
-  * [`--custom_config_version`](#--custom_config_version)
-  * [`--custom_config_base`](#--custom_config_base)
-  * [`--max_memory`](#--max_memory)
-  * [`--max_time`](#--max_time)
-  * [`--max_cpus`](#--max_cpus)
-  * [`--plaintext_email`](#--plaintext_email)
-  * [`--monochrome_logs`](#--monochrome_logs)
-  * [`--multiqc_config`](#--multiqc_config)
+* [nf-core/scrnaseq: Usage](#nf-corescrnaseq-usage)
+  * [Table of contents](#table-of-contents)
+  * [Introduction](#introduction)
+  * [Running the pipeline](#running-the-pipeline)
+    * [Updating the pipeline](#updating-the-pipeline)
+    * [Reproducibility](#reproducibility)
+  * [Main arguments](#main-arguments)
+    * [`-profile`](#profile)
+    * [`--reads`](#reads)
+    * [`--single_end`](#singleend)
+    * [`--aligner`](#aligner)
+    * [`--alevin_qc`](#alevinqc)
+  * [Cellular barcodes](#cellular-barcodes)
+    * [`--type` to specify droplet type](#type-to-specify-droplet-type)
+    * [`--chemistry` (using cellranger barcodes)](#chemistry-using-cellranger-barcodes)
+    * [`--barcode_whitelist` for custom barcode whitelist](#barcodewhitelist-for-custom-barcode-whitelist)
+  * [Reference genomes](#reference-genomes)
+    * [`--genome` (using iGenomes)](#genome-using-igenomes)
+    * [`--fasta`](#fasta)
+    * [`--gtf`](#gtf)
+    * [`--transcript_fasta`](#transcriptfasta)
+    * [`--salmon_index`](#salmonindex)
+    * [`--txp2gene`](#txp2gene)
+    * [`--kallisto_gene_map`](#kallistogenemap)
+    * [`--igenomes_ignore`](#igenomesignore)
+  * [Job resources](#job-resources)
+    * [Automatic resubmission](#automatic-resubmission)
+    * [Custom resource requests](#custom-resource-requests)
+  * [AWS Batch specific parameters](#aws-batch-specific-parameters)
+    * [`--awsqueue`](#awsqueue)
+    * [`--awsregion`](#awsregion)
+  * [Other command line parameters](#other-command-line-parameters)
+    * [`--outdir`](#outdir)
+    * [`--email`](#email)
+    * [`-name`](#name)
+    * [`-resume`](#resume)
+    * [`-c`](#c)
+    * [`--custom_config_version`](#customconfigversion)
+    * [`--custom_config_base`](#customconfigbase)
+    * [`--max_memory`](#maxmemory)
+    * [`--max_time`](#maxtime)
+    * [`--max_cpus`](#maxcpus)
+    * [`--plaintext_email`](#plaintextemail)
+    * [`--monochrome_logs`](#monochromelogs)
+    * [`--multiqc_config`](#multiqcconfig)
 <!-- TOC END -->
 
 ## Introduction
@@ -132,7 +135,7 @@ Please note the following requirements:
 
 If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
 
-### `--singleEnd`
+### `--single_end`
 
 By default, the pipeline expects paired-end data. If you have single-end data, you need to specify `--singleEnd` on the command line when you launch the pipeline. A normal glob pattern, enclosed in quotation marks, can then be used for `--reads`. For example:
 
@@ -244,7 +247,7 @@ This allows the specification of a transcript to gene mapping file for Salmon Al
 
 Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.
 
-### `--igenomesIgnore`
+### `--igenomes_ignore`
 
 Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.
 

@@ -165,7 +165,7 @@ ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
      } else {
          Channel
             .fromFilePairs( params.reads )
-            .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --singleEnd on the command line." }
+            .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\nIf this is single-end data, please specify --single_end on the command line." }
             .into { read_files_alevin; read_files_star; read_files_kallisto }
 }
 

@@ -236,8 +236,8 @@ if(params.email) {
   summary['E-mail Address']  = params.email
   summary['MultiQC maxsize'] = params.max_multiqc_email_size
 }
-log.info summary.collect { k,v -> "${k.padRight(26)}: $v" }.join("\n")
-log.info "\033[2m----------------------------------------------------\033[0m"
+log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
+log.info "-\033[2m--------------------------------------------------\033[0m-"
 
 // Check the hostnames against configured profiles
 checkHostname()

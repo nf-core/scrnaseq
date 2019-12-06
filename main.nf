@@ -24,7 +24,7 @@ def helpMessage() {
       --reads                       Path to input data (must be surrounded with quotes)
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, awsbatch, test and more.
-      --type                        Name of droplet technology e.g. "--type 10x"
+      --type                        Name of droplet technology e.g. "--type 10x". Currently supported: 10x
       --chemistry                   Version of 10x chemistry, e.g. "--chemistry v2" or "--chemistry v3"
       --barcode_whitelist           Custom file of whitelisted barcodes
       --aligner                     Name of the tool to use for scRNA (pseudo-) alignment. Available are: "alevin", "star", "kallisto". Default 'alevin'.
@@ -576,30 +576,8 @@ process star {
     """
 }
 
-// Function that checks the alignment rate of the STAR output
-// and returns true if the alignment passed and otherwise false
-skipped_poor_alignment = []
-def check_log(logs) {
-    def percent_aligned = 0;
-    logs.eachLine { line ->
-        if ((matcher = line =~ /Uniquely mapped reads %\s*\|\s*([\d\.]+)%/)) {
-            percent_aligned = matcher[0][1]
-        }
-    }
-    logname = logs.getBaseName() - 'Log.final'
-    if(percent_aligned.toFloat() <= '5'.toFloat() ){
-        log.info "#################### VERY POOR ALIGNMENT RATE! IGNORING FOR FURTHER DOWNSTREAM ANALYSIS! ($logname)    >> ${percent_aligned}% <<"
-        skipped_poor_alignment << logname
-        return false
-    } else {
-        log.info "          Passed alignment > star ($logname)   >> ${percent_aligned}% <<"
-        return true
-    }
-}
-
-// Filter removes all 'aligned' channels that fail the check
+// get output flattened for other downstream processes
 star_aligned
-    .filter { logs, bams -> check_log(logs) }
     .flatMap {  logs, bams -> bams }
 .into { bam_count; bam_rseqc; bam_preseq; bam_markduplicates; bam_htseqcount; bam_stringtieFPKM; bam_for_genebody; bam_dexseq; leafcutter_bam }
 

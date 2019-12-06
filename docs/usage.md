@@ -11,7 +11,7 @@
   * [Main arguments](#main-arguments)
     * [`-profile`](#profile)
     * [`--reads`](#reads)
-    * [`--aligner`](#aligner)
+    * [`--aligner` (Required)](#aligner-required)
       * [Alevin](#alevin)
         * [`--salmon_index`](#salmonindex)
         * [`--txp2gene_alevin`](#txp2genealevin)
@@ -23,8 +23,8 @@
         * [`--kallisto_gene_map`](#kallistogenemap)
         * [`--kallisto_index`](#kallistoindex)
     * [Cellular barcodes](#cellular-barcodes)
-      * [`--type` to specify droplet type](#type-to-specify-droplet-type)
-      * [`--chemistry` (using cellranger barcodes)](#chemistry-using-cellranger-barcodes)
+      * [`--type` to specify droplet type (Required)](#type-to-specify-droplet-type-required)
+      * [`--chemistry` (using cellranger barcodes) (Required)](#chemistry-using-cellranger-barcodes-required)
       * [`--barcode_whitelist` for custom barcode whitelist](#barcodewhitelist-for-custom-barcode-whitelist)
   * [Reference genomes](#reference-genomes)
     * [`--genome` (using iGenomes)](#genome-using-igenomes)
@@ -66,13 +66,13 @@ NXF_OPTS='-Xms1g -Xmx4g'
 
 ## Running the pipeline
 
-The typical command for running the pipeline is as follows:
+The minimum typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' --type '10x' --barcode_whitelist 10xv2.whitelist.txt --fasta human.fasta --gtf human.gtf -profile docker
+nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' --fasta human.fasta --gtf human.gtf -profile docker
 ```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -138,7 +138,7 @@ Please note the following requirements:
 
 If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
 
-### `--aligner`
+### `--aligner` (Required)
 
 The workflow can handle three types of methods:
 
@@ -146,7 +146,7 @@ The workflow can handle three types of methods:
 * Salmon Alevin + AlevinQC
 * STARsolo
 
-To choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option.
+To choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.
 
 #### Alevin
 
@@ -188,11 +188,11 @@ Specify a path to the precomputed Kallisto index.
 
 ### Cellular barcodes
 
-#### `--type` to specify droplet type
+#### `--type` to specify droplet type (Required)
 
 Currently, only 10X Genomics' chromium chemistry is supported. Drop-Seq, inDrop, etc may be supported in the future.
 
-#### `--chemistry` (using cellranger barcodes)
+#### `--chemistry` (using cellranger barcodes) (Required)
 
 To specify which chemistry (and thus barcode whitelist) to use, use the `--chemistry` flag. For example, to specify V3 chemistry (the default, as it is compatible with V2), use `--chemistry V3`.
 

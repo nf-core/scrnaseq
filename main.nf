@@ -458,14 +458,14 @@ process build_txp2gene {
     tag "$gtf"
     publishDir "${params.outdir}/reference_data/alevin/", mode: 'copy'
 
-    when:
-    params.aligner == 'alevin' && !params.txp2gene_alevin
-
     input:
     file gtf from gtf_alevin
 
     output:
     file "txp2gene.tsv" into txp2gene_alevin
+
+    when:
+    params.aligner == 'alevin' && !params.txp2gene_alevin
 
     script:
 
@@ -482,17 +482,16 @@ process alevin {
     label 'high_memory'
     publishDir "${params.outdir}/alevin/alevin", mode: 'copy'
 
-    when:
-    params.aligner == "alevin"
-
     input:
     set val(name), file(reads) from read_files_alevin
     file index from salmon_index_alevin.collect()
     file txp2gene from txp2gene_alevin.collect()
 
-
     output:
     file "${name}_alevin_results" into alevin_results, alevin_logs
+
+    when:
+    params.aligner == "alevin"
 
     script:
     read1 = reads[0]

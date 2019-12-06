@@ -323,7 +323,7 @@ process extract_transcriptome {
     file gtf from gtf_extract_transcriptome
 
     output:
-    file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin_extr, transcriptome_fasta_kallisto_extr)
+    file "${genome_fasta}.transcriptome.fa" into (transcriptome_fasta_alevin_extracted, transcriptome_fasta_kallisto_extracted)
 
     when: !params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')
     script:
@@ -347,7 +347,7 @@ process build_salmon_index {
     params.aligner == 'alevin' && !params.salmon_index
 
     input:
-    file fasta from transcriptome_fasta_alevin.mix(transcriptome_fasta_alevin_extr)
+    file fasta from transcriptome_fasta_alevin.mix(transcriptome_fasta_alevin_extracted)
 
     output:
     file "salmon_index" into salmon_index_alevin
@@ -400,7 +400,7 @@ process build_kallisto_index {
     publishDir path: { params.save_reference ? "${params.outdir}/reference_genome/kallisto_index" : params.outdir },
                 saveAs: { params.save_reference ? it : null }, mode: 'copy'
     input:
-    file fasta from transcriptome_fasta_kallisto.mix(transcriptome_fasta_kallisto_extr)
+    file fasta from transcriptome_fasta_kallisto.mix(transcriptome_fasta_kallisto_extracted)
 
     output:
     file "${name}.idx" into kallisto_index
@@ -644,7 +644,7 @@ process bustools_correct_sort{
     file whitelist from barcode_whitelist_kallisto.mix(barcode_whitelist_kallisto_unzip).collect()
 
     output:
-    file bus into (kallisto_corr_sort_to_count, kallisto_corr_sort_to_metrics)
+    file bus into (kallisto_corrected_sort_to_count, kallisto_corrected_sort_to_metrics)
 
     when: !params.skip_bustools
 
@@ -672,7 +672,7 @@ process bustools_count{
     publishDir "${params.outdir}/kallisto/bustools_counts", mode: "copy"
 
     input:
-    file bus from kallisto_corr_sort_to_count
+    file bus from kallisto_corrected_sort_to_count
     file t2g from kallisto_gene_map.collect()
 
     output:
@@ -697,7 +697,7 @@ process bustools_inspect{
     publishDir "${params.outdir}/kallisto/bustools_metrics", mode: "copy"
 
     input:
-    file bus from kallisto_corr_sort_to_metrics
+    file bus from kallisto_corrected_sort_to_metrics
 
     output:
     file "${bus}.json"

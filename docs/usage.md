@@ -166,7 +166,7 @@ This allows the specification of a transcript to gene mapping file for Salmon Al
 
 Specify a path to the precomputed STAR index.
 
-> NB: This has to be computed with STAR Version 2.7 or later.
+> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.
 
 #### Kallisto | BUStools
 
@@ -184,7 +184,7 @@ Specify a Kallisto gene mapping file here. If you don't, this will be automatica
 
 ##### `--kallisto_index`
 
-Specify a path to the precomputed Kallist index.
+Specify a path to the precomputed Kallisto index.
 
 ### Cellular barcodes
 

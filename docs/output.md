@@ -75,7 +75,7 @@ For details on how to load these into R and perform further downstream analysis,
 **Output directory: `results/reference_genome`**
 
 * `barcodes`
-  * Contains the utilized barcode lists
+  * Contains the utilized cell barcode whitelists (if applicable)
 * `extract_transcriptome`
   * When supplied with a `--fasta` genome fasta, this contains the extracted transcriptome
   * The GTF file supplied with `--gtf` is used to extract the transcriptome positions appropriately

@@ -7,17 +7,6 @@ if (length(args) < 3) {
   stop("Usage: alevin_qc.r <baseDir> <sampleId> <outDir>", call.=FALSE)
 }
 
-print(R.Version())
-
-if (!require("BiocManager")){
-    install.packages("BiocManager", dependencies=TRUE, repos='http://cloud.r-project.org/')
-    BiocManager::install()}
-
-if (!require("alevinQC")) {
-  BiocManager::install("alevinQC")
-}
-
-
 require(alevinQC)
 require(tximport)
 

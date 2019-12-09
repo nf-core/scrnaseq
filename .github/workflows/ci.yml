@@ -1,0 +1,26 @@
+name: scrnaseq CI
+# This workflow is triggered on pushes and PRs to the repository.
+on: [push, pull_request]  
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nxf_ver: ['19.10.0', '']
+        profile: ['test,docker', 'test_kallisto,docker', 'test,docker --aligner star']
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Nextflow
+        run: |
+          export NXF_VER=${{ matrix.nxf_ver }}
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+      - name: Download and tag image
+        run: |
+          docker pull nfcore/scrnaseq:dev
+          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:1.0.0
+      - name: "Test suites for all alignment methods"
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }}
+      

@@ -1,25 +1,24 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: nf-core-scrnaseq-1.0dev
+name: nf-core-scrnaseq-1.0.0
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - matplotlib=3.0.3        # Current 3.1.0 build incompatible with multiqc=1.7
   - conda-forge::python=3.7.3
-  - bioconda::multiqc=1.7
-  - bioconda::salmon=0.14.0
-  - bioconda::r-seurat=3.0.1
-  - bioconda::bioconductor-isee=1.2.0
-  - bioconda::bioconductor-tximeta=1.0.3
-  - conda-forge::r-markdown=0.9
+  - bioconda::multiqc=1.8
+  - bioconda::salmon=1.0.0
+  - bioconda::r-seurat=3.0.2
+  - bioconda::bioconductor-isee=1.6.0
+  - bioconda::bioconductor-tximeta=1.4.0
+  - conda-forge::r-markdown=1.1
   - bioconda::bioawk=1.0
-  #- bioconda::bioconductor-alevinqc=1.0.0
-  - bioconda::bioconductor-tximport=1.10.1
-  - bioconda::star=2.7.1a
+  - bioconda::bioconductor-alevinqc=1.2.0
+  - bioconda::bioconductor-tximport=1.14.0
+  - bioconda::star=2.7.2c #2.7.3a is broken!
   - samtools=1.9
-  - gffread=0.11.4
+  - gffread=0.11.6
   - bioconda::kallisto=0.46.0
-  - bioconda::bustools=0.39.2
-  
+  - bioconda::bustools=0.39.4
+  - font-ttf-source-code-pro=2.030 #Required for fonts in alevinQC

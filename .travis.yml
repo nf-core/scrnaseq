@@ -9,12 +9,12 @@ matrix:
 
 before_install:
   # PRs to master are only ok if coming from dev branch
-  - '[ $TRAVIS_PULL_REQUEST = "false" ] || [ $TRAVIS_BRANCH != "master" ] || ([ $TRAVIS_PULL_REQUEST_SLUG = $TRAVIS_REPO_SLUG ] && [ $TRAVIS_PULL_REQUEST_BRANCH = "dev" ])'
+  - '[ $TRAVIS_PULL_REQUEST = "false" ] || [ $TRAVIS_BRANCH != "master" ] || ([ $TRAVIS_PULL_REQUEST_SLUG = $TRAVIS_REPO_SLUG ] && ([ $TRAVIS_PULL_REQUEST_BRANCH = "dev" ] || [ $TRAVIS_PULL_REQUEST_BRANCH = "patch" ]))'
   # Pull the docker image first so the test doesn't wait for this
   - docker pull nfcore/scrnaseq:dev
   # Fake the tag locally so that the pipeline runs properly
   # Looks weird when this is :dev to :dev, but makes sense when testing code for a release (:dev to :1.0.1)
-  - docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:dev
+  - docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:1.0.0
 
 install:
   # Install Nextflow
@@ -24,19 +24,23 @@ install:
   # Install nf-core/tools
   - pip install --upgrade pip
   - pip install nf-core
+  # Install Conda 
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  - bash Miniconda3-latest-Linux-x86_64.sh -b -f -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
   # Reset
   - mkdir ${TRAVIS_BUILD_DIR}/tests && cd ${TRAVIS_BUILD_DIR}/tests
   # Install markdownlint-cli
   - sudo apt-get install npm && npm install -g markdownlint-cli
 
 env:
-  - NXF_VER='0.32.0' # Specify a minimum NF version that should be tested and work
-  - NXF_VER='' # Plus: get the latest NF version and check that it works
+  - NXF_VER='19.10.0' NXF_ANSI_LOG=0
+  - NXF_VER='' NXF_ANSI_LOG=0 
 
 script:
   # Lint the pipeline code
   - nf-core lint ${TRAVIS_BUILD_DIR}
-  # Lint the documentation
   - markdownlint ${TRAVIS_BUILD_DIR} -c ${TRAVIS_BUILD_DIR}/.github/markdownlint.yml
-  # Run the pipeline with the test profile
+  # REFERENCE: Run the basic pipeline with the test profile
   - nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker
+  # All other tests run via GithUB Actions now

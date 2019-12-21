@@ -86,7 +86,9 @@ if( params.star_index && params.aligner == 'star' ){
     star_index = Channel
         .fromPath(params.star_index)
         .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
-} else if (params.gtf && params.fasta){
+}
+
+if (params.gtf && params.fasta && params.aligner == 'star' && !params.star_index){
   exit 1, "STAR needs either a GTF + FASTA or a precomputed index supplied."
 }
 

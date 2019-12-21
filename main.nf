@@ -46,7 +46,7 @@ def helpMessage() {
       --genome                      Use iGenomes genome Fasta references
       --fasta                       Path to **genome** Fasta reference file
       --gtf                         Path to gtf file
-      --transcriptome_fasta         Path to **transcriptome** Fasta reference file
+      --transcript_fasta            Path to **transcriptome** Fasta reference file
       --save_reference              Save indexed reference genomes in results
 
     Other options:
@@ -106,7 +106,7 @@ if (!params.gtf && !params.txp2gene){
 
 //Check if a transcriptome FastA or at least a Genome FastA is provided!
 if (!params.fasta && !params.transcript_fasta){
-  exit 1, "Neither of --fasta or --transcriptome provided! At least one must be provided to quantify genes"
+  exit 1, "Neither of --fasta or --transcript_fasta provided! At least one must be provided to quantify genes"
 }
 
 //Setup FastA channels

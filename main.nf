@@ -77,7 +77,6 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
     exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
 }
 
-
 //Check if one of the available aligners is used (alevin, kallisto, star)
 if (params.aligner != 'star' && params.aligner != 'alevin' && params.aligner != 'kallisto'){
     exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin', 'kallisto'"
@@ -87,6 +86,13 @@ if( params.star_index && params.aligner == 'star' ){
     star_index = Channel
         .fromPath(params.star_index)
         .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
+} else if (params.gtf && params.fasta){
+  exit 1, "STAR needs either a GTF + FASTA or a precomputed index supplied."
+}
+
+//Sanity check Kallisto behaviour
+if ( params.aligner == 'kallisto' && !params.kallisto_index && params.fasta && params.gtf ) {
+  exit 1, "Kallisto needs either a precomputed index or a FASTA + GTF file to run!"
 }
 
 //Check if GTF is supplied properly
@@ -95,18 +101,11 @@ if( params.gtf ){
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
         .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star; gtf_gene_map }
-} else if (params.aligner == 'star'){
-  exit 1, "Must provide a GTF file ('--gtf') to align with STAR"
 }
 
 //Check if TXP2Gene is provided for Alevin
-if (!params.gtf && !params.txp2gene){
+if (!params.gtf && !params.txp2gene && params.aligner == 'alevin'){
   exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
-}
-
-//Check if a transcriptome FastA or at least a Genome FastA is provided!
-if (!params.fasta && !params.transcript_fasta){
-  exit 1, "Neither of --fasta or --transcript_fasta provided! At least one must be provided to quantify genes"
 }
 
 //Setup FastA channels

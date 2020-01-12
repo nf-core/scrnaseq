@@ -93,7 +93,7 @@ if (params.aligner == 'star' && (!params.star_index && (!params.gtf || !params.f
 }
 
 //Sanity check Kallisto behaviour
-if ( params.aligner == 'kallisto' && !( params.kallisto_index || (params.fasta && params.gtf ))) {
+if ( params.aligner == 'kallisto' && !( params.kallisto_index || ((params.fasta || params.transcript_fasta)  && params.gtf ))) {
   exit 1, "Kallisto needs either a precomputed index or a FASTA + GTF file to run!"
 }
 

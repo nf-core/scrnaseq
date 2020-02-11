@@ -1,5 +1,9 @@
 # nf-core/scrnaseq: Changelog
 
+## dev / unreleased
+
+* [25](https://github.com/nf-core/scrnaseq/issues/25) Fix small documentation error with wrong parameter for txp2gene
+
 ## V1.0.1 - 2019
 
 ### Fixes

@@ -19,7 +19,7 @@ jobs:
       - name: Download and tag image
         run: |
           docker pull nfcore/scrnaseq:dev
-          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:1.0.0
+          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:dev
       - name: "Test suites for all alignment methods"
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }}

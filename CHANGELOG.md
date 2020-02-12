@@ -2,7 +2,17 @@
 
 ## dev / unreleased
 
+### Fixes
+
 * [25](https://github.com/nf-core/scrnaseq/issues/25) Fix small documentation error with wrong parameter for txp2gene
+
+### Dependency Updates
+
+* Salmon to 1.1.0
+* Samtools to 1.10
+* GFFRead to 0.11.7
+* Kallisto to 0.46.2
+* BUSTools to 0.40.0
 
 ## V1.0.1 - 2019
 

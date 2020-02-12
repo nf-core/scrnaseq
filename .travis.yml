@@ -9,7 +9,7 @@ matrix:
 
 before_install:
   # PRs to master are only ok if coming from dev branch
-  - '[ $TRAVIS_PULL_REQUEST = "false" ] || [ $TRAVIS_BRANCH != "master" ] || ([ $TRAVIS_PULL_REQUEST_SLUG = $TRAVIS_REPO_SLUG ] && [ $TRAVIS_PULL_REQUEST_BRANCH = "dev" ])'
+  - '[ $TRAVIS_PULL_REQUEST = "false" ] || [ $TRAVIS_BRANCH != "master" ] || ([ $TRAVIS_PULL_REQUEST_SLUG = $TRAVIS_REPO_SLUG ] && [ $TRAVIS_PULL_REQUEST_BRANCH = "dev" ]) || [ $TRAVIS_PULL_REQUEST_BRANCH = "patch" ]'
   # Pull the docker image first so the test doesn't wait for this
   - docker pull nfcore/scrnaseq:dev
   # Fake the tag locally so that the pipeline runs properly
@@ -30,8 +30,13 @@ install:
   - sudo apt-get install npm && npm install -g markdownlint-cli
 
 env:
-  - NXF_VER='0.32.0' # Specify a minimum NF version that should be tested and work
-  - NXF_VER='' # Plus: get the latest NF version and check that it works
+  # Tower token is to inspect runs on https://tower.nf
+  # Use public mailbox nf-core@mailinator.com to log in: https://www.mailinator.com/v3/index.jsp?zone=public&query=nf-core
+  # Specify a minimum NF version that should be tested and work
+  - NXF_VER='19.10.0'  TOWER_ACCESS_TOKEN="1c1f493bc2703472d6f1b9f6fb9e9d117abab7b1"
+   # Plus: get the latest NF version and check that it works
+  - NXF_VER=''         TOWER_ACCESS_TOKEN="1c1f493bc2703472d6f1b9f6fb9e9d117abab7b1"
+
 
 script:
   # Lint the pipeline code
@@ -39,4 +44,4 @@ script:
   # Lint the documentation
   - markdownlint ${TRAVIS_BUILD_DIR} -c ${TRAVIS_BUILD_DIR}/.github/markdownlint.yml
   # Run the pipeline with the test profile
-  - nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker
+  - nextflow run ${TRAVIS_BUILD_DIR} -profile test,docker -ansi-log false -name scrnaseq-${TRAVIS_EVENT_TYPE}-${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT:0:6}-test-description

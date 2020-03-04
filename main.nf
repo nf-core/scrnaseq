@@ -9,7 +9,6 @@
 ----------------------------------------------------------------------------------------
 */
 
-
 def helpMessage() {
     log.info nfcoreHeader()
     log.info"""
@@ -57,20 +56,21 @@ def helpMessage() {
       --igenomes_ignore             Ignore iGenomes reference data
 
     AWSBatch options:
-      --awsqueue                    The AWSBatch JobQueue that needs to be set when running on AWSBatch
-      --awsregion                   The AWS Region for your AWS Batch job to run on
+      --awsqueue [str]                The AWSBatch JobQueue that needs to be set when running on AWSBatch
+      --awsregion [str]               The AWS Region for your AWS Batch job to run on
+      --awscli [str]                  Path to the AWS CLI tool
     """.stripIndent()
+}
+
+// Show help message
+if (params.help) {
+    helpMessage()
+    exit 0
 }
 
 /*
  * SET UP CONFIGURATION VARIABLES
  */
-
-// Show help emssage
-if (params.help){
-    helpMessage()
-    exit 0
-}
 
 // Check if genome exists in the config file
 if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
@@ -145,8 +145,8 @@ if (params.aligner == 'alevin' && params.salmon_index) {
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
 custom_runName = params.name
-if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
-  custom_runName = workflow.runName
+if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
+    custom_runName = workflow.runName
 }
 
 
@@ -161,8 +161,8 @@ if( workflow.profile == 'awsbatch') {
 }
 
 // Stage config files
-ch_multiqc_config = Channel.fromPath(params.multiqc_config)
-ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
+ch_multiqc_config = file(params.multiqc_config, checkIfExists: true)
+ch_output_docs = file("$baseDir/docs/output.md", checkIfExists: true)
 
 /*
  * Create a channel for input read files
@@ -198,11 +198,10 @@ if (params.type == "10x" && !params.barcode_whitelist){
   barcode_whitelist_gzipped = Channel.empty()
 }
 
-
 // Header log info
 log.info nfcoreHeader()
 def summary = [:]
-if(workflow.revision) summary['Pipeline Release'] = workflow.revision
+if (workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
 summary['Reads']            = params.reads
 if(params.fasta)         summary['Genome Reference']        = params.fasta
@@ -219,23 +218,25 @@ if (params.aligner == 'alevin') summary['Alevin TXP2Gene']        = params.txp2g
 if (params.aligner == 'kallisto') summary['Kallisto Gene Map']        = params.kallisto_gene_map
 if(params.aligner == 'kallisto') summary['BUSTools Correct'] = params.bustools_correct
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
-if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
+if (workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
 summary['Launch dir']       = workflow.launchDir
 summary['Working dir']      = workflow.workDir
 summary['Script dir']       = workflow.projectDir
 summary['User']             = workflow.userName
-if(workflow.profile == 'awsbatch'){
-   summary['AWS Region']    = params.awsregion
-   summary['AWS Queue']     = params.awsqueue
+if (workflow.profile.contains('awsbatch')) {
+    summary['AWS Region']   = params.awsregion
+    summary['AWS Queue']    = params.awsqueue
+    summary['AWS CLI']      = params.awscli
 }
 summary['Config Profile'] = workflow.profile
-if(params.config_profile_description) summary['Config Description'] = params.config_profile_description
-if(params.config_profile_contact)     summary['Config Contact']     = params.config_profile_contact
-if(params.config_profile_url)         summary['Config URL']         = params.config_profile_url
-if(params.email) {
-  summary['E-mail Address']  = params.email
-  summary['MultiQC maxsize'] = params.max_multiqc_email_size
+if (params.config_profile_description) summary['Config Description'] = params.config_profile_description
+if (params.config_profile_contact)     summary['Config Contact']     = params.config_profile_contact
+if (params.config_profile_url)         summary['Config URL']         = params.config_profile_url
+if (params.email || params.email_on_fail) {
+    summary['E-mail Address']    = params.email
+    summary['E-mail on failure'] = params.email_on_fail
+    summary['MultiQC maxsize']   = params.max_multiqc_email_size
 }
 log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
 log.info "-\033[2m--------------------------------------------------\033[0m-"
@@ -260,19 +261,18 @@ ${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style
    return yaml_file
 }
 
-
 /*
  * Parse software version numbers
  */
 process get_software_versions {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy',
-    saveAs: {filename ->
-        if (filename.indexOf(".csv") > 0) filename
-        else null
-    }
+        saveAs: { filename ->
+                      if (filename.indexOf(".csv") > 0) filename
+                      else null
+                }
 
     output:
-    file 'software_versions_mqc.yaml' into software_versions_yaml
+    file 'software_versions_mqc.yaml' into ch_software_versions_yaml
     file "software_versions.csv"
 
     script:
@@ -694,14 +694,14 @@ process multiqc {
 
     input:
     file multiqc_config from ch_multiqc_config
-    file ('software_versions/*') from software_versions_yaml
+    file ('software_versions/*') from ch_software_versions_yaml
     file workflow_summary from create_workflow_summary(summary)
     file ('STAR/*') from star_log.collect().ifEmpty([])
     file ('alevin/*') from alevin_logs.collect().ifEmpty([])
     file ('kallisto/*') from kallisto_log_for_multiqc.collect().ifEmpty([])
 
     output:
-    file "*multiqc_report.html" into multiqc_report
+    file "*multiqc_report.html" into ch_multiqc_report
     file "*_data"
 
     script:
@@ -738,8 +738,8 @@ workflow.onComplete {
 
     // Set up the e-mail variables
     def subject = "[nf-core/scrnaseq] Successful: $workflow.runName"
-    if(!workflow.success){
-      subject = "[nf-core/scrnaseq] FAILED: $workflow.runName"
+    if (!workflow.success) {
+        subject = "[nf-core/scrnaseq] FAILED: $workflow.runName"
     }
     def email_fields = [:]
     email_fields['version'] = workflow.manifest.version
@@ -757,10 +757,9 @@ workflow.onComplete {
     email_fields['summary']['Date Completed'] = workflow.complete
     email_fields['summary']['Pipeline script file path'] = workflow.scriptFile
     email_fields['summary']['Pipeline script hash ID'] = workflow.scriptId
-    if(workflow.repository) email_fields['summary']['Pipeline repository Git URL'] = workflow.repository
-    if(workflow.commitId) email_fields['summary']['Pipeline repository Git Commit'] = workflow.commitId
-    if(workflow.revision) email_fields['summary']['Pipeline Git branch/tag'] = workflow.revision
-    if(workflow.container) email_fields['summary']['Docker image'] = workflow.container
+    if (workflow.repository) email_fields['summary']['Pipeline repository Git URL'] = workflow.repository
+    if (workflow.commitId) email_fields['summary']['Pipeline repository Git Commit'] = workflow.commitId
+    if (workflow.revision) email_fields['summary']['Pipeline Git branch/tag'] = workflow.revision
     email_fields['summary']['Nextflow Version'] = workflow.nextflow.version
     email_fields['summary']['Nextflow Build'] = workflow.nextflow.build
     email_fields['summary']['Nextflow Compile Timestamp'] = workflow.nextflow.timestamp
@@ -769,14 +768,20 @@ workflow.onComplete {
     def mqc_report = null
     try {
         if (workflow.success) {
-            mqc_report = multiqc_report.getVal()
-            if (mqc_report.getClass() == ArrayList){
+            mqc_report = ch_multiqc_report.getVal()
+            if (mqc_report.getClass() == ArrayList) {
                 log.warn "[nf-core/scrnaseq] Found multiple reports from process 'multiqc', will use only one"
                 mqc_report = mqc_report[0]
             }
         }
     } catch (all) {
         log.warn "[nf-core/scrnaseq] Could not attach MultiQC report to summary email"
+    }
+
+    // Check if we are only sending emails on failure
+    email_address = params.email
+    if (!params.email && params.email_on_fail && !workflow.success) {
+        email_address = params.email_on_fail
     }
 
     // Render the TXT template
@@ -797,83 +802,83 @@ workflow.onComplete {
     def sendmail_html = sendmail_template.toString()
 
     // Send the HTML e-mail
-    if (params.email) {
+    if (email_address) {
         try {
-          if( params.plaintext_email ){ throw GroovyException('Send plaintext e-mail, not HTML') }
-          // Try to send HTML e-mail using sendmail
-          [ 'sendmail', '-t' ].execute() << sendmail_html
-          log.info "[nf-core/scrnaseq] Sent summary e-mail to $params.email (sendmail)"
+            if (params.plaintext_email) { throw GroovyException('Send plaintext e-mail, not HTML') }
+            // Try to send HTML e-mail using sendmail
+            [ 'sendmail', '-t' ].execute() << sendmail_html
+            log.info "[nf-core/scrnaseq] Sent summary e-mail to $email_address (sendmail)"
         } catch (all) {
-          // Catch failures and try with plaintext
-          [ 'mail', '-s', subject, params.email ].execute() << email_txt
-          log.info "[nf-core/scrnaseq] Sent summary e-mail to $params.email (mail)"
+            // Catch failures and try with plaintext
+            [ 'mail', '-s', subject, email_address ].execute() << email_txt
+            log.info "[nf-core/scrnaseq] Sent summary e-mail to $email_address (mail)"
         }
     }
 
     // Write summary e-mail HTML to a file
-    def output_d = new File( "${params.outdir}/pipeline_info/" )
-    if( !output_d.exists() ) {
-      output_d.mkdirs()
+    def output_d = new File("${params.outdir}/pipeline_info/")
+    if (!output_d.exists()) {
+        output_d.mkdirs()
     }
-    def output_hf = new File( output_d, "pipeline_report.html" )
+    def output_hf = new File(output_d, "pipeline_report.html")
     output_hf.withWriter { w -> w << email_html }
-    def output_tf = new File( output_d, "pipeline_report.txt" )
+    def output_tf = new File(output_d, "pipeline_report.txt")
     output_tf.withWriter { w -> w << email_txt }
 
-    c_reset = params.monochrome_logs ? '' : "\033[0m";
-    c_purple = params.monochrome_logs ? '' : "\033[0;35m";
     c_green = params.monochrome_logs ? '' : "\033[0;32m";
+    c_purple = params.monochrome_logs ? '' : "\033[0;35m";
     c_red = params.monochrome_logs ? '' : "\033[0;31m";
+    c_reset = params.monochrome_logs ? '' : "\033[0m";
 
     if (workflow.stats.ignoredCount > 0 && workflow.success) {
-      log.info "${c_purple}Warning, pipeline completed, but with errored process(es) ${c_reset}"
-      log.info "${c_red}Number of ignored errored process(es) : ${workflow.stats.ignoredCount} ${c_reset}"
-      log.info "${c_green}Number of successfully ran process(es) : ${workflow.stats.succeedCountFmt} ${c_reset}"
+        log.info "-${c_purple}Warning, pipeline completed, but with errored process(es) ${c_reset}-"
+        log.info "-${c_red}Number of ignored errored process(es) : ${workflow.stats.ignoredCount} ${c_reset}-"
+        log.info "-${c_green}Number of successfully ran process(es) : ${workflow.stats.succeedCount} ${c_reset}-"
     }
 
-    if(workflow.success){
-        log.info "${c_purple}[nf-core/scrnaseq]${c_green} Pipeline completed successfully${c_reset}"
+    if (workflow.success) {
+        log.info "-${c_purple}[nf-core/scrnaseq]${c_green} Pipeline completed successfully${c_reset}-"
     } else {
         checkHostname()
-        log.info "${c_purple}[nf-core/scrnaseq]${c_red} Pipeline completed with errors${c_reset}"
+        log.info "-${c_purple}[nf-core/scrnaseq]${c_red} Pipeline completed with errors${c_reset}-"
     }
 
 }
 
 
-def nfcoreHeader(){
+def nfcoreHeader() {
     // Log colors ANSI codes
-    c_reset = params.monochrome_logs ? '' : "\033[0m";
-    c_dim = params.monochrome_logs ? '' : "\033[2m";
     c_black = params.monochrome_logs ? '' : "\033[0;30m";
-    c_green = params.monochrome_logs ? '' : "\033[0;32m";
-    c_yellow = params.monochrome_logs ? '' : "\033[0;33m";
     c_blue = params.monochrome_logs ? '' : "\033[0;34m";
-    c_purple = params.monochrome_logs ? '' : "\033[0;35m";
     c_cyan = params.monochrome_logs ? '' : "\033[0;36m";
+    c_dim = params.monochrome_logs ? '' : "\033[2m";
+    c_green = params.monochrome_logs ? '' : "\033[0;32m";
+    c_purple = params.monochrome_logs ? '' : "\033[0;35m";
+    c_reset = params.monochrome_logs ? '' : "\033[0m";
     c_white = params.monochrome_logs ? '' : "\033[0;37m";
+    c_yellow = params.monochrome_logs ? '' : "\033[0;33m";
 
-    return """    ${c_dim}----------------------------------------------------${c_reset}
+    return """    -${c_dim}--------------------------------------------------${c_reset}-
                                             ${c_green},--.${c_black}/${c_green},-.${c_reset}
     ${c_blue}        ___     __   __   __   ___     ${c_green}/,-._.--~\'${c_reset}
     ${c_blue}  |\\ | |__  __ /  ` /  \\ |__) |__         ${c_yellow}}  {${c_reset}
     ${c_blue}  | \\| |       \\__, \\__/ |  \\ |___     ${c_green}\\`-._,-`-,${c_reset}
                                             ${c_green}`._,._,\'${c_reset}
     ${c_purple}  nf-core/scrnaseq v${workflow.manifest.version}${c_reset}
-    ${c_dim}----------------------------------------------------${c_reset}
+    -${c_dim}--------------------------------------------------${c_reset}-
     """.stripIndent()
 }
 
-def checkHostname(){
+def checkHostname() {
     def c_reset = params.monochrome_logs ? '' : "\033[0m"
     def c_white = params.monochrome_logs ? '' : "\033[0;37m"
     def c_red = params.monochrome_logs ? '' : "\033[1;91m"
     def c_yellow_bold = params.monochrome_logs ? '' : "\033[1;93m"
-    if(params.hostnames){
+    if (params.hostnames) {
         def hostname = "hostname".execute().text.trim()
         params.hostnames.each { prof, hnames ->
             hnames.each { hname ->
-                if(hostname.contains(hname) && !workflow.profile.contains(prof)){
+                if (hostname.contains(hname) && !workflow.profile.contains(prof)) {
                     log.error "====================================================\n" +
                             "  ${c_red}WARNING!${c_reset} You are running with `-profile $workflow.profile`\n" +
                             "  but your machine hostname is ${c_white}'$hostname'${c_reset}\n" +

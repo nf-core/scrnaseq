@@ -9,50 +9,52 @@
     * [Updating the pipeline](#updating-the-pipeline)
     * [Reproducibility](#reproducibility)
   * [Main arguments](#main-arguments)
-    * [-profile](#-profile)
-    * [--reads](#--reads)
-    * [--aligner (Required)](#--aligner-required)
+    * [`-profile`](#-profile)
+    * [`--reads`](#--reads)
+    * [`--aligner` (Required)](#--aligner-required)
       * [Alevin](#alevin)
-        * [--salmon_index](#--salmon_index)
-        * [--txp2gene_alevin](#--txp2gene_alevin)
+        * [`--salmon_index`](#--salmon_index)
+        * [`--txp2gene`](#--txp2gene)
       * [STARSolo](#starsolo)
-        * [--star_index](#--star_index)
+        * [`--star_index`](#--star_index)
       * [Kallisto | BUStools](#kallisto--bustools)
-        * [--bustools_correct](#--bustools_correct)
-        * [--skip_bustools](#--skip_bustools)
-        * [--kallisto_gene_map](#--kallisto_gene_map)
-        * [--kallisto_index](#--kallisto_index)
+        * [`--bustools_correct`](#--bustools_correct)
+        * [`--skip_bustools`](#--skip_bustools)
+        * [`--kallisto_gene_map`](#--kallisto_gene_map)
+        * [`--kallisto_index`](#--kallisto_index)
     * [Cellular barcodes](#cellular-barcodes)
-      * [--type to specify droplet type (Required)](#--type-to-specify-droplet-type-required)
-      * [--chemistry (using cellranger barcodes) (Required)](#--chemistry-using-cellranger-barcodes-required)
-      * [--barcode_whitelist for custom barcode whitelist](#--barcode_whitelist-for-custom-barcode-whitelist)
+      * [`--type` to specify droplet type (Required)](#--type-to-specify-droplet-type-required)
+      * [`--chemistry` (using cellranger barcodes) (Required)](#--chemistry-using-cellranger-barcodes-required)
+      * [`--barcode_whitelist` for custom barcode whitelist](#--barcode_whitelist-for-custom-barcode-whitelist)
   * [Reference genomes](#reference-genomes)
-    * [--genome (using iGenomes)](#--genome-using-igenomes)
-    * [--fasta](#--fasta)
-    * [--gtf](#--gtf)
-    * [--transcript_fasta](#--transcript_fasta)
-    * [--save_reference](#--save_reference)
-    * [--igenomes_ignore](#--igenomes_ignore)
+    * [`--genome` (using iGenomes)](#--genome-using-igenomes)
+    * [`--fasta`](#--fasta)
+    * [`--gtf`](#--gtf)
+    * [`--transcript_fasta`](#--transcript_fasta)
+    * [`--save_reference`](#--save_reference)
+    * [`--igenomes_ignore`](#--igenomes_ignore)
   * [Job resources](#job-resources)
     * [Automatic resubmission](#automatic-resubmission)
     * [Custom resource requests](#custom-resource-requests)
   * [AWS Batch specific parameters](#aws-batch-specific-parameters)
-    * [--awsqueue](#--awsqueue)
-    * [--awsregion](#--awsregion)
+    * [`--awsqueue`](#--awsqueue)
+    * [`--awsregion`](#--awsregion)
   * [Other command line parameters](#other-command-line-parameters)
-    * [--outdir](#--outdir)
-    * [--email](#--email)
-    * [-name](#-name)
-    * [-resume](#-resume)
-    * [-c](#-c)
-    * [--custom_config_version](#--custom_config_version)
-    * [--custom_config_base](#--custom_config_base)
-    * [--max_memory](#--max_memory)
-    * [--max_time](#--max_time)
-    * [--max_cpus](#--max_cpus)
-    * [--plaintext_email](#--plaintext_email)
-    * [--monochrome_logs](#--monochrome_logs)
-    * [--multiqc_config](#--multiqc_config)
+    * [`--outdir`](#--outdir)
+    * [`--email`](#--email)
+    * [`--email_on_fail`](#--email_on_fail)
+    * [`--max_multiqc_email_size`](#--max_multiqc_email_size)
+    * [`-name`](#-name)
+    * [`-resume`](#-resume)
+    * [`-c`](#-c)
+    * [`--custom_config_version`](#--custom_config_version)
+    * [`--custom_config_base`](#--custom_config_base)
+    * [`--max_memory`](#--max_memory)
+    * [`--max_time`](#--max_time)
+    * [`--max_cpus`](#--max_cpus)
+    * [`--plaintext_email`](#--plaintext_email)
+    * [`--monochrome_logs`](#--monochrome_logs)
+    * [`--multiqc_config`](#--multiqc_config)
 
 ## Introduction
 
@@ -105,10 +107,17 @@ This version number will be logged in reports when you run the pipeline, so that
 
 Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments. Note that multiple profiles can be loaded, for example: `-profile docker` - the order of arguments is important!
 
-If `-profile` is not specified at all the pipeline will be run locally and expects all software to be installed and available on the `PATH`.
+Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments.
 
-* `awsbatch`
-  * A generic configuration profile to be used with AWS Batch.
+Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, Conda) - see below.
+
+The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making multiple config profiles for various institutional clusters available at run time. For more information and to see if your system is available in these configs please see the [nf-core/configs documentation](https://github.com/nf-core/configs#documentation).
+
+Note that multiple profiles can be loaded, for example: `-profile test,docker` - the order of arguments is important!
+They are loaded in sequence, so later profiles can overwrite earlier profiles.
+
+If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended.
+
 * `conda`
   * A generic configuration profile to be used with [conda](https://conda.io/docs/)
   * Pulls most software from [Bioconda](https://bioconda.github.io/)
@@ -154,7 +163,7 @@ To choose which one to use, please specify either `alevin`, `star` or `kallisto`
 
 This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.
 
-##### `--txp2gene_alevin`
+##### `--txp2gene`
 
 This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.
 
@@ -305,6 +314,14 @@ The output directory where the results will be saved.
 ### `--email`
 
 Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.
+
+### `--email_on_fail`
+
+This works exactly as with `--email`, except emails are only sent if the workflow is not successful.
+
+### `--max_multiqc_email_size`
+
+Threshold size for MultiQC report to be attached in notification email. If file generated by pipeline exceeds the threshold, it will not be attached (Default: 25MB).
 
 ### `-name`
 

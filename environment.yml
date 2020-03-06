@@ -1,18 +1,20 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: nf-core-scrnaseq-1.0.2dev
+name: nf-core-scrnaseq-1.0.1dev
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
   - conda-forge::python=3.7.3
+  - conda-forge::markdown=3.1.1
+  - conda-forge::pymdown-extensions=6.0
+  - conda-forge::pygments=2.5.2
   - bioconda::multiqc=1.8
   - bioconda::salmon=1.1.0
   - bioconda::r-seurat=3.0.2
   - bioconda::bioconductor-isee=1.6.0
   - bioconda::bioconductor-tximeta=1.4.0
-  - conda-forge::r-markdown=1.1
   - bioconda::bioawk=1.0
   - bioconda::bioconductor-alevinqc=1.2.0
   - bioconda::bioconductor-tximport=1.14.0

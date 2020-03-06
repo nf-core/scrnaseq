@@ -18,8 +18,9 @@ jobs:
           sudo mv nextflow /usr/local/bin/
       - name: Download and tag image
         run: |
-          docker pull nfcore/scrnaseq:dev && docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:dev
-      - name: "Test suites for all alignment methods"
+          docker pull nfcore/scrnaseq:dev
+          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:dev
+      - name: Run pipeline with test data
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }}
       

@@ -695,7 +695,8 @@ process multiqc {
     input:
     file multiqc_config from ch_multiqc_config
     file ('software_versions/*') from ch_software_versions_yaml
-    file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")    file ('STAR/*') from star_log.collect().ifEmpty([])
+    file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")    
+    file ('STAR/*') from star_log.collect().ifEmpty([])
     file ('alevin/*') from alevin_logs.collect().ifEmpty([])
     file ('kallisto/*') from kallisto_log_for_multiqc.collect().ifEmpty([])
 

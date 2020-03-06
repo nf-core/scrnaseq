@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Update Salmon `1.0.0` -> `1.1.0`
 * Update Samtools `1.9` -> `1.10`
 * Update GFFRead `0.11.6` -> `0.11.7`
-* Update Kallisto `0.46.0` -> `0.46.2`
+* Update Kallisto `0.46.0` -> `0.46.1`
 * Update BUSTools `0.39.4` -> `0.40.0`
 
 ## [1.0.1] - 2019

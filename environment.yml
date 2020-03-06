@@ -22,6 +22,6 @@ dependencies:
   - bioconda::star=2.7.2c #2.7.3a is broken!
   - samtools=1.10
   - gffread=0.11.7
-  - bioconda::kallisto=0.46.2
+  - bioconda::kallisto=0.46.1
   - bioconda::bustools=0.40.0
   - font-ttf-source-code-pro=2.030 #Required for fonts in alevinQC

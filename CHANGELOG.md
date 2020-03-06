@@ -1,27 +1,35 @@
 # nf-core/scrnaseq: Changelog
 
-## dev / unreleased
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-### Fixes
+## [Unpublished Version / DEV]
+
+### `Added`
+
+* FastQC to QC raw reads
+
+### `Fixed`
 
 * [25](https://github.com/nf-core/scrnaseq/issues/25) Fix small documentation error with wrong parameter for txp2gene
 
-### Dependency Updates
+### `Dependencies`
 
-* Salmon to 1.1.0
-* Samtools to 1.10
-* GFFRead to 0.11.7
-* Kallisto to 0.46.2
-* BUSTools to 0.40.0
+* Added FastQC `0.11.9`
+* Update Salmon `1.0.0` -> `1.1.0`
+* Update Samtools `1.9` -> `1.10`
+* Update GFFRead `0.11.6` -> `0.11.7`
+* Update Kallisto `0.46.0` -> `0.46.2`
+* Update BUSTools `0.39.4` -> `0.40.0`
 
-## V1.0.1 - 2019
+## [1.0.1] - 2019
 
-### Fixes
+### `Fixed`
 
 * [#20](https://github.com/nf-core/scrnaseq/issues/20) Fix Transcriptome Fasta argument not detected well
 * [#21](https://github.com/nf-core/scrnaseq/issues/21) Fix `--kallisto_index` being ignored
 
-## v1.0.0 - 2019-11-28 "Tiny Aluminium Crab"
+## [1.0.0] - 2019-11-28 "Tiny Aluminium Crab"
 
 Initial release of nf-core/scrnaseq, created with the [nf-core](http://nf-co.re/) template.
 This includes the following workflow options:

@@ -6,6 +6,7 @@ import re
 regexes = {
     'nf-core/scrnaseq': ['v_pipeline.txt', r"(\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
+    'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
     'STAR': ['v_star.txt', r"(\S+)"],
     'Salmon': ['v_salmon.txt', r"salmon (\S+)"],
     'Kallisto': ['v_kallisto.txt', r"kallisto, version (\S+)"],
@@ -15,6 +16,7 @@ regexes = {
 results = OrderedDict()
 results['nf-core/scrnaseq'] = '<span style="color:#999999;\">N/A</span>'
 results['Nextflow'] = '<span style="color:#999999;\">N/A</span>'
+results['FastQC'] = '<span style="color:#999999;\">N/A</span>'
 results['STAR'] = '<span style="color:#999999;\">N/A</span>'
 results['Salmon'] = '<span style="color:#999999;\">N/A</span>'
 results['Kallisto'] = '<span style="color:#999999;\">N/A</span>'
@@ -39,8 +41,8 @@ for k in list(results):
 
 # Dump to YAML
 print ('''
-id: 'nf-core/scrnaseq-software-versions'
-section_name: 'nf-core/scrnaseq Software Versions'
+id: 'software_versions'
+section_name: 'Software Versions'
 section_href: 'https://github.com/nf-core/scrnaseq'
 plot_type: 'html'
 description: 'are collected at run time from the software output.'

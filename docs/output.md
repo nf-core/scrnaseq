@@ -9,11 +9,27 @@ and processes data using the following steps:
 
 * [nf-core/scrnaseq: Output](#nf-corescrnaseq-output)
   * [Pipeline overview](#pipeline-overview)
+  * [FastQC](#fastqc)
   * [Kallisto & Bustools Results](#kallisto--bustools-results)
   * [STARsolo](#starsolo)
   * [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
   * [Other output data](#other-output-data)
   * [MultiQC](#multiqc)
+
+## FastQC
+
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your reads. It provides information about the quality score distribution across your reads, the per base sequence content (%T/A/G/C). You get information about adapter contamination and other overrepresented sequences.
+
+For further reading and documentation see the [FastQC help](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+
+> **NB**: some scRNAseq preparations make use of either R1 or R2 to get the cell barcode and/or the UMI (unique molecular identifier) sequences. Thus, some metrics on these reads might look weird and/or fail the checks.
+
+**Output directory: `results/fastqc`**
+
+* `sample_fastqc.html`
+  * FastQC report, containing quality metrics for your raw fastq files
+* `zips/sample_fastqc.zip`
+  * zip file containing the FastQC report, tab-delimited data file and plot images
 
 ## Kallisto & Bustools Results
 

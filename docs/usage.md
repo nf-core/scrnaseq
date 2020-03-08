@@ -33,6 +33,7 @@
     * [`--transcript_fasta`](#--transcript_fasta)
     * [`--save_reference`](#--save_reference)
     * [`--igenomes_ignore`](#--igenomes_ignore)
+  * [Skipping QC steps](#skipping-qc-steps)
   * [Job resources](#job-resources)
     * [Automatic resubmission](#automatic-resubmission)
     * [Custom resource requests](#custom-resource-requests)
@@ -279,6 +280,15 @@ Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to t
 ### `--igenomes_ignore`
 
 Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.
+
+## Skipping QC steps
+
+Sometimes, QCs have already been conducted on the data, so it may not be desirable to run all of them if time and compute resources are limited.
+The following options make this easy:
+
+* `--skip_fastqc` - Skips FastQC
+
+> **NB**: some scRNAseq preparations make use of either R1 or R2 to get the cell barcode and/or the UMI (unique molecular identifier) sequences. Thus, some metrics on these reads might look weird and/or fail the checks.
 
 ## Job resources
 

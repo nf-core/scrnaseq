@@ -54,4 +54,4 @@ These tests are run both with the latest available version of `Nextflow` and als
 
 ## Getting help
 
-For further information/help, please consult the [nf-core/scrnaseq documentation](https://nf-co.re/scrnaseq/docs) and don't hesitate to get in touch on the nf-core Slack [#scrnaseq](https://nfcore.slack.com/channels/scrnaseq) channel ([join our Slack here](https://nf-co.re/join/slack)).
+For further information/help, please consult the [nf-core/scrnaseq documentation](https://nf-co.re/scrnaseq/usage) and don't hesitate to get in touch on the nf-core Slack [#scrnaseq](https://nfcore.slack.com/channels/scrnaseq) channel ([join our Slack here](https://nf-co.re/join/slack)).

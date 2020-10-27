@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json-schema.org/draft-07/schema",
+    "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/scrnaseq/master/nextflow_schema.json",
     "title": "nf-core/scrnaseq pipeline parameters",
     "description": "Pipeline for processing of 10xGenomics single cell rnaseq data",
@@ -101,7 +101,7 @@
                         "link",
                         "copy",
                         "copyNoFollow",
-                        "mov"
+                        "move"
                     ]
                 },
                 "name": {

@@ -161,7 +161,8 @@ if( workflow.profile == 'awsbatch') {
 }
 
 // Stage config files
-ch_multiqc_config = file(params.multiqc_config, checkIfExists: true)
+ch_multiqc_config = file("$baseDir/assets/multiqc_config.yaml", checkIfExists: true)
+ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
 ch_output_docs = file("$baseDir/docs/output.md", checkIfExists: true)
 
 /*
@@ -230,12 +231,13 @@ if (workflow.profile.contains('awsbatch')) {
     summary['AWS CLI']      = params.awscli
 }
 summary['Config Profile'] = workflow.profile
-if(params.config_profile_description) summary['Config Description'] = params.config_profile_description
-if(params.config_profile_contact)     summary['Config Contact']     = params.config_profile_contact
-if(params.config_profile_url)         summary['Config URL']         = params.config_profile_url
-if(params.email) {
-  summary['E-mail Address']  = params.email
-  summary['MultiQC maxsize'] = params.max_multiqc_email_size
+if (params.config_profile_description) summary['Config Description'] = params.config_profile_description
+if (params.config_profile_contact)     summary['Config Contact']     = params.config_profile_contact
+if (params.config_profile_url)         summary['Config URL']         = params.config_profile_url
+if (params.email || params.email_on_fail) {
+    summary['E-mail Address']    = params.email
+    summary['E-mail on failure'] = params.email_on_fail
+    summary['MultiQC maxsize']   = params.max_multiqc_email_size
 }
 log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
 log.info "-\033[2m--------------------------------------------------\033[0m-"
@@ -243,9 +245,10 @@ log.info "-\033[2m--------------------------------------------------\033[0m-"
 // Check the hostnames against configured profiles
 checkHostname()
 
-def create_workflow_summary(summary) {
-    def yaml_file = workDir.resolve('workflow_summary_mqc.yaml')
-    yaml_file.text  = """
+Channel.from(summary.collect{ [it.key, it.value] })
+    .map { k,v -> "<dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }
+    .reduce { a, b -> return [a, b].join("\n            ") }
+    .map { x -> """
     id: 'nf-core-scrnaseq-summary'
     description: " - this information is collected when the pipeline is started."
     section_name: 'nf-core/scrnaseq Workflow Summary'
@@ -253,12 +256,10 @@ def create_workflow_summary(summary) {
     plot_type: 'html'
     data: |
         <dl class=\"dl-horizontal\">
-${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }.join("\n")}
+            $x
         </dl>
-    """.stripIndent()
-
-   return yaml_file
-}
+    """.stripIndent() }
+    .set { ch_workflow_summary }
 
 /*
  * Parse software version numbers
@@ -693,9 +694,8 @@ process multiqc {
 
     input:
     file multiqc_config from ch_multiqc_config
-    file ('fastqc/*') from ch_fastqc_results.collect().ifEmpty([])
-    file ('software_versions/*') from ch_software_versions_yaml.collect()
-    file workflow_summary from create_workflow_summary(summary)
+    file ('software_versions/*') from ch_software_versions_yaml
+    file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")    
     file ('STAR/*') from star_log.collect().ifEmpty([])
     file ('alevin/*') from alevin_logs.collect().ifEmpty([])
     file ('kallisto/*') from kallisto_log_for_multiqc.collect().ifEmpty([])
@@ -707,8 +707,10 @@ process multiqc {
     script:
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
+    custom_config_file = params.multiqc_config ? "--config $mqc_custom_config" : ''
+
     """
-    multiqc -f $rtitle $rfilename --config $multiqc_config \
+    multiqc -f $rtitle $rfilename --config $custom_config_file \
       -m custom_content -m salmon -m star -m kallisto .
     """
 }
@@ -727,7 +729,7 @@ process output_documentation {
 
     script:
     """
-    markdown_to_html.r $output_docs results_description.html
+    markdown_to_html.py $output_docs -o results_description.html
     """
 }
 

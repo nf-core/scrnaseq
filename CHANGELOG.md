@@ -1,10 +1,12 @@
 # nf-core/scrnaseq: Changelog
 
-## dev / unreleased
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+
+## V1.0.1dev - 2019
 
 * [25](https://github.com/nf-core/scrnaseq/issues/25) Fix small documentation error with wrong parameter for txp2gene
-
-## V1.0.1 - 2019
+* Updated to nf-core template v1.11
 
 ### Fixes
 

@@ -6,21 +6,21 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - conda-forge::python=3.7.3
-  - conda-forge::markdown=3.1.1
-  - conda-forge::pymdown-extensions=6.0
-  - conda-forge::pygments=2.5.2
-  - bioconda::multiqc=1.8
-  - bioconda::salmon=1.1.0
+  - conda-forge::python=3.9.0
+  - conda-forge::markdown=3.3.3
+  - conda-forge::pymdown-extensions=8.0.1
+  - conda-forge::pygments=2.7.2
+  - bioconda::multiqc=1.9
+  - bioconda::salmon=1.3.0
   - bioconda::r-seurat=3.0.2
-  - bioconda::bioconductor-isee=1.6.0
-  - bioconda::bioconductor-tximeta=1.4.0
+  - bioconda::bioconductor-isee=2.2.0
+  - bioconda::bioconductor-tximeta=1.8.0
   - bioconda::bioawk=1.0
-  - bioconda::bioconductor-alevinqc=1.2.0
-  - bioconda::bioconductor-tximport=1.14.0
-  - bioconda::star=2.7.2c #2.7.3a is broken!
+  - bioconda::bioconductor-alevinqc=1.6.0
+  - bioconda::bioconductor-tximport=1.18.0
+  - bioconda::star=2.7.6a #2.7.2c worked, 2.7.3a is broken!
   - samtools=1.10
-  - gffread=0.11.7
+  - gffread=0.12.1
   - bioconda::kallisto=0.46.2
   - bioconda::bustools=0.40.0
   - font-ttf-source-code-pro=2.030 #Required for fonts in alevinQC

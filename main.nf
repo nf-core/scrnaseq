@@ -20,7 +20,7 @@ def helpMessage() {
     nextflow run nf-core/scrnaseq --input '*_R{1,2}.fastq.gz' -profile docker
 
     Mandatory arguments:
-      --reads                       Path to input data (must be surrounded with quotes)
+      --input                       Path to input data (must be surrounded with quotes)
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, awsbatch, test and more.
       --type                        Name of droplet technology e.g. "--type 10x". Currently supported: 10x
@@ -178,7 +178,7 @@ ch_output_docs_images = file("$baseDir/docs/images/", checkIfExists: true)
              .into { read_files_alevin; read_files_star; read_files_kallisto}
      } else {
          Channel
-            .fromFilePairs( params.reads )
+            .fromFilePairs( params.input )
             .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\n" }
             .into { read_files_alevin; read_files_star; read_files_kallisto }
 }

@@ -14,7 +14,7 @@ process CELLRANGER_COUNT {
     container "streitlab/custom-nf-modules-cellranger:latest"
 
     input:
-        tuple val(meta), path(reads)
+        tuple val(meta), path('fastqs/*')
         path reference_genome
 
     output:
@@ -24,7 +24,7 @@ process CELLRANGER_COUNT {
     script:
         prefix = meta.run ? "${meta.sample_name}_${meta.run}" : "${meta.sample_name}"
 
-        cellranger_count_command = "cellranger count --id='${prefix}_cellranger' --fastqs='./' --sample=${meta.sample_id} --transcriptome=${reference_genome} ${options.args}"
+        cellranger_count_command = "cellranger count --id='${prefix}_cellranger' --fastqs='fastqs' --sample=${meta.sample_id} --transcriptome=${reference_genome} ${options.args}"
         
         // Log
         if (params.verbose){

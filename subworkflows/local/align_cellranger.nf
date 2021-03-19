@@ -19,18 +19,17 @@ workflow CELLRANGER_ALIGN {
         samplesheet
 
     main:
-
         // Set sample channel from samplesheet input
-        METADATA( samplesheet )
+        METADATA            ( samplesheet )
     
         // Filter GTF based on gene biotypes passed in params.modules
-        CELLRANGER_MKGTF( gtf )
+        CELLRANGER_MKGTF    ( gtf )
 
         // Make reference genome
-        CELLRANGER_MKREF( CELLRANGER_MKGTF.out, fasta )
+        CELLRANGER_MKREF    ( CELLRANGER_MKGTF.out.gtf, fasta )
 
         // Obtain read counts
-        CELLRANGER_COUNT( METADATA.out, CELLRANGER_MKREF.out.collect() )
+        CELLRANGER_COUNT    ( METADATA.out, CELLRANGER_MKREF.out.reference_genome )
 
     emit:
         read_counts     = CELLRANGER_COUNT.out.read_counts

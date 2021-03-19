@@ -14,22 +14,21 @@ process CELLRANGER_MKGTF {
     container "streitlab/custom-nf-modules-cellranger:latest"
 
     input:
-        path(gtf)
+    path gtf
 
     output:
-        path("*.gtf")
+    path '*.gtf'            , emit: gtf
+    path '*.version.txt'    , emit: version
 
     script:
-        
-        mkgtf_command = "cellranger mkgtf ${gtf} ${gtf.baseName}_mkgtf.gtf ${options.args}"
-        
-        // Log
-        if (params.verbose){
-            println ("[MODULE] filter gtf command: " + mkgtf_command)
-        }
+    def software = getSoftwareName(task.process)
 
-       //SHELL
-        """
-        ${mkgtf_command}
-        """
+    """
+    cellranger mkgtf \\
+        ${gtf} \\
+        ${gtf.baseName}_mkgtf.gtf \\
+        ${options.args}
+
+    echo \$(cellranger --version 2>&1) | sed 's/^.*cellranger //; s/ .*\$//' > ${software}.version.txt
+    """
 }

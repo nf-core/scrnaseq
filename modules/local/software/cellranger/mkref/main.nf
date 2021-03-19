@@ -14,22 +14,23 @@ process CELLRANGER_MKREF {
     container "streitlab/custom-nf-modules-cellranger:latest"
 
     input:
-        path(gtf)
-        path(fasta)
+    path gtf
+    path fasta
 
     output:
-        path("reference_genome")
+    path 'reference_genome' , emit: reference_genome
+    path '*.version.txt'    , emit: version
 
     script:
-        mkref_command = "cellranger mkref --genome=reference_genome --genes=${gtf} --fasta=${fasta} --nthreads=${task.cpus}"
-        
-        // Log
-        if (params.verbose){
-            println ("[MODULE] mkref command: " + mkref_command)
-        }
+    def software = getSoftwareName(task.process)
 
-        //SHELL
-        """
-        ${mkref_command}
-        """
+    """
+    cellranger mkref \\
+        --genome=reference_genome \\
+        --genes=${gtf} \\
+        --fasta=${fasta} \\
+        --nthreads=${task.cpus}
+
+    echo \$(cellranger --version 2>&1) | sed 's/^.*cellranger //; s/ .*\$//' > ${software}.version.txt
+    """
 }

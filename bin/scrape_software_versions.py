@@ -38,10 +38,11 @@ for k in list(results):
         del results[k]
 
 # Dump to YAML
-print ('''
-id: 'nf-core/scrnaseq-software-versions'
-section_name: 'nf-core/scrnaseq Software Versions'
-section_href: 'https://github.com/nf-core/scrnaseq'
+print(
+    """
+id: 'software_versions'
+section_name: '{{ name }} Software Versions'
+section_href: 'https://github.com/{{ name }}'
 plot_type: 'html'
 description: 'are collected at run time from the software output.'
 data: |

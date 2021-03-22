@@ -127,7 +127,7 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
          Channel
              .from(params.input_paths)
              .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
-             .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
+             .ifEmpty { exit 1, "params.input_paths was empty - no input files supplied" }
              .into { read_files_alevin; read_files_star; read_files_kallisto}
      } else {
          Channel
@@ -164,7 +164,6 @@ if (workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
 summary['Reads']            = params.input
 if(params.fasta)         summary['Genome Reference']        = params.fasta
-if(params.transcriptome_fasta)  summary['Transcriptome Reference']        = params.transcriptome_fasta
 summary['GTF Reference']        = params.gtf
 summary['Save Reference?'] = params.save_reference
 summary['Aligner']        = params.aligner
@@ -410,7 +409,7 @@ process build_gene_map{
 
 
 /*
-* Preprocessing - Generate TXP2Gene if not supplied via --txp2gene_alevin
+* Preprocessing - Generate TXP2Gene if not supplied via --txp2gene
 */
 process build_txp2gene {
     tag "$gtf"
@@ -420,10 +419,10 @@ process build_txp2gene {
     file gtf from gtf_alevin
 
     output:
-    file "txp2gene.tsv" into txp2gene_alevin
+    file "txp2gene.tsv" into txp2gene
 
     when:
-    params.aligner == 'alevin' && !params.txp2gene_alevin
+    params.aligner == 'alevin' && !params.txp2gene
 
     script:
 
@@ -443,7 +442,7 @@ process alevin {
     input:
     set val(name), file(reads) from read_files_alevin
     file index from salmon_index_alevin.collect()
-    file txp2gene from txp2gene_alevin.collect()
+    file txp2gene from txp2gene.collect()
 
     output:
     file "${name}_alevin_results" into alevin_results, alevin_logs

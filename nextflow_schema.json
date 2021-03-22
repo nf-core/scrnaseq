@@ -107,6 +107,11 @@
                 "gtf": {
                     "type": "string",
                     "description": "Reference GTF annotation file"
+                },
+                "save_reference": {
+                    "type": "string",
+                    "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
+                    "fa_icon": "fas fa-bookmark"
                 }
             }
         },

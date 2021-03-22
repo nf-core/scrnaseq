@@ -1,3 +1,9 @@
+---
+name: Feature request
+about: Suggest an idea for the nf-core/scrnaseq pipeline
+labels: enhancement
+---
+
 <!--
 # nf-core/scrnaseq feature request
 

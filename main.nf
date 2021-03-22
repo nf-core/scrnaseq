@@ -161,7 +161,7 @@ log.info NfcoreSchema.params_summary_log(workflow, params, json_schema)
 // Header log info
 def summary = [:]
 if (workflow.revision) summary['Pipeline Release'] = workflow.revision
-summary['Run Name']         = custom_runName ?: workflow.runName
+summary['Run Name']         = workflow.runName
 summary['Reads']            = params.input
 if(params.fasta)         summary['Genome Reference']        = params.fasta
 summary['GTF Reference']        = params.gtf

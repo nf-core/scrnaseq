@@ -24,3 +24,4 @@ dependencies:
   - bioconda::kallisto=0.46.2
   - bioconda::bustools=0.40.0
   - font-ttf-source-code-pro=2.030 #Required for fonts in alevinQC
+  - pandoc=2.12

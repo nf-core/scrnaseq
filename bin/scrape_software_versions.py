@@ -41,8 +41,8 @@ for k in list(results):
 print(
     """
 id: 'software_versions'
-section_name: '{{ name }} Software Versions'
-section_href: 'https://github.com/{{ name }}'
+section_name: 'nf-core/scrnaseq Software Versions'
+section_href: 'https://github.com/nf-core/scrnaseq'
 plot_type: 'html'
 description: 'are collected at run time from the software output.'
 data: |

@@ -11,14 +11,24 @@
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
             "required": [
-                "input"
+                "input",
+                "reads"
             ],
             "properties": {
                 "input": {
                     "type": "string",
                     "fa_icon": "fas fa-dna",
                     "description": "Input FastQ files.",
-                    "help_text": "Use this to specify the location of your input FastQ files. For example:\n\n```bash\n--input 'path/to/data/sample_*_{1,2}.fastq'\n```\n\nPlease note the following requirements:\n\n1. The path must be enclosed in quotes\n2. The path must have at least one `*` wildcard character\n3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.\n\nIf left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`"
+                    "help_text": "Use this to specify the location of your input FastQ files. For example:\n\n```bash\n--input 'path/to/data/sample_*_{1,2}.fastq'\n```\n\nPlease note the following requirements:\n\n1. The path must be enclosed in quotes\n2. The path must have at least one `*` wildcard character\n3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.\n\nIf left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`",
+                    "hidden": true
+                },
+                "reads": {
+                    "type": "string",
+                    "description": "Input FastQ files. (This will be replaced by --input in future)"
+                },
+                "readPaths": {
+                    "type": "string",
+                    "hidden": true
                 },
                 "outdir": {
                     "type": "string",
@@ -95,6 +105,64 @@
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                },
+                "gtf": {
+                    "type": "string",
+                    "description": "Reference GTF annotation file"
+                }
+            }
+        },
+        "alevin_options": {
+            "title": "Alevin Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "salmon_index": {
+                    "type": "string",
+                    "description": "Path to Salmon index"
+                },
+                "txp2gene": {
+                    "type": "string",
+                    "description": "Path to transcript to gene mapping file"
+                }
+            }
+        },
+        "starsolo_options": {
+            "title": "STARSolo Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "star_index": {
+                    "type": "string",
+                    "description": "Path to STARSolo index"
+                }
+            },
+            "fa_icon": "fas fa-star"
+        },
+        "kallisto_bus_options": {
+            "title": "Kallisto/BUS Options",
+            "type": "object",
+            "description": "Params related to Kallisto/BUS tool",
+            "default": "",
+            "fa_icon": "fas fa-fish",
+            "properties": {
+                "kallisto_gene_map": {
+                    "type": "string",
+                    "description": "A gene map used for bustools correction of BUS files created by Kallisto"
+                },
+                "bustools_correct": {
+                    "type": "boolean",
+                    "description": "Perform BUS correction step in BUSTools"
+                },
+                "skip_bustools": {
+                    "type": "boolean",
+                    "description": "Skip BUStools entirely in workflow"
+                },
+                "kallisto_index": {
+                    "type": "string",
+                    "description": "Supply precomputed Kallisto index to pipeline"
                 }
             }
         },
@@ -260,59 +328,6 @@
                     "fa_icon": "fas fa-users-cog"
                 }
             }
-        },
-        "alevin_options": {
-            "title": "Alevin Options",
-            "type": "object",
-            "description": "",
-            "default": "",
-            "properties": {
-                "salmon_index": {
-                    "type": "string",
-                    "description": "Path to Salmon index"
-                },
-                "txp2gene": {
-                    "type": "string",
-                    "description": "Path to transcript to gene mapping file"
-                }
-            }
-        },
-        "starsolo_options": {
-            "title": "STARSolo Options",
-            "type": "object",
-            "description": "",
-            "default": "",
-            "properties": {
-                "star_index": {
-                    "type": "string",
-                    "description": "Path to STARSolo index"
-                }
-            }
-        },
-        "kallisto_bus_options": {
-            "title": "Kallisto/BUS Options",
-            "type": "object",
-            "description": "Params related to Kallisto/BUS tool",
-            "default": "",
-            "fa_icon": "fas fa-fish",
-            "properties": {
-                "kallisto_gene_map": {
-                    "type": "string",
-                    "description": "A gene map used for bustools correction of BUS files created by Kallisto"
-                },
-                "bustools_correct": {
-                    "type": "boolean",
-                    "description": "Perform BUS correction step in BUSTools"
-                },
-                "skip_bustools": {
-                    "type": "boolean",
-                    "description": "Skip BUStools entirely in workflow"
-                },
-                "kallisto_index": {
-                    "type": "string",
-                    "description": "Supply precomputed Kallisto index to pipeline"
-                }
-            }
         }
     },
     "allOf": [
@@ -326,15 +341,6 @@
             "$ref": "#/definitions/reference_genome_options"
         },
         {
-            "$ref": "#/definitions/generic_options"
-        },
-        {
-            "$ref": "#/definitions/max_job_request_options"
-        },
-        {
-            "$ref": "#/definitions/institutional_config_options"
-        },
-        {
             "$ref": "#/definitions/alevin_options"
         },
         {
@@ -342,6 +348,15 @@
         },
         {
             "$ref": "#/definitions/kallisto_bus_options"
+        },
+        {
+            "$ref": "#/definitions/generic_options"
+        },
+        {
+            "$ref": "#/definitions/max_job_request_options"
+        },
+        {
+            "$ref": "#/definitions/institutional_config_options"
         }
     ]
 }

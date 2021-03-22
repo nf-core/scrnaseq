@@ -670,7 +670,7 @@ process multiqc {
     custom_config_file = params.multiqc_config ? "--config $mqc_custom_config" : ''
 
     """
-    multiqc -f $rtitle $rfilename --config $custom_config_file \
+    multiqc -f $rtitle $rfilename $custom_config_file \
       -m custom_content -m salmon -m star -m kallisto .
     """
 }

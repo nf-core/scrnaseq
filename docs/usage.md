@@ -112,28 +112,28 @@ They are loaded in sequence, so later profiles can overwrite earlier profiles.
 
 If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended.
 
-* `docker`
-  * A generic configuration profile to be used with [Docker](https://docker.com/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `singularity`
-  * A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `podman`
-  * A generic configuration profile to be used with [Podman](https://podman.io/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `shifter`
-  * A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `charliecloud`
-  * A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `conda`
-  * Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
-  * A generic configuration profile to be used with [Conda](https://conda.io/docs/)
-  * Pulls most software from [Bioconda](https://bioconda.github.io/)
-* `test`
-  * A profile with a complete configuration for automated testing
-  * Includes links to test data so needs no other parameters
+- `docker`
+  - A generic configuration profile to be used with [Docker](https://docker.com/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `singularity`
+  - A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `podman`
+  - A generic configuration profile to be used with [Podman](https://podman.io/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `shifter`
+  - A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `charliecloud`
+  - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `conda`
+  - Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
+  - A generic configuration profile to be used with [Conda](https://conda.io/docs/)
+  - Pulls most software from [Bioconda](https://bioconda.github.io/)
+- `test`
+  - A profile with a complete configuration for automated testing
+  - Includes links to test data so needs no other parameters
 
 ### `--reads`
 
@@ -155,9 +155,9 @@ If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
 
 The workflow can handle three types of methods:
 
-* Kallisto/Bustools
-* Salmon Alevin + AlevinQC
-* STARsolo
+- Kallisto/Bustools
+- Salmon Alevin + AlevinQC
+- STARsolo
 
 To choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.
 
@@ -211,9 +211,9 @@ To specify which chemistry (and thus barcode whitelist) to use, use the `--chemi
 
 These files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.
 
-* V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`
-* V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`
-* V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`
+- V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`
+- V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`
+- V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`
 
 #### `--barcode_whitelist` for custom barcode whitelist
 

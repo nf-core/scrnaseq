@@ -11,7 +11,7 @@ dependencies:
   - conda-forge::pymdown-extensions=6.0
   - conda-forge::pygments=2.5.2
   - bioconda::multiqc=1.8
-  - bioconda::salmon=1.1.0
+  - bioconda::salmon=1.4.0
   - bioconda::r-seurat=3.0.2
   - bioconda::bioconductor-isee=1.6.0
   - bioconda::bioconductor-tximeta=1.4.0

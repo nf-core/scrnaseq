@@ -1,57 +1,5 @@
 # nf-core/scrnaseq: Usage
 
-## Table of contents
-
-* [nf-core/scrnaseq: Usage](#nf-corescrnaseq-usage)
-  * [Table of contents](#table-of-contents)
-  * [Introduction](#introduction)
-  * [Running the pipeline](#running-the-pipeline)
-    * [Updating the pipeline](#updating-the-pipeline)
-    * [Reproducibility](#reproducibility)
-  * [Core Nextflow arguments](#core-nextflow-arguments)
-    * [`-profile`](#-profile)
-    * [`--reads`](#--reads)
-    * [`--aligner` (Required)](#--aligner-required)
-      * [Alevin](#alevin)
-        * [`--salmon_index`](#--salmon_index)
-        * [`--txp2gene`](#--txp2gene)
-      * [STARSolo](#starsolo)
-        * [`--star_index`](#--star_index)
-      * [Kallisto | BUStools](#kallisto--bustools)
-        * [`--bustools_correct`](#--bustools_correct)
-        * [`--skip_bustools`](#--skip_bustools)
-        * [`--kallisto_gene_map`](#--kallisto_gene_map)
-        * [`--kallisto_index`](#--kallisto_index)
-    * [Cellular barcodes](#cellular-barcodes)
-      * [`--type` to specify droplet type (Required)](#--type-to-specify-droplet-type-required)
-      * [`--chemistry` (using cellranger barcodes) (Required)](#--chemistry-using-cellranger-barcodes-required)
-      * [`--barcode_whitelist` for custom barcode whitelist](#--barcode_whitelist-for-custom-barcode-whitelist)
-  * [Reference genomes](#reference-genomes)
-    * [`--genome` (using iGenomes)](#--genome-using-igenomes)
-    * [`-c`](#-c)
-      * [Custom resource requests](#custom-resource-requests)
-    * [`--fasta`](#--fasta)
-    * [`--gtf`](#--gtf)
-    * [`--transcript_fasta`](#--transcript_fasta)
-    * [`--save_reference`](#--save_reference)
-    * [`--igenomes_ignore`](#--igenomes_ignore)
-  * [Job resources](#job-resources)
-    * [Automatic resubmission](#automatic-resubmission)
-    * [Custom resource requests](#custom-resource-requests-1)
-  * [AWS Batch specific parameters](#aws-batch-specific-parameters)
-    * [Running in the background](#running-in-the-background)
-      * [Nextflow memory requirements](#nextflow-memory-requirements)
-  * [Other command line parameters](#other-command-line-parameters)
-    * [`--outdir`](#--outdir)
-    * [`--email`](#--email)
-    * [`--email_on_fail`](#--email_on_fail)
-    * [`--max_multiqc_email_size`](#--max_multiqc_email_size)
-    * [`-name`](#-name)
-    * [`-resume`](#-resume)
-    * [`-c`](#-c-1)
-    * [`--custom_config_version`](#--custom_config_version)
-    * [`--custom_config_base`](#--custom_config_base)
-
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
 
 ## Introduction
@@ -101,7 +49,7 @@ Use this parameter to choose a configuration profile. Profiles can give configur
 
 Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments.
 
-Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, Podman, Conda) - see below.
+Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, Podman, Shifter, Charliecloud, Conda) - see below.
 
 > We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
 
@@ -112,22 +60,28 @@ They are loaded in sequence, so later profiles can overwrite earlier profiles.
 
 If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended.
 
-* `docker`
-  * A generic configuration profile to be used with [Docker](https://docker.com/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `singularity`
-  * A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `podman`
-  * A generic configuration profile to be used with [Podman](https://podman.io/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `conda`
-  * Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity or Podman.
-  * A generic configuration profile to be used with [Conda](https://conda.io/docs/)
-  * Pulls most software from [Bioconda](https://bioconda.github.io/)
-* `test`
-  * A profile with a complete configuration for automated testing
-  * Includes links to test data so needs no other parameters
+- `docker`
+  - A generic configuration profile to be used with [Docker](https://docker.com/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `singularity`
+  - A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `podman`
+  - A generic configuration profile to be used with [Podman](https://podman.io/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `shifter`
+  - A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `charliecloud`
+  - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `conda`
+  - Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
+  - A generic configuration profile to be used with [Conda](https://conda.io/docs/)
+  - Pulls most software from [Bioconda](https://bioconda.github.io/)
+- `test`
+  - A profile with a complete configuration for automated testing
+  - Includes links to test data so needs no other parameters
 
 ### `--reads`
 
@@ -149,9 +103,9 @@ If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
 
 The workflow can handle three types of methods:
 
-* Kallisto/Bustools
-* Salmon Alevin + AlevinQC
-* STARsolo
+- Kallisto/Bustools
+- Salmon Alevin + AlevinQC
+- STARsolo
 
 To choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.
 
@@ -205,9 +159,9 @@ To specify which chemistry (and thus barcode whitelist) to use, use the `--chemi
 
 These files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.
 
-* V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`
-* V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`
-* V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`
+- V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`
+- V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`
+- V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`
 
 #### `--barcode_whitelist` for custom barcode whitelist
 

@@ -6,23 +6,23 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - conda-forge::python=3.7.3
-  - conda-forge::markdown=3.1.1
-  - conda-forge::pymdown-extensions=6.0
-  - conda-forge::pygments=2.5.2
-  - bioconda::multiqc=1.8
-  - bioconda::salmon=1.1.0
+  - conda-forge::python=3.9.2
+  - conda-forge::markdown=3.3.4
+  - conda-forge::pymdown-extensions=8.1.1
+  - conda-forge::pygments=2.8.1
+  - bioconda::multiqc=1.10
+  - bioconda::salmon=1.4.0
   - bioconda::r-seurat=3.0.2
-  - bioconda::bioconductor-isee=1.6.0
-  - bioconda::bioconductor-tximeta=1.4.0
+  - bioconda::bioconductor-isee=2.2.0
+  - bioconda::bioconductor-tximeta=1.8.0
   - bioconda::bioawk=1.0
-  - bioconda::bioconductor-alevinqc=1.2.0
-  - bioconda::bioconductor-tximport=1.14.0
-  - bioconda::star=2.7.2c #2.7.3a is broken!
-  - samtools=1.10
-  - gffread=0.11.7
+  - bioconda::bioconductor-alevinqc=1.6.0
+  - bioconda::bioconductor-tximport=1.18.0
+  - bioconda::star=2.7.8a #2.7.3a is broken!
+  - samtools=1.12
+  - gffread=0.12.1
   - bioconda::kallisto=0.46.2
   - bioconda::bustools=0.40.0
   - font-ttf-source-code-pro=2.030 #Required for fonts in alevinQC
-  - pandoc=2.12
-  - tbb=2020.2 #Fixing a still existing bioconda bug :-) 
+  - pandoc=2.13
+  - tbb=2021.1.1 #Fixing a still existing bioconda bug :-) 

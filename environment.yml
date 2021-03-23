@@ -25,3 +25,4 @@ dependencies:
   - bioconda::bustools=0.40.0
   - font-ttf-source-code-pro=2.030 #Required for fonts in alevinQC
   - pandoc=2.12
+  - tbb=2020.2 #Fixing a still existing bioconda bug :-) 

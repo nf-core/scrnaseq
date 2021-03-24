@@ -19,9 +19,9 @@ jobs:
       NXF_ANSI_LOG: false
     strategy:
       matrix:
-        nxf_ver: ['20.10.0', '']
         profile: ['test,docker', 'test_kallisto,docker', 'test,docker --aligner star']
         # Nextflow versions: check pipeline minimum and current latest
+        nxf_ver: ['20.10.0', '21.03.0-edge']
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2

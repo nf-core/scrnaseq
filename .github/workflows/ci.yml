@@ -35,13 +35,13 @@ jobs:
 
       - name: Build new docker image
         if: env.MATCHED_FILES
-        run: docker build --no-cache . -t nfcore/scrnaseq:dev
+        run: docker build --no-cache . -t nfcore/scrnaseq:1.1
 
       - name: Pull docker image
         if: ${{ !env.MATCHED_FILES }}
         run: |
           docker pull nfcore/scrnaseq:dev
-          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:dev
+          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:1.1
 
       - name: Install Nextflow
         env:

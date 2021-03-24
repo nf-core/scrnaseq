@@ -10,21 +10,17 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input"
-            ],
             "properties": {
                 "input": {
                     "type": "string",
                     "fa_icon": "fas fa-dna",
-                    "description": "Input FastQ files.",
+                    "description": "Input FastQ files",
                     "help_text": "Use this to specify the location of your input FastQ files. For example:\n\n```bash\n--input 'path/to/data/sample_*_{1,2}.fastq'\n```\n\nPlease note the following requirements:\n\n1. The path must be enclosed in quotes\n2. The path must have at least one `*` wildcard character\n3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.\n\nIf left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`"
                 },
-                "single_end": {
-                    "type": "boolean",
-                    "description": "Specifies that the input is single-end reads.",
-                    "fa_icon": "fas fa-align-center",
-                    "help_text": "By default, the pipeline expects paired-end data. If you have single-end data, you need to specify `--single_end` on the command line when you launch the pipeline. A normal glob pattern, enclosed in quotation marks, can then be used for `--input`. For example:\n\n```bash\n--single_end --input '*.fastq'\n```\n\nIt is not possible to run a mixture of single-end and paired-end files in one run."
+                "input_paths": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "Input FastQ files path in array format"
                 },
                 "outdir": {
                     "type": "string",
@@ -38,6 +34,34 @@
                     "fa_icon": "fas fa-envelope",
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
+                }
+            }
+        },
+        "mandatory_arguments": {
+            "title": "Mandatory arguments",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Name of droplet technology (Currently supported: 10x)",
+                    "fa_icon": "fas fa-align-center",
+                    "default": "10x"
+                },
+                "chemistry": {
+                    "type": "string",
+                    "description": "Version of 10x chemistry",
+                    "default": "V3"
+                },
+                "barcode_whitelist": {
+                    "type": "string",
+                    "description": "Custom file of whitelisted barcodes"
+                },
+                "aligner": {
+                    "type": "string",
+                    "description": "Name of the tool to use for scRNA (pseudo-) alignment. Available are: \"alevin\", \"star\", \"kallisto\". Default 'alevin'.",
+                    "default": "alevin"
                 }
             }
         },
@@ -72,6 +96,73 @@
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                },
+                "transcript_fasta": {
+                    "type": "string",
+                    "description": "A cDNA fastq file"
+                },
+                "gtf": {
+                    "type": "string",
+                    "description": "Reference GTF annotation file"
+                },
+                "save_reference": {
+                    "type": "string",
+                    "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
+                    "fa_icon": "fas fa-bookmark"
+                }
+            }
+        },
+        "alevin_options": {
+            "title": "Alevin Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "salmon_index": {
+                    "type": "string",
+                    "description": "Path to Salmon index"
+                },
+                "txp2gene": {
+                    "type": "string",
+                    "description": "Path to transcript to gene mapping file"
+                }
+            }
+        },
+        "starsolo_options": {
+            "title": "STARSolo Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "star_index": {
+                    "type": "string",
+                    "description": "Path to STARSolo index"
+                }
+            },
+            "fa_icon": "fas fa-star"
+        },
+        "kallisto_bus_options": {
+            "title": "Kallisto/BUS Options",
+            "type": "object",
+            "description": "Params related to Kallisto/BUS tool",
+            "default": "",
+            "fa_icon": "fas fa-fish",
+            "properties": {
+                "kallisto_gene_map": {
+                    "type": "string",
+                    "description": "A gene map used for bustools correction of BUS files created by Kallisto"
+                },
+                "bustools_correct": {
+                    "type": "boolean",
+                    "description": "Perform BUS correction step in BUSTools"
+                },
+                "skip_bustools": {
+                    "type": "boolean",
+                    "description": "Skip BUStools entirely in workflow"
+                },
+                "kallisto_index": {
+                    "type": "string",
+                    "description": "Supply precomputed Kallisto index to pipeline"
                 }
             }
         },
@@ -82,6 +173,10 @@
             "description": "Less common options for the pipeline, typically set in a config file.",
             "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the pipeline run"
+                },
                 "help": {
                     "type": "boolean",
                     "description": "Display help text.",
@@ -259,7 +354,19 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
+            "$ref": "#/definitions/mandatory_arguments"
+        },
+        {
             "$ref": "#/definitions/reference_genome_options"
+        },
+        {
+            "$ref": "#/definitions/alevin_options"
+        },
+        {
+            "$ref": "#/definitions/starsolo_options"
+        },
+        {
+            "$ref": "#/definitions/kallisto_bus_options"
         },
         {
             "$ref": "#/definitions/generic_options"

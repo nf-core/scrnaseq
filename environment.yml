@@ -10,6 +10,17 @@ dependencies:
   - conda-forge::markdown=3.1.1
   - conda-forge::pymdown-extensions=6.0
   - conda-forge::pygments=2.5.2
-  # TODO nf-core: Add required software dependencies here
-  - bioconda::fastqc=0.11.8
-  - bioconda::multiqc=1.7
+  - bioconda::multiqc=1.8
+  - bioconda::salmon=1.4.0
+  - bioconda::r-seurat=3.0.2
+  - bioconda::bioconductor-isee=1.6.0
+  - bioconda::bioconductor-tximeta=1.4.0
+  - bioconda::bioawk=1.0
+  - bioconda::bioconductor-alevinqc=1.2.0
+  - bioconda::bioconductor-tximport=1.14.0
+  - bioconda::star=2.7.2c #2.7.3a is broken!
+  - samtools=1.10
+  - gffread=0.11.7
+  - bioconda::kallisto=0.46.2
+  - bioconda::bustools=0.40.0
+  - font-ttf-source-code-pro=2.030 #Required for fonts in alevinQC

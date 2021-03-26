@@ -20,7 +20,8 @@
                 "input_paths": {
                     "type": "string",
                     "hidden": true,
-                    "description": "Input FastQ files path in array format"
+                    "description": "Input FastQ files path in array format",
+                    "fa_icon": "fas fa-dna"
                 },
                 "outdir": {
                     "type": "string",
@@ -45,25 +46,31 @@
             "properties": {
                 "type": {
                     "type": "string",
-                    "description": "Name of droplet technology (Currently supported: 10x)",
+                    "description": "Name of droplet technology (Currently supported: 10x, Drop-Seq, inDrop, etc may be supported in the future.)",
                     "fa_icon": "fas fa-align-center",
                     "default": "10x"
                 },
                 "chemistry": {
                     "type": "string",
                     "description": "Version of 10x chemistry",
-                    "default": "V3"
+                    "default": "V3",
+                    "help_text": "To specify which chemistry (and thus barcode whitelist) to use, use the `--chemistry` flag. For example, to specify V3 chemistry (the default, as it is compatible with V2), use `--chemistry V3`.\n\nThese files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.\n\n- V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`\n- V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`\n- V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`",
+                    "fa_icon": "fas fa-atom"
                 },
                 "barcode_whitelist": {
                     "type": "string",
-                    "description": "Custom file of whitelisted barcodes"
+                    "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
+                    "fa_icon": "fas fa-barcode"
                 },
                 "aligner": {
                     "type": "string",
                     "description": "Name of the tool to use for scRNA (pseudo-) alignment. Available are: \"alevin\", \"star\", \"kallisto\". Default 'alevin'.",
-                    "default": "alevin"
+                    "default": "alevin",
+                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "fa_icon": "fas fa-align-center"
                 }
-            }
+            },
+            "fa_icon": "fas fa-terminal"
         },
         "reference_genome_options": {
             "title": "Reference genome options",
@@ -99,11 +106,13 @@
                 },
                 "transcript_fasta": {
                     "type": "string",
-                    "description": "A cDNA fastq file"
+                    "description": "A cDNA fastq file",
+                    "fa_icon": "fas fa-dna"
                 },
                 "gtf": {
                     "type": "string",
-                    "description": "Reference GTF annotation file"
+                    "description": "Reference GTF annotation file",
+                    "fa_icon": "fas fa-code-branch"
                 },
                 "save_reference": {
                     "type": "string",
@@ -120,11 +129,14 @@
             "properties": {
                 "salmon_index": {
                     "type": "string",
-                    "description": "Path to Salmon index"
+                    "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
+                    "fa_icon": "fas fa-fish"
                 },
                 "txp2gene": {
                     "type": "string",
-                    "description": "Path to transcript to gene mapping file"
+                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
+                    "help_text": "> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.",
+                    "fa_icon": "fas fa-map-marked-alt"
                 }
             }
         },
@@ -136,7 +148,9 @@
             "properties": {
                 "star_index": {
                     "type": "string",
-                    "description": "Path to STARSolo index"
+                    "description": "Specify a path to the precomputed STAR index.",
+                    "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
+                    "fa_icon": "fas fa-asterisk"
                 }
             },
             "fa_icon": "fas fa-star"
@@ -150,19 +164,23 @@
             "properties": {
                 "kallisto_gene_map": {
                     "type": "string",
-                    "description": "A gene map used for bustools correction of BUS files created by Kallisto"
+                    "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
+                    "fa_icon": "fas fa-fish"
                 },
                 "bustools_correct": {
                     "type": "boolean",
-                    "description": "Perform BUS correction step in BUSTools"
+                    "description": "If set to false, skip the correct steps after mapping with Kallisto.",
+                    "fa_icon": "fas fa-bus-alt"
                 },
                 "skip_bustools": {
                     "type": "boolean",
-                    "description": "Skip BUStools entirely in workflow"
+                    "description": "Skip BUStools entirely in workflow",
+                    "fa_icon": "fas fa-forward"
                 },
                 "kallisto_index": {
                     "type": "string",
-                    "description": "Supply precomputed Kallisto index to pipeline"
+                    "description": "Specify a path to the precomputed Kallisto index.",
+                    "fa_icon": "fas fa-fish"
                 }
             }
         },
@@ -173,10 +191,6 @@
             "description": "Less common options for the pipeline, typically set in a config file.",
             "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
-                "name": {
-                    "type": "string",
-                    "description": "Name of the pipeline run"
-                },
                 "help": {
                     "type": "boolean",
                     "description": "Display help text.",

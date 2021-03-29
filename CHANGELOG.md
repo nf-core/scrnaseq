@@ -7,11 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Template update with latest nf-core/tools v1.13.2
 * Parameters JSON Schema added [#42](https://github.com/nf-core/scrnaseq/issues/42)
-
-## V1.0.1dev
-
 * [25](https://github.com/nf-core/scrnaseq/issues/25) Fix small documentation error with wrong parameter for txp2gene
-* Updated to nf-core template v1.11
 
 ### Fixes
 

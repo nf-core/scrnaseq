@@ -1,26 +1,58 @@
-name: scrnaseq CI
-# This workflow is triggered on pushes and PRs to the repository.
-on: [push, pull_request]  
+name: nf-core CI
+# This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+  release:
+    types: [published]
 
 jobs:
   test:
+    name: Run workflow tests
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/scrnaseq') }}
     runs-on: ubuntu-latest
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
+      NXF_ANSI_LOG: false
     strategy:
       matrix:
-        nxf_ver: ['19.10.0', '']
         profile: ['test,docker', 'test_kallisto,docker', 'test,docker --aligner star']
+        # Nextflow versions: check pipeline minimum and current latest
+        nxf_ver: ['20.10.0', '21.03.0-edge']
     steps:
-      - uses: actions/checkout@v1
-      - name: Install Nextflow
-        run: |
-          export NXF_VER=${{ matrix.nxf_ver }}
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
-      - name: Download and tag image
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Check if Dockerfile or Conda environment changed
+        uses: technote-space/get-diff-action@v4
+        with:
+          FILES: |
+            Dockerfile
+            environment.yml
+
+      - name: Build new docker image
+        if: env.MATCHED_FILES
+        run: docker build --no-cache . -t nfcore/scrnaseq:1.1.0
+
+      - name: Pull docker image
+        if: ${{ !env.MATCHED_FILES }}
         run: |
           docker pull nfcore/scrnaseq:dev
-          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:1.0.0
-      - name: "Test suites for all alignment methods"
+          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:1.1.0
+
+      - name: Install Nextflow
+        env:
+          CAPSULE_LOG: none
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+
+      - name: Run pipeline with test data
+        # For example: adding multiple test runs with different parameters
+        # Remember that you can parallelise this by using strategy.matrix
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }}
       

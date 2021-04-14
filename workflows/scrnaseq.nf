@@ -142,7 +142,8 @@ def gffread_txp2gene_options        = modules['gffread_tx2pgene']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { GFFREAD as GFFREAD_TRANSCRIPTOME } from                 './modules/local/gffread/transcriptome/main'                        addParams( options: [:] )
+include { GFFREAD as GFFREAD_TRANSCRIPTOME }  from './modules/local/gffread/transcriptome/main' addParams( options: [:] )
+include { STAR_ALIGN }                        from '../modules/local/star/align/main'           addParams( options: star_align_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -151,7 +152,6 @@ include { GUNZIP }                  from '../modules/nf-core/software/gunzip/mai
 include { GFFREAD }                 from '../modules/nf-core/software/gffread/main'             addParams( options: gffread_txp2gene_options )
 include { SALMON_INDEX }            from '../modules/nf-core/software/salmon/index/main'        addParams( options: salmon_index_options )
 include { STAR_GENOMEGENERATE }     from '../modules/nf-core/software/star/genomegenerate/main' addParams( options: star_genomegenerate_options )
-include { STAR_ALIGN }              from '../modules/nf-core/software/star/align/main'          addParams( options: star_align_options )
 include { KALLISTO_INDEX }          from '../modules/nf-core/software/kallisto/index/main'      addParams( options: kallisto_index_options )
 
 ////////////////////////////////////////////////////

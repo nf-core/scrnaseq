@@ -13,32 +13,12 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
     exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(', ')}"
 }
 
-//Check if one of the available aligners is used (alevin, kallisto, star)
-if (params.aligner != 'star' && params.aligner != 'alevin' && params.aligner != 'kallisto'){
-    exit 1, "Invalid aligner option: ${params.aligner}. Valid options: 'star', 'alevin', 'kallisto'"
-}
-//Check if STAR index is supplied properly
-if( params.star_index && params.aligner == 'star' ){
-    star_index = Channel
-        .fromPath(params.star_index)
-        .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
-}
-
-if (params.aligner == 'star' && (!params.star_index && (!params.gtf || !params.fasta))){
-  exit 1, "STAR needs either a GTF + FASTA or a precomputed index supplied."
-}
-
-//Sanity check Kallisto behaviour
-if ( params.aligner == 'kallisto' && !( params.kallisto_index || ((params.fasta || params.transcript_fasta)  && params.gtf ))) {
-  exit 1, "Kallisto needs either a precomputed index or a FASTA + GTF file to run!"
-}
-
 //Check if GTF is supplied properly
 if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into { gtf_extract_transcriptome; gtf_alevin; gtf_makeSTARindex; gtf_star; gtf_gene_map }
+        .into { gtf_extract_transcriptome; gtf_alevin; gtf_gene_map }
 }
 
 //Check if TXP2Gene is provided for Alevin
@@ -51,10 +31,9 @@ if( params.fasta ){
     Channel
         .fromPath(params.fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
-        .into { genome_fasta_extract_transcriptome ; genome_fasta_makeSTARindex }
+        .into { genome_fasta_extract_transcriptome }
 } else {
   genome_fasta_extract_transcriptome = Channel.empty()
-  genome_fasta_makeSTARindex = Channel.empty()
 }
 //Setup Transcript FastA channels
 if( params.transcript_fasta ){
@@ -64,14 +43,13 @@ if( params.transcript_fasta ){
     Channel
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
-        .into { transcriptome_fasta_alevin; transcriptome_fasta_kallisto }
+        .into { transcriptome_fasta_alevin }
 } else {
   transcriptome_fasta_alevin = Channel.empty()
-  transcriptome_fasta_kallisto = Channel.empty()
 }
 
 //Setup channel for salmon index if specified
-if (params.aligner == 'alevin' && params.salmon_index) {
+if (params.salmon_index) {
     Channel
         .fromPath(params.salmon_index)
         .ifEmpty { exit 1, "Salmon index not found: ${params.salmon_index}" }
@@ -79,15 +57,7 @@ if (params.aligner == 'alevin' && params.salmon_index) {
 }
 
 // Check AWS batch settings
-if (workflow.profile.contains('awsbatch')) {
-    // AWSBatch sanity checking
-    if (!params.awsqueue || !params.awsregion) exit 1, 'Specify correct --awsqueue and --awsregion parameters on AWSBatch!'
-    // Check outdir paths to be S3 buckets if running on AWSBatch
-    // related: https://github.com/nextflow-io/nextflow/issues/813
-    if (!params.outdir.startsWith('s3:')) exit 1, 'Outdir not on S3 - specify S3 Bucket to run on AWSBatch!'
-    // Prevent trace files to be stored on S3 since S3 does not support rolling files.
-    if (params.tracedir.startsWith('s3:')) exit 1, 'Specify a local tracedir or run without trace! S3 cannot be used for tracefiles.'
-}
+// TODO use the Checks.awsBatch() function instead
 
 // Stage config files
 ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
@@ -112,6 +82,12 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
             .into { read_files_alevin; read_files_star; read_files_kallisto }
 }
 
+if (params.txp2gene){
+      Channel
+      .fromPath(params.txp2gene)
+      .set{ ch_txp2gene } 
+}
+
 //Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"
 
@@ -121,32 +97,34 @@ if (params.type == "10x" && !params.barcode_whitelist){
   Channel.fromPath(barcode_filename)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
-  Channel.empty().into{ barcode_whitelist_star; barcode_whitelist_kallisto; barcode_whitelist_alevinqc }
+  Channel.empty().into{ barcode_whitelist_alevinqc }
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
-         .into{ barcode_whitelist_star; barcode_whitelist_kallisto; barcode_whitelist_alevinqc }
+         .into{ barcode_whitelist_alevinqc }
   barcode_whitelist_gzipped = Channel.empty()
 }
 
 ////////////////////////////////////////////////////
-/* --    Define command line options     -- */
+/* --    Define command line options           -- */
 ////////////////////////////////////////////////////
 def modules = params.modules.clone()
 
 def salmon_index_options            = modules['salmon_index']
 def gffread_txp2gene_options        = modules['gffread_tx2pgene']
+def salmon_alevin_options           = modules['salmon_alevin_options']
+
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { GFFREAD as GFFREAD_TRANSCRIPTOME }  from './modules/local/gffread/transcriptome/main' addParams( options: [:] )
-
+include { GFFREAD as GFFREAD_TRANSCRIPTOME }  from './modules/local/gffread_transcriptome' addParams( options: [:] )
+include { SALMON_ALEVIN }                     from './modules/local/salmon_alevin'          addParams( options: salmon_alevin_options )
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                  from '../modules/nf-core/software/gunzip/main'              addParams( options: [:] )
-include { GFFREAD }                 from '../modules/nf-core/software/gffread/main'             addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }            from '../modules/nf-core/software/salmon/index/main'        addParams( options: salmon_index_options )
+include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'              addParams( options: [:] )
+include { GFFREAD as GFFREAD_TXP2GENE } from '../modules/nf-core/software/gffread/main'             addParams( options: gffread_txp2gene_options )
+include { SALMON_INDEX }                from '../modules/nf-core/software/salmon/index/main'        addParams( options: salmon_index_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -166,21 +144,25 @@ workflow SCRNASEQ_ALEVIN {
         GFFREAD_TRANSCRIPTOME( genome_fasta_extract_transcriptome, gtf_extract_transcriptome)
     }
     
-    // build salmon index
+    // build salmon index if not supplied
     if (!params.salmon_index) {
-
         SALMON_INDEX( GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted)
-
-
-      // build the gene map
-    if (!params.gtf_gene_map){
-        GFFREAD( gtf_alevin )
+        salmon_index_alevin = SALMON_INDEX.out.index
     }
 
-      // TODO run salmon alevin (PR for module open)
+    // build the gene map
+    if (!params.txp2gene){
+        GFFREAD_TXP2GENE( gtf_alevin )
+        ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
+    }
+
+    // run alignment with salmon alevin
+    protocol = "chromium"
+    SALMON_ALEVIN ( input_paths, salmon_index_alevin, ch_txp2gene, protocol )
+    // TODO run salmon alevin (PR for module open)
       
       // TODO run alevinQC (PR for module open)
-    }
+
 
 
 

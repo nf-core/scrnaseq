@@ -135,15 +135,11 @@ if (params.type == "10x" && !params.barcode_whitelist){
 def modules = params.modules.clone()
 
 def salmon_index_options            = modules['salmon_index']
-def star_genomegenerate_options     = modules['star_genomegenerate']
-def star_align_options              = modules['star_align']
-def kallisto_index_options          = modules['kallisto_index']
 def gffread_txp2gene_options        = modules['gffread_tx2pgene']
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 include { GFFREAD as GFFREAD_TRANSCRIPTOME }  from './modules/local/gffread/transcriptome/main' addParams( options: [:] )
-include { STAR_ALIGN }                        from '../modules/local/star/align/main'           addParams( options: star_align_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -151,15 +147,13 @@ include { STAR_ALIGN }                        from '../modules/local/star/align/
 include { GUNZIP }                  from '../modules/nf-core/software/gunzip/main'              addParams( options: [:] )
 include { GFFREAD }                 from '../modules/nf-core/software/gffread/main'             addParams( options: gffread_txp2gene_options )
 include { SALMON_INDEX }            from '../modules/nf-core/software/salmon/index/main'        addParams( options: salmon_index_options )
-include { STAR_GENOMEGENERATE }     from '../modules/nf-core/software/star/genomegenerate/main' addParams( options: star_genomegenerate_options )
-include { KALLISTO_INDEX }          from '../modules/nf-core/software/kallisto/index/main'      addParams( options: kallisto_index_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
 def multiqc_report    = []
 
-workflow SCRNASEQ {
+workflow SCRNASEQ_ALEVIN {
     ch_software_versions = Channel.empty()
 
     // unzip barcodes
@@ -168,49 +162,26 @@ workflow SCRNASEQ {
     }
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
-    if (params.transcript_fasta && (params.aligner == 'alevin' || params.aligner == 'kallisto')) {
+    if (params.transcript_fasta) {
         GFFREAD_TRANSCRIPTOME( genome_fasta_extract_transcriptome, gtf_extract_transcriptome)
     }
     
     // build salmon index
-    if (params.aligner == 'alevin' && !params.salmon_index) {
+    if (!params.salmon_index) {
 
-      // generate salmon index
-      if (!params.salmon_index) {
-          SALMON_INDEX( GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted)
-      }
+        SALMON_INDEX( GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted)
+
 
       // build the gene map
-      if (!params.gtf_gene_map){
+    if (!params.gtf_gene_map){
         GFFREAD( gtf_alevin )
-      }
+    }
 
       // TODO run salmon alevin (PR for module open)
       
       // TODO run alevinQC (PR for module open)
     }
 
-    // build star index
-    if (params.aligner == 'star') {
-
-      if (!params.star_index && params.fasta){
-        STAR_GENOMEGENERATE( genome_fasta_makeSTARindex, gtf_makeSTARindex )
-      }
 
 
-        
-    }
-
-    // kallisto
-    if (params.aligner == 'kallisto') {
-
-      // build index
-      if (!params.kallisto_index){
-        KALLISTO_INDEX( transcriptome_fasta_kallisto )
-      }
-
-      // TODO: kallisto genemap
-
-
-    }
 }

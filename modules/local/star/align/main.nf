@@ -23,6 +23,7 @@ process STAR_ALIGN {
     tuple val(meta), path(reads)
     path  index
     path  gtf
+    path whitelist
 
     output:
     tuple val(meta), path('*d.out.bam')       , emit: bam
@@ -50,6 +51,7 @@ process STAR_ALIGN {
         --readFilesIn $reads  \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
+        --soloCBwhitelist $whitelist \\
         $out_sam_type \\
         $ignore_gtf \\
         $seq_center \\

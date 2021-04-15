@@ -48,8 +48,25 @@ Checks.hostname(workflow, params, log)
 ////////////////////////////////////////////////////
 
 workflow {
-    include { SCRNASEQ } from './workflows/scrnaseq'
-    SCRNASEQ()
+
+    // run alevin pipeline
+    if (params.aligner == "alevin") {
+        include { SCRNASEQ_ALEVIN } from './workflows/alevin'
+        SCRNASEQ_ALEVIN()
+    }
+
+    // run STARsolo pipeline
+    if (params.aligner == "star") {
+        include { STARSOLO } from './workflows/starsolo'
+        STARSOLO()
+    }
+
+    // run kallisto bustools pipeline
+    if (params.aligner == "kallisto") {
+        include { KALLISTO_BUSTOOLS } from './workflows/kallisto_bustools'
+        KALLISTO_BUSTOOLS()
+    }
+    
 }
 
 ////////////////////////////////////////////////////

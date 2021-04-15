@@ -10,21 +10,18 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input"
-            ],
             "properties": {
                 "input": {
                     "type": "string",
                     "fa_icon": "fas fa-dna",
-                    "description": "Input FastQ files.",
+                    "description": "Input FastQ files",
                     "help_text": "Use this to specify the location of your input FastQ files. For example:\n\n```bash\n--input 'path/to/data/sample_*_{1,2}.fastq'\n```\n\nPlease note the following requirements:\n\n1. The path must be enclosed in quotes\n2. The path must have at least one `*` wildcard character\n3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.\n\nIf left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`"
                 },
-                "single_end": {
-                    "type": "boolean",
-                    "description": "Specifies that the input is single-end reads.",
-                    "fa_icon": "fas fa-align-center",
-                    "help_text": "By default, the pipeline expects paired-end data. If you have single-end data, you need to specify `--single_end` on the command line when you launch the pipeline. A normal glob pattern, enclosed in quotation marks, can then be used for `--input`. For example:\n\n```bash\n--single_end --input '*.fastq'\n```\n\nIt is not possible to run a mixture of single-end and paired-end files in one run."
+                "input_paths": {
+                    "type": "string",
+                    "hidden": true,
+                    "description": "Input FastQ files path in array format",
+                    "fa_icon": "fas fa-dna"
                 },
                 "outdir": {
                     "type": "string",
@@ -40,6 +37,40 @@
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
                 }
             }
+        },
+        "mandatory_arguments": {
+            "title": "Mandatory arguments",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Name of droplet technology (Currently supported: 10x, Drop-Seq, inDrop, etc may be supported in the future.)",
+                    "fa_icon": "fas fa-align-center",
+                    "default": "10x"
+                },
+                "chemistry": {
+                    "type": "string",
+                    "description": "Version of 10x chemistry",
+                    "default": "V3",
+                    "help_text": "To specify which chemistry (and thus barcode whitelist) to use, use the `--chemistry` flag. For example, to specify V3 chemistry (the default, as it is compatible with V2), use `--chemistry V3`.\n\nThese files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.\n\n- V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`\n- V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`\n- V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`",
+                    "fa_icon": "fas fa-atom"
+                },
+                "barcode_whitelist": {
+                    "type": "string",
+                    "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
+                    "fa_icon": "fas fa-barcode"
+                },
+                "aligner": {
+                    "type": "string",
+                    "description": "Name of the tool to use for scRNA (pseudo-) alignment. Available are: \"alevin\", \"star\", \"kallisto\". Default 'alevin'.",
+                    "default": "alevin",
+                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "fa_icon": "fas fa-align-center"
+                }
+            },
+            "fa_icon": "fas fa-terminal"
         },
         "reference_genome_options": {
             "title": "Reference genome options",
@@ -72,6 +103,84 @@
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                },
+                "transcript_fasta": {
+                    "type": "string",
+                    "description": "A cDNA fastq file",
+                    "fa_icon": "fas fa-dna"
+                },
+                "gtf": {
+                    "type": "string",
+                    "description": "Reference GTF annotation file",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "save_reference": {
+                    "type": "string",
+                    "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
+                    "fa_icon": "fas fa-bookmark"
+                }
+            }
+        },
+        "alevin_options": {
+            "title": "Alevin Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "salmon_index": {
+                    "type": "string",
+                    "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
+                    "fa_icon": "fas fa-fish"
+                },
+                "txp2gene": {
+                    "type": "string",
+                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
+                    "help_text": "> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.",
+                    "fa_icon": "fas fa-map-marked-alt"
+                }
+            }
+        },
+        "starsolo_options": {
+            "title": "STARSolo Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "star_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed STAR index.",
+                    "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
+                    "fa_icon": "fas fa-asterisk"
+                }
+            },
+            "fa_icon": "fas fa-star"
+        },
+        "kallisto_bus_options": {
+            "title": "Kallisto/BUS Options",
+            "type": "object",
+            "description": "Params related to Kallisto/BUS tool",
+            "default": "",
+            "fa_icon": "fas fa-fish",
+            "properties": {
+                "kallisto_gene_map": {
+                    "type": "string",
+                    "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
+                    "fa_icon": "fas fa-fish"
+                },
+                "bustools_correct": {
+                    "type": "boolean",
+                    "description": "If set to false, skip the correct steps after mapping with Kallisto.",
+                    "fa_icon": "fas fa-bus-alt"
+                },
+                "skip_bustools": {
+                    "type": "boolean",
+                    "description": "Skip BUStools entirely in workflow",
+                    "fa_icon": "fas fa-forward"
+                },
+                "kallisto_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed Kallisto index.",
+                    "fa_icon": "fas fa-fish"
                 }
             }
         },
@@ -104,12 +213,12 @@
                         "move"
                     ]
                 },
-                "name": {
-                    "type": "string",
-                    "description": "Workflow name.",
-                    "fa_icon": "fas fa-fingerprint",
-                    "hidden": true,
-                    "help_text": "A custom name for the pipeline run. Unlike the core nextflow `-name` option with one hyphen this parameter can be reused multiple times, for example if using `-resume`. Passed through to steps such as MultiQC and used for things like report filenames and titles."
+                "validate_params": {
+                    "type": "boolean",
+                    "description": "Boolean whether to validate parameters against the schema at runtime",
+                    "default": true,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
                 },
                 "email_on_fail": {
                     "type": "string",
@@ -153,6 +262,13 @@
                     "default": "${params.outdir}/pipeline_info",
                     "fa_icon": "fas fa-cogs",
                     "hidden": true
+                },
+                "show_hidden_params": {
+                    "type": "boolean",
+                    "fa_icon": "far fa-eye-slash",
+                    "description": "Show all params when using `--help`",
+                    "hidden": true,
+                    "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 }
             }
         },
@@ -176,6 +292,7 @@
                     "description": "Maximum amount of memory that can be requested for any single job.",
                     "default": "128.GB",
                     "fa_icon": "fas fa-memory",
+                    "pattern": "^[\\d\\.]+\\s*.(K|M|G|T)?B$",
                     "hidden": true,
                     "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
                 },
@@ -184,6 +301,7 @@
                     "description": "Maximum amount of time that can be requested for any single job.",
                     "default": "240.h",
                     "fa_icon": "far fa-clock",
+                    "pattern": "^[\\d\\.]+\\.*(s|m|h|d)$",
                     "hidden": true,
                     "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
                 }
@@ -218,6 +336,12 @@
                     "hidden": true,
                     "fa_icon": "fas fa-users-cog"
                 },
+                "config_profile_name": {
+                    "type": "string",
+                    "description": "Institutional config name.",
+                    "hidden": true,
+                    "fa_icon": "fas fa-users-cog"
+                },
                 "config_profile_description": {
                     "type": "string",
                     "description": "Institutional config description.",
@@ -244,7 +368,19 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
+            "$ref": "#/definitions/mandatory_arguments"
+        },
+        {
             "$ref": "#/definitions/reference_genome_options"
+        },
+        {
+            "$ref": "#/definitions/alevin_options"
+        },
+        {
+            "$ref": "#/definitions/starsolo_options"
+        },
+        {
+            "$ref": "#/definitions/kallisto_bus_options"
         },
         {
             "$ref": "#/definitions/generic_options"

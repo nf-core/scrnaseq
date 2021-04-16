@@ -18,11 +18,10 @@ if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into { gtf_extract_transcriptome; gtf_alevin; gtf_gene_map }
+        .set { gtf }
 }
-
 //Check if TXP2Gene is provided for Alevin
-if (!params.gtf && !params.txp2gene && params.aligner == 'alevin'){
+if (!params.gtf && !params.txp2gene){
   exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
 }
 
@@ -31,21 +30,21 @@ if( params.fasta ){
     Channel
         .fromPath(params.fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
-        .into { genome_fasta_extract_transcriptome }
-} else {
-  genome_fasta_extract_transcriptome = Channel.empty()
-}
+        .set { genome_fasta }
+} 
+
 //Setup Transcript FastA channels
-if( params.transcript_fasta ){
-  if( params.aligner == "star" && !params.fasta) {
-    exit 1, "Transcriptome-only alignment is not valid with the aligner: ${params.aligner}. Transcriptome-only alignment is only valid with '--aligner alevin'"
-  }
-    Channel
-        .fromPath(params.transcript_fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
-        .into { transcriptome_fasta_alevin }
+if( params.transcriptome ){
+  Channel
+        .fromPath(params.transcriptome)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.transcriptome}" }
+        .set { transcriptome_fasta }
 } else {
-  transcriptome_fasta_alevin = Channel.empty()
+  transcriptome_fasta = Channel.empty()
+}
+
+if (!params.salmon_index && !params.gtf && !params.transcript_fasta) {
+  exit 1, "Must provide a GTF file ('--gtf') or a transcript fasta ('--transcript-fasta') if no index is given!"
 }
 
 //Setup channel for salmon index if specified
@@ -69,24 +68,15 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
  * Create a channel for input read files
  */
 
- if(params.input_paths){
-         Channel
-             .from(params.input_paths)
-             .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
-             .ifEmpty { exit 1, "params.input_paths was empty - no input files supplied" }
-             .into { read_files_alevin; read_files_star; read_files_kallisto}
-     } else {
-         Channel
-            .fromFilePairs( params.input )
-            .ifEmpty { exit 1, "Cannot find any reads matching: ${params.input}\nNB: Path needs to be enclosed in quotes!\nNB: Path requires at least one * wildcard!\n" }
-            .into { read_files_alevin; read_files_star; read_files_kallisto }
-}
+if (params.input)      { ch_input      = file(params.input)      } else { exit 1, 'Input samplesheet file not specified!' }
 
+// Check if txp2gene file has been provided
 if (params.txp2gene){
       Channel
       .fromPath(params.txp2gene)
       .set{ ch_txp2gene } 
 }
+protocol = params.protocol
 
 //Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"
@@ -97,11 +87,11 @@ if (params.type == "10x" && !params.barcode_whitelist){
   Channel.fromPath(barcode_filename)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
-  Channel.empty().into{ barcode_whitelist_alevinqc }
+  Channel.empty().set{ barcode_whitelist_alevinqc }
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
-         .into{ barcode_whitelist_alevinqc }
+         .set{ barcode_whitelist_alevinqc }
   barcode_whitelist_gzipped = Channel.empty()
 }
 
@@ -112,13 +102,14 @@ def modules = params.modules.clone()
 
 def salmon_index_options            = modules['salmon_index']
 def gffread_txp2gene_options        = modules['gffread_tx2pgene']
-def salmon_alevin_options           = modules['salmon_alevin_options']
+def salmon_alevin_options           = modules['salmon_alevin']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { GFFREAD as GFFREAD_TRANSCRIPTOME }  from './modules/local/gffread_transcriptome' addParams( options: [:] )
-include { SALMON_ALEVIN }                     from './modules/local/salmon_alevin'          addParams( options: salmon_alevin_options )
+include { INPUT_CHECK        }                from '../subworkflows/local/input_check'        addParams( options: [:] )
+include { GFFREAD_TRANSCRIPTOME }             from '../modules/local/gffread_transcriptome'   addParams( options: [:] )
+include { SALMON_ALEVIN }                     from '../modules/local/salmon_alevin'           addParams( options: salmon_alevin_options )
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
@@ -134,36 +125,42 @@ def multiqc_report    = []
 workflow SCRNASEQ_ALEVIN {
     ch_software_versions = Channel.empty()
 
+    /*
+    * Check input files and stage input data
+    */
+    INPUT_CHECK( ch_input )
+    .map {
+        meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
+        [ meta, reads ]
+    }
+    .groupTuple(by: [0])
+    .map { it -> [ it[0], it[1].flatten() ] }
+    .set { ch_fastq }
+
     // unzip barcodes
     if (params.type == "10x" && !params.barcode_whitelist) {
         GUNZIP( barcode_whitelist_gzipped )
     }
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
-    if (params.transcript_fasta) {
-        GFFREAD_TRANSCRIPTOME( genome_fasta_extract_transcriptome, gtf_extract_transcriptome)
+    if (!params.transcript_fasta) {
+        GFFREAD_TRANSCRIPTOME( genome_fasta, gtf )
+        transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
     }
     
     // build salmon index if not supplied
     if (!params.salmon_index) {
-        SALMON_INDEX( GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted)
+        SALMON_INDEX( genome_fasta, transcriptome_fasta )
         salmon_index_alevin = SALMON_INDEX.out.index
     }
 
     // build the gene map
     if (!params.txp2gene){
-        GFFREAD_TXP2GENE( gtf_alevin )
+        GFFREAD_TXP2GENE( gtf )
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
     }
 
     // run alignment with salmon alevin
-    protocol = "chromium"
-    SALMON_ALEVIN ( input_paths, salmon_index_alevin, ch_txp2gene, protocol )
-    // TODO run salmon alevin (PR for module open)
-      
-      // TODO run alevinQC (PR for module open)
-
-
-
+    SALMON_ALEVIN ( ch_fastq, salmon_index_alevin, ch_txp2gene, protocol )
 
 }

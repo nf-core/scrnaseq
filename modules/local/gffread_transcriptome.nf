@@ -6,7 +6,7 @@ params.options = [:]
 options        = initOptions(params.options)
 
 process GFFREAD_TRANSCRIPTOME {
-    tag '$bam'
+    tag "${genome_fasta}"
     label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
@@ -20,12 +20,11 @@ process GFFREAD_TRANSCRIPTOME {
     }
 
     input:
-    path bam
     path genome_fasta
     path gtf
 
-    output:n
-    path "${genome_fasta}.transcriptome.fa" , emit transcriptome_extracted
+    output:
+    path "${genome_fasta}.transcriptome.fa" , emit: transcriptome_extracted
     path "*.version.txt"                    , emit: version
 
     script:

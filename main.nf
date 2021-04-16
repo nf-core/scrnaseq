@@ -34,12 +34,12 @@ if (params.validate_params) {
 /* --         PRINT PARAMETER SUMMARY          -- */
 ////////////////////////////////////////////////////
 
-def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params, json_schema)
-log.info NfcoreSchema.paramsSummaryLog(workflow, params, json_schema)
+def summary_params = NfcoreSchema.params_summary_map(workflow, params, json_schema)
+log.info NfcoreSchema.params_summary_log(workflow, params, json_schema)
 
 
 // Check the hostnames against configured profiles
-Checks.hostname(workflow, params, log)
+//Checks.hostname(workflow, params, log)
 
 
 
@@ -53,18 +53,6 @@ workflow {
     if (params.aligner == "alevin") {
         include { SCRNASEQ_ALEVIN } from './workflows/alevin'
         SCRNASEQ_ALEVIN()
-    }
-
-    // run STARsolo pipeline
-    if (params.aligner == "star") {
-        include { STARSOLO } from './workflows/starsolo'
-        STARSOLO()
-    }
-
-    // run kallisto bustools pipeline
-    if (params.aligner == "kallisto") {
-        include { KALLISTO_BUSTOOLS } from './workflows/kallisto_bustools'
-        KALLISTO_BUSTOOLS()
     }
     
 }

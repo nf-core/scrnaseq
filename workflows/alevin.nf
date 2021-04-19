@@ -103,6 +103,8 @@ def modules = params.modules.clone()
 def salmon_index_options            = modules['salmon_index']
 def gffread_txp2gene_options        = modules['gffread_tx2pgene']
 def salmon_alevin_options           = modules['salmon_alevin']
+def alevin_qc_options               = modules['alevinqc']
+def multiqc_options                 = modules['multiqc_alevin']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
@@ -110,6 +112,10 @@ def salmon_alevin_options           = modules['salmon_alevin']
 include { INPUT_CHECK        }                from '../subworkflows/local/input_check'        addParams( options: [:] )
 include { GFFREAD_TRANSCRIPTOME }             from '../modules/local/gffread_transcriptome'   addParams( options: [:] )
 include { SALMON_ALEVIN }                     from '../modules/local/salmon_alevin'           addParams( options: salmon_alevin_options )
+include { ALEVINQC }                          from '../modules/local/alevinqc'                addParams( options: alevin_qc_options )
+include { GET_SOFTWARE_VERSIONS }             from '../modules/local/get_software_versions'   addParams( options: [publish_files: ['csv':'']]       )
+include { MULTIQC }                           from '../modules/local/multiqc_alevin'          addParams( options: multiqc_options )
+
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
@@ -146,6 +152,7 @@ workflow SCRNASEQ_ALEVIN {
     if (!params.transcript_fasta) {
         GFFREAD_TRANSCRIPTOME( genome_fasta, gtf )
         transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
+        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
     }
     
     // build salmon index if not supplied
@@ -158,9 +165,35 @@ workflow SCRNASEQ_ALEVIN {
     if (!params.txp2gene){
         GFFREAD_TXP2GENE( gtf )
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
+        ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.first().ifEmpty(null))
     }
 
     // run alignment with salmon alevin
     SALMON_ALEVIN ( ch_fastq, salmon_index_alevin, ch_txp2gene, protocol )
+    ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.version.first().ifEmpty(null))
+    ch_salmon_multiqc = SALMON_ALEVIN.out.alevin_results
+
+    // alevin qc
+    ALEVINQC( SALMON_ALEVIN.out.alevin_results )
+    ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
+
+
+    /*
+    * MultiQC
+    */
+        if (!params.skip_multiqc) {
+        workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
+        ch_workflow_summary = Channel.value(workflow_summary)
+
+        MULTIQC (
+            ch_multiqc_config,
+            ch_multiqc_custom_config.collect().ifEmpty([]),
+            GET_SOFTWARE_VERSIONS.out.yaml.collect(),
+            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
+            ch_salmon_multiqc.collect{it[1]}.ifEmpty([]),
+        )
+        multiqc_report = MULTIQC.out.report.toList()
+    }
+    MULTIQC()
 
 }

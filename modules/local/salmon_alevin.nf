@@ -41,6 +41,7 @@ process SALMON_ALEVIN {
         --${protocol} \\
         -i $index \\
         --tgMap $txp2gene \\
+        --dumpFeatures --dumpMtx \\
         $options.args \\
         -o ${prefix}_alevin_results
     salmon --version | sed -e "s/salmon //g" > ${software}.version.txt

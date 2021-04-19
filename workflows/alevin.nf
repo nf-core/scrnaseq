@@ -83,15 +83,15 @@ whitelist_folder = "$baseDir/assets/whitelist/"
 
 // TODO adapt this with the protocol parameter
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
-if (params.type == "10x" && !params.barcode_whitelist){
-  barcode_filename = "$whitelist_folder/${params.type}_${params.chemistry}_barcode_whitelist.txt.gz"
+if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist){
+  barcode_filename = "$whitelist_folder/10x_${params.chemistry}_barcode_whitelist.txt.gz"
   Channel.fromPath(barcode_filename)
-         .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
+         .ifEmpty{ exit 1, "Cannot find ${params.protocol} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
   Channel.empty().set{ barcode_whitelist_alevinqc }
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
-         .ifEmpty{ exit 1, "Cannot find ${params.type} barcode whitelist: $barcode_filename" }
+         .ifEmpty{ exit 1, "Cannot find ${params.protocol} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_alevinqc }
   barcode_whitelist_gzipped = Channel.empty()
 }
@@ -145,7 +145,7 @@ workflow SCRNASEQ_ALEVIN {
     .set { ch_fastq }
 
     // unzip barcodes
-    if (params.type == "10x" && !params.barcode_whitelist) {
+    if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist) {
         GUNZIP( barcode_whitelist_gzipped )
     }
 

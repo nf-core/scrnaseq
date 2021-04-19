@@ -22,28 +22,7 @@ process MULTIQC {
     path multiqc_custom_config
     path software_versions
     path workflow_summary
-    path fail_mapping_summary
-    path ('fastqc/*')
-    path ('fastp/*')
-    path ('kraken2/*')
-    path ('bowtie2/*')
-    path ('bowtie2/*')
-    path ('ivar_trim/*')
-    path ('picard_markduplicates/*')
-    path ('picard_markduplicates/*')
-    path ('picard_metrics/*')
-    path ('mosdepth/*')
-    path ('variants_ivar/*')
-    path ('variants_ivar/*')
-    path ('variants_ivar/*')
-    path ('variants_ivar/*')
-    path ('variants_bcftools/*')
-    path ('variants_bcftools/*')
-    path ('variants_bcftools/*')
-    path ('cutadapt/*')
-    path ('assembly_spades/*')
-    path ('assembly_unicycler/*')
-    path ('assembly_minia/*')
+    path ('salmon_alevin/*')
         
     output:
     path "*multiqc_report.html"     , emit: report
@@ -56,8 +35,6 @@ process MULTIQC {
     def software      = getSoftwareName(task.process)
     def custom_config = params.multiqc_config ? "--config $multiqc_custom_config" : ''
     """
-    multiqc -f $options.args $custom_config .
-    multiqc_to_custom_csv.py --platform illumina
     multiqc -f $options.args $custom_config .
     """
 }

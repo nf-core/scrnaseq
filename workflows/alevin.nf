@@ -20,7 +20,8 @@ if( params.gtf ){
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
         .set { gtf }
 }
-//Check if TXP2Gene is provided for Alevin
+
+// Check if TXP2Gene is provided for Alevin
 if (!params.gtf && !params.txp2gene){
   exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
 }
@@ -39,12 +40,11 @@ if( params.transcript_fasta ){
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
         .set { transcriptome_fasta }
-} else {
-  transcriptome_fasta = Channel.empty()
-}
+} 
 
-if (!params.salmon_index && !params.gtf && !params.transcript_fasta) {
-  exit 1, "Must provide a GTF file ('--gtf') or a transcript fasta ('--transcript-fasta') if no index is given!"
+// Check if files for index building are given if no index is specified
+if (!params.salmon_index && !params.genome_fasta || !params.transcript_fasta) {
+  exit 1, "Must provide a genome fasta file ('--genome_fasta') or a transcript fasta ('--transcript_fasta') if no index is given!"
 }
 
 //Setup channel for salmon index if specified
@@ -55,6 +55,19 @@ if (params.salmon_index) {
         .set { salmon_index_alevin }
 }
 
+// Create a channel for input read files
+if (params.input)      { ch_input      = file(params.input)      } else { exit 1, 'Input samplesheet file not specified!' }
+
+// Check if txp2gene file has been provided
+if (params.txp2gene){
+      Channel
+      .fromPath(params.txp2gene)
+      .set{ ch_txp2gene } 
+}
+
+// Get the protocol parameter
+protocol = params.protocol
+
 // Check AWS batch settings
 // TODO use the Checks.awsBatch() function instead
 
@@ -64,23 +77,11 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
-/*
- * Create a channel for input read files
- */
-
-if (params.input)      { ch_input      = file(params.input)      } else { exit 1, 'Input samplesheet file not specified!' }
-
-// Check if txp2gene file has been provided
-if (params.txp2gene){
-      Channel
-      .fromPath(params.txp2gene)
-      .set{ ch_txp2gene } 
-}
-protocol = params.protocol
 
 //Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"
 
+// TODO adapt this with the protocol parameter
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
 if (params.type == "10x" && !params.barcode_whitelist){
   barcode_filename = "$whitelist_folder/${params.type}_${params.chemistry}_barcode_whitelist.txt.gz"
@@ -149,7 +150,7 @@ workflow SCRNASEQ_ALEVIN {
     }
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
-    if (!params.transcript_fasta) {
+    if (!params.transcript_fasta && params.genome_fasta && params.gtf) {
         GFFREAD_TRANSCRIPTOME( genome_fasta, gtf )
         transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
         ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
@@ -186,7 +187,7 @@ workflow SCRNASEQ_ALEVIN {
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
 
     // collect software versions
-    GET_SOFTWARE_VERSIONS ( ch_software_versions )
+    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
 
     /*
     * MultiQC
@@ -204,6 +205,5 @@ workflow SCRNASEQ_ALEVIN {
         )
         multiqc_report = MULTIQC.out.report.toList()
     }
-    MULTIQC()
 
 }

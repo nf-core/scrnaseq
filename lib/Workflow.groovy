@@ -15,36 +15,6 @@ class Workflow {
                "  https://github.com/${workflow.manifest.name}/blob/master/CITATIONS.md"
     }
 
-    static void validateMainParams(workflow, params, json_schema, log) {
-        // Validate workflow parameters via the JSON schema
-        if (params.validate_params) {
-            NfcoreSchema.validateParameters(params, json_schema, log)
-        }
-
-        // Check that conda channels are set-up correctly
-        if (params.enable_conda) {
-            Checks.checkCondaChannels(log)
-        }
-
-        // Check AWS batch settings
-        Checks.awsBatch(workflow, params)
-
-        // Check the hostnames against configured profiles
-        Checks.hostName(workflow, params, log)
-
-        // Check sequencing platform
-        def platformList = ['illumina', 'nanopore']
-        if (!params.public_data_ids) {
-            if (!params.platform) {
-                log.error "Platform not specified with e.g. '--platform illumina'. Valid options: ${platformList.join(', ')}."
-                System.exit(1)
-            } else if (!platformList.contains(params.platform)) {
-                log.error "Invalid platform option: '${params.platform}'. Valid options: ${platformList.join(', ')}."
-                System.exit(1)
-            }
-        }
-    }
-
 
     // Exit pipeline if incorrect --genome key provided
     static void genomeExists(params, log) {

@@ -11,12 +11,11 @@ process STAR_ALIGN {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:meta, publish_by_meta:['id']) }
 
-    // Note: 2.7X indices incompatible with AWS iGenomes.
-    conda (params.enable_conda ? 'bioconda::star=2.6.1d' : null)
+    conda (params.enable_conda ? 'bioconda::star=2.7.8a' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container 'https://depot.galaxyproject.org/singularity/star:2.6.1d--0'
+        container 'https://depot.galaxyproject.org/singularity/star:2.7.8a--h9ee0642_1'
     } else {
-        container 'quay.io/biocontainers/star:2.6.1d--0'
+        container 'quay.io/biocontainers/star:2.7.8a--h9ee0642_1'
     }
 
     input:
@@ -48,14 +47,14 @@ process STAR_ALIGN {
     """
     STAR \\
         --genomeDir $index \\
-        --readFilesIn $reads  \\
+        --readFilesIn ${reads[1]} ${reads[0]}  \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
         --soloCBwhitelist $whitelist \\
         $out_sam_type \\
         $ignore_gtf \\
         $seq_center \\
-        $options.args
+        $options.args \\
 
     $mv_unsorted_bam
 

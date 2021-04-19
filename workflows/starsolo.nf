@@ -100,13 +100,14 @@ def multiqc_options                 = modules['multiqc_alevin']
 include { INPUT_CHECK        }          from '../subworkflows/local/input_check'                    addParams( options: [:] )
 include { GET_SOFTWARE_VERSIONS }       from '../modules/local/get_software_versions'               addParams( options: [publish_files: ['csv':'']]       )
 include { MULTIQC }                     from '../modules/local/multiqc_alevin'                      addParams( options: multiqc_options )
+include { STAR_ALIGN }                  from '../modules/local/star_align'                          addParams( options: star_align_options )
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
 include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'              addParams( options: [:] )
 include { STAR_GENOMEGENERATE }         from '../modules/nf-core/software/star/genomegenerate/main' addParams( options: star_genomegenerate_options )
-include { STAR_ALIGN }                  from '../modules/nf-core/software/star/align/main'          addParams( options: star_align_options )
+
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -139,13 +140,20 @@ workflow STARSOLO {
     */
     if (!params.star_index) {
       STAR_GENOMEGENERATE( genome_fasta, gtf )
+      star_index = STAR_GENOMEGENERATE.out.index
     }
     
 
     /*
     * Perform mapping with STAR
     */ 
-    // do stuff
+    STAR_ALIGN( 
+      ch_fastq,
+      star_index,
+      gtf,
+      ch_barcode_whitelist
+    )
+    
 
     // collect software versions
     // GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )

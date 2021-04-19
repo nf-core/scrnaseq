@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////
-/* --         LOCAL PARAMETER VALUES           -- */
+/* --         SALMON ALEVIN WORKFLOW           -- */
 ////////////////////////////////////////////////////
 
 params.summary_params = [:]
@@ -65,9 +65,6 @@ if (params.txp2gene){
       .set{ ch_txp2gene } 
 }
 
-// Get the protocol parameter
-protocol = params.protocol
-
 // Check AWS batch settings
 // TODO use the Checks.awsBatch() function instead
 
@@ -77,9 +74,11 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
-
 //Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"
+
+// Get the protocol parameter
+protocol = params.protocol
 
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
 if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist){

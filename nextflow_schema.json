@@ -17,12 +17,6 @@
                     "description": "Input FastQ files",
                     "help_text": "Use this to specify the location of your input FastQ files. For example:\n\n```bash\n--input 'path/to/data/sample_*_{1,2}.fastq'\n```\n\nPlease note the following requirements:\n\n1. The path must be enclosed in quotes\n2. The path must have at least one `*` wildcard character\n3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.\n\nIf left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`"
                 },
-                "input_paths": {
-                    "type": "string",
-                    "hidden": true,
-                    "description": "Input FastQ files path in array format",
-                    "fa_icon": "fas fa-dna"
-                },
                 "outdir": {
                     "type": "string",
                     "description": "The output directory where the results will be saved.",
@@ -44,12 +38,6 @@
             "description": "",
             "default": "",
             "properties": {
-                "type": {
-                    "type": "string",
-                    "description": "Name of droplet technology (Currently supported: 10x, Drop-Seq, inDrop, etc may be supported in the future.)",
-                    "fa_icon": "fas fa-align-center",
-                    "default": "10x"
-                },
                 "chemistry": {
                     "type": "string",
                     "description": "Version of 10x chemistry",
@@ -391,5 +379,17 @@
         {
             "$ref": "#/definitions/institutional_config_options"
         }
-    ]
+    ],
+    "properties": {
+        "genome_fasta": {
+            "type": "string"
+        },
+        "protocol": {
+            "type": "string",
+            "default": "chromium"
+        },
+        "enable_conda": {
+            "type": "string"
+        }
+    }
 }

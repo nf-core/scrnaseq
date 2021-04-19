@@ -81,19 +81,16 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 //Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"
 
-// TODO adapt this with the protocol parameter
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
 if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist){
   barcode_filename = "$whitelist_folder/10x_${params.chemistry}_barcode_whitelist.txt.gz"
   Channel.fromPath(barcode_filename)
          .ifEmpty{ exit 1, "Cannot find ${params.protocol} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
-  Channel.empty().set{ barcode_whitelist_alevinqc }
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${params.protocol} barcode whitelist: $barcode_filename" }
-         .set{ barcode_whitelist_alevinqc }
-  barcode_whitelist_gzipped = Channel.empty()
+         .set{ ch_barcode_whitelist }
 }
 
 ////////////////////////////////////////////////////
@@ -147,6 +144,7 @@ workflow SCRNASEQ_ALEVIN {
     // unzip barcodes
     if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist) {
         GUNZIP( barcode_whitelist_gzipped )
+        ch_barcode_whitelist = GUNZIP.out.gunzip
     }
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
@@ -176,7 +174,7 @@ workflow SCRNASEQ_ALEVIN {
     /*
     * Perform quantification with salmon alevin
     */
-    SALMON_ALEVIN ( ch_fastq, salmon_index_alevin, ch_txp2gene, protocol )
+    SALMON_ALEVIN ( ch_fastq, salmon_index_alevin, ch_txp2gene, protocol, ch_barcode_whitelist )
     ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.version.first().ifEmpty(null))
     ch_salmon_multiqc = SALMON_ALEVIN.out.alevin_results
 

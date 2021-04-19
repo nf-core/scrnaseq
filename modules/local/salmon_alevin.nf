@@ -24,6 +24,7 @@ process SALMON_ALEVIN {
     path index
     path txp2gene
     val protocol
+    path whitelist
 
     output:
     tuple val(meta), path("*_alevin_results"), emit: alevin_results
@@ -44,6 +45,9 @@ process SALMON_ALEVIN {
         --dumpFeatures --dumpMtx \\
         $options.args \\
         -o ${prefix}_alevin_results
+
+    mv ${whitelist} ${prefix}_alevin_results/alevin/whitelist.txt
+    
     salmon --version | sed -e "s/salmon //g" > ${software}.version.txt
     """
 }

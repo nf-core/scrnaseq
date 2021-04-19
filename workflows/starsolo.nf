@@ -142,8 +142,7 @@ workflow STARSOLO {
       STAR_GENOMEGENERATE( genome_fasta, gtf )
       star_index = STAR_GENOMEGENERATE.out.index
     }
-    
-
+  
     /*
     * Perform mapping with STAR
     */ 
@@ -153,27 +152,28 @@ workflow STARSOLO {
       gtf,
       ch_barcode_whitelist
     )
-    
+    ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
+    ch_star_multiqc      = STAR_ALIGN.out.log_final
 
     // collect software versions
-    // GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
+    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
 
-    // /*
-    // * MultiQC
-    // */
-    // if (!params.skip_multiqc) {
-    //     workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-    //     ch_workflow_summary = Channel.value(workflow_summary)
+    /*
+    * MultiQC
+    */
+    if (!params.skip_multiqc) {
+        workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
+        ch_workflow_summary = Channel.value(workflow_summary)
 
-    //     MULTIQC (
-    //         ch_multiqc_config,
-    //         ch_multiqc_custom_config.collect().ifEmpty([]),
-    //         GET_SOFTWARE_VERSIONS.out.yaml.collect(),
-    //         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
-    //         ch_salmon_multiqc.collect{it[1]}.ifEmpty([]),
-    //     )
-    //     multiqc_report = MULTIQC.out.report.toList()
-    // }
+        MULTIQC (
+            ch_multiqc_config,
+            ch_multiqc_custom_config.collect().ifEmpty([]),
+            GET_SOFTWARE_VERSIONS.out.yaml.collect(),
+            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
+            ch_star_multiqc.collect{it[1]}.ifEmpty([]),
+        )
+        multiqc_report = MULTIQC.out.report.toList()
+    }
 
 }
 

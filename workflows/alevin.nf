@@ -205,3 +205,16 @@ workflow SCRNASEQ_ALEVIN {
     }
 
 }
+
+////////////////////////////////////////////////////
+/* --              COMPLETION EMAIL            -- */
+////////////////////////////////////////////////////
+
+workflow.onComplete {
+    Completion.email(workflow, params, params.summary_params, projectDir, log, multiqc_report)
+    Completion.summary(workflow, params, log)
+}
+
+////////////////////////////////////////////////////
+/* --                  THE END                 -- */
+////////////////////////////////////////////////////

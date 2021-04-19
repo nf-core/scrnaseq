@@ -26,18 +26,18 @@ if (!params.gtf && !params.txp2gene){
 }
 
 //Setup FastA channels
-if( params.fasta ){
+if( params.genome_fasta ){
     Channel
-        .fromPath(params.fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.fasta}" }
+        .fromPath(params.genome_fasta)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
         .set { genome_fasta }
 } 
 
 //Setup Transcript FastA channels
-if( params.transcriptome ){
+if( params.transcript_fasta ){
   Channel
-        .fromPath(params.transcriptome)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.transcriptome}" }
+        .fromPath(params.transcript_fasta)
+        .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
         .set { transcriptome_fasta }
 } else {
   transcriptome_fasta = Channel.empty()
@@ -155,33 +155,43 @@ workflow SCRNASEQ_ALEVIN {
         ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
     }
     
-    // build salmon index if not supplied
+    /*
+    * Build salmon index
+    */
     if (!params.salmon_index) {
         SALMON_INDEX( genome_fasta, transcriptome_fasta )
         salmon_index_alevin = SALMON_INDEX.out.index
     }
 
-    // build the gene map
+    /*
+    * Build txp2gene map
+    */
     if (!params.txp2gene){
         GFFREAD_TXP2GENE( gtf )
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
         ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.first().ifEmpty(null))
     }
 
-    // run alignment with salmon alevin
+    /*
+    * Perform quantification with salmon alevin
+    */
     SALMON_ALEVIN ( ch_fastq, salmon_index_alevin, ch_txp2gene, protocol )
     ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.version.first().ifEmpty(null))
     ch_salmon_multiqc = SALMON_ALEVIN.out.alevin_results
 
-    // alevin qc
+    /*
+    * Run alevinQC
+    */ 
     ALEVINQC( SALMON_ALEVIN.out.alevin_results )
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
 
+    // collect software versions
+    GET_SOFTWARE_VERSIONS ( ch_software_versions )
 
     /*
     * MultiQC
     */
-        if (!params.skip_multiqc) {
+    if (!params.skip_multiqc) {
         workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
         ch_workflow_summary = Channel.value(workflow_summary)
 

@@ -29,17 +29,10 @@ if( params.genome_fasta ){
         .set { genome_fasta }
 } 
 
-//Setup Transcript FastA channels
-if( params.transcript_fasta ){
-  Channel
-        .fromPath(params.transcript_fasta)
-        .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
-        .set { transcriptome_fasta }
-} 
 
 // Check if files for index building are given if no index is specified
-if (!params.kallisto_index && !params.genome_fasta || !params.transcript_fasta) {
-  exit 1, "Must provide a genome fasta file ('--genome_fasta') or a transcript fasta ('--transcript_fasta') if no index is given!"
+if (!params.kallisto_index && (!params.genome_fasta || !params.gtf)) {
+  exit 1, "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
 }
 
 //Setup channel for salmon index if specified
@@ -58,8 +51,12 @@ if (params.kallisto_gene_map){
       .set{ ch_kallisto_gene_map } 
 }
 if (!params.gtf && !params.kallisto_gene_map){
-  exit 1, "Must provide either a GTF file ('--gtf') or kallisto gene mao('--kallisto_gene_map') to align with kallisto bustools!"
+  exit 1, "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
 }
+
+// Other kb parameters
+technology = params.protocol
+kb_workflow = "standard"
 
 // Create a channel for input read files
 if (params.input)      { ch_input      = file(params.input)      } else { exit 1, 'Input samplesheet file not specified!' }
@@ -73,30 +70,12 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
-//Whitelist files for STARsolo and Kallisto
-whitelist_folder = "$baseDir/assets/whitelist/"
-
-// Get the protocol parameter
-protocol = params.protocol
-
-//Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
-if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist){
-  barcode_filename = "$whitelist_folder/10x_${params.chemistry}_barcode_whitelist.txt.gz"
-  Channel.fromPath(barcode_filename)
-         .ifEmpty{ exit 1, "Cannot find ${params.protocol} barcode whitelist: $barcode_filename" }
-         .set{ barcode_whitelist_gzipped }
-} else if (params.barcode_whitelist){
-  Channel.fromPath(params.barcode_whitelist)
-         .ifEmpty{ exit 1, "Cannot find ${params.protocol} barcode whitelist: $barcode_filename" }
-         .set{ ch_barcode_whitelist }
-}
-
 ////////////////////////////////////////////////////
 /* --    Define command line options           -- */
 ////////////////////////////////////////////////////
 def modules = params.modules.clone()
 
-def kallisto_index_options          = modules['kallistobustools_ref']
+def kallistobustools_ref_options    = modules['kallistobustools_ref']
 def kallistobustools_count_options  = modules['kallistobustools_count']
 def multiqc_options                 = modules['multiqc_kb']
 
@@ -105,7 +84,7 @@ def multiqc_options                 = modules['multiqc_kb']
 ////////////////////////////////////////////////////
 include { INPUT_CHECK        }                from '../subworkflows/local/input_check'        addParams( options: [:] )
 include { GENE_MAP }                          from '../modules/local/gene_map'                addParams( options: [:] )
-include { KALLISTOBUSTOOLS_COUNT }            FROM '../modules/local/kallistobustools_count'  addParams( options: kallistobustools_count_options )
+include { KALLISTOBUSTOOLS_COUNT }            from '../modules/local/kallistobustools_count'  addParams( options: kallistobustools_count_options )
 include { GET_SOFTWARE_VERSIONS }             from '../modules/local/get_software_versions'   addParams( options: [publish_files: ['csv':'']]       )
 include { MULTIQC }                           from '../modules/local/multiqc_kb'              addParams( options: multiqc_options )
 
@@ -113,7 +92,8 @@ include { MULTIQC }                           from '../modules/local/multiqc_kb'
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
 include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'                    addParams( options: [:] )
-include { KALLISTOBUSTOOLS_REF }       from '../modules/nf-core/software/kallistobustools/ref/main'      addParams( options: kallistobustools_ref_options )
+include { KALLISTOBUSTOOLS_REF }       from '../modules/nf-core/software/kallistobustools/ref/main'       addParams( options: kallistobustools_ref_options )
+
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
 ////////////////////////////////////////////////////
@@ -134,17 +114,12 @@ workflow KALLISTO_BUSTOOLS {
     .map { it -> [ it[0], it[1].flatten() ] }
     .set { ch_fastq }
 
-    // unzip barcodes
-    if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist) {
-        GUNZIP( barcode_whitelist_gzipped )
-        ch_barcode_whitelist = GUNZIP.out.gunzip
-    }
-
     /*
-    * Generate Kallisto Gene Map if not supplied
+    * Generate Kallisto Gene Map if not supplied and index is given
+    * If index is given, the gene map will be generated in the 'kb ref' step
     */ 
-    if (!params.kallisto_gene_map) {
-      GENE_MAP)( gtf )
+    if (!params.kallisto_gene_map && params.kallisto_index) {
+      GENE_MAP( gtf )
       ch_kallisto_gene_map = GENE_MAP.out.gene_map
     }
 
@@ -152,10 +127,26 @@ workflow KALLISTO_BUSTOOLS {
     * Generate kallisto index
     */ 
     if (!params.kallisto_index) { 
-      val kb_workflow = "standard"
       KALLISTOBUSTOOLS_REF( genome_fasta, gtf, kb_workflow )
+      ch_kallisto_gene_map = KALLISTOBUSTOOLS_REF.out.t2g
+      ch_kallisto_index    = KALLISTOBUSTOOLS_REF.out.index
     }
 
+    /*
+    * Quantification with kallistobustools count
+    */
+    KALLISTOBUSTOOLS_COUNT(
+      ch_fastq,
+      ch_kallisto_index,
+      ch_kallisto_gene_map,
+      [],
+      [],
+      false,
+      false,
+      kb_workflow,
+      technology
+    )
+    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
 
     // collect software versions
     GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
@@ -163,19 +154,18 @@ workflow KALLISTO_BUSTOOLS {
     /*
     * MultiQC
     */
-    // if (!params.skip_multiqc) {
-    //     workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-    //     ch_workflow_summary = Channel.value(workflow_summary)
+    if (!params.skip_multiqc) {
+        workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
+        ch_workflow_summary = Channel.value(workflow_summary)
 
-    //     MULTIQC (
-    //         ch_multiqc_config,
-    //         ch_multiqc_custom_config.collect().ifEmpty([]),
-    //         GET_SOFTWARE_VERSIONS.out.yaml.collect(),
-    //         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
-    //         ch_salmon_multiqc.collect{it[1]}.ifEmpty([]),
-    //     )
-    //     multiqc_report = MULTIQC.out.report.toList()
-    // }
+        MULTIQC (
+            ch_multiqc_config,
+            ch_multiqc_custom_config.collect().ifEmpty([]),
+            GET_SOFTWARE_VERSIONS.out.yaml.collect(),
+            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
+        )
+        multiqc_report = MULTIQC.out.report.toList()
+    }
 
 }
 

@@ -22,7 +22,7 @@ process MULTIQC {
     path multiqc_custom_config
     path software_versions
     path workflow_summary
-    path ('salmon_alevin/*')
+    //path ('salmon_alevin/*')
         
     output:
     path "*multiqc_report.html"     , emit: report

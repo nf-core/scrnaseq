@@ -23,6 +23,7 @@ process STAR_ALIGN {
     path  index
     path  gtf
     path whitelist
+    val protocol
 
     output:
     tuple val(meta), path('*d.out.bam')       , emit: bam
@@ -52,6 +53,7 @@ process STAR_ALIGN {
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
         --soloCBwhitelist $whitelist \\
+        --soloType $protocol \\
         $out_sam_type \\
         $ignore_gtf \\
         $seq_center \\

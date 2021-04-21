@@ -54,8 +54,8 @@ if (!params.gtf && !params.kallisto_gene_map){
   exit 1, "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
 }
 
-// Other kb parameters
-technology = params.protocol
+// Get the protocol parameter
+(protocol, chemistry) = Workflow.formatProtocol(params.protocol, "kallisto")
 kb_workflow = "standard"
 
 // Create a channel for input read files
@@ -144,7 +144,7 @@ workflow KALLISTO_BUSTOOLS {
       false,
       false,
       kb_workflow,
-      technology
+      protocol
     )
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
 

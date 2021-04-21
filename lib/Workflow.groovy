@@ -54,4 +54,83 @@ class Workflow {
         yaml_file_text        += "${summary_section}"
         return yaml_file_text
     }
+
+    /*
+    * Format the protocol
+    * Given the protocol paramter (params.protocol) and the aligner (params.aligner),
+    * this function formats the protocol such that it is fit for the respective
+    * subworkflow
+    */
+    static formatProtocol(protocol, aligner) {
+        String new_protocol = protocol
+        String chemistry = ""
+        
+        // alevin
+        if (aligner == "alevin") {
+            switch(protocol) {
+                case "10XV1":
+                    new_protocol = "chromium"
+                    chemistry = "V1"
+                    break
+                case "10XV2":
+                    new_protocol = "chromium"
+                    chemistry = "V2"
+                    break
+                case "10XV3":
+                    new_protocol = "chromiumV3"
+                    chemistry = "V3"
+                    break
+                case "dropseq":
+                    new_protocol = "dropseq"
+            }
+        }
+
+        // star
+        else if (aligner == "star") {
+            switch(protocol) {
+                case "10XV1":
+                    new_protocol = "CB_UMI_Simple"
+                    chemistry = "V1"
+                    break
+                case "10XV2":
+                    new_protocol = "CB_UMI_Simple"
+                    chemistry = "V2"
+                    break
+                case "10XV3":
+                    new_protocol = "CB_UMI_Simple"
+                    chemistry = "V3"
+                    break
+                case "dropseq":
+                    new_protocol = "CB_UMI_Simple"
+                    break
+                case "smartseq":
+                    new_protocol = "SmartSeq"
+            }
+        }
+
+        // kallisto bustools
+        else {
+            switch(protocol) {
+                case "10XV1":
+                    new_protocol = "10XV1"
+                    chemistry = "V1"
+                    break
+                case "10XV2":
+                    new_protocol = "10XV2"
+                    chemistry = "V2"
+                    break
+                case "10XV3":
+                    new_protocol = "10XV3"
+                    chemistry = "V3"
+                    break
+                case "dropseq":
+                    new_protocol = "DROPSEQ"
+                    break
+                case "smartseq":
+                    new_protocol = "SMARTSEQ"
+            }
+        }
+
+        return [new_protocol, chemistry]
+    }
 }

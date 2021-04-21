@@ -67,21 +67,21 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
+// Get the protocol parameter
+(protocol, chemistry) = Workflow.formatProtocol(params.protocol, "star")
+
 //Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"
 
-// Get the protocol parameter
-protocol = params.protocol
-
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
-if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist){
-  barcode_filename = "$whitelist_folder/10x_${params.chemistry}_barcode_whitelist.txt.gz"
+if (params.protocol.contains("10X") && !params.barcode_whitelist){
+  barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
   Channel.fromPath(barcode_filename)
-         .ifEmpty{ exit 1, "Cannot find ${params.protocol} barcode whitelist: $barcode_filename" }
+         .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
-         .ifEmpty{ exit 1, "Cannot find ${params.protocol} barcode whitelist: $barcode_filename" }
+         .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
          .set{ ch_barcode_whitelist }
 }
 
@@ -130,7 +130,7 @@ workflow STARSOLO {
     .set { ch_fastq }
 
     // unzip barcodes
-    if ((params.protocol == "chromium" || params.protocol == "chromiumV3") && !params.barcode_whitelist) {
+    if (params.protocol.contains("10X") && !params.barcode_whitelist) {
         GUNZIP( barcode_whitelist_gzipped )
         ch_barcode_whitelist = GUNZIP.out.gunzip
     }
@@ -150,7 +150,8 @@ workflow STARSOLO {
       ch_fastq,
       star_index,
       gtf,
-      ch_barcode_whitelist
+      ch_barcode_whitelist,
+      protocol
     )
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
     ch_star_multiqc      = STAR_ALIGN.out.log_final

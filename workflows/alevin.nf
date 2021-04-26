@@ -82,7 +82,7 @@ whitelist_folder = "$baseDir/assets/whitelist/"
 
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
 if (params.protocol.contains("10X") && !params.barcode_whitelist){
-  barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
+    barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
   Channel.fromPath(barcode_filename)
          .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
          .set{ barcode_whitelist_gzipped }
@@ -167,7 +167,10 @@ workflow SCRNASEQ_ALEVIN {
     if (!params.txp2gene){
         GFFREAD_TXP2GENE( gtf )
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
-        ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.first().ifEmpty(null))
+        // Only collect version if not already done for gffread
+        if (!GFFREAD_TRANSCRIPTOME.out.version) {
+            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.first().ifEmpty(null))
+        }
     }
 
     /*

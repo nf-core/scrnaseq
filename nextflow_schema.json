@@ -49,6 +49,17 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center"
+                },
+                "protocol": {
+                    "type": "string",
+                    "default": "10XV2",
+                    "fa_icon": "fas fa-cogs",
+                    "enum": [
+                        "10XV3",
+                        "10XV2",
+                        "10XV1",
+                        "dropseq"
+                    ]
                 }
             },
             "fa_icon": "fas fa-terminal"
@@ -65,7 +76,7 @@
                     "fa_icon": "fas fa-book",
                     "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`.\n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
                 },
-                "fasta": {
+                "genome_fasta": {
                     "type": "string",
                     "fa_icon": "fas fa-font",
                     "description": "Path to FASTA genome file.",
@@ -132,6 +143,9 @@
                     "description": "Specify a path to the precomputed STAR index.",
                     "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
                     "fa_icon": "fas fa-asterisk"
+                },
+                "star_ignore_sjdbgtf": {
+                    "type": "string"
                 }
             },
             "fa_icon": "fas fa-star"
@@ -250,6 +264,15 @@
                     "description": "Show all params when using `--help`",
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
+                },
+                "enable_conda": {
+                    "type": "string"
+                },
+                "skip_multiqc": {
+                    "type": "string"
+                },
+                "seq_center": {
+                    "type": "string"
                 }
             }
         },
@@ -372,27 +395,5 @@
         {
             "$ref": "#/definitions/institutional_config_options"
         }
-    ],
-    "properties": {
-        "genome_fasta": {
-            "type": "string"
-        },
-        "protocol": {
-            "type": "string",
-            "default": "10XV2",
-            "fa_icon": "fas fa-cogs"
-        },
-        "enable_conda": {
-            "type": "string"
-        },
-        "star_ignore_sjdbgtf": {
-            "type": "string"
-        },
-        "skip_multiqc": {
-            "type": "string"
-        },
-        "seq_center": {
-            "type": "string"
-        }
-    }
+    ]
 }

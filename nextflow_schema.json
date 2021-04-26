@@ -38,13 +38,6 @@
             "description": "",
             "default": "",
             "properties": {
-                "chemistry": {
-                    "type": "string",
-                    "description": "Version of 10x chemistry",
-                    "default": "V3",
-                    "help_text": "To specify which chemistry (and thus barcode whitelist) to use, use the `--chemistry` flag. For example, to specify V3 chemistry (the default, as it is compatible with V2), use `--chemistry V3`.\n\nThese files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.\n\n- V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`\n- V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`\n- V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`",
-                    "fa_icon": "fas fa-atom"
-                },
                 "barcode_whitelist": {
                     "type": "string",
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
@@ -386,9 +379,19 @@
         },
         "protocol": {
             "type": "string",
-            "default": "chromium"
+            "default": "10XV2",
+            "fa_icon": "fas fa-cogs"
         },
         "enable_conda": {
+            "type": "string"
+        },
+        "star_ignore_sjdbgtf": {
+            "type": "string"
+        },
+        "skip_multiqc": {
+            "type": "string"
+        },
+        "seq_center": {
             "type": "string"
         }
     }

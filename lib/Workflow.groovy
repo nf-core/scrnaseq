@@ -130,6 +130,9 @@ class Workflow {
                     new_protocol = "SMARTSEQ"
             }
         }
+        else {
+        exit 1, "Aligner not recognized."
+        }
 
         return [new_protocol, chemistry]
     }

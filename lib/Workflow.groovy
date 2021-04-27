@@ -109,7 +109,7 @@ class Workflow {
         }
 
         // kallisto bustools
-        else {
+        else if (aligner = "kallisto" ) {
             switch(protocol) {
                 case "10XV1":
                     new_protocol = "10XV1"

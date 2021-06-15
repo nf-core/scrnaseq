@@ -22,6 +22,7 @@ jobs:
       NXF_ANSI_LOG: false
     strategy:
       matrix:
+        profile: ['test,docker', 'test_kallisto,docker', 'test,docker --aligner star']
         # Nextflow versions: check pipeline minimum and current latest
         nxf_ver: ['20.04.0', '']
     steps:
@@ -37,13 +38,13 @@ jobs:
 
       - name: Build new docker image
         if: env.MATCHED_FILES
-        run: docker build --no-cache . -t nfcore/scrnaseq:dev
+        run: docker build --no-cache . -t nfcore/scrnaseq:1.1.0
 
       - name: Pull docker image
         if: ${{ !env.MATCHED_FILES }}
         run: |
           docker pull nfcore/scrnaseq:dev
-          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:dev
+          docker tag nfcore/scrnaseq:dev nfcore/scrnaseq:1.1.0
 
       - name: Install Nextflow
         env:
@@ -53,8 +54,8 @@ jobs:
           sudo mv nextflow /usr/local/bin/
 
       - name: Run pipeline with test data
-        # TODO nf-core: You can customise CI pipeline run tests as required
         # For example: adding multiple test runs with different parameters
         # Remember that you can parallelise this by using strategy.matrix
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }}
+      

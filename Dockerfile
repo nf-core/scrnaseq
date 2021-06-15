@@ -6,6 +6,10 @@ LABEL authors="Peter J Bailey, Alexander Peltzer, Olga Botvinnik" \
 COPY environment.yml /
 RUN conda env create --quiet -f /environment.yml && conda clean -a
 
+# The conda bug with tbb - salmon: error while loading shared libraries: libtbb.so.2
+# pandoc via conda was not working
+RUN apt-get update && apt-get install -y libtbb2 pandoc-citeproc
+
 # Add conda installation dir to PATH (instead of doing 'conda activate')
 ENV PATH /opt/conda/envs/nf-core-scrnaseq-1.1.0/bin:$PATH
 

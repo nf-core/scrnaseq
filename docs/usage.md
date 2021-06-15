@@ -1,29 +1,25 @@
 # nf-core/scrnaseq: Usage
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/scrnaseq/usage](https://nf-co.re/scrnaseq/usage)
-
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
-
 ## Running the pipeline
 
-The typical command for running the pipeline is as follows:
+The minimum typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/scrnaseq --input '*_R{1,2}.fastq.gz' -profile docker
+nextflow run nf-core/scrnaseq --reads '*_R{1,2}.fastq.gz' --fasta human.fasta --gtf human.gtf -profile docker
 ```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.
 
 Note that the pipeline will create the following files in your working directory:
 
 ```bash
 work            # Directory containing the nextflow working files
 results         # Finished results (configurable, see below)
-.nextflow_log   # Log file from Nextflow
+.nextflow.log   # Log file from Nextflow
 # Other nextflow hidden files, eg. history of pipeline runs and old logs.
 ```
 
@@ -39,7 +35,7 @@ nextflow pull nf-core/scrnaseq
 
 It's a good idea to specify a pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
 
-First, go to the [nf-core/scrnaseq releases page](https://github.com/nf-core/scrnaseq/releases) and find the latest version number - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`.
+First, go to the [nf-core/scrnaseq releases page](https://github.com/nf-core/scrnaseq/releases) and find the latest version number - numeric only (eg. `1.0.0`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.0.0`.
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
 
@@ -48,6 +44,8 @@ This version number will be logged in reports when you run the pipeline, so that
 > **NB:** These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
 
 ### `-profile`
+
+Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments. Note that multiple profiles can be loaded, for example: `-profile docker` - the order of arguments is important!
 
 Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments.
 
@@ -62,28 +60,28 @@ They are loaded in sequence, so later profiles can overwrite earlier profiles.
 
 If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended.
 
-* `docker`
-  * A generic configuration profile to be used with [Docker](https://docker.com/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `singularity`
-  * A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `podman`
-  * A generic configuration profile to be used with [Podman](https://podman.io/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `shifter`
-  * A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `charliecloud`
-  * A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
-  * Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
-* `conda`
-  * Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
-  * A generic configuration profile to be used with [Conda](https://conda.io/docs/)
-  * Pulls most software from [Bioconda](https://bioconda.github.io/)
-* `test`
-  * A profile with a complete configuration for automated testing
-  * Includes links to test data so needs no other parameters
+- `docker`
+  - A generic configuration profile to be used with [Docker](https://docker.com/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `singularity`
+  - A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `podman`
+  - A generic configuration profile to be used with [Podman](https://podman.io/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `shifter`
+  - A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `charliecloud`
+  - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
+  - Pulls software from Docker Hub: [`nfcore/scrnaseq`](https://hub.docker.com/r/nfcore/scrnaseq/)
+- `conda`
+  - Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter or Charliecloud.
+  - A generic configuration profile to be used with [Conda](https://conda.io/docs/)
+  - Pulls most software from [Bioconda](https://bioconda.github.io/)
+- `test`
+  - A profile with a complete configuration for automated testing
+  - Includes links to test data so needs no other parameters
 
 ### `-resume`
 
@@ -108,8 +106,6 @@ process {
   }
 }
 ```
-
-To find the exact name of a process you wish to modify the compute resources, check the live-status of a nextflow run displayed on your terminal or check the nextflow error for a line like so: `Error executing process > 'bwa'`. In this case the name to specify in the custom config file is `bwa`.
 
 See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for more information.
 

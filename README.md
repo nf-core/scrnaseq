@@ -14,7 +14,6 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 The **nf-core/scrnaseq** is a bioinformatics best-practise analysis pipeline for transciptomic data of single-cell RNAs. The pipeline creates count matrices from FASTQ sequence reads. It is suitable for droplets-based sequencing technologies.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.

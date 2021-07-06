@@ -19,9 +19,14 @@ jobs:
       NXF_ANSI_LOG: false
     strategy:
       matrix:
-        profile: ['test,docker', 'test_kallisto,docker', 'test,docker --aligner star']
+        profile:
+          [
+            "test,docker --aligner alevin",
+            "test,docker --aligner kallisto",
+            "test,docker --aligner star",
+          ]
         # Nextflow versions: check pipeline minimum and current latest
-        nxf_ver: ['20.10.0', '21.03.0-edge']
+        nxf_ver: ["20.10.0", "21.03.0-edge"]
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -55,4 +60,3 @@ jobs:
         # Remember that you can parallelise this by using strategy.matrix
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }}
-      

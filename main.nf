@@ -37,11 +37,23 @@ if (params.validate_params) {
 def summary_params = NfcoreSchema.params_summary_map(workflow, params, json_schema)
 log.info NfcoreSchema.params_summary_log(workflow, params, json_schema)
 
+////////////////////////////////////////////////////
+/* --          PARAMETER CHECKS                -- */
+////////////////////////////////////////////////////
+
+// Check that conda channels are set-up correctly
+if (params.enable_conda) {
+    Checks.checkCondaChannels(log)
+}
+
+// Check AWS batch settings
+Checks.awsBatch(workflow, params)
 
 // Check the hostnames against configured profiles
-//Checks.hostname(workflow, params, log)
+Checks.hostName(workflow, params, log)
 
-
+// Check genome key exists if provided
+Checks.genomeExists(params, log)
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */

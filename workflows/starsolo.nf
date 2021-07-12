@@ -105,8 +105,8 @@ include { STAR_ALIGN }                  from '../modules/local/star_align'      
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'              addParams( options: [:] )
-include { STAR_GENOMEGENERATE }         from '../modules/nf-core/software/star/genomegenerate/main' addParams( options: star_genomegenerate_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'              addParams( options: [:] )
+include { STAR_GENOMEGENERATE }         from '../modules/nf-core/modules/star/genomegenerate/main' addParams( options: star_genomegenerate_options )
 
 
 ////////////////////////////////////////////////////

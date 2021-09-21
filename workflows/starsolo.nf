@@ -18,6 +18,7 @@ if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
+        .collect()
         .set { gtf }
 }
 
@@ -26,6 +27,7 @@ if( params.genome_fasta ){
     Channel
         .fromPath(params.genome_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
+        .collect()
         .set { genome_fasta }
 } 
 
@@ -34,6 +36,7 @@ if( params.transcript_fasta ){
   Channel
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
+        .collect()
         .set { transcriptome_fasta }
 } 
 
@@ -41,6 +44,7 @@ if( params.transcript_fasta ){
 if( params.star_index  ){
     star_index = Channel
         .fromPath(params.star_index)
+        .collect()
         .ifEmpty { exit 1, "STAR index not found: ${params.star_index}" }
 }
 
@@ -55,6 +59,7 @@ if (params.input)      { ch_input      = file(params.input)      } else { exit 1
 if (params.txp2gene){
       Channel
       .fromPath(params.txp2gene)
+      .collect()
       .set{ ch_txp2gene } 
 }
 
@@ -78,10 +83,12 @@ if (params.protocol.contains("10X") && !params.barcode_whitelist){
   barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
   Channel.fromPath(barcode_filename)
          .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+         .collect()
          .set{ barcode_whitelist_gzipped }
 } else if (params.barcode_whitelist){
   Channel.fromPath(params.barcode_whitelist)
          .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+         .collect()
          .set{ ch_barcode_whitelist }
 }
 
@@ -142,7 +149,7 @@ workflow STARSOLO {
       STAR_GENOMEGENERATE( genome_fasta, gtf )
       star_index = STAR_GENOMEGENERATE.out.index
     }
-  
+
     /*
     * Perform mapping with STAR
     */ 

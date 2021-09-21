@@ -18,6 +18,7 @@ if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
+        .collect()
         .set { gtf }
 }
 
@@ -26,6 +27,7 @@ if( params.genome_fasta ){
     Channel
         .fromPath(params.genome_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
+        .collect()
         .set { genome_fasta }
 } 
 
@@ -40,6 +42,7 @@ if (params.kallisto_index) {
     Channel
         .fromPath(params.kallisto_index)
         .ifEmpty { exit 1, "Kallisto index not found: ${params.kallisto_index}" }
+        .collect()
         .set { ch_kallisto_index }
 }
 
@@ -48,6 +51,7 @@ if (params.kallisto_index) {
 if (params.kallisto_gene_map){
       Channel
       .fromPath(params.kallisto_gene_map)
+      .collect()
       .set{ ch_kallisto_gene_map } 
 }
 if (!params.gtf && !params.kallisto_gene_map){

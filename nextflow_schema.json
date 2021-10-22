@@ -17,12 +17,6 @@
                     "description": "Input FastQ files",
                     "help_text": "Use this to specify the location of your input FastQ files. For example:\n\n```bash\n--input 'path/to/data/sample_*_{1,2}.fastq'\n```\n\nPlease note the following requirements:\n\n1. The path must be enclosed in quotes\n2. The path must have at least one `*` wildcard character\n3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.\n\nIf left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`"
                 },
-                "input_paths": {
-                    "type": "string",
-                    "hidden": true,
-                    "description": "Input FastQ files path in array format",
-                    "fa_icon": "fas fa-dna"
-                },
                 "outdir": {
                     "type": "string",
                     "description": "The output directory where the results will be saved.",
@@ -44,19 +38,6 @@
             "description": "",
             "default": "",
             "properties": {
-                "type": {
-                    "type": "string",
-                    "description": "Name of droplet technology (Currently supported: 10x, Drop-Seq, inDrop, etc may be supported in the future.)",
-                    "fa_icon": "fas fa-align-center",
-                    "default": "10x"
-                },
-                "chemistry": {
-                    "type": "string",
-                    "description": "Version of 10x chemistry",
-                    "default": "V3",
-                    "help_text": "To specify which chemistry (and thus barcode whitelist) to use, use the `--chemistry` flag. For example, to specify V3 chemistry (the default, as it is compatible with V2), use `--chemistry V3`.\n\nThese files were copied out of 10x Genomics' [cellranger](https://github.com/10XGenomics/cellranger) `cellranger/lib/python/cellranger/barcodes`, in some cases gzipped for simplicity across versions, and copied to `assets/whitelist`.\n\n- V1: `737K-april-2014_rc.txt` --> gzipped --> `10x_V1_barcode_whitelist.txt.gz`\n- V2: `737K-august-2016.txt` --> gzipped --> `10x_V2_barcode_whitelist.txt.gz`\n- V3: `3M-february-2018.txt.gz` --> `10x_V3_barcode_whitelist.txt.gz`",
-                    "fa_icon": "fas fa-atom"
-                },
                 "barcode_whitelist": {
                     "type": "string",
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
@@ -68,6 +49,17 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center"
+                },
+                "protocol": {
+                    "type": "string",
+                    "default": "10XV2",
+                    "fa_icon": "fas fa-cogs",
+                    "enum": [
+                        "10XV3",
+                        "10XV2",
+                        "10XV1",
+                        "dropseq"
+                    ]
                 }
             },
             "fa_icon": "fas fa-terminal"
@@ -84,7 +76,7 @@
                     "fa_icon": "fas fa-book",
                     "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`.\n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
                 },
-                "fasta": {
+                "genome_fasta": {
                     "type": "string",
                     "fa_icon": "fas fa-font",
                     "description": "Path to FASTA genome file.",
@@ -151,6 +143,9 @@
                     "description": "Specify a path to the precomputed STAR index.",
                     "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
                     "fa_icon": "fas fa-asterisk"
+                },
+                "star_ignore_sjdbgtf": {
+                    "type": "string"
                 }
             },
             "fa_icon": "fas fa-star"
@@ -269,6 +264,15 @@
                     "description": "Show all params when using `--help`",
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
+                },
+                "enable_conda": {
+                    "type": "string"
+                },
+                "skip_multiqc": {
+                    "type": "string"
+                },
+                "seq_center": {
+                    "type": "string"
                 }
             }
         },
@@ -292,7 +296,7 @@
                     "description": "Maximum amount of memory that can be requested for any single job.",
                     "default": "128.GB",
                     "fa_icon": "fas fa-memory",
-                    "pattern": "^[\\d\\.]+\\s*.(K|M|G|T)?B$",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
                     "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
                 },
@@ -301,7 +305,7 @@
                     "description": "Maximum amount of time that can be requested for any single job.",
                     "default": "240.h",
                     "fa_icon": "far fa-clock",
-                    "pattern": "^[\\d\\.]+\\.*(s|m|h|d)$",
+                    "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
                     "hidden": true,
                     "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
                 }

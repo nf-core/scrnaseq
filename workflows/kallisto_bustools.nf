@@ -91,8 +91,8 @@ include { MULTIQC }                           from '../modules/local/multiqc_kb'
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'                    addParams( options: [:] )
-include { KALLISTOBUSTOOLS_REF }       from '../modules/nf-core/software/kallistobustools/ref/main'       addParams( options: kallistobustools_ref_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'                    addParams( options: [:] )
+include { KALLISTOBUSTOOLS_REF }        from '../modules/nf-core/modules/kallistobustools/ref/main'       addParams( options: kallistobustools_ref_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */

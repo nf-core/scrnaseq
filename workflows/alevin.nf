@@ -113,9 +113,9 @@ include { MULTIQC }                           from '../modules/local/multiqc_ale
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/software/gunzip/main'              addParams( options: [:] )
-include { GFFREAD as GFFREAD_TXP2GENE } from '../modules/nf-core/software/gffread/main'             addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }                from '../modules/nf-core/software/salmon/index/main'        addParams( options: salmon_index_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'              addParams( options: [:] )
+include { GFFREAD as GFFREAD_TXP2GENE } from '../modules/nf-core/modules/gffread/main'             addParams( options: gffread_txp2gene_options )
+include { SALMON_INDEX }                from '../modules/nf-core/modules/salmon/index/main'        addParams( options: salmon_index_options )
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */

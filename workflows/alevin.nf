@@ -32,7 +32,7 @@ if( params.genome_fasta ){
         .fromPath(params.genome_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
         .set { genome_fasta }
-} 
+}
 
 //Setup Transcript FastA channels
 if( params.transcript_fasta ){
@@ -40,7 +40,7 @@ if( params.transcript_fasta ){
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
         .set { transcriptome_fasta }
-} 
+}
 
 // Check if files for index building are given if no index is specified
 if (!params.salmon_index && (!params.genome_fasta)) {
@@ -60,13 +60,10 @@ if (params.input)      { ch_input      = file(params.input)      } else { exit 1
 
 // Check if txp2gene file has been provided
 if (params.txp2gene){
-      Channel
-      .fromPath(params.txp2gene)
-      .set{ ch_txp2gene } 
+    Channel
+        .fromPath(params.txp2gene)
+        .set{ ch_txp2gene }
 }
-
-// Check AWS batch settings
-// TODO use the Checks.awsBatch() function instead
 
 // Stage config files
 ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
@@ -152,7 +149,7 @@ workflow SCRNASEQ_ALEVIN {
         transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
         ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
     }
-    
+
     /*
     * Build salmon index
     */
@@ -182,7 +179,7 @@ workflow SCRNASEQ_ALEVIN {
 
     /*
     * Run alevinQC
-    */ 
+    */
     ALEVINQC( SALMON_ALEVIN.out.alevin_results )
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
 
@@ -213,8 +210,10 @@ workflow SCRNASEQ_ALEVIN {
 ////////////////////////////////////////////////////
 
 workflow.onComplete {
-    Completion.email(workflow, params, params.summary_params, projectDir, log, multiqc_report)
-    Completion.summary(workflow, params, log)
+    if (params.email || params.email_on_fail) {
+        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+    }
+    NfcoreTemplate.summary(workflow, params, log)
 }
 
 ////////////////////////////////////////////////////

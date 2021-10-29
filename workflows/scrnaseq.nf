@@ -23,9 +23,9 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 ========================================================================================
 */
 
-include { SCRNASEQ_ALEVIN } from './workflows/alevin'
-include { STARSOLO } from './workflows/starsolo'
-include { KALLISTO_BUSTOOLS } from './workflows/kallisto_bustools'
+include { SCRNASEQ_ALEVIN } from './alevin'
+include { STARSOLO } from './starsolo'
+include { KALLISTO_BUSTOOLS } from './kallisto_bustools'
 
 
 /*
@@ -60,12 +60,7 @@ workflow SCRNASEQ {
 ========================================================================================
 */
 
-workflow.onComplete {
-    if (params.email || params.email_on_fail) {
-        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
-    }
-    NfcoreTemplate.summary(workflow, params, log)
-}
+// Added to individual workflows
 
 /*
 ========================================================================================

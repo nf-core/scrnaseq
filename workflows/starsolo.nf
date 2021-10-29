@@ -27,7 +27,7 @@ if( params.genome_fasta ){
         .fromPath(params.genome_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
         .set { genome_fasta }
-} 
+}
 
 //Setup Transcript FastA channels
 if( params.transcript_fasta ){
@@ -35,7 +35,7 @@ if( params.transcript_fasta ){
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
         .set { transcriptome_fasta }
-} 
+}
 
 // Check if STAR index is supplied properly
 if( params.star_index  ){
@@ -55,7 +55,7 @@ if (params.input)      { ch_input      = file(params.input)      } else { exit 1
 if (params.txp2gene){
       Channel
       .fromPath(params.txp2gene)
-      .set{ ch_txp2gene } 
+      .set{ ch_txp2gene }
 }
 
 // Check AWS batch settings
@@ -142,11 +142,11 @@ workflow STARSOLO {
       STAR_GENOMEGENERATE( genome_fasta, gtf )
       star_index = STAR_GENOMEGENERATE.out.index
     }
-  
+
     /*
     * Perform mapping with STAR
-    */ 
-    STAR_ALIGN( 
+    */
+    STAR_ALIGN(
       ch_fastq,
       star_index,
       gtf,
@@ -183,10 +183,11 @@ workflow STARSOLO {
 ////////////////////////////////////////////////////
 
 workflow.onComplete {
-    Completion.email(workflow, params, params.summary_params, projectDir, log, multiqc_report)
-    Completion.summary(workflow, params, log)
+    if (params.email || params.email_on_fail) {
+        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+    }
+    NfcoreTemplate.summary(workflow, params, log)
 }
-
 ////////////////////////////////////////////////////
 /* --                  THE END                 -- */
 ////////////////////////////////////////////////////

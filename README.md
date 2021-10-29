@@ -56,7 +56,6 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage
 
 4. Start running your own analysis!
 
-
     ```console
     nextflow run nf-core/scrnaseq -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input samplesheet.csv --genome_fasta GRCm38.p6.genome.chr19.fa --gtf gencode.vM19.annotation.chr19.gtf --protocol 10XV2
     ```

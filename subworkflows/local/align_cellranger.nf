@@ -21,7 +21,7 @@ workflow CELLRANGER_ALIGN {
     main:
         // Set sample channel from samplesheet input
         METADATA            ( samplesheet )
-    
+
         // Filter GTF based on gene biotypes passed in params.modules
         CELLRANGER_MKGTF    ( gtf )
 

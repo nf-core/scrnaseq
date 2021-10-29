@@ -119,32 +119,32 @@ workflow KALLISTO_BUSTOOLS {
     * If index is given, the gene map will be generated in the 'kb ref' step
     */
     if (!params.kallisto_gene_map && params.kallisto_index) {
-      GENE_MAP( gtf )
-      ch_kallisto_gene_map = GENE_MAP.out.gene_map
+        GENE_MAP( gtf )
+        ch_kallisto_gene_map = GENE_MAP.out.gene_map
     }
 
     /*
     * Generate kallisto index
     */
     if (!params.kallisto_index) {
-      KALLISTOBUSTOOLS_REF( genome_fasta, gtf, kb_workflow )
-      ch_kallisto_gene_map = KALLISTOBUSTOOLS_REF.out.t2g
-      ch_kallisto_index    = KALLISTOBUSTOOLS_REF.out.index
+        KALLISTOBUSTOOLS_REF( genome_fasta, gtf, kb_workflow )
+        ch_kallisto_gene_map = KALLISTOBUSTOOLS_REF.out.t2g
+        ch_kallisto_index    = KALLISTOBUSTOOLS_REF.out.index
     }
 
     /*
     * Quantification with kallistobustools count
     */
     KALLISTOBUSTOOLS_COUNT(
-      ch_fastq,
-      ch_kallisto_index,
-      ch_kallisto_gene_map,
-      [],
-      [],
-      false,
-      false,
-      kb_workflow,
-      protocol
+        ch_fastq,
+        ch_kallisto_index,
+        ch_kallisto_gene_map,
+        [],
+        [],
+        false,
+        false,
+        kb_workflow,
+        protocol
     )
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
 

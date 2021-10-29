@@ -31,7 +31,7 @@ if( params.genome_fasta ){
 
 //Setup Transcript FastA channels
 if( params.transcript_fasta ){
-  Channel
+    Channel
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
         .set { transcriptome_fasta }
@@ -45,7 +45,7 @@ if( params.star_index  ){
 }
 
 if (!params.star_index && (!params.gtf || !params.genome_fasta)){
-  exit 1, "STAR needs either a GTF + FASTA or a precomputed index supplied."
+    exit 1, "STAR needs either a GTF + FASTA or a precomputed index supplied."
 }
 
 // Create a channel for input read files
@@ -53,9 +53,9 @@ if (params.input)      { ch_input      = file(params.input)      } else { exit 1
 
 // Check if txp2gene file has been provided
 if (params.txp2gene){
-      Channel
-      .fromPath(params.txp2gene)
-      .set{ ch_txp2gene }
+    Channel
+        .fromPath(params.txp2gene)
+        .set{ ch_txp2gene }
 }
 
 // Check AWS batch settings
@@ -75,14 +75,14 @@ whitelist_folder = "$baseDir/assets/whitelist/"
 
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
 if (params.protocol.contains("10X") && !params.barcode_whitelist){
-  barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
-  Channel.fromPath(barcode_filename)
-         .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-         .set{ barcode_whitelist_gzipped }
+    barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
+    Channel.fromPath(barcode_filename)
+            .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+            .set{ barcode_whitelist_gzipped }
 } else if (params.barcode_whitelist){
-  Channel.fromPath(params.barcode_whitelist)
-         .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-         .set{ ch_barcode_whitelist }
+    Channel.fromPath(params.barcode_whitelist)
+            .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+            .set{ ch_barcode_whitelist }
 }
 
 ////////////////////////////////////////////////////
@@ -139,19 +139,19 @@ workflow STARSOLO {
     * Build STAR index if not supplied
     */
     if (!params.star_index) {
-      STAR_GENOMEGENERATE( genome_fasta, gtf )
-      star_index = STAR_GENOMEGENERATE.out.index
+        STAR_GENOMEGENERATE( genome_fasta, gtf )
+        star_index = STAR_GENOMEGENERATE.out.index
     }
 
     /*
     * Perform mapping with STAR
     */
     STAR_ALIGN(
-      ch_fastq,
-      star_index,
-      gtf,
-      ch_barcode_whitelist,
-      protocol
+        ch_fastq,
+        star_index,
+        gtf,
+        ch_barcode_whitelist,
+        protocol
     )
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
     ch_star_multiqc      = STAR_ALIGN.out.log_final

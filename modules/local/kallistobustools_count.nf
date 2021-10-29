@@ -40,16 +40,16 @@ process KALLISTOBUSTOOLS_COUNT {
     def introns     = use_t2c ? "-c2 $t2c" : ''
     """
     kb count \\
-    -t $task.cpus \\
-    -i $index \\
-    -g $t2g \\
-    $cdna \\
-    $introns \\
-    --workflow $workflow \\
-    -x $technology \\
-    $options.args \\
-    -o ${prefix}_kallistobustools_count \\
-    ${reads[0]} ${reads[1]}
+        -t $task.cpus \\
+        -i $index \\
+        -g $t2g \\
+        $cdna \\
+        $introns \\
+        --workflow $workflow \\
+        -x $technology \\
+        $options.args \\
+        -o ${prefix}_kallistobustools_count \\
+        ${reads[0]} ${reads[1]}
 
     echo \$(kb 2>&1) | sed 's/^kb_python //; s/Usage.*\$//' > ${software}.version.txt
     """

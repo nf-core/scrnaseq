@@ -34,11 +34,6 @@ This is a community effort in building a pipeline capable to support:
 * STARSolo
 * Kallisto + BUStools
 
-By default, the pipeline currently performs the following:
-
-1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
-
 ## Documentation
 
 The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage](https://nf-co.re/scrnaseq/usage), [parameters](https://nf-co.re/scrnaseq/parameters) and [output](https://nf-co.re/scrnaseq/output).

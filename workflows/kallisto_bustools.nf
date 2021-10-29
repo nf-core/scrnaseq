@@ -27,12 +27,12 @@ if( params.genome_fasta ){
         .fromPath(params.genome_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
         .set { genome_fasta }
-} 
+}
 
 
 // Check if files for index building are given if no index is specified
 if (!params.kallisto_index && (!params.genome_fasta || !params.gtf)) {
-  exit 1, "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
+    exit 1, "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
 }
 
 //Setup channel for salmon index if specified
@@ -46,12 +46,12 @@ if (params.kallisto_index) {
 // Kallist gene map
 // Check if txp2gene file has been provided
 if (params.kallisto_gene_map){
-      Channel
-      .fromPath(params.kallisto_gene_map)
-      .set{ ch_kallisto_gene_map } 
+    Channel
+        .fromPath(params.kallisto_gene_map)
+        .set{ ch_kallisto_gene_map }
 }
 if (!params.gtf && !params.kallisto_gene_map){
-  exit 1, "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
+    exit 1, "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
 }
 
 // Get the protocol parameter
@@ -117,7 +117,7 @@ workflow KALLISTO_BUSTOOLS {
     /*
     * Generate Kallisto Gene Map if not supplied and index is given
     * If index is given, the gene map will be generated in the 'kb ref' step
-    */ 
+    */
     if (!params.kallisto_gene_map && params.kallisto_index) {
       GENE_MAP( gtf )
       ch_kallisto_gene_map = GENE_MAP.out.gene_map
@@ -125,8 +125,8 @@ workflow KALLISTO_BUSTOOLS {
 
     /*
     * Generate kallisto index
-    */ 
-    if (!params.kallisto_index) { 
+    */
+    if (!params.kallisto_index) {
       KALLISTOBUSTOOLS_REF( genome_fasta, gtf, kb_workflow )
       ch_kallisto_gene_map = KALLISTOBUSTOOLS_REF.out.t2g
       ch_kallisto_index    = KALLISTOBUSTOOLS_REF.out.index

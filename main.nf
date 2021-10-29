@@ -1,74 +1,58 @@
 #!/usr/bin/env nextflow
 /*
 ========================================================================================
-                         nf-core/scrnaseq
+    nf-core/scrnaseq
 ========================================================================================
- nf-core/scrnaseq Analysis Pipeline.
- #### Homepage / Documentation
- https://github.com/nf-core/scrnaseq
+    Github : https://github.com/nf-core/scrnaseq
+    Website: https://nf-co.re/scrnaseq
+    Slack  : https://nfcore.slack.com/channels/scrnaseq
 ----------------------------------------------------------------------------------------
 */
 
 nextflow.enable.dsl = 2
 
-log.info Headers.nf_core(workflow, params.monochrome_logs)
 
-////////////////////////////////////////////////////
-/* --               PRINT HELP                 -- */
-////////////////////////////////////////////////////+
-def json_schema = "$projectDir/nextflow_schema.json"
-if (params.help) {
-    def command = "nextflow run nf-core/scrnaseq --input '*_R{1,2}.fastq.gz' -profile docker"
-    log.info NfcoreSchema.params_help(workflow, params, json_schema, command)
-    exit 0
+/*
+========================================================================================
+    VALIDATE & PRINT PARAMETER SUMMARY
+========================================================================================
+*/
+
+WorkflowMain.initialise(workflow, params, log)
+
+
+/*
+========================================================================================
+    NAMED WORKFLOW FOR PIPELINE
+========================================================================================
+*/
+
+include { SCRNASEQ } from './workflows/scrnaseq'
+
+//
+// WORKFLOW: Run main scrnaseq analysis pipeline
+//
+
+workflow NFCORE_SCRNASEQ{
+    SCRNASEQ()
 }
 
-////////////////////////////////////////////////////
-/* --         VALIDATE PARAMETERS              -- */
-////////////////////////////////////////////////////+
-if (params.validate_params) {
-    NfcoreSchema.validateParameters(params, json_schema, log)
-}
+/*
+========================================================================================
+    RUN ALL WORKFLOWS
+========================================================================================
+*/
 
-////////////////////////////////////////////////////
-/* --         PRINT PARAMETER SUMMARY          -- */
-////////////////////////////////////////////////////
-
-def summary_params = NfcoreSchema.params_summary_map(workflow, params, json_schema)
-log.info NfcoreSchema.params_summary_log(workflow, params, json_schema)
-
-
-// Check the hostnames against configured profiles
-//Checks.hostname(workflow, params, log)
-
-
-
-////////////////////////////////////////////////////
-/* --           RUN MAIN WORKFLOW              -- */
-////////////////////////////////////////////////////
-
+//
+// WORKFLOW: Execute a single named workflow for the pipeline
+// See: https://github.com/nf-core/rnaseq/issues/619
+//
 workflow {
-
-    // Run salmon alevin pipeline
-    if (params.aligner == "alevin") {
-        include { SCRNASEQ_ALEVIN } from './workflows/alevin'
-        SCRNASEQ_ALEVIN()
-    }
-
-    // Run STARSolo pipeline
-    if (params.aligner == "star") {
-        include { STARSOLO } from './workflows/starsolo'
-        STARSOLO()
-    }
-
-    // Run kallisto bustools pipeline
-    if (params.aligner == "kallisto") {
-        include { KALLISTO_BUSTOOLS } from './workflows/kallisto_bustools'
-        KALLISTO_BUSTOOLS()
-    }
-    
+    NFCORE_SCRNASEQ ()
 }
 
-////////////////////////////////////////////////////
-/* --                  THE END                 -- */
-////////////////////////////////////////////////////
+/*
+========================================================================================
+    THE END
+========================================================================================
+*/

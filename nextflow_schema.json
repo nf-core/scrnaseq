@@ -405,5 +405,13 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "skip_multiqc": {
+            "type": "string"
+        },
+        "seq_center": {
+            "type": "string"
+        }
+    }
 }

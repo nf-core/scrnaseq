@@ -23,7 +23,7 @@ if( params.gtf ){
 
 // Check if TXP2Gene is provided for Alevin
 if (!params.gtf && !params.txp2gene){
-  exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
+    exit 1, "Must provide either a GTF file ('--gtf') or transcript to gene mapping ('--txp2gene') to align with Alevin"
 }
 
 //Setup FastA channels
@@ -32,19 +32,19 @@ if( params.genome_fasta ){
         .fromPath(params.genome_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.genome_fasta}" }
         .set { genome_fasta }
-} 
+}
 
 //Setup Transcript FastA channels
 if( params.transcript_fasta ){
-  Channel
+    Channel
         .fromPath(params.transcript_fasta)
         .ifEmpty { exit 1, "Fasta file not found: ${params.transcript_fasta}" }
         .set { transcriptome_fasta }
-} 
+}
 
 // Check if files for index building are given if no index is specified
 if (!params.salmon_index && (!params.genome_fasta)) {
-  exit 1, "Must provide a genome fasta file ('--genome_fasta') or a transcript fasta ('--transcript_fasta') if no index is given!"
+    exit 1, "Must provide a genome fasta file ('--genome_fasta') or a transcript fasta ('--transcript_fasta') if no index is given!"
 }
 
 //Setup channel for salmon index if specified
@@ -60,13 +60,10 @@ if (params.input)      { ch_input      = file(params.input)      } else { exit 1
 
 // Check if txp2gene file has been provided
 if (params.txp2gene){
-      Channel
-      .fromPath(params.txp2gene)
-      .set{ ch_txp2gene } 
+    Channel
+        .fromPath(params.txp2gene)
+        .set{ ch_txp2gene }
 }
-
-// Check AWS batch settings
-// TODO use the Checks.awsBatch() function instead
 
 // Stage config files
 ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
@@ -83,13 +80,13 @@ whitelist_folder = "$baseDir/assets/whitelist/"
 //Automatically set up proper filepaths to the barcode whitelist files bundled with the pipeline
 if (params.protocol.contains("10X") && !params.barcode_whitelist){
     barcode_filename = "$whitelist_folder/10x_${chemistry}_barcode_whitelist.txt.gz"
-  Channel.fromPath(barcode_filename)
-         .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-         .set{ barcode_whitelist_gzipped }
+    Channel.fromPath(barcode_filename)
+        .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+        .set{ barcode_whitelist_gzipped }
 } else if (params.barcode_whitelist){
-  Channel.fromPath(params.barcode_whitelist)
-         .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
-         .set{ ch_barcode_whitelist }
+    Channel.fromPath(params.barcode_whitelist)
+        .ifEmpty{ exit 1, "Cannot find ${protocol} barcode whitelist: $barcode_filename" }
+        .set{ ch_barcode_whitelist }
 }
 
 ////////////////////////////////////////////////////
@@ -152,7 +149,7 @@ workflow SCRNASEQ_ALEVIN {
         transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
         ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
     }
-    
+
     /*
     * Build salmon index
     */
@@ -182,7 +179,7 @@ workflow SCRNASEQ_ALEVIN {
 
     /*
     * Run alevinQC
-    */ 
+    */
     ALEVINQC( SALMON_ALEVIN.out.alevin_results )
     ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
 
@@ -213,8 +210,10 @@ workflow SCRNASEQ_ALEVIN {
 ////////////////////////////////////////////////////
 
 workflow.onComplete {
-    Completion.email(workflow, params, params.summary_params, projectDir, log, multiqc_report)
-    Completion.summary(workflow, params, log)
+    if (params.email || params.email_on_fail) {
+        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+    }
+    NfcoreTemplate.summary(workflow, params, log)
 }
 
 ////////////////////////////////////////////////////

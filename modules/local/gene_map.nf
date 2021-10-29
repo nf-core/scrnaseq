@@ -27,11 +27,11 @@ process GENE_MAP {
 
     script:
     if("${gtf}".endsWith('.gz')){
-      name = "${gtf.baseName}"
-      unzip = "gunzip -f ${gtf}"
+        name = "${gtf.baseName}"
+        unzip = "gunzip -f ${gtf}"
     } else {
-      unzip = ""
-      name = "${gtf}"
+        unzip = ""
+        name = "${gtf}"
     }
     """
     $unzip

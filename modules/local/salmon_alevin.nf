@@ -47,7 +47,7 @@ process SALMON_ALEVIN {
         -o ${prefix}_alevin_results
 
     mv ${whitelist} ${prefix}_alevin_results/alevin/whitelist.txt
-    
+
     salmon --version | sed -e "s/salmon //g" > ${software}.version.txt
     """
 }

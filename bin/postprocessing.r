@@ -1,7 +1,7 @@
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) < 2) {
-  stop("Usage: postprocessing.r <base.path>", call.=FALSE)
+    stop("Usage: postprocessing.r <base.path>", call.=FALSE)
 }
 
 base.path <- args[1]
@@ -10,20 +10,20 @@ base.path <- args[1]
 # Parts of the function is taken from Seurat's Read10x parsing function
 ReadAlevin <- function( base.path = NULL ){
     if (! dir.exists(base.path )){
-      stop("Directory provided does not exist")
+        stop("Directory provided does not exist")
     }
 
     barcode.loc <- paste0( base.path, "alevin/quants_mat_rows.txt" )
     gene.loc <- paste0( base.path, "alevin/quants_mat_cols.txt" )
     matrix.loc <- paste0( base.path, "alevin/quants_mat.csv" )
     if (!file.exists( barcode.loc )){
-      stop("Barcode file missing")
+        stop("Barcode file missing")
     }
     if (! file.exists(gene.loc) ){
-      stop("Gene name file missing")
+        stop("Gene name file missing")
     }
     if (! file.exists(matrix.loc )){
-      stop("Expression matrix file missing")
+        stop("Expression matrix file missing")
     }
     matrix <- as.matrix(read.csv( matrix.loc, header=FALSE))
     matrix <- t(matrix[,1:ncol(matrix)-1])

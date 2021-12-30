@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
-* Make sure Kallisto/BUStools runs on multiple samples [#77](https://github.com/nf-core/scrnaseq/pull/77)
+* Make sure pipeline runs on multiple samples [#77](https://github.com/nf-core/scrnaseq/pull/77)
 
 ## v1.1.0 - 2021-03-24 "Olive Mercury Corgi"
 

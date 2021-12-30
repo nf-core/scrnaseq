@@ -13,16 +13,16 @@ process ALEVINQC {
 
     conda (params.enable_conda ? "bioconda::bioconductor-alevinqc=1.6.1" : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.6.1--r40hdfd78af_0"
+        container "https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.10.0--r41hdfd78af_0"
     } else {
-        container "quay.io/biocontainers/bioconductor-alevinqc:1.6.1--r40hdfd78af_0"
+        container "quay.io/biocontainers/bioconductor-alevinqc:1.10.0--r41hdfd78af_0"
     }
 
     input:
     tuple val(meta), path(alevin_results)
 
     output:
-    tuple val(meta), path("alevinReport.html"), emit: report
+    tuple val(meta), path("alevin_report_${meta.id}.html"), emit: report
     path "*.version.txt"                      , emit: version
 
     script:
@@ -32,7 +32,7 @@ process ALEVINQC {
     #!/usr/bin/env Rscript
     require(alevinQC)
     alevinQCReport(baseDir = "${alevin_results}", sampleId = "${prefix}",
-                outputFile = "alevinReport.html",
+                outputFile = "alevin_report_${meta.id}.html",
                 outputFormat = "html_document",
                 outputDir = "./", forceOverwrite = TRUE)
     write(as.character(packageVersion("alevinQC")), paste0("${software}", ".version.txt"))

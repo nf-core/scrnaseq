@@ -13,10 +13,10 @@ class Utils {
         Yaml parser = new Yaml()
         def channels = []
         try {
-            def config = parser.load("conda config --show channels".execute().text)
+            def config = parser.load('conda config --show channels'.execute().text)
             channels = config.channels
-        } catch(NullPointerException | IOException e) {
-            log.warn "Could not verify conda channel configuration."
+        } catch (NullPointerException | IOException e) {
+            log.warn 'Could not verify conda channel configuration.'
             return
         }
 
@@ -29,12 +29,12 @@ class Utils {
         conda_check_failed |= !(channels.indexOf('bioconda') < channels.indexOf('defaults'))
 
         if (conda_check_failed) {
-            log.warn "=============================================================================\n" +
-                "  There is a problem with your Conda configuration!\n\n" +
-                "  You will need to set-up the conda-forge and bioconda channels correctly.\n" +
-                "  Please refer to https://bioconda.github.io/user/install.html#set-up-channels\n" +
-                "  NB: The order of the channels matters!\n" +
-                "==================================================================================="
+            log.warn '=============================================================================\n' +
+                '  There is a problem with your Conda configuration!\n\n' +
+                '  You will need to set-up the conda-forge and bioconda channels correctly.\n' +
+                '  Please refer to https://bioconda.github.io/user/install.html#set-up-channels\n' +
+                '  NB: The order of the channels matters!\n' +
+                '==================================================================================='
         }
     }
 }

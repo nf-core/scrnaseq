@@ -9,8 +9,26 @@
             "fastqc": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
+            "gffread": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+            },
+            "gunzip": {
+                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
+            },
+            "kallistobustools/ref": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+            },
             "multiqc": {
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+            },
+            "salmon/index": {
+                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
+            },
+            "salmon/quant": {
+                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
+            },
+            "star/genomegenerate": {
+                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
             }
         }
     }

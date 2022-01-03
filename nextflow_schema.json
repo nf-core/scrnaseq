@@ -379,7 +379,7 @@
     ],
     "properties": {
         "skip_multiqc": {
-            "type": "string"
+            "type": "boolean"
         },
         "seq_center": {
             "type": "string"

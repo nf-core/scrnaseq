@@ -137,8 +137,8 @@ workflow KALLISTO_BUSTOOLS {
     */
     KALLISTOBUSTOOLS_COUNT(
         ch_fastq,
-        ch_kallisto_index,
-        ch_kallisto_gene_map,
+        ch_kallisto_index.collect(),
+        ch_kallisto_gene_map.collect(),
         [],
         [],
         false,

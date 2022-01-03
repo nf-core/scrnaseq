@@ -148,9 +148,9 @@ workflow STARSOLO {
     */
     STAR_ALIGN(
         ch_fastq,
-        star_index,
-        gtf,
-        ch_barcode_whitelist,
+        star_index.collect(),
+        gtf.collect(),
+        ch_barcode_whitelist.collect(),
         protocol
     )
     ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))

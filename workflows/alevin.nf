@@ -173,7 +173,13 @@ workflow SCRNASEQ_ALEVIN {
     /*
     * Perform quantification with salmon alevin
     */
-    SALMON_ALEVIN ( ch_fastq, salmon_index_alevin, ch_txp2gene, protocol, ch_barcode_whitelist )
+    SALMON_ALEVIN (
+        ch_fastq,
+        salmon_index_alevin.collect(),
+        ch_txp2gene.collect(),
+        protocol,
+        ch_barcode_whitelist.collect()
+    )
     ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.version.first().ifEmpty(null))
     ch_salmon_multiqc = SALMON_ALEVIN.out.alevin_results
 

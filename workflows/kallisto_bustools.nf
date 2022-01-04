@@ -85,7 +85,7 @@ def multiqc_options                 = modules['multiqc_kb']
 include { INPUT_CHECK        }                from '../subworkflows/local/input_check'        addParams( options: [:] )
 include { GENE_MAP }                          from '../modules/local/gene_map'                addParams( options: [:] )
 include { KALLISTOBUSTOOLS_COUNT }            from '../modules/local/kallistobustools_count'  addParams( options: kallistobustools_count_options )
-include { GET_SOFTWARE_VERSIONS }             from '../modules/local/get_software_versions'   addParams( options: [publish_files: ['csv':'']]       )
+include { CUSTOM_DUMPSOFTWAREVERSIONS }             from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'   addParams( options: [publish_files: ['csv':'']]       )
 include { MULTIQC }                           from '../modules/local/multiqc_kb'              addParams( options: multiqc_options )
 
 ////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ workflow KALLISTO_BUSTOOLS {
     ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
 
     // collect software versions
-    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
+    CUSTOM_DUMPSOFTWAREVERSIONS ( ch_software_versions.map { it }.collect() )
 
     /*
     * MultiQC
@@ -162,7 +162,7 @@ workflow KALLISTO_BUSTOOLS {
         MULTIQC (
             ch_multiqc_config,
             ch_multiqc_custom_config.collect().ifEmpty([]),
-            GET_SOFTWARE_VERSIONS.out.yaml.collect(),
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.yaml.collect(),
             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
         )
         multiqc_report = MULTIQC.out.report.toList()

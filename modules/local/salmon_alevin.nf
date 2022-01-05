@@ -3,11 +3,9 @@ process SALMON_ALEVIN {
     label 'process_medium'
 
     conda (params.enable_conda ? "bioconda::salmon=1.4.0" : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/salmon:1.4.0--h84f40af_1"
-    } else {
-        container "quay.io/biocontainers/salmon:1.4.0--h84f40af_1"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/salmon:1.4.0--h84f40af_1' :
+        'quay.io/biocontainers/salmon:1.4.0--h84f40af_1' }"
 
     input:
     tuple val(meta), path(reads)

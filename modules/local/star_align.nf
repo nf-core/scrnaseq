@@ -3,11 +3,9 @@ process STAR_ALIGN {
     label 'process_high'
 
     conda (params.enable_conda ? 'bioconda::star=2.7.8a' : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container 'https://depot.galaxyproject.org/singularity/star:2.7.8a--h9ee0642_1'
-    } else {
-        container 'quay.io/biocontainers/star:2.7.8a--h9ee0642_1'
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/star:2.7.8a--h9ee0642_1' :
+        'quay.io/biocontainers/star:2.7.8a--h9ee0642_1' }"
 
     input:
     tuple val(meta), path(reads)

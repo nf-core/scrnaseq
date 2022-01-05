@@ -3,11 +3,9 @@ process GFFREAD_TRANSCRIPTOME {
     label 'process_low'
 
     conda (params.enable_conda ? "bioconda::gffread=0.12.1" : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/gffread:0.12.1--h2e03b76_1"
-    } else {
-        container "quay.io/biocontainers/gffread:0.12.1--h2e03b76_1"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/gffread:0.12.1--h2e03b76_1' :
+        'quay.io/biocontainers/gffread:0.12.1--h2e03b76_1' }"
 
     input:
     path genome_fasta

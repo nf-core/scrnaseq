@@ -138,7 +138,7 @@ workflow SCRNASEQ_ALEVIN {
     if (!params.transcript_fasta && params.genome_fasta && params.gtf) {
         GFFREAD_TRANSCRIPTOME( genome_fasta, gtf )
         transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
-        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
+        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.versions.first().ifEmpty(null))
     }
 
     /*
@@ -156,8 +156,8 @@ workflow SCRNASEQ_ALEVIN {
         GFFREAD_TXP2GENE( gtf )
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
         // Only collect version if not already done for gffread
-        if (!GFFREAD_TRANSCRIPTOME.out.version) {
-            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.first().ifEmpty(null))
+        if (!GFFREAD_TRANSCRIPTOME.out.versions) {
+            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.versions.first().ifEmpty(null))
         }
     }
 
@@ -171,17 +171,19 @@ workflow SCRNASEQ_ALEVIN {
         protocol,
         ch_barcode_whitelist.collect()
     )
-    ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.versions.first().ifEmpty(null))
     ch_salmon_multiqc = SALMON_ALEVIN.out.alevin_results
 
     /*
     * Run alevinQC
     */
     ALEVINQC( SALMON_ALEVIN.out.alevin_results )
-    ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(ALEVINQC.out.versions.first().ifEmpty(null))
 
     // collect software versions
-    CUSTOM_DUMPSOFTWAREVERSIONS ( ch_software_versions.map { it }.collect() )
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+         ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 
     /*
     * MultiQC
@@ -193,7 +195,7 @@ workflow SCRNASEQ_ALEVIN {
         MULTIQC (
             ch_multiqc_config,
             ch_multiqc_custom_config.collect().ifEmpty([]),
-            CUSTOM_DUMPSOFTWAREVERSIONS.out.yaml.collect(),
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
             ch_salmon_multiqc.collect{it[1]}.ifEmpty([]),
         )

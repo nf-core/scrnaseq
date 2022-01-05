@@ -15,7 +15,7 @@ process KALLISTOBUSTOOLS_COUNT {
     path    t2c
     val     use_t1c
     val     use_t2c
-    val     workflow
+    val     sc_workflow
     val     technology
 
     output:
@@ -34,7 +34,7 @@ process KALLISTOBUSTOOLS_COUNT {
         -g $t2g \\
         $cdna \\
         $introns \\
-        --workflow $workflow \\
+        --workflow $sc_workflow \\
         -x $technology \\
         $args \\
         -o ${prefix}_kallistobustools_count \\
@@ -42,7 +42,7 @@ process KALLISTOBUSTOOLS_COUNT {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        kallistobustools: \$(echo \$(kb 2>&1) | sed 's/^kb_python //; s/Usage.*\$//')
+        kallistobustools: \$(echo \$(kb --version 2>&1) | sed 's/^.*kb_python //;s/positional arguments.*\$//')
     END_VERSIONS
     """
 }

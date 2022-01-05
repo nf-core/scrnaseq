@@ -146,11 +146,13 @@ workflow STARSOLO {
         ch_barcode_whitelist.collect(),
         protocol
     )
-    ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.versions.first().ifEmpty(null))
     ch_star_multiqc      = STAR_ALIGN.out.log_final
 
     // collect software versions
-    CUSTOM_DUMPSOFTWAREVERSIONS ( ch_software_versions.map { it }.collect() )
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+         ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 
     /*
     * MultiQC
@@ -162,7 +164,7 @@ workflow STARSOLO {
         MULTIQC (
             ch_multiqc_config,
             ch_multiqc_custom_config.collect().ifEmpty([]),
-            CUSTOM_DUMPSOFTWAREVERSIONS.out.yaml.collect(),
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
             ch_star_multiqc.collect{it[1]}.ifEmpty([]),
         )

@@ -138,10 +138,12 @@ workflow KALLISTO_BUSTOOLS {
         kb_workflow,
         protocol
     )
-    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions.first().ifEmpty(null))
 
     // collect software versions
-    CUSTOM_DUMPSOFTWAREVERSIONS ( ch_software_versions.map { it }.collect() )
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+         ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 
     /*
     * MultiQC
@@ -153,7 +155,7 @@ workflow KALLISTO_BUSTOOLS {
         MULTIQC (
             ch_multiqc_config,
             ch_multiqc_custom_config.collect().ifEmpty([]),
-            CUSTOM_DUMPSOFTWAREVERSIONS.out.yaml.collect(),
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
         )
         multiqc_report = MULTIQC.out.report.toList()

@@ -24,9 +24,13 @@ process ALEVINQC {
                 outputFormat = "html_document",
                 outputDir = "./", forceOverwrite = TRUE)
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        alevinqc: \$(Rscript -e "cat(paste(packageVersion('alevinQC'), collapse='.'))")
-    END_VERSIONS
+    yaml::write_yaml(
+        list(
+            '${task.process}'=list(
+                'alevinqc' = paste(packageVersion('alevinQC'), collapse='.')
+            )
+        ),
+        "versions.yml"
+    )
     """
 }

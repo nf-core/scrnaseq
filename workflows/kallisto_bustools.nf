@@ -71,28 +71,19 @@ ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
 ////////////////////////////////////////////////////
-/* --    Define command line options           -- */
-////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
-def kallistobustools_ref_options    = modules['kallistobustools_ref']
-def kallistobustools_count_options  = modules['kallistobustools_count']
-def multiqc_options                 = modules['multiqc_kb']
-
-////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK        }                from '../subworkflows/local/input_check'        addParams( options: [:] )
-include { GENE_MAP }                          from '../modules/local/gene_map'                addParams( options: [:] )
-include { KALLISTOBUSTOOLS_COUNT }            from '../modules/local/kallistobustools_count'  addParams( options: kallistobustools_count_options )
-include { CUSTOM_DUMPSOFTWAREVERSIONS }             from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'   addParams( options: [publish_files: ['csv':'']]       )
-include { MULTIQC }                           from '../modules/local/multiqc_kb'              addParams( options: multiqc_options )
+include { INPUT_CHECK        }                from '../subworkflows/local/input_check'
+include { GENE_MAP }                          from '../modules/local/gene_map'
+include { KALLISTOBUSTOOLS_COUNT }            from '../modules/local/kallistobustools_count'
+include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { MULTIQC }                           from '../modules/local/multiqc_kb'
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'                    addParams( options: [:] )
-include { KALLISTOBUSTOOLS_REF }       from '../modules/nf-core/modules/kallistobustools/ref/main'       addParams( options: kallistobustools_ref_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'
+include { KALLISTOBUSTOOLS_REF }       from '../modules/nf-core/modules/kallistobustools/ref/main'
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */

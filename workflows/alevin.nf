@@ -89,33 +89,23 @@ if (params.protocol.contains("10X") && !params.barcode_whitelist){
         .set{ ch_barcode_whitelist }
 }
 
-////////////////////////////////////////////////////
-/* --    Define command line options           -- */
-////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
-def salmon_index_options            = modules['salmon_index']
-def gffread_txp2gene_options        = modules['gffread_tx2pgene']
-def salmon_alevin_options           = modules['salmon_alevin']
-def alevin_qc_options               = modules['alevinqc']
-def multiqc_options                 = modules['multiqc_alevin']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK        }                from '../subworkflows/local/input_check'        addParams( options: [:] )
-include { GFFREAD_TRANSCRIPTOME }             from '../modules/local/gffread_transcriptome'   addParams( options: [:] )
-include { SALMON_ALEVIN }                     from '../modules/local/salmon_alevin'           addParams( options: salmon_alevin_options )
-include { ALEVINQC }                          from '../modules/local/alevinqc'                addParams( options: alevin_qc_options )
-include { CUSTOM_DUMPSOFTWAREVERSIONS }             from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'   addParams( options: [publish_files: ['csv':'']]       )
-include { MULTIQC }                           from '../modules/local/multiqc_alevin'          addParams( options: multiqc_options )
+include { INPUT_CHECK        }                from '../subworkflows/local/input_check'
+include { GFFREAD_TRANSCRIPTOME }             from '../modules/local/gffread_transcriptome'
+include { SALMON_ALEVIN }                     from '../modules/local/salmon_alevin'
+include { ALEVINQC }                          from '../modules/local/alevinqc'
+include { CUSTOM_DUMPSOFTWAREVERSIONS }             from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { MULTIQC }                           from '../modules/local/multiqc_alevin'
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'              addParams( options: [:] )
-include { GFFREAD as GFFREAD_TXP2GENE } from '../modules/nf-core/modules/gffread/main'             addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }                from '../modules/nf-core/modules/salmon/index/main'        addParams( options: salmon_index_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'
+include { GFFREAD as GFFREAD_TXP2GENE } from '../modules/nf-core/modules/gffread/main'
+include { SALMON_INDEX }                from '../modules/nf-core/modules/salmon/index/main'
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */

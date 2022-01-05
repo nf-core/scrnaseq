@@ -85,28 +85,20 @@ if (params.protocol.contains("10X") && !params.barcode_whitelist){
             .set{ ch_barcode_whitelist }
 }
 
-////////////////////////////////////////////////////
-/* --    Define command line options           -- */
-////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
-def star_genomegenerate_options     = modules['star_genomegenerate']
-def star_align_options              = modules['star_align']
-def multiqc_options                 = modules['multiqc_alevin']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK        }          from '../subworkflows/local/input_check'                    addParams( options: [:] )
-include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'               addParams( options: [publish_files: ['csv':'']]       )
-include { MULTIQC }                     from '../modules/local/multiqc_alevin'                      addParams( options: multiqc_options )
-include { STAR_ALIGN }                  from '../modules/local/star_align'                          addParams( options: star_align_options )
+include { INPUT_CHECK        }          from '../subworkflows/local/input_check'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { MULTIQC }                     from '../modules/local/multiqc_alevin'
+include { STAR_ALIGN }                  from '../modules/local/star_align'
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'              addParams( options: [:] )
-include { STAR_GENOMEGENERATE }         from '../modules/nf-core/modules/star/genomegenerate/main' addParams( options: star_genomegenerate_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'
+include { STAR_GENOMEGENERATE }         from '../modules/nf-core/modules/star/genomegenerate/main'
 
 
 ////////////////////////////////////////////////////

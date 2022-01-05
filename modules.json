@@ -3,6 +3,15 @@
     "homePage": "https://github.com/nf-core/scrnaseq",
     "repos": {
         "nf-core/modules": {
+            "cellranger/count": {
+                "git_sha": "e2ba70ed9a1d2f09aa77b0744ea50b447c35f696"
+            },
+            "cellranger/mkgtf": {
+                "git_sha": "e2ba70ed9a1d2f09aa77b0744ea50b447c35f696"
+            },
+            "cellranger/mkref": {
+                "git_sha": "e2ba70ed9a1d2f09aa77b0744ea50b447c35f696"
+            },
             "custom/dumpsoftwareversions": {
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },

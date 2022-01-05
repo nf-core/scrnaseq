@@ -12,15 +12,16 @@ process GFFREAD_TRANSCRIPTOME {
     path gtf
 
     output:
-    path "${genome_fasta}.transcriptome.fa" , emit: transcriptome_extracted
-    path "*.version.txt"                    , emit: version
+    path "${genome_fasta}.transcriptome.fa", emit: transcriptome_extracted
+    path "versions.yml"                    , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
-
     """
     gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
 
-    echo \$(gffread --version 2>&1) > ${software}.version.txt
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        gffread: \$(gffread --version 2>&1)
+    END_VERSIONS
     """
 }

@@ -12,11 +12,10 @@ process ALEVINQC {
 
     output:
     tuple val(meta), path("alevin_report_${meta.id}.html"), emit: report
-    path "*.version.txt"                      , emit: version
+    path  "versions.yml"                      , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+    def prefix = task.ext.prefix ?: "${meta.id}"
     """
     #!/usr/bin/env Rscript
     require(alevinQC)
@@ -24,6 +23,10 @@ process ALEVINQC {
                 outputFile = "alevin_report_${meta.id}.html",
                 outputFormat = "html_document",
                 outputDir = "./", forceOverwrite = TRUE)
-    write(as.character(packageVersion("alevinQC")), paste0("${software}", ".version.txt"))
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        alevinqc: \$(Rscript -e "cat(paste(packageVersion('alevinQC'), collapse='.'))")
+    END_VERSIONS
     """
 }

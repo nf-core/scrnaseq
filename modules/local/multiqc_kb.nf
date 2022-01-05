@@ -11,7 +11,6 @@ process MULTIQC {
     path multiqc_custom_config
     path software_versions
     path workflow_summary
-    //path ('salmon_alevin/*')
 
     output:
     path "*multiqc_report.html"     , emit: report
@@ -21,7 +20,6 @@ process MULTIQC {
     path "*_plots"                  , optional:true, emit: plots
 
     script:
-    def software      = getSoftwareName(task.process)
     def custom_config = params.multiqc_config ? "--config $multiqc_custom_config" : ''
     """
     multiqc -f $options.args $custom_config .

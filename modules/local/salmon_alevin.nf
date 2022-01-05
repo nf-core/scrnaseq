@@ -16,11 +16,11 @@ process SALMON_ALEVIN {
 
     output:
     tuple val(meta), path("*_alevin_results"), emit: alevin_results
-    path "*.version.txt"                     , emit: version
+    path  "versions.yml"                     , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
     """
     salmon alevin \\
         -l ISR \\
@@ -31,11 +31,14 @@ process SALMON_ALEVIN {
         -i $index \\
         --tgMap $txp2gene \\
         --dumpFeatures --dumpMtx \\
-        $options.args \\
+        $args \\
         -o ${prefix}_alevin_results
 
     mv ${whitelist} ${prefix}_alevin_results/alevin/whitelist.txt
 
-    salmon --version | sed -e "s/salmon //g" > ${software}.version.txt
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        salmon: \$(salmon --version | sed -e "s/salmon //g")
+    END_VERSIONS
     """
 }

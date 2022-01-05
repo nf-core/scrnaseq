@@ -142,7 +142,7 @@ workflow KALLISTO_BUSTOOLS {
 
     // collect software versions
     CUSTOM_DUMPSOFTWAREVERSIONS (
-         ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
+        ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
     /*

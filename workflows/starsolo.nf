@@ -85,28 +85,20 @@ if (params.protocol.contains("10X") && !params.barcode_whitelist){
             .set{ ch_barcode_whitelist }
 }
 
-////////////////////////////////////////////////////
-/* --    Define command line options           -- */
-////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
-def star_genomegenerate_options     = modules['star_genomegenerate']
-def star_align_options              = modules['star_align']
-def multiqc_options                 = modules['multiqc_alevin']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK        }          from '../subworkflows/local/input_check'                    addParams( options: [:] )
-include { GET_SOFTWARE_VERSIONS }       from '../modules/local/get_software_versions'               addParams( options: [publish_files: ['csv':'']]       )
-include { MULTIQC }                     from '../modules/local/multiqc_alevin'                      addParams( options: multiqc_options )
-include { STAR_ALIGN }                  from '../modules/local/star_align'                          addParams( options: star_align_options )
+include { INPUT_CHECK        }          from '../subworkflows/local/input_check'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { MULTIQC }                     from '../modules/local/multiqc_alevin'
+include { STAR_ALIGN }                  from '../modules/local/star_align'
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'              addParams( options: [:] )
-include { STAR_GENOMEGENERATE }         from '../modules/nf-core/modules/star/genomegenerate/main' addParams( options: star_genomegenerate_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'
+include { STAR_GENOMEGENERATE }         from '../modules/nf-core/modules/star/genomegenerate/main'
 
 
 ////////////////////////////////////////////////////
@@ -121,6 +113,7 @@ workflow STARSOLO {
     * Check input files and stage input data
     */
     INPUT_CHECK( ch_input )
+    .reads
     .map {
         meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
         [ meta, reads ]
@@ -131,8 +124,8 @@ workflow STARSOLO {
 
     // unzip barcodes
     if (params.protocol.contains("10X") && !params.barcode_whitelist) {
-        GUNZIP( barcode_whitelist_gzipped )
-        ch_barcode_whitelist = GUNZIP.out.gunzip
+        GUNZIP( barcode_whitelist_gzipped.map{ it -> [[:], it]} )
+        ch_barcode_whitelist = GUNZIP.out.gunzip.map{ meta, res -> res}
     }
 
     /*
@@ -153,11 +146,13 @@ workflow STARSOLO {
         ch_barcode_whitelist.collect(),
         protocol
     )
-    ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.versions.first().ifEmpty(null))
     ch_star_multiqc      = STAR_ALIGN.out.log_final
 
     // collect software versions
-    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+        ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 
     /*
     * MultiQC
@@ -169,7 +164,7 @@ workflow STARSOLO {
         MULTIQC (
             ch_multiqc_config,
             ch_multiqc_custom_config.collect().ifEmpty([]),
-            GET_SOFTWARE_VERSIONS.out.yaml.collect(),
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
             ch_star_multiqc.collect{it[1]}.ifEmpty([]),
         )

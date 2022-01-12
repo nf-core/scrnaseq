@@ -89,33 +89,23 @@ if (params.protocol.contains("10X") && !params.barcode_whitelist){
         .set{ ch_barcode_whitelist }
 }
 
-////////////////////////////////////////////////////
-/* --    Define command line options           -- */
-////////////////////////////////////////////////////
-def modules = params.modules.clone()
-
-def salmon_index_options            = modules['salmon_index']
-def gffread_txp2gene_options        = modules['gffread_tx2pgene']
-def salmon_alevin_options           = modules['salmon_alevin']
-def alevin_qc_options               = modules['alevinqc']
-def multiqc_options                 = modules['multiqc_alevin']
 
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK        }                from '../subworkflows/local/input_check'        addParams( options: [:] )
-include { GFFREAD_TRANSCRIPTOME }             from '../modules/local/gffread_transcriptome'   addParams( options: [:] )
-include { SALMON_ALEVIN }                     from '../modules/local/salmon_alevin'           addParams( options: salmon_alevin_options )
-include { ALEVINQC }                          from '../modules/local/alevinqc'                addParams( options: alevin_qc_options )
-include { GET_SOFTWARE_VERSIONS }             from '../modules/local/get_software_versions'   addParams( options: [publish_files: ['csv':'']]       )
-include { MULTIQC }                           from '../modules/local/multiqc_alevin'          addParams( options: multiqc_options )
+include { INPUT_CHECK        }                from '../subworkflows/local/input_check'
+include { GFFREAD_TRANSCRIPTOME }             from '../modules/local/gffread_transcriptome'
+include { SALMON_ALEVIN }                     from '../modules/local/salmon_alevin'
+include { ALEVINQC }                          from '../modules/local/alevinqc'
+include { CUSTOM_DUMPSOFTWAREVERSIONS }             from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { MULTIQC }                           from '../modules/local/multiqc_alevin'
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'              addParams( options: [:] )
-include { GFFREAD as GFFREAD_TXP2GENE } from '../modules/nf-core/modules/gffread/main'             addParams( options: gffread_txp2gene_options )
-include { SALMON_INDEX }                from '../modules/nf-core/modules/salmon/index/main'        addParams( options: salmon_index_options )
+include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'
+include { GFFREAD as GFFREAD_TXP2GENE } from '../modules/nf-core/modules/gffread/main'
+include { SALMON_INDEX }                from '../modules/nf-core/modules/salmon/index/main'
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -129,6 +119,7 @@ workflow SCRNASEQ_ALEVIN {
     * Check input files and stage input data
     */
     INPUT_CHECK( ch_input )
+    .reads
     .map {
         meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
         [ meta, reads ]
@@ -139,15 +130,15 @@ workflow SCRNASEQ_ALEVIN {
 
     // unzip barcodes
     if (params.protocol.contains("10X") && !params.barcode_whitelist) {
-        GUNZIP( barcode_whitelist_gzipped )
-        ch_barcode_whitelist = GUNZIP.out.gunzip
+        GUNZIP( barcode_whitelist_gzipped.map { it -> [[:], it] } )
+        ch_barcode_whitelist = GUNZIP.out.gunzip.map{ meta, res -> res}
     }
 
     // Preprocessing - Extract transcriptome fasta from genome fasta
     if (!params.transcript_fasta && params.genome_fasta && params.gtf) {
         GFFREAD_TRANSCRIPTOME( genome_fasta, gtf )
         transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
-        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.version.first().ifEmpty(null))
+        ch_software_versions = ch_software_versions.mix(GFFREAD_TRANSCRIPTOME.out.versions.first().ifEmpty(null))
     }
 
     /*
@@ -165,8 +156,8 @@ workflow SCRNASEQ_ALEVIN {
         GFFREAD_TXP2GENE( gtf )
         ch_txp2gene = GFFREAD_TXP2GENE.out.gtf
         // Only collect version if not already done for gffread
-        if (!GFFREAD_TRANSCRIPTOME.out.version) {
-            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.version.first().ifEmpty(null))
+        if (!GFFREAD_TRANSCRIPTOME.out.versions) {
+            ch_software_versions = ch_software_versions.mix(GFFREAD_TXP2GENE.out.versions.first().ifEmpty(null))
         }
     }
 
@@ -180,17 +171,19 @@ workflow SCRNASEQ_ALEVIN {
         protocol,
         ch_barcode_whitelist.collect()
     )
-    ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(SALMON_ALEVIN.out.versions.first().ifEmpty(null))
     ch_salmon_multiqc = SALMON_ALEVIN.out.alevin_results
 
     /*
     * Run alevinQC
     */
     ALEVINQC( SALMON_ALEVIN.out.alevin_results )
-    ch_software_versions = ch_software_versions.mix(ALEVINQC.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(ALEVINQC.out.versions.first().ifEmpty(null))
 
     // collect software versions
-    GET_SOFTWARE_VERSIONS ( ch_software_versions.map { it }.collect() )
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+        ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 
     /*
     * MultiQC
@@ -202,7 +195,7 @@ workflow SCRNASEQ_ALEVIN {
         MULTIQC (
             ch_multiqc_config,
             ch_multiqc_custom_config.collect().ifEmpty([]),
-            GET_SOFTWARE_VERSIONS.out.yaml.collect(),
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
             ch_salmon_multiqc.collect{it[1]}.ifEmpty([]),
         )

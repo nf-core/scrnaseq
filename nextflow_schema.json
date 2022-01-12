@@ -107,7 +107,7 @@
                 },
                 "transcript_fasta": {
                     "type": "string",
-                    "description": "A cDNA fastq file",
+                    "description": "A cDNA FASTQ file",
                     "fa_icon": "fas fa-dna"
                 },
                 "gtf": {

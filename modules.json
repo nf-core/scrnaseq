@@ -4,13 +4,13 @@
     "repos": {
         "nf-core/modules": {
             "fastqc": {
-                "git_sha": "e937c7950af70930d1f34bb961403d9d2aa81c7d"
+                "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "gffread": {
-                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+                "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
             },
             "gunzip": {
-                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "kallistobustools/count": {
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
@@ -19,16 +19,16 @@
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "multiqc": {
-                "git_sha": "e937c7950af70930d1f34bb961403d9d2aa81c7d"
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "salmon/index": {
-                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             },
             "salmon/quant": {
-                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
+                "git_sha": "d473a247d2e0c619b0df877ea19d9a5a98c8e3c8"
             },
             "star/genomegenerate": {
-                "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
+                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
             }
         }
     }

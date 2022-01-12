@@ -139,8 +139,8 @@ workflow KALLISTO_BUSTOOLS {
         ch_fastq,
         ch_kallisto_index.collect(),
         ch_kallisto_gene_map.collect(),
-        false,
-        false,
+        [],
+        [],
         kb_workflow,
         protocol
     )

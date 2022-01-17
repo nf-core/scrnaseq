@@ -50,10 +50,16 @@
                 },
                 "aligner": {
                     "type": "string",
-                    "description": "Name of the tool to use for scRNA (pseudo-) alignment. Available are: \"alevin\", \"star\", \"kallisto\". Default 'alevin'.",
+                    "description": "Name of the tool to use for scRNA (pseudo-) alignment.",
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
-                    "fa_icon": "fas fa-align-center"
+                    "fa_icon": "fas fa-align-center",
+                    "enum": [
+                        "salmon",
+                        "star",
+                        "alevin",
+                        "cellranger"
+                    ]
                 },
                 "protocol": {
                     "type": "string",

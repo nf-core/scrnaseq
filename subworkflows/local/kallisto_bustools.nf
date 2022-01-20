@@ -1,17 +1,16 @@
 ////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
-include { INPUT_CHECK }                       from '../subworkflows/local/input_check'
-include { GENE_MAP }                          from '../modules/local/gene_map'
-include { KALLISTOBUSTOOLS_COUNT }            from '../modules/local/kallistobustools_count'
-include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
-include { MULTIQC }                           from '../modules/local/multiqc_kb'
+include { GENE_MAP }                          from '../../modules/local/gene_map'
+include { KALLISTOBUSTOOLS_COUNT }            from '../../modules/local/kallistobustools_count'
+include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { MULTIQC }                           from '../../modules/local/multiqc_kb'
 
 ////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 ////////////////////////////////////////////////////
-include { GUNZIP }                      from '../modules/nf-core/modules/gunzip/main'
-include { KALLISTOBUSTOOLS_REF }        from '../modules/nf-core/modules/kallistobustools/ref/main'
+include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
+include { KALLISTOBUSTOOLS_REF }        from '../../modules/nf-core/modules/kallistobustools/ref/main'
 
 ////////////////////////////////////////////////////
 /* --           RUN MAIN WORKFLOW              -- */
@@ -77,21 +76,21 @@ workflow KALLISTO_BUSTOOLS {
         ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
-    /*
-    * MultiQC
-    */
-    if (!params.skip_multiqc) {
-        workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-        ch_workflow_summary = Channel.value(workflow_summary)
+    // /*
+    // * MultiQC
+    // */
+    // if (!params.skip_multiqc) {
+    //     workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
+    //     ch_workflow_summary = Channel.value(workflow_summary)
 
-        MULTIQC (
-            ch_multiqc_config,
-            ch_multiqc_custom_config.collect().ifEmpty([]),
-            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
-        )
-        multiqc_report = MULTIQC.out.report.toList()
-    }
+    //     MULTIQC (
+    //         ch_multiqc_config,
+    //         ch_multiqc_custom_config.collect().ifEmpty([]),
+    //         CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
+    //         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
+    //     )
+    //     multiqc_report = MULTIQC.out.report.toList()
+    // }
 
     emit:
     ch_software_versions

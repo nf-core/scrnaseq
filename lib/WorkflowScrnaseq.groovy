@@ -10,30 +10,10 @@ class WorkflowScrnaseq {
     public static void initialise(params, log) {
         genomeExists(params, log)
 
-        assert !params.genome_fasta || (new File(params.genome_fasta).exists()):
-            "Genome fasta file not found. Specify with e.g. '--genome_fasta genome.fa' or via a detectable config file"
-
-        assert !params.gtf || (new File(params.gtf).exists()):
-             "GTF annotation file not found"
-
-        assert !params.transcript_fasta || (new File(params.transcript_fasta).exists()):
-             "Transcript FASTA file not found"
-
-        assert !params.salmon_index || (new File(params.salmon_index).exists()):
-             "Salmon index not found"
-
-        assert !params.kallisto_index || (new File(params.kallisto_index).exists()):
-             "Kallisto index not found"
-
-        assert !params.star_index || (new File(params.star_index).exists()):
-             "STAR index not found"
-
-        assert !params.txp2gene || (new File(params.txp2gene).exists()):
-             "Transcript to gene mapping (txp2gene) not found"
-
-        assert params.input && (new File(params.input).exists()):
-            "Input samplesheet (--input) not found"
-
+        if (!params.input) {
+            log.error "Please provide an input samplesheet with --input"
+            System.exit(1)
+        }
     }
 
     //

@@ -72,7 +72,7 @@ ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
 // Get the protocol parameter
-(protocol, chemistry) = Workflow.formatProtocol(params.protocol, "alevin")
+(protocol, chemistry) = WorkflowScrnaseq.formatProtocol(params.protocol, "alevin")
 
 //Whitelist files for STARsolo and Kallisto
 whitelist_folder = "$baseDir/assets/whitelist/"

@@ -2,7 +2,6 @@
 include { GFFREAD_TRANSCRIPTOME }             from '../../modules/local/gffread_transcriptome'
 include { SALMON_ALEVIN }                     from '../../modules/local/salmon_alevin'
 include { ALEVINQC }                          from '../../modules/local/alevinqc'
-include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 include { MULTIQC }                           from '../../modules/local/multiqc_alevin'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -81,10 +80,6 @@ workflow SCRNASEQ_ALEVIN {
     ALEVINQC( SALMON_ALEVIN.out.alevin_results )
     ch_versions = ch_versions.mix(ALEVINQC.out.versions)
 
-    // collect software versions
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
 
     // /*
     // * MultiQC
@@ -109,18 +104,3 @@ workflow SCRNASEQ_ALEVIN {
     alevinqc = ALEVINQC.out.report
 
 }
-
-////////////////////////////////////////////////////
-/* --              COMPLETION EMAIL            -- */
-////////////////////////////////////////////////////
-
-workflow.onComplete {
-    if (params.email || params.email_on_fail) {
-        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
-    }
-    NfcoreTemplate.summary(workflow, params, log)
-}
-
-////////////////////////////////////////////////////
-/* --                  THE END                 -- */
-////////////////////////////////////////////////////

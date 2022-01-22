@@ -23,11 +23,12 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 ========================================================================================
 */
 
-include { INPUT_CHECK }       from '../subworkflows/local/input_check'
+include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN } from '../subworkflows/local/alevin'
-// include { STARSOLO } from '../subworkflows/local/starsolo'
+include { STARSOLO } from '../subworkflows/local/starsolo'
 
+include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
 ========================================================================================
@@ -50,6 +51,7 @@ ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
 ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 ch_txp2gene = params.txp2gene ? file(txp2gene) : []
+ch_star_index = params.star_index ? file(params.star_index) : []
 kb_workflow = params.kb_workflow
 
 if (params.barcode_whitelist) {
@@ -62,9 +64,9 @@ if (params.barcode_whitelist) {
 
 workflow SCRNASEQ {
 
-    /*
-    * Check input files and stage input data
-    */
+    ch_versions = Channel.empty()
+
+    // Check input files and stage input data
     ch_fastq = INPUT_CHECK( ch_input )
         .reads
         .map {
@@ -86,6 +88,7 @@ workflow SCRNASEQ {
             kb_workflow,
             ch_fastq
         )
+        ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
     }
 
     // Run salmon alevin pipeline
@@ -101,15 +104,28 @@ workflow SCRNASEQ {
             chemistry,
             ch_fastq
         )
+        ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
     }
 
-    // // Run STARSolo pipeline
-    // if (params.aligner == "star") {
-    //     STARSOLO()
-    // }
+    // Run STARSolo pipeline
+    if (params.aligner == "star") {
+        STARSOLO(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_star_index,
+            protocol,
+            ch_barcode_whitelist,
+            ch_fastq
+        )
+        ch_versions.mix(STARSOLO.out.ch_versions)
+    }
 
     // TODO multiqc
-    // TODO dumpsoftwareversions
+
+    // collect software versions
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 
 }
 

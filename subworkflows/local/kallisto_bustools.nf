@@ -1,20 +1,12 @@
-////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-////////////////////////////////////////////////////
 include { GENE_MAP }                          from '../../modules/local/gene_map'
 include { KALLISTOBUSTOOLS_COUNT }            from '../../modules/local/kallistobustools_count'
-include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 include { MULTIQC }                           from '../../modules/local/multiqc_kb'
 
-////////////////////////////////////////////////////
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-////////////////////////////////////////////////////
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
 include { KALLISTOBUSTOOLS_REF }        from '../../modules/nf-core/modules/kallistobustools/ref/main'
 
-////////////////////////////////////////////////////
-/* --           RUN MAIN WORKFLOW              -- */
-////////////////////////////////////////////////////
 def multiqc_report    = []
 
 workflow KALLISTO_BUSTOOLS {
@@ -73,10 +65,7 @@ workflow KALLISTO_BUSTOOLS {
     )
     ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions)
 
-    // collect software versions
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
+
 
     // /*
     // * MultiQC

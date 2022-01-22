@@ -29,7 +29,7 @@ workflow KALLISTO_BUSTOOLS {
     ch_fastq
 
     main:
-    ch_software_versions = Channel.empty()
+    ch_versions = Channel.empty()
 
     assert kallisto_index || (genome_fasta && gtf):
         "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
@@ -44,6 +44,7 @@ workflow KALLISTO_BUSTOOLS {
     if (!txp2gene && kallisto_index) {
         GENE_MAP( gtf )
         txp2gene = GENE_MAP.out.gene_map
+        ch_versions = ch_versions.mix(GENE_MAP.out.versions)
     }
 
     /*
@@ -53,6 +54,7 @@ workflow KALLISTO_BUSTOOLS {
         KALLISTOBUSTOOLS_REF( genome_fasta, gtf, kb_workflow )
         txp2gene = KALLISTOBUSTOOLS_REF.out.t2g.collect()
         kallisto_index = KALLISTOBUSTOOLS_REF.out.index.collect()
+        ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_REF.out.versions)
     }
 
     /*
@@ -69,11 +71,11 @@ workflow KALLISTO_BUSTOOLS {
         kb_workflow,
         protocol
     )
-    ch_software_versions = ch_software_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions.first().ifEmpty(null))
+    ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions)
 
     // collect software versions
     CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
     // /*
@@ -93,7 +95,7 @@ workflow KALLISTO_BUSTOOLS {
     // }
 
     emit:
-    ch_software_versions
+    ch_versions
     counts = KALLISTOBUSTOOLS_COUNT.out.counts
 
 

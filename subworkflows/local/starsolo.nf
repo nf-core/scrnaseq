@@ -116,7 +116,7 @@ workflow STARSOLO {
     samples
 
     main:
-    ch_software_versions = Channel.empty()
+    ch_versions = Channel.empty()
 
     /*
     * Check input files and stage input data
@@ -155,12 +155,12 @@ workflow STARSOLO {
         ch_barcode_whitelist.collect(),
         protocol
     )
-    ch_software_versions = ch_software_versions.mix(STAR_ALIGN.out.versions.first().ifEmpty(null))
+    ch_versions = ch_versions.mix(STAR_ALIGN.out.versions.first().ifEmpty(null))
     ch_star_multiqc      = STAR_ALIGN.out.log_final
 
     // collect software versions
     CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_software_versions.unique().collectFile(name: 'collated_versions.yml')
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
     /*

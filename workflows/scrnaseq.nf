@@ -12,7 +12,7 @@ WorkflowScrnaseq.initialise(params, log)
 def checkPathParamList = [
     params.input, params.multiqc_config, params.genome_fasta, params.gtf,
     params.transcript_fasta, params.salmon_index, params.kallisto_index,
-    params.star_index, params.txp2gene
+    params.star_index, params.txp2gene, params.barcode_whitelist
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -25,7 +25,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 
 include { INPUT_CHECK }       from '../subworkflows/local/input_check'
 include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
-// include { SCRNASEQ_ALEVIN } from '../subworkflows/local/alevin'
+include { SCRNASEQ_ALEVIN } from '../subworkflows/local/alevin'
 // include { STARSOLO } from '../subworkflows/local/starsolo'
 
 
@@ -46,9 +46,19 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 ch_input = file(params.input)
 ch_genome_fasta = params.genome_fasta ? file(params.genome_fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
-ch_kallisto_index = params.kallisto_index ? file(kallisto_index) : []
+ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
+ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
+ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 ch_txp2gene = params.txp2gene ? file(txp2gene) : []
 kb_workflow = params.kb_workflow
+
+if (params.barcode_whitelist) {
+    ch_barcode_whitelist = file(params.barcode_whitelist)
+} else if (params.protocol.contains("10X")) {
+    ch_barcode_whitelist = file("$baseDir/assets/whitelist/10x_${chemistry}_barcode_whitelist.txt.gz", checkIfExists: true)
+} else {
+    ch_barcode_whitelist = []
+}
 
 workflow SCRNASEQ {
 
@@ -78,10 +88,20 @@ workflow SCRNASEQ {
         )
     }
 
-    // // Run salmon alevin pipeline
-    // if (params.aligner == "alevin") {
-    //     SCRNASEQ_ALEVIN()
-    // }
+    // Run salmon alevin pipeline
+    if (params.aligner == "alevin") {
+        SCRNASEQ_ALEVIN(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_transcript_fasta,
+            ch_salmon_index,
+            ch_txp2gene,
+            ch_barcode_whitelist,
+            protocol,
+            chemistry,
+            ch_fastq
+        )
+    }
 
     // // Run STARSolo pipeline
     // if (params.aligner == "star") {
@@ -89,6 +109,7 @@ workflow SCRNASEQ {
     // }
 
     // TODO multiqc
+    // TODO dumpsoftwareversions
 
 }
 

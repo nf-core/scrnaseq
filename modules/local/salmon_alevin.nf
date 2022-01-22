@@ -34,7 +34,7 @@ process SALMON_ALEVIN {
         $args \\
         -o ${prefix}_alevin_results
 
-    mv ${whitelist} ${prefix}_alevin_results/alevin/whitelist.txt
+    gzip -cdf ${whitelist} > ${prefix}_alevin_results/alevin/whitelist.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

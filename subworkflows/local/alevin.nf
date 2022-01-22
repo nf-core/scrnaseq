@@ -33,7 +33,7 @@ workflow SCRNASEQ_ALEVIN {
         and a transcriptome fasta file ('--transcriptome_fasta`) if no index is given!""".stripIndent()
 
     assert txp2gene || gtf:
-         "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
+        "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
 
 
     /*

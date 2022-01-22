@@ -27,7 +27,7 @@ workflow KALLISTO_BUSTOOLS {
         "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
 
     assert txp2gene || gtf:
-         "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
+        "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
 
     /*
     * Generate Kallisto Gene Map if not supplied and index is given

@@ -38,9 +38,9 @@ workflow SCRNASEQ_ALEVIN {
     /*
     * Build salmon index
     */
-    if (!params.salmon_index) {
+    if (!salmon_index) {
         // Preprocessing - Extract transcriptome fasta from genome fasta
-        if (!params.transcript_fasta) {
+        if (!transcript_fasta) {
             GFFREAD_TRANSCRIPTOME( genome_fasta, gtf )
             transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
             ch_versions = ch_versions.mix(GFFREAD_TRANSCRIPTOME.out.versions)
@@ -53,7 +53,7 @@ workflow SCRNASEQ_ALEVIN {
     /*
     * Build txp2gene map
     */
-    if (!params.txp2gene){
+    if (!txp2gene){
         GFFREAD_TXP2GENE( gtf )
         txp2gene = GFFREAD_TXP2GENE.out.gtf
         // Only collect version if not already done for gffread

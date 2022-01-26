@@ -28,7 +28,7 @@ workflow STARSOLO {
     /*
     * Build STAR index if not supplied
     */
-    if (!params.star_index) {
+    if (!star_index) {
         STAR_GENOMEGENERATE( genome_fasta, gtf )
         star_index = STAR_GENOMEGENERATE.out.index.collect()
         ch_versions = ch_versions.mix(STAR_GENOMEGENERATE.out.versions)

@@ -1,5 +1,5 @@
 process CELLRANGER_COUNT {
-    tag "$meta.gem"
+    // tag { "$meta.gem" }
     label 'process_high'
 
     if (params.enable_conda) {

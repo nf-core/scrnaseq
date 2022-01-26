@@ -1,7 +1,6 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { GENE_MAP }                          from '../../modules/local/gene_map'
 include { KALLISTOBUSTOOLS_COUNT }            from '../../modules/local/kallistobustools_count'
-include { MULTIQC }                           from '../../modules/local/multiqc_kb'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
@@ -65,23 +64,6 @@ workflow KALLISTO_BUSTOOLS {
     )
     ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions)
 
-
-
-    // /*
-    // * MultiQC
-    // */
-    // if (!params.skip_multiqc) {
-    //     workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-    //     ch_workflow_summary = Channel.value(workflow_summary)
-
-    //     MULTIQC (
-    //         ch_multiqc_config,
-    //         ch_multiqc_custom_config.collect().ifEmpty([]),
-    //         CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
-    //         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
-    //     )
-    //     multiqc_report = MULTIQC.out.report.toList()
-    // }
 
     emit:
     ch_versions

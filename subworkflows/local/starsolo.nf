@@ -1,5 +1,4 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { MULTIQC }                     from '../../modules/local/multiqc_alevin'
 include { STAR_ALIGN }                  from '../../modules/local/star_align'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -46,28 +45,12 @@ workflow STARSOLO {
         protocol
     )
     ch_versions = ch_versions.mix(STAR_ALIGN.out.versions)
-    ch_star_multiqc = STAR_ALIGN.out.log_final
 
-
-    // /*
-    // * MultiQC
-    // */
-    // if (!params.skip_multiqc) {
-    //     workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-    //     ch_workflow_summary = Channel.value(workflow_summary)
-
-    //     MULTIQC (
-    //         ch_multiqc_config,
-    //         ch_multiqc_custom_config.collect().ifEmpty([]),
-    //         CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
-    //         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
-    //         ch_star_multiqc.collect{it[1]}.ifEmpty([]),
-    //     )
-    //     multiqc_report = MULTIQC.out.report.toList()
-    // }
 
     emit:
     ch_versions
     star_result = STAR_ALIGN.out.tab
+    for_multiqc = STAR_ALIGN.out.log_final.collect{it[1]}.ifEmpty([])
+
 
 }

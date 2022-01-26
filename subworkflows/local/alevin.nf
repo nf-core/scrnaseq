@@ -2,7 +2,6 @@
 include { GFFREAD_TRANSCRIPTOME }             from '../../modules/local/gffread_transcriptome'
 include { SALMON_ALEVIN }                     from '../../modules/local/salmon_alevin'
 include { ALEVINQC }                          from '../../modules/local/alevinqc'
-include { MULTIQC }                           from '../../modules/local/multiqc_alevin'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
@@ -72,7 +71,6 @@ workflow SCRNASEQ_ALEVIN {
         barcode_whitelist
     )
     ch_versions = ch_versions.mix(SALMON_ALEVIN.out.versions)
-    ch_salmon_multiqc = SALMON_ALEVIN.out.alevin_results
 
     /*
     * Run alevinQC
@@ -80,27 +78,10 @@ workflow SCRNASEQ_ALEVIN {
     ALEVINQC( SALMON_ALEVIN.out.alevin_results )
     ch_versions = ch_versions.mix(ALEVINQC.out.versions)
 
-
-    // /*
-    // * MultiQC
-    // */
-    // if (!params.skip_multiqc) {
-    //     workflow_summary    = Workflow.paramsSummaryMultiqc(workflow, params.summary_params)
-    //     ch_workflow_summary = Channel.value(workflow_summary)
-
-    //     MULTIQC (
-    //         ch_multiqc_config,
-    //         ch_multiqc_custom_config.collect().ifEmpty([]),
-    //         CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
-    //         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'),
-    //         ch_salmon_multiqc.collect{it[1]}.ifEmpty([]),
-    //     )
-    //     multiqc_report = MULTIQC.out.report.toList()
-    // }
-
     emit:
     ch_versions
     alevin_results = SALMON_ALEVIN.out.alevin_results
     alevinqc = ALEVINQC.out.report
+    for_multiqc = SALMON_ALEVIN.out.alevin_results.collect{it[1]}.ifEmpty([])
 
 }

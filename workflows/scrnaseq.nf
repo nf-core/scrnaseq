@@ -28,7 +28,8 @@ include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN } from '../subworkflows/local/alevin'
 include { STARSOLO } from '../subworkflows/local/starsolo'
 
-include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { MULTIQC } from "../modules/local/multiqc"
 
 /*
 ========================================================================================
@@ -39,7 +40,7 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS }       from '../modules/nf-core/modules/c
 // Info required for completion email and summary
 def multiqc_report = []
 ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
-ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+ch_multiqc_custom_config = params.multiqc_config ? file(params.multiqc_config) : []
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 (protocol, chemistry) = WorkflowScrnaseq.formatProtocol(params.protocol, params.aligner)
@@ -52,6 +53,8 @@ ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): [
 ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 ch_txp2gene = params.txp2gene ? file(txp2gene) : []
 ch_star_index = params.star_index ? file(params.star_index) : []
+ch_multiqc_alevin = []
+ch_multiqc_star = []
 kb_workflow = params.kb_workflow
 
 if (params.barcode_whitelist) {
@@ -75,6 +78,8 @@ workflow SCRNASEQ {
         }
         .groupTuple(by: [0])
         .map { it -> [ it[0], it[1].flatten() ] }
+
+    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
@@ -105,6 +110,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
+        ch_multiqc_alevin = SCRNASEQ_ALEVIN.out.for_multiqc
     }
 
     // Run STARSolo pipeline
@@ -117,15 +123,29 @@ workflow SCRNASEQ {
             ch_barcode_whitelist,
             ch_fastq
         )
-        ch_versions.mix(STARSOLO.out.ch_versions)
+        ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
+        ch_multiqc_star = STARSOLO.out.for_multiqc
     }
-
-    // TODO multiqc
 
     // collect software versions
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
+
+    if (!params.skip_multiqc) {
+        ch_workflow_summary = Channel.value(
+            WorkflowScrnaseq.paramsSummaryMultiqc(workflow, summary_params)
+        ).collectFile(name: 'workflow_summary_mqc.yaml')
+
+        MULTIQC(
+            ch_multiqc_config,
+            ch_multiqc_custom_config,
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
+            ch_workflow_summary,
+            ch_multiqc_alevin,
+            ch_multiqc_star
+        )
+    }
 
 }
 

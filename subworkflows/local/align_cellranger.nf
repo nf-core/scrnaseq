@@ -6,10 +6,10 @@ params.cellranger_mkgtf_options    = [:]
 params.cellranger_mkref_options    = [:]
 params.cellranger_count_options    = [:]
 
-include {METADATA} from "../../modules/local/software/metadata/main.nf" addParams(options: params.cellranger_mkgtf_options)
-include {CELLRANGER_MKGTF} from "../../modules/local/software/cellranger/mkgtf/main.nf" addParams(options: params.cellranger_mkgtf_options)
-include {CELLRANGER_MKREF} from "../../modules/local/software/cellranger/mkref/main.nf" addParams(options: params.cellranger_mkref_options)
-include {CELLRANGER_COUNT} from "../../modules/local/software/cellranger/count/main.nf" addParams(options: params.cellranger_count_options)
+include {METADATA} from "../../modules/local/software/metadata/main.nf"
+include {CELLRANGER_MKGTF} from "../../modules/local/software/cellranger/mkgtf/main.nf"
+include {CELLRANGER_MKREF} from "../../modules/local/software/cellranger/mkref/main.nf"
+include {CELLRANGER_COUNT} from "../../modules/local/software/cellranger/count/main.nf"
 
 // Define workflow to subset and index a genome region fasta file
 workflow CELLRANGER_ALIGN {

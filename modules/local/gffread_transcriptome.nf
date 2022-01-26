@@ -1,38 +1,27 @@
-// Import generic module functions
-include { initOptions; saveFiles; getSoftwareName } from './functions'
-
-
-params.options = [:]
-options        = initOptions(params.options)
-
 process GFFREAD_TRANSCRIPTOME {
     tag "${genome_fasta}"
     label 'process_low'
-    publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), publish_id:'') }
 
     conda (params.enable_conda ? "bioconda::gffread=0.12.1" : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/gffread:0.12.1--h2e03b76_1"
-    } else {
-        container "quay.io/biocontainers/gffread:0.12.1--h2e03b76_1"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/gffread:0.12.1--h2e03b76_1' :
+        'quay.io/biocontainers/gffread:0.12.1--h2e03b76_1' }"
 
     input:
     path genome_fasta
     path gtf
 
     output:
-    path "${genome_fasta}.transcriptome.fa" , emit: transcriptome_extracted
-    path "*.version.txt"                    , emit: version
+    path "${genome_fasta}.transcriptome.fa", emit: transcriptome_extracted
+    path "versions.yml"                    , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
-
     """
     gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta
 
-    echo \$(gffread --version 2>&1) > ${software}.version.txt
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        gffread: \$(gffread --version 2>&1)
+    END_VERSIONS
     """
 }

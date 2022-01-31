@@ -41,7 +41,7 @@ process STAR_ALIGN {
         --readFilesIn ${reads[1]} ${reads[0]}  \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
-        --soloCBwhitelist $whitelist \\
+        --soloCBwhitelist <(gzip -cdf $whitelist) \\
         --soloType $protocol \\
         $out_sam_type \\
         $ignore_gtf \\

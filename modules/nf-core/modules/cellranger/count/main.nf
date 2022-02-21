@@ -8,7 +8,7 @@ process CELLRANGER_COUNT {
     container "nfcore/cellranger:6.0.2"
 
     input:
-    tuple val(meta), path(reads)
+    tuple val(meta), path("${meta.id}/*")
     path  reference
 
     output:

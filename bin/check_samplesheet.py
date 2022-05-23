@@ -10,11 +10,12 @@ import argparse
 
 def parse_args(args=None):
     Description = "Reformat nf-core/scrnaseq samplesheet file and check its contents."
-    Epilog = "Example usage: python check_samplesheet.py <FILE_IN> <FILE_OUT>"
+    Epilog = "Example usage: python check_samplesheet.py --cellranger <FILE_IN> <FILE_OUT>"
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
     parser.add_argument("FILE_IN", help="Input samplesheet file.")
     parser.add_argument("FILE_OUT", help="Output file.")
+    parser.add_argument('--cellranger', dest='CELLRANGER', default=False, action='store_true', help="Is it for cellranger?")
     return parser.parse_args(args)
 
 
@@ -37,7 +38,7 @@ def print_error(error, context="Line", context_str=""):
     sys.exit(1)
 
 
-def check_samplesheet(file_in, file_out):
+def check_samplesheet(file_in, file_out, is_cellranger):
     """
     This function checks that the samplesheet follows the following structure:
 
@@ -111,7 +112,13 @@ def check_samplesheet(file_in, file_out):
             if sample not in sample_mapping_dict:
                 sample_mapping_dict[sample] = [sample_info]
             else:
-                sample_mapping_dict[sample].append(sample_info)
+                if sample_info in sample_mapping_dict[sample]:
+                    if is_cellranger:
+                        sample_mapping_dict[sample].append(sample_info)
+                    else:
+                        print_error("Samplesheet contains duplicate rows!", "Line", line)
+                else:
+                    sample_mapping_dict[sample].append(sample_info)
 
     ## Write validated samplesheet with appropriate columns
     if len(sample_mapping_dict) > 0:
@@ -133,7 +140,7 @@ def check_samplesheet(file_in, file_out):
 
 def main(args=None):
     args = parse_args(args)
-    check_samplesheet(args.FILE_IN, args.FILE_OUT)
+    check_samplesheet(args.FILE_IN, args.FILE_OUT, args.CELLRANGER)
 
 
 if __name__ == "__main__":

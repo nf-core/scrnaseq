@@ -14,8 +14,10 @@ process SAMPLESHEET_CHECK {
     path "versions.yml", emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
+    def cellranger_param = (params.aligner == 'cellranger') ? '--cellranger' : ''
     """
     check_samplesheet.py \\
+        $cellranger_param \\
         $samplesheet \\
         samplesheet.valid.csv
 

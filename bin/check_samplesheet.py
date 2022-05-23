@@ -109,12 +109,15 @@ def check_samplesheet(file_in, file_out):
 
             ## Create sample mapping dictionary = { sample: [ single_end, fastq_1, fastq_2 ] }
             if sample not in sample_mapping_dict:
+                replicate = 1
                 sample_mapping_dict[sample] = [sample_info]
             else:
                 if sample_info in sample_mapping_dict[sample]:
-                    print_error("Samplesheet contains duplicate rows!", "Line", line)
+                    replicate += 1
+                    sample_mapping_dict[f"{sample}_rep{replicate}"] = [sample_info]
                 else:
-                    sample_mapping_dict[sample].append(sample_info)
+                    replicate = 1
+                    sample_mapping_dict[sample] = [sample_info]
 
     ## Write validated samplesheet with appropriate columns
     if len(sample_mapping_dict) > 0:

@@ -392,6 +392,9 @@
             "$ref": "#/definitions/kallisto_bus_options"
         },
         {
+            "$ref": "#/definitions/cellranger_options"
+        },
+        {
             "$ref": "#/definitions/institutional_config_options"
         },
         {

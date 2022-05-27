@@ -30,10 +30,10 @@ jobs:
             NXF_EDGE: '1'
         profile:
           [
+            "test_cellranger,docker --aligner cellranger",
             "test,docker --aligner alevin",
             "test,docker --aligner kallisto",
-            "test,docker --aligner star",
-            "test_cellranger,docker --aligner cellranger"
+            "test,docker --aligner star"
           ]
     steps:
       - name: Check out pipeline code

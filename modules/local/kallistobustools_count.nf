@@ -38,7 +38,7 @@ process KALLISTOBUSTOOLS_COUNT {
         -x $technology \\
         $args \\
         -o ${prefix}_kallistobustools_count \\
-        ${reads[0]} ${reads[1]}
+        ${reads.join( " " )}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

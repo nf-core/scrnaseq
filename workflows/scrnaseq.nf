@@ -85,6 +85,9 @@ workflow SCRNASEQ {
     ch_fastq = INPUT_CHECK( ch_input )
         .reads
         .map {
+            // This tokenize is still required as inputs come 
+            // from the samplesheet with an _T1 tag, which is 
+            // removed here to group reads of a sample in a single array
             meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
             [ meta, reads ]
         }

@@ -4,7 +4,7 @@
     "repos": {
         "nf-core/modules": {
             "cellranger/count": {
-                "git_sha": "e2ba70ed9a1d2f09aa77b0744ea50b447c35f696"
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
             "cellranger/mkgtf": {
                 "git_sha": "e2ba70ed9a1d2f09aa77b0744ea50b447c35f696"

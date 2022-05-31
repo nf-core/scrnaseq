@@ -112,6 +112,7 @@ def check_samplesheet(file_in, file_out):
                 sample_mapping_dict[sample] = [sample_info]
             else:
                 if sample_info in sample_mapping_dict[sample]:
+                    # print_error("Samplesheet contains duplicate rows!", "Line", line)
                     sample_mapping_dict[sample].append(sample_info)
                 else:
                     sample_mapping_dict[sample].append(sample_info)

@@ -34,11 +34,20 @@ process STAR_ALIGN {
     def seq_center = params.seq_center ? "--outSAMattrRGline ID:$prefix 'CN:$params.seq_center' 'SM:$prefix'" : "--outSAMattrRGline ID:$prefix 'SM:$prefix'"
     def out_sam_type = (args.contains('--outSAMtype')) ? '' : '--outSAMtype BAM Unsorted'
     def mv_unsorted_bam = (args.contains('--outSAMtype BAM Unsorted SortedByCoordinate')) ? "mv ${prefix}.Aligned.out.bam ${prefix}.Aligned.unsort.out.bam" : ''
-    def read_pair = params.protocol.contains("chromium") ? "${reads[1]} ${reads[0]}" : "${reads[0]} ${reads[1]}"
+    // def read_pair = params.protocol.contains("chromium") ? "${reads[1]} ${reads[0]}" : "${reads[0]} ${reads[1]}" -- commented out to be removed is it is not being used
+
+    // simple loop to separate forward from reverse pairs
+    def forward_pairs = []
+    def reverse_pairs = []
+    for (n in 1..reads.toList().size()) {
+        current_index = n - 1
+        if ( n % 2 == 0 ) { reverse_pairs.add(reads[current_index]) }
+        else { forward_pairs.add(reads[current_index]) }
+    }
     """
     STAR \\
         --genomeDir $index \\
-        --readFilesIn ${reads[1]} ${reads[0]}  \\
+        --readFilesIn ${reverse_pairs.join( "," )} ${forward_pairs.join( "," )} \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
         --soloCBwhitelist <(gzip -cdf $whitelist) \\

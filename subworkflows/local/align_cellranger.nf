@@ -35,7 +35,8 @@ workflow CELLRANGER_ALIGN {
         // Obtain read counts
         CELLRANGER_COUNT (
              // TODO what is `gem` and why is it needed?
-             ch_fastq.map{ meta, reads -> [meta + ["gem": meta.id, "samples": [meta.id]], reads]},
+             // needed to add .flatten() on reads as cellranger count module expects a flattened array
+             ch_fastq.map{ meta, reads -> [meta + ["gem": meta.id, "samples": [meta.id]], reads.flatten()] },
              cellranger_index
         )
         ch_versions = ch_versions.mix(CELLRANGER_COUNT.out.versions)

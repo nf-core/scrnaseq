@@ -82,17 +82,7 @@ workflow SCRNASEQ {
     ch_versions = Channel.empty()
 
     // Check input files and stage input data
-    ch_fastq = INPUT_CHECK( ch_input )
-        .reads
-        .map {
-            // This tokenize is still required as inputs come 
-            // from the samplesheet with an _T1 tag, which is 
-            // removed here to group reads of a sample in a single array
-            meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
-            [ meta, reads ]
-        }
-        .groupTuple(by: [0])
-        .map { it -> [ it[0], it[1].flatten() ] }
+    ch_fastq = INPUT_CHECK( ch_input ).reads
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 

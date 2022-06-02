@@ -36,18 +36,12 @@ process STAR_ALIGN {
     def mv_unsorted_bam = (args.contains('--outSAMtype BAM Unsorted SortedByCoordinate')) ? "mv ${prefix}.Aligned.out.bam ${prefix}.Aligned.unsort.out.bam" : ''
     // def read_pair = params.protocol.contains("chromium") ? "${reads[1]} ${reads[0]}" : "${reads[0]} ${reads[1]}" -- commented out to be removed is it is not being used
 
-    // simple loop to separate forward from reverse pairs
-    def forward_pairs = []
-    def reverse_pairs = []
-    for (n in 1..reads.toList().size()) {
-        current_index = n - 1
-        if ( n % 2 == 0 ) { reverse_pairs.add(reads[current_index]) }
-        else { forward_pairs.add(reads[current_index]) }
-    }
+    // separate forward from reverse pairs
+    def (forward, reverse) = reads.collate(2).transpose()
     """
     STAR \\
         --genomeDir $index \\
-        --readFilesIn ${reverse_pairs.join( "," )} ${forward_pairs.join( "," )} \\
+        --readFilesIn ${reverse.join( "," )} ${forward.join( "," )} \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
         --soloCBwhitelist <(gzip -cdf $whitelist) \\

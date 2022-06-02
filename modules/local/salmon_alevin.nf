@@ -22,20 +22,14 @@ process SALMON_ALEVIN {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
-    // simple loop to separate forward from reverse pairs
-    def forward_pairs = []
-    def reverse_pairs = []
-    for (n in 1..reads.toList().size()) {
-        current_index = n - 1
-        if ( n % 2 == 0 ) { reverse_pairs.add(reads[current_index]) }
-        else { forward_pairs.add(reads[current_index]) }
-    }
+    // separate forward from reverse pairs
+    def (forward, reverse) = reads.collate(2).transpose()
     """
     salmon alevin \\
         -l ISR \\
         -p $task.cpus \\
-        -1 ${forward_pairs.join( " " )} \\
-        -2 ${reverse_pairs.join( " " )} \\
+        -1 ${forward.join( " " )} \\
+        -2 ${reverse.join( " " )} \\
         --${protocol} \\
         -i $index \\
         --tgMap $txp2gene \\

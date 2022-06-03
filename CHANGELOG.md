@@ -5,29 +5,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0dev -
 
--   Pipeline ported to dsl2
--   Template update with latest nf-core/tools v2.1
+* Pipeline ported to dsl2
+* Template update with latest nf-core/tools v2.1
 
 ### Fixes
 
--   Make sure pipeline runs on multiple samples [#77](https://github.com/nf-core/scrnaseq/pull/77)
+* Make sure pipeline runs on multiple samples [#77](https://github.com/nf-core/scrnaseq/pull/77)
 
 ## v1.1.0 - 2021-03-24 "Olive Mercury Corgi"
 
--   Template update with latest nf-core/tools v1.13.2
--   Parameters JSON Schema added [#42](https://github.com/nf-core/scrnaseq/issues/42)
--   [25](https://github.com/nf-core/scrnaseq/issues/25) Fix small documentation error with wrong parameter for txp2gene
+* Template update with latest nf-core/tools v1.13.2
+* Parameters JSON Schema added [#42](https://github.com/nf-core/scrnaseq/issues/42)
+* [25](https://github.com/nf-core/scrnaseq/issues/25) Fix small documentation error with wrong parameter for txp2gene
 
 ### Fixes
 
--   [#20](https://github.com/nf-core/scrnaseq/issues/20) Fix Transcriptome Fasta argument not detected well
--   [#21](https://github.com/nf-core/scrnaseq/issues/21) Fix `--kallisto_index` being ignored
+* [#20](https://github.com/nf-core/scrnaseq/issues/20) Fix Transcriptome Fasta argument not detected well
+* [#21](https://github.com/nf-core/scrnaseq/issues/21) Fix `--kallisto_index` being ignored
 
 ## v1.0.0 - 2019-11-28 "Tiny Aluminium Crab"
 
 Initial release of nf-core/scrnaseq, created with the [nf-core](http://nf-co.re/) template.
 This includes the following workflow options:
 
--   Salmon Alevin + AlevinQC
--   STARSolo
--   Kallisto / BUStools
+* Salmon Alevin + AlevinQC
+* STARSolo
+* Kallisto / BUStools

@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Launch workflow via tower
         uses: nf-core/tower-action@v2
-        
+
         with:
           workspace_id: ${{ secrets.TOWER_WORKSPACE_ID }}
           access_token: ${{ secrets.TOWER_ACCESS_TOKEN }}
@@ -25,4 +25,4 @@ jobs:
               "outdir": "s3://${{ secrets.AWS_S3_BUCKET }}/scrnaseq/results-test-${{ github.sha }}"
             }
           profiles: test,aws_tower
-          pre_run_script: 'export NXF_VER=21.10.3'
+          pre_run_script: "export NXF_VER=21.10.3"

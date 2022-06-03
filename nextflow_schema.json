@@ -187,13 +187,7 @@
                     "default": "standard",
                     "description": "Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite: 10xFB` for 10x Genomics Feature Barcoding technology. (default: standard)",
                     "fa_icon": "fas fa-fish",
-                    "enum": [
-                        "standard",
-                        "lamanno",
-                        "nucleus",
-                        "kite",
-                        "kite: 10xFB"
-                    ]
+                    "enum": ["standard", "lamanno", "nucleus", "kite", "kite: 10xFB"]
                 }
             }
         },

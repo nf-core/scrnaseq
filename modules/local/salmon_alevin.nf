@@ -8,6 +8,10 @@ process SALMON_ALEVIN {
         'quay.io/biocontainers/salmon:1.4.0--h84f40af_1' }"
 
     input:
+    //
+    // Input reads are expected to come as: [ meta, [ pair1_read1, pair1_read2, pair2_read1, pair2_read2 ] ]
+    // Input array for a sample is created in the same order reads appear in samplesheet as pairs from replicates are appended to array.
+    //
     tuple val(meta), path(reads)
     path index
     path txp2gene
@@ -21,12 +25,15 @@ process SALMON_ALEVIN {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+
+    // separate forward from reverse pairs
+    def (forward, reverse) = reads.collate(2).transpose()
     """
     salmon alevin \\
         -l ISR \\
         -p $task.cpus \\
-        -1 ${reads[0]} \\
-        -2 ${reads[1]} \\
+        -1 ${forward.join( " " )} \\
+        -2 ${reverse.join( " " )} \\
         --${protocol} \\
         -i $index \\
         --tgMap $txp2gene \\

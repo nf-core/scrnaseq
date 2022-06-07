@@ -8,6 +8,10 @@ process KALLISTOBUSTOOLS_COUNT {
         'quay.io/biocontainers/kb-python:0.25.1--py_0' }"
 
     input:
+    //
+    // Input reads are expected to come as: [ meta, [ pair1_read1, pair1_read2, pair2_read1, pair2_read2 ] ]
+    // Input array for a sample is created in the same order reads appear in samplesheet as pairs from replicates are appended to array.
+    //
     tuple   val(meta),  path(reads)
     path    index
     path    t2g
@@ -38,7 +42,7 @@ process KALLISTOBUSTOOLS_COUNT {
         -x $technology \\
         $args \\
         -o ${prefix}_kallistobustools_count \\
-        ${reads[0]} ${reads[1]}
+        ${reads.join( " " )}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

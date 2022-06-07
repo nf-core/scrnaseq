@@ -12,7 +12,7 @@ WorkflowScrnaseq.initialise(params, log)
 def checkPathParamList = [
     params.input, params.multiqc_config, params.genome_fasta, params.gtf,
     params.transcript_fasta, params.salmon_index, params.kallisto_index,
-    params.star_index, params.txp2gene, params.barcode_whitelist
+    params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -27,6 +27,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN } from '../subworkflows/local/alevin'
 include { STARSOLO } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN } from "../subworkflows/local/align_cellranger"
 
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 include { MULTIQC } from "../modules/local/multiqc"
@@ -45,18 +46,14 @@ ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 (protocol, chemistry) = WorkflowScrnaseq.formatProtocol(params.protocol, params.aligner)
 
+// general input and params
 ch_input = file(params.input)
 ch_genome_fasta = params.genome_fasta ? file(params.genome_fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
-ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
-ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 ch_txp2gene = params.txp2gene ? file(txp2gene) : []
-ch_star_index = params.star_index ? file(params.star_index) : []
 ch_multiqc_alevin = []
 ch_multiqc_star = []
-kb_workflow = params.kb_workflow
-
 if (params.barcode_whitelist) {
     ch_barcode_whitelist = file(params.barcode_whitelist)
 } else if (params.protocol.contains("10X")) {
@@ -65,19 +62,27 @@ if (params.barcode_whitelist) {
     ch_barcode_whitelist = []
 }
 
+
+//kallisto params
+ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
+kb_workflow = params.kb_workflow
+
+//salmon params
+ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
+
+//star params
+ch_star_index = params.star_index ? file(params.star_index) : []
+
+//cellranger params
+ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
+
+
 workflow SCRNASEQ {
 
     ch_versions = Channel.empty()
 
     // Check input files and stage input data
-    ch_fastq = INPUT_CHECK( ch_input )
-        .reads
-        .map {
-            meta, reads -> meta.id = meta.id.split('_')[0..-2].join('_')
-            [ meta, reads ]
-        }
-        .groupTuple(by: [0])
-        .map { it -> [ it[0], it[1].flatten() ] }
+    ch_fastq = INPUT_CHECK( ch_input ).reads
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
@@ -125,6 +130,17 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_star = STARSOLO.out.for_multiqc
+    }
+
+    // Run cellranger pipeline
+    if (params.aligner == "cellranger") {
+        CELLRANGER_ALIGN(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_cellranger_index,
+            ch_fastq
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
     }
 
     // collect software versions

@@ -197,13 +197,19 @@
                     "default": "standard",
                     "description": "Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite: 10xFB` for 10x Genomics Feature Barcoding technology. (default: standard)",
                     "fa_icon": "fas fa-fish",
-                    "enum": [
-                        "standard",
-                        "lamanno",
-                        "nucleus",
-                        "kite",
-                        "kite: 10xFB"
-                    ]
+                    "enum": ["standard", "lamanno", "nucleus", "kite", "kite: 10xFB"]
+                }
+            }
+        },
+        "cellranger_options": {
+            "title": "Cellranger Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "cellranger_index": {
+                    "type": "string",
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
                 }
             }
         },
@@ -385,6 +391,9 @@
         },
         {
             "$ref": "#/definitions/kallisto_bus_options"
+        },
+        {
+            "$ref": "#/definitions/cellranger_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

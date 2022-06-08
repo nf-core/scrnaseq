@@ -70,7 +70,7 @@ ch_input = file(params.input)
 ch_genome_fasta = params.genome_fasta ? file(params.genome_fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
-ch_txp2gene = params.txp2gene ? file(txp2gene) : []
+ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = []
 ch_multiqc_star = []
 if (params.barcode_whitelist) {

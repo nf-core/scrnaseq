@@ -10,10 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input",
-                "outdir"
-            ],
+            "required": ["input", "outdir"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -59,23 +56,14 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
-                    "enum": [
-                        "kallisto",
-                        "star",
-                        "alevin",
-                        "cellranger"
-                    ]
+                    "enum": ["kallisto", "star", "alevin", "cellranger"]
                 },
                 "protocol": {
                     "type": "string",
+                    "description": "The protocol that was used to generate the single cell data, e.g. 10XV2 (default).",
                     "default": "10XV2",
                     "fa_icon": "fas fa-cogs",
-                    "enum": [
-                        "10XV3",
-                        "10XV2",
-                        "10XV1",
-                        "dropseq"
-                    ]
+                    "enum": ["10XV3", "10XV2", "10XV1", "dropseq"]
                 }
             },
             "fa_icon": "fas fa-terminal"
@@ -165,7 +153,8 @@
                     "fa_icon": "fas fa-asterisk"
                 },
                 "star_ignore_sjdbgtf": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Ignore the SJDB GTF file."
                 }
             },
             "fa_icon": "fas fa-star"
@@ -202,13 +191,7 @@
                     "default": "standard",
                     "description": "Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite: 10xFB` for 10x Genomics Feature Barcoding technology. (default: standard)",
                     "fa_icon": "fas fa-fish",
-                    "enum": [
-                        "standard",
-                        "lamanno",
-                        "nucleus",
-                        "kite",
-                        "kite: 10xFB"
-                    ]
+                    "enum": ["standard", "lamanno", "nucleus", "kite", "kite: 10xFB"]
                 }
             }
         },
@@ -326,14 +309,7 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": [
-                        "symlink",
-                        "rellink",
-                        "link",
-                        "copy",
-                        "copyNoFollow",
-                        "move"
-                    ],
+                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
                     "hidden": true
                 },
                 "email_on_fail": {
@@ -398,10 +374,8 @@
                     "fa_icon": "fas fa-bacon"
                 },
                 "skip_multiqc": {
-                    "type": "boolean"
-                },
-                "seq_center": {
-                    "type": "string"
+                    "type": "boolean",
+                    "description": "Skip the MultiQC reporting feature in the pipeline."
                 }
             }
         }

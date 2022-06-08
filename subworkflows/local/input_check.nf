@@ -12,7 +12,7 @@ workflow INPUT_CHECK {
     SAMPLESHEET_CHECK ( samplesheet )
         .csv
         .splitCsv ( header:true, sep:',' )
-        .map { create_fastq_channels(it) }
+        .map { create_fastq_channel(it) }
         .groupTuple(by: [0]) // group replicate files together, modifies channel to [ val(meta), [ [reads_rep1], [reads_repN] ] ]
         .map { meta, reads -> [ meta, reads.flatten() ] } // needs to flatten due to last "groupTuple", so we now have reads as a single array as expected by nf-core modules: [ val(meta), [ reads ] ]
         .set { reads }
@@ -24,22 +24,24 @@ workflow INPUT_CHECK {
 
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
-def create_fastq_channels(LinkedHashMap row) {
+def create_fastq_channel(LinkedHashMap row) {
+    // create meta map
     def meta = [:]
-    meta.id           = row.sample
-    meta.single_end   = row.single_end.toBoolean()
+    meta.id         = row.sample
+    meta.single_end = row.single_end.toBoolean()
 
-    def array = []
+    // add path(s) of the fastq file(s) to the meta map
+    def fastq_meta = []
     if (!file(row.fastq_1).exists()) {
         exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
     }
     if (meta.single_end) {
-        array = [ meta, [ file(row.fastq_1) ] ]
+        fastq_meta = [ meta, [ file(row.fastq_1) ] ]
     } else {
         if (!file(row.fastq_2).exists()) {
             exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
         }
-        array = [ meta, [ file(row.fastq_1), file(row.fastq_2) ] ]
+        fastq_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ] ]
     }
-    return array
+    return fastq_meta
 }

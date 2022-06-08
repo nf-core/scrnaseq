@@ -24,8 +24,6 @@
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
-<!-- TODO nf-core: Add full-sized test dataset and amend the paragraph below if applicable -->
-
 On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/scrnaseq/results).
 
 ## Pipeline summary
@@ -61,8 +59,6 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage
 
 4. Start running your own analysis!
 
-   <!-- TODO nf-core: Update the example "typical command" below used to run the pipeline -->
-
    ```console
    nextflow run nf-core/scrnaseq --input samplesheet.csv --outdir <OUTDIR> --genome_fasta GRCm38.p6.genome.chr19.fa --gtf gencode.vM19.annotation.chr19.gtf --protocol 10XV2 -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
@@ -76,6 +72,7 @@ We thank the following people for their extensive assistance in the development 
 * @KevinMenden
 * @ggabernet
 * @FloWuenne
+* @fmalmeida
 
 ## Contributions and Support
 

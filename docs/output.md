@@ -76,7 +76,7 @@ For details on how to load these into R and perform further downstream analysis,
 
 ## Cellranger
 
-Cell Ranger is a set of analysis pipelines that process Chromium single cell data to align reads, generate feature-barcode matrices, perform clustering and other secondary analysis. See [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) for more information on Cellranger.
+Cell Ranger is a set of analysis scripts that processes 10X Chromium single cell data to align reads, generate feature-barcode matrices, perform clustering and other secondary analysis. See [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) for more information on Cellranger.
 
 **Output directory: `results/cellranger`**
 

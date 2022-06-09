@@ -29,7 +29,13 @@ A final samplesheet file consisting of both single- and paired-end data may look
 
 ```console
 sample,fastq_1,fastq_2
-test,https://github.com/nf-core/test-datasets/raw/scrnaseq/testdata/S10_L001_R1_001.fastq.gz,https://github.com/nf-core/test-datasets/raw/scrnaseq/testdata/S10_L001_R2_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
+CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
+TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
+TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
+TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
+TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 ```
 
 | Column    | Description                                                                                                                                                                            |

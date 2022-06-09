@@ -46,6 +46,19 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
+## Aligning options
+
+By default, the pipeline uses [Salmon Alevin](https://salmon.readthedocs.io/en/latest/alevin.html) (i.e. --aligner alevin) to perform pseudo-alignment of reads to the reference genome and to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
+
+Other aligner options for running the pipeline are:
+
+- [Kallisto](https://pachterlab.github.io/kallisto/about) & [Bustools](https://bustools.github.io/), where kallisto is used for alignment and bustools is used for downstream analysis
+    - `--aligner kallisto`
+- [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md) to perform both alignment and downstream analysis.
+    - `--aligner star`
+- [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
+    - `--aligner cellranger`
+
 ### If using cellranger
 
 In order to use cellranger aligner, reads must be named as [required by the tool](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):

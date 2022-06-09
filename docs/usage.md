@@ -40,12 +40,25 @@ test,https://github.com/nf-core/test-datasets/raw/scrnaseq/testdata/S10_L001_R1_
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
+### If using cellranger
+
+In order to use cellranger aligner, reads must be named as [required by the tool](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
+
+`[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz`
+
+Besides that, the sample name given in the samplesheet must be the same that is present in the reads name. E.g.
+
+```console
+sample,fastq_1,fastq_2,
+TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
+```
+
 ## Running the pipeline
 
 The minimum typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/scrnaseq --input 'samplesheet.csv' --fasta human.fasta --gtf human.gtf -profile docker
+nextflow run nf-core/scrnaseq --input 'samplesheet.csv' --genome_fasta human.fasta --gtf human.gtf -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.

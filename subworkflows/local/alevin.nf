@@ -27,9 +27,9 @@ workflow SCRNASEQ_ALEVIN {
     main:
     ch_versions = Channel.empty()
 
-    assert salmon_index || (genome_fasta && gtf) || (genome_fasta && transcriptome_fasta):
+    assert salmon_index || (genome_fasta && gtf) || (genome_fasta && transcript_fasta):
         """Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf'), or a genome fasta file
-        and a transcriptome fasta file ('--transcriptome_fasta`) if no index is given!""".stripIndent()
+        and a transcriptome fasta file ('--transcript_fasta`) if no index is given!""".stripIndent()
 
     assert txp2gene || gtf:
         "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
@@ -42,10 +42,10 @@ workflow SCRNASEQ_ALEVIN {
         // Preprocessing - Extract transcriptome fasta from genome fasta
         if (!transcript_fasta) {
             GFFREAD_TRANSCRIPTOME( genome_fasta, gtf )
-            transcriptome_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
+            transcript_fasta = GFFREAD_TRANSCRIPTOME.out.transcriptome_extracted
             ch_versions = ch_versions.mix(GFFREAD_TRANSCRIPTOME.out.versions)
         }
-        SALMON_INDEX( genome_fasta, transcriptome_fasta )
+        SALMON_INDEX( genome_fasta, transcript_fasta )
         salmon_index = SALMON_INDEX.out.index.collect()
         ch_versions = ch_versions.mix(SALMON_INDEX.out.versions)
     }

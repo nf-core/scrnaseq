@@ -4,13 +4,13 @@
     "repos": {
         "nf-core/modules": {
             "cellranger/count": {
-                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+                "git_sha": "8032833e6e0fd3edeb20d4121885112249f273c4"
             },
             "cellranger/mkgtf": {
-                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+                "git_sha": "e499abe572bc7c1322dfa66b767b0e65fe8c62ca"
             },
             "cellranger/mkref": {
-                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+                "git_sha": "61d87bb2bcbcd058e1af6e5f14bb821b8ae4ed3e"
             },
             "custom/dumpsoftwareversions": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"

@@ -28,7 +28,7 @@
                 "git_sha": "e20e57f90b6787ac9a010a980cf6ea98bd990046"
             },
             "multiqc": {
-                "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
+                "git_sha": "e5f8924fabf4c8380f55fb7aee89fd2c268161b1"
             },
             "salmon/index": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"

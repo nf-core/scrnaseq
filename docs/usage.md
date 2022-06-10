@@ -53,11 +53,11 @@ By default, the pipeline uses [Salmon Alevin](https://salmon.readthedocs.io/en/l
 Other aligner options for running the pipeline are:
 
 - [Kallisto](https://pachterlab.github.io/kallisto/about) & [Bustools](https://bustools.github.io/), where kallisto is used for alignment and bustools is used for downstream analysis
-    - `--aligner kallisto`
+  - `--aligner kallisto`
 - [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md) to perform both alignment and downstream analysis.
-    - `--aligner star`
+  - `--aligner star`
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
-    - `--aligner cellranger`
+  - `--aligner cellranger`
 
 ### If using cellranger
 

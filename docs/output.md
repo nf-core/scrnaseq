@@ -15,6 +15,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [Kallisto & Bustools Results](#kallisto--bustools-results)
   - [STARsolo](#starsolo)
   - [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
+  - [Cellranger](#cellranger)
   - [Other output data](#other-output-data)
   - [MultiQC](#multiqc)
   - [Pipeline information](#pipeline-information)
@@ -72,6 +73,14 @@ For details on how to load these into R and perform further downstream analysis,
   - Contains the indexed reference transcriptome for Salmon Alevin
 - `alevin/txp2gene.tsv`
   - The transcriptome to gene mapping TSV file utilized by Salmon Alevin
+
+## Cellranger
+
+Cell Ranger is a set of analysis scripts that processes 10X Chromium single cell data to align reads, generate feature-barcode matrices, perform clustering and other secondary analysis. See [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) for more information on Cellranger.
+
+**Output directory: `results/cellranger`**
+
+- Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger
 
 ## Other output data
 

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pipeline ported to dsl2
 - Template update with latest nf-core/tools v2.1
+- Added cellranger v.7.0.0 subworkflow
+- Added full size tests
 
 ### Fixes
 

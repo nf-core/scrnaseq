@@ -1,5 +1,5 @@
 process MTX_TO_H5AD {
-    tag "$prefix"
+    //tag "$prefix"
     label 'process_medium'
 
     conda (params.enable_conda ? "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg" : null)
@@ -14,8 +14,9 @@ process MTX_TO_H5AD {
     path "matrix.h5ad", emit: h5ad
 
     script:
-    def prefix = cellranger_outdir.getName().toString()
+    //def prefix = cellranger_outdir.getName().toString()
     """
+    ls ${cellranger_outdir} > ls.txt
     mtx_to_h5ad.py \\
         -m ${cellranger_outdir}/outs/filtered_feature_bc_matrix/matrix.mtx.gz") \\
         -o matrix.h5ad

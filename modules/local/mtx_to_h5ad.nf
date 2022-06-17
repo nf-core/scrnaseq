@@ -15,8 +15,9 @@ process MTX_TO_H5AD {
 
     script:
     """
+    mkdir -p ${prefix}
     mtx_to_h5ad.py \\
         -m filtered_feature_bc_matrix \\
-        -o matrix.h5ad
+        -o ${prefix}/matrix.h5ad
     """
 }

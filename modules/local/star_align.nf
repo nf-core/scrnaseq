@@ -17,6 +17,7 @@ process STAR_ALIGN {
     path  gtf
     path whitelist
     val protocol
+    val other_10x_parameters
 
     output:
     tuple val(meta), path('*d.out.bam')       , emit: bam
@@ -50,6 +51,7 @@ process STAR_ALIGN {
         --outFileNamePrefix $prefix. \\
         --soloCBwhitelist <(gzip -cdf $whitelist) \\
         --soloType $protocol \\
+        $other_10x_parameters \\
         $out_sam_type \\
         $ignore_gtf \\
         $seq_center \\

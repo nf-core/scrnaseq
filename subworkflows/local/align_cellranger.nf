@@ -5,6 +5,7 @@
 include {CELLRANGER_MKGTF} from "../../modules/nf-core/modules/cellranger/mkgtf/main.nf"
 include {CELLRANGER_MKREF} from "../../modules/nf-core/modules/cellranger/mkref/main.nf"
 include {CELLRANGER_COUNT} from "../../modules/nf-core/modules/cellranger/count/main.nf"
+include {MTX_TO_H5AD     } from "../../modules/local/mtx_to_h5ad.nf"
 
 // Define workflow to subset and index a genome region fasta file
 workflow CELLRANGER_ALIGN {
@@ -39,6 +40,11 @@ workflow CELLRANGER_ALIGN {
             cellranger_index
         )
         ch_versions = ch_versions.mix(CELLRANGER_COUNT.out.versions)
+
+        // Convert matrix do h5ad
+        MTX_TO_H5AD (
+            CELLRANGER_COUNT.out.outs
+        )
 
     emit:
         ch_versions

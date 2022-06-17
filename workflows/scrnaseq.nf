@@ -63,7 +63,7 @@ include { MULTIQC } from "../modules/local/multiqc"
 // TODO: Are this channels still necessary?
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
-(protocol, chemistry) = WorkflowScrnaseq.formatProtocol(params.protocol, params.aligner)
+(protocol, chemistry, other_parameters) = WorkflowScrnaseq.formatProtocol(params.protocol, params.aligner)
 
 // general input and params
 ch_input = file(params.input)
@@ -145,7 +145,8 @@ workflow SCRNASEQ {
             ch_star_index,
             protocol,
             ch_barcode_whitelist,
-            ch_fastq
+            ch_fastq,
+            other_parameters
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_star = STARSOLO.out.for_multiqc

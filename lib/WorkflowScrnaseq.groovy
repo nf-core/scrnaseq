@@ -77,6 +77,7 @@ class WorkflowScrnaseq {
     static formatProtocol(protocol, aligner) {
         String new_protocol = protocol
         String chemistry = ''
+        String other_parameters = ''
 
         // alevin
         if (aligner == 'alevin') {
@@ -104,14 +105,17 @@ class WorkflowScrnaseq {
                 case '10XV1':
                     new_protocol = 'CB_UMI_Simple'
                     chemistry = 'V1'
+                    other_parameters = '--soloUMIlen 10'
                     break
                 case '10XV2':
                     new_protocol = 'CB_UMI_Simple'
                     chemistry = 'V2'
+                    other_parameters = '--soloUMIlen 10'
                     break
                 case '10XV3':
                     new_protocol = 'CB_UMI_Simple'
                     chemistry = 'V3'
+                    other_parameters = '--soloUMIlen 12'
                     break
                 case 'dropseq':
                     new_protocol = 'CB_UMI_Simple'
@@ -147,7 +151,7 @@ class WorkflowScrnaseq {
             exit 1, 'Aligner not recognized.'
         }
 
-        return [new_protocol, chemistry]
+        return [new_protocol, chemistry, other_parameters]
     }
 
 }

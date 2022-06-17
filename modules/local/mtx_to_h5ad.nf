@@ -8,13 +8,12 @@ process MTX_TO_H5AD {
         'gcfntnu/scanpy:1.7.0' }"
 
     input:
-    path cellranger_outdir
+    tuple val(prefix), path(cellranger_outdir)
 
     output:
     path "matrix.h5ad", emit: h5ad
 
     script:
-    def prefix = cellranger_outdir[0].getName().toString()[-3]
     """
     mtx_to_h5ad.py \\
         -m filtered_feature_bc_matrix \\

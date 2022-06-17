@@ -42,12 +42,11 @@ workflow CELLRANGER_ALIGN {
         ch_versions = ch_versions.mix(CELLRANGER_COUNT.out.versions)
 
         // Convert matrix do h5ad
-        CELLRANGER_COUNT.out.outs.map{ inputs ->
-            prefix = inputs[0].toString()[-3]
-            [ prefix, inputs ]
-        }.view()
         MTX_TO_H5AD (
-            CELLRANGER_COUNT.out.outs
+            CELLRANGER_COUNT.out.outs.map{ inputs ->
+                prefix = inputs[0].toString()[-3]
+                [ prefix, inputs ]
+            }
         )
 
     emit:

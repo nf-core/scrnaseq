@@ -1,5 +1,5 @@
 process MTX_TO_H5AD {
-    tag "$prefix"
+    tag "$meta.id"
     label 'process_medium'
 
     conda (params.enable_conda ? "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg" : null)
@@ -8,17 +8,16 @@ process MTX_TO_H5AD {
         'gcfntnu/scanpy:1.7.0' }"
 
     input:
-    tuple val(cellranger_prefix), path(cellranger_outdir)
+    tuple val(meta), path(cellranger_outdir)
 
     output:
-    path "matrix.h5ad", emit: h5ad
+    path "${meta.cellranger_prefix}", emit: h5ad
 
     script:
-    def prefix = cellranger_prefix.tokenize('-')[1]
     """
-    mkdir -p ${cellranger_prefix}
+    mkdir -p ${meta.cellranger_prefix}
     mtx_to_h5ad.py \\
         -m filtered_feature_bc_matrix \\
-        -o ${cellranger_prefix}/matrix.h5ad
+        -o ${meta.cellranger_prefix}/matrix.h5ad
     """
 }

@@ -44,7 +44,7 @@ workflow CELLRANGER_ALIGN {
         // Convert matrix do h5ad
         MTX_TO_H5AD (
             CELLRANGER_COUNT.out.outs.map{ inputs ->
-                prefix = inputs[0].toString()[-3]
+                prefix = inputs[0].toString().tokenize('/')[-3]
                 [ prefix, inputs ]
             }
         )

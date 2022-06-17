@@ -17,9 +17,7 @@ process MTX_TO_H5AD {
     def prefix = cellranger_outdir.getName().toString()
     """
     mtx_to_h5ad.py \\
-        -m \$(find ${cellranger_outdir} -wholename "*filtered_feature_bc_matrix/matrix.mtx.gz") \\
-        -f \$(find ${cellranger_outdir} -wholename "*filtered_feature_bc_matrix/features.tsv.gz") \\
-        -b \$(find ${cellranger_outdir} -wholename "*filtered_feature_bc_matrix/barcodes.tsv.gz") \\
+        -m ${cellranger_outdir}/outs/filtered_feature_bc_matrix/matrix.mtx.gz") \\
         -o matrix.h5ad
     """
 }

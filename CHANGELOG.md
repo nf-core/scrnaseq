@@ -5,10 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.1dev
 
-
 ### Fixes
-
-
 
 ## v2.0.0 - 2022-06-17 "Gray Nickel Beagle"
 

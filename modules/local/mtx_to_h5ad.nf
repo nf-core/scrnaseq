@@ -4,8 +4,8 @@ process MTX_TO_H5AD {
 
     conda (params.enable_conda ? "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'docker://gcfntnu/scanpy:1.7.0' :
-        'quay.io/biocontainers/scanpy-scripts:1.1.6--pypyhdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/scanpy:1.7.2--pyhdfd78af_0' :
+        'quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(cellranger_outdir)

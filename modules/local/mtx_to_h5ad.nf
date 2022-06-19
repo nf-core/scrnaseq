@@ -11,13 +11,14 @@ process MTX_TO_H5AD {
     tuple val(meta), path(cellranger_outdir)
 
     output:
-    path "${meta.cellranger_prefix}", emit: h5ad
+    path "matrix.h5ad.gz", emit: h5ad
 
     script:
     """
-    mkdir -p ${meta.cellranger_prefix}
     mtx_to_h5ad.py \\
         -m filtered_feature_bc_matrix \\
-        -o ${meta.cellranger_prefix}/matrix.h5ad
+        -o matrix.h5ad
+    
+    gzip -c matrix.h5ad > matrix.h5ad.gz
     """
 }

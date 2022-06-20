@@ -8,7 +8,7 @@ process MTX_TO_H5AD {
         'quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
 
     input:
-    tuple val(meta), path(cellranger_outdir)
+    tuple val(meta), path(inputs)
 
     output:
     path "matrix.h5ad.gz", emit: h5ad

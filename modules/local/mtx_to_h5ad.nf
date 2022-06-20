@@ -24,7 +24,7 @@ process MTX_TO_H5AD {
     mtx_to_h5ad.py \\
         -m filtered_feature_bc_matrix \\
         -o matrix.h5ad
-    
+
     gzip -c matrix.h5ad > ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix/matrix.h5ad.gz
     """
 

@@ -8,17 +8,23 @@ process MTX_TO_H5AD {
         'quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
 
     input:
+    // inputs from cellranger nf-core module does not come in a single sample dir
+    // for each sample, the sub-folders and files come directly in array.
     tuple val(meta), path(inputs)
 
     output:
-    path "matrix.h5ad.gz", emit: h5ad
+    path "${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix/matrix.h5ad.gz", emit: h5ad
 
     script:
     """
+    # create dir to mirror cellranger output organisation to have results published in the same place
+    mkdir ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix ;
+
+    # convert file types
     mtx_to_h5ad.py \\
         -m filtered_feature_bc_matrix \\
         -o matrix.h5ad
     
-    gzip -c matrix.h5ad > matrix.h5ad.gz
+    gzip -c matrix.h5ad > ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix/matrix.h5ad.gz
     """
 }

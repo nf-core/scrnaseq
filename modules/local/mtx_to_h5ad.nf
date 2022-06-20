@@ -18,7 +18,7 @@ process MTX_TO_H5AD {
     script:
     """
     # create dir to mirror cellranger output organisation to have results published in the same place
-    mkdir ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix ;
+    mkdir -p ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix ;
 
     # convert file types
     mtx_to_h5ad.py \\
@@ -26,5 +26,14 @@ process MTX_TO_H5AD {
         -o matrix.h5ad
     
     gzip -c matrix.h5ad > ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix/matrix.h5ad.gz
+    """
+
+    stub:
+    """
+    # create dir to mirror cellranger output organisation to have results published in the same place
+    mkdir -p ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix ;
+
+    # create dummy
+    touch ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix/matrix.h5ad.gz
     """
 }

@@ -45,8 +45,11 @@ workflow CELLRANGER_ALIGN {
         MTX_TO_H5AD (
             CELLRANGER_COUNT.out.outs.map{ inputs ->
             meta = [:]
-            meta.cellranger_prefix = inputs[0].toString().tokenize('/')[-3]
+            // in stub-run variable is string and not an array
+            if (inputs.getName() ==~ 'fake_file.txt') { meta.cellranger_prefix = [inputs][0].toString().tokenize('/')[-3] } 
+            else { meta.cellranger_prefix = inputs[0].toString().tokenize('/')[-3] }
             meta.id = meta.cellranger_prefix.tokenize('-')[1]
+            
                 [ meta, inputs ]
             }
         )

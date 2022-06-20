@@ -13,27 +13,23 @@ process MTX_TO_H5AD {
     tuple val(meta), path(inputs)
 
     output:
-    path "${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix/matrix.h5ad.gz", emit: h5ad
+    path "matrix.h5ad.gz", emit: h5ad
 
     script:
+    if (params.aligner == 'cellranger') {
+        matrix_directory = "filtered_feature_bc_matrix"
+    }
     """
-    # create dir to mirror cellranger output organisation to have results published in the same place
-    mkdir -p ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix ;
-
     # convert file types
     mtx_to_h5ad.py \\
-        -m filtered_feature_bc_matrix \\
+        -m ${matrix_directory} \\
         -o matrix.h5ad
 
-    gzip -c matrix.h5ad > ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix/matrix.h5ad.gz
+    gzip -c matrix.h5ad > matrix.h5ad.gz
     """
 
     stub:
     """
-    # create dir to mirror cellranger output organisation to have results published in the same place
-    mkdir -p ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix ;
-
-    # create dummy
-    touch ${meta.cellranger_prefix}/outs/filtered_feature_bc_matrix/matrix.h5ad.gz
+    touch matrix.h5ad.gz
     """
 }

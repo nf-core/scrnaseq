@@ -1,7 +1,7 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { GENE_MAP }                          from '../../modules/local/gene_map'
 include { KALLISTOBUSTOOLS_COUNT }            from '../../modules/local/kallistobustools_count'
-include {MTX_TO_H5AD     }                    from "../../modules/local/mtx_to_h5ad.nf"
+include {MTX_TO_H5AD     }                    from '../../modules/local/mtx_to_h5ad.nf'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'

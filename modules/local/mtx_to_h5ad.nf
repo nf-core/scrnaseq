@@ -16,13 +16,23 @@ process MTX_TO_H5AD {
     path "matrix.h5ad.gz", emit: h5ad
 
     script:
-    if (params.aligner == 'cellranger') {
-        matrix_directory = "filtered_feature_bc_matrix"
-    }
+    if (params.aligner == 'cellranger')
+    """
+    # convert file types
+    cellranger_mtx_to_h5ad.py \\
+        -m filtered_feature_bc_matrix \\
+        -o matrix.h5ad
+
+    gzip -c matrix.h5ad > matrix.h5ad.gz
+    """
+
+    else if (params.aligner == 'kallisto')
     """
     # convert file types
     mtx_to_h5ad.py \\
-        -m ${matrix_directory} \\
+        -m ${meta.id}_kallistobustools_count/counts_unfiltered/*.mtx \\
+        -b ${meta.id}_kallistobustools_count/counts_unfiltered/*.barcodes.txt \\
+        -f ${meta.id}_kallistobustools_count/counts_unfiltered/*.genes.txt \\
         -o matrix.h5ad
 
     gzip -c matrix.h5ad > matrix.h5ad.gz

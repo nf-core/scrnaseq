@@ -24,6 +24,6 @@ if __name__ == "__main__":
 
     adata = mtx_to_adata(args["mtx"], verbose=args["verbose"])
 
-    adata.write_h5ad(args["out"])
+    adata.write_h5ad(args["out"], compression="gzip")
 
     print("Wrote h5ad file to {}".format(args["out"]))

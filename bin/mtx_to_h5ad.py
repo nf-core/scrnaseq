@@ -39,6 +39,6 @@ if __name__ == "__main__":
         args["mtx"], args["barcode"], args["feature"], verbose=args["verbose"]
     )
 
-    adata.write_h5ad(args["out"])
+    adata.write_h5ad(args["out"], compression="gzip")
 
     print("Wrote h5ad file to {}".format(args["out"]))

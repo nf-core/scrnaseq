@@ -46,6 +46,6 @@ process MTX_TO_H5AD {
 
     stub:
     """
-    touch matrix.h5ad.gz
+    touch matrix.h5ad
     """
 }

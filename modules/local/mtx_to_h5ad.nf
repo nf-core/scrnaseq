@@ -13,7 +13,7 @@ process MTX_TO_H5AD {
     tuple val(meta), path(inputs)
 
     output:
-    path "*.h5ad.gz", emit: h5ad
+    path "*.h5ad", emit: h5ad
 
     script:
     if (params.aligner == 'cellranger')
@@ -22,8 +22,6 @@ process MTX_TO_H5AD {
     cellranger_mtx_to_h5ad.py \\
         -m filtered_feature_bc_matrix \\
         -o matrix.h5ad
-
-    gzip -c matrix.h5ad > matrix.h5ad.gz
     """
 
     else if (params.aligner == 'kallisto')
@@ -34,8 +32,6 @@ process MTX_TO_H5AD {
         -b *_kallistobustools_count/counts_unfiltered/*.barcodes.txt \\
         -f *_kallistobustools_count/counts_unfiltered/*.genes.txt \\
         -o cells_x_genes.h5ad
-
-    gzip -c cells_x_genes.h5ad > cells_x_genes.h5ad.gz
     """
 
     else if (params.aligner == 'alevin')
@@ -46,8 +42,6 @@ process MTX_TO_H5AD {
         -b *_alevin_results/alevin/quants_mat_rows.txt \\
         -f *_alevin_results/alevin/quants_mat_cols.txt \\
         -o quants_mat.h5ad
-
-    gzip -c quants_mat.h5ad > quants_mat.h5ad.gz
     """
 
     stub:

@@ -2,6 +2,7 @@
 include { GFFREAD_TRANSCRIPTOME }             from '../../modules/local/gffread_transcriptome'
 include { SALMON_ALEVIN }                     from '../../modules/local/salmon_alevin'
 include { ALEVINQC }                          from '../../modules/local/alevinqc'
+include {MTX_TO_H5AD     }                    from '../../modules/local/mtx_to_h5ad.nf'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
@@ -71,6 +72,13 @@ workflow SCRNASEQ_ALEVIN {
         barcode_whitelist
     )
     ch_versions = ch_versions.mix(SALMON_ALEVIN.out.versions)
+
+    /*
+    * Convert matrix do h5ad
+    */
+    MTX_TO_H5AD (
+        SALMON_ALEVIN.out.alevin_results
+    )
 
     /*
     * Run alevinQC

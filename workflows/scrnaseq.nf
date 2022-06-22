@@ -165,6 +165,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out_rebuilt)
     }
 
     // Run mtx to h5ad conversion subworkflow

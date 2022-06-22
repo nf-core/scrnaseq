@@ -5,7 +5,7 @@ import argparse
 
 
 def mtx_to_adata(
-    mtx_file: str, barcode_file: str, feature_file: str, verbose: bool = False
+    mtx_file: str, barcode_file: str, feature_file: str, sample: str, verbose: bool = False
 ):
 
     if verbose:
@@ -14,6 +14,7 @@ def mtx_to_adata(
     adata = sc.read_mtx(mtx_file)
     adata.obs_names = pd.read_csv(barcode_file, header=None)[0].values
     adata.var_names = pd.read_csv(feature_file, header=None)[0].values
+    adata.obs["sample"] = sample
 
     return adata
 
@@ -28,12 +29,13 @@ if __name__ == "__main__":
     )
     parser.add_argument("-f", "--feature", dest="feature", help="Path to feature file.")
     parser.add_argument("-b", "--barcode", dest="barcode", help="Path to barcode file.")
+    parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
 
     args = vars(parser.parse_args())
 
     adata = mtx_to_adata(
-        args["mtx"], args["barcode"], args["feature"], verbose=args["verbose"]
+        args["mtx"], args["barcode"], args["feature"], args["sample"], verbose=args["verbose"]
     )
 
     adata.write_h5ad(args["out"], compression="gzip")

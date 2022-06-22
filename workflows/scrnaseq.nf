@@ -40,6 +40,7 @@ include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
+include { H5AD_CONVERSION   } from "../subworkflows/local/conversion_to_h5ad"
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,7 +99,8 @@ ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : 
 
 workflow SCRNASEQ {
 
-    ch_versions = Channel.empty()
+    ch_versions     = Channel.empty()
+    ch_mtx_matrices = Channel.empty()
 
     // Check input files and stage input data
     ch_fastq = INPUT_CHECK( ch_input ).reads
@@ -135,6 +137,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
         ch_multiqc_alevin = SCRNASEQ_ALEVIN.out.for_multiqc
+        ch_mtx_matrices = ch_mtx_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_results)
     }
 
     // Run STARSolo pipeline
@@ -162,6 +165,12 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
     }
+
+    // Run mtx to h5ad conversion subworkflow
+    H5AD_CONVERSION (
+        ch_mtx_matrices,
+        ch_input
+    )
 
     // collect software versions
     CUSTOM_DUMPSOFTWAREVERSIONS (

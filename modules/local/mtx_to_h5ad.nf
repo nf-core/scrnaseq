@@ -21,7 +21,7 @@ process MTX_TO_H5AD {
     # convert file types
     cellranger_mtx_to_h5ad.py \\
         -m filtered_feature_bc_matrix \\
-        -o matrix.h5ad
+        -o ${meta.id}_matrix.h5ad
     """
 
     else if (params.aligner == 'kallisto')
@@ -31,7 +31,7 @@ process MTX_TO_H5AD {
         -m *_kallistobustools_count/counts_unfiltered/*.mtx \\
         -b *_kallistobustools_count/counts_unfiltered/*.barcodes.txt \\
         -f *_kallistobustools_count/counts_unfiltered/*.genes.txt \\
-        -o cells_x_genes.h5ad
+        -o ${meta.id}_matrix.h5ad
     """
 
     else if (params.aligner == 'alevin')
@@ -41,11 +41,11 @@ process MTX_TO_H5AD {
         -m *_alevin_results/alevin/quants_mat.mtx.gz \\
         -b *_alevin_results/alevin/quants_mat_rows.txt \\
         -f *_alevin_results/alevin/quants_mat_cols.txt \\
-        -o quants_mat.h5ad
+        -o ${meta.id}_matrix.h5ad
     """
 
     stub:
     """
-    touch matrix.h5ad
+    touch ${meta.id}_matrix.h5ad
     """
 }

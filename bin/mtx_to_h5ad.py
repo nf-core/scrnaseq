@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-import sys
-import os
 import scanpy as sc
 import pandas as pd
-import typing
 import argparse
 
 

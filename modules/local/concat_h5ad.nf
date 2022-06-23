@@ -16,9 +16,9 @@ process CONCAT_H5AD {
     script:
     """
     concat_h5ad.py \\
-        -i $samplesheet \\
-        -o combined_matrix.h5ad \\
-        -s "_matrix.h5ad"
+        --input $samplesheet \\
+        --out combined_matrix.h5ad \\
+        --suffix "_matrix.h5ad"
     """
 
     stub:

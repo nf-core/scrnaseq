@@ -20,31 +20,31 @@ process MTX_TO_H5AD {
     """
     # convert file types
     cellranger_mtx_to_h5ad.py \\
-        -m filtered_feature_bc_matrix \\
-        -s ${meta.id} \\
-        -o ${meta.id}_matrix.h5ad
+        --mtx filtered_feature_bc_matrix \\
+        --sample ${meta.id} \\
+        --out ${meta.id}_matrix.h5ad
     """
 
     else if (params.aligner == 'kallisto')
     """
     # convert file types
     mtx_to_h5ad.py \\
-        -s ${meta.id} \\
-        -m *_kallistobustools_count/counts_unfiltered/*.mtx \\
-        -b *_kallistobustools_count/counts_unfiltered/*.barcodes.txt \\
-        -f *_kallistobustools_count/counts_unfiltered/*.genes.txt \\
-        -o ${meta.id}_matrix.h5ad
+        --sample ${meta.id} \\
+        --mtx *_kallistobustools_count/counts_unfiltered/*.mtx \\
+        --barcode *_kallistobustools_count/counts_unfiltered/*.barcodes.txt \\
+        --feature *_kallistobustools_count/counts_unfiltered/*.genes.txt \\
+        --out ${meta.id}_matrix.h5ad
     """
 
     else if (params.aligner == 'alevin')
     """
     # convert file types
     mtx_to_h5ad.py \\
-        -s ${meta.id} \\
-        -m *_alevin_results/alevin/quants_mat.mtx.gz \\
-        -b *_alevin_results/alevin/quants_mat_rows.txt \\
-        -f *_alevin_results/alevin/quants_mat_cols.txt \\
-        -o ${meta.id}_matrix.h5ad
+        --sample ${meta.id} \\
+        --mtx *_alevin_results/alevin/quants_mat.mtx.gz \\
+        --barcode *_alevin_results/alevin/quants_mat_rows.txt \\
+        --feature *_alevin_results/alevin/quants_mat_cols.txt \\
+        --out ${meta.id}_matrix.h5ad
     """
 
     stub:

@@ -15,13 +15,6 @@ def read_samplesheet(samplesheet):
     # return
     return(df)
 
-# combine and write, just a simple concatenation.
-def concat_h5ad(adatas):
-    combined = ad.concat(adatas, label="sample", merge="unique")
-    
-    # return
-    return(combined)
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Concatenates h5ad files and merge metadata from samplesheet")
@@ -42,7 +35,7 @@ if __name__ == "__main__":
     }
 
     # concat h5ad files
-    adata = concat_h5ad(dict_of_h5ad)
+    adata = ad.concat(dict_of_h5ad, label="sample", merge="unique")
 
     # merge with data.frame, on sample information
     adata.obs = adata.obs.join(df_samplesheet, on="sample")

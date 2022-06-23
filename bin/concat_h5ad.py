@@ -26,8 +26,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Concatenates h5ad files and merge metadata from samplesheet")
 
-    parser.add_argument("-i", "--input", dest="input", help="Path to samplesheet.csv")
-    parser.add_argument("-o", "--out",   dest="out",   help="Output path.")
+    parser.add_argument("-i", "--input",  dest="input",  help="Path to samplesheet.csv")
+    parser.add_argument("-o", "--out",    dest="out",    help="Output path.")
+    parser.add_argument("-s", "--suffix", dest="suffix", help="Suffix of matrices to remove and get sample name")
 
     args = vars(parser.parse_args())
 
@@ -36,7 +37,7 @@ if __name__ == "__main__":
 
     # find all h5ad and append to dict
     dict_of_h5ad = {
-            str(path).replace("_matrix.h5ad", ""): sc.read_h5ad(path)
+            str(path).replace(args["suffix"], ""): sc.read_h5ad(path)
             for path in Path(".").rglob('*.h5ad')
     }
 

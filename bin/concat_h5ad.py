@@ -12,7 +12,6 @@ def read_samplesheet(samplesheet):
     # only keep unique values using set()
     df = df.groupby(["sample"]).agg(lambda column: ",".join(set(column)))
 
-    # return
     return(df)
 
 if __name__ == "__main__":

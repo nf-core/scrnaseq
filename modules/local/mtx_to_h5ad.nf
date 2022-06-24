@@ -47,30 +47,6 @@ process MTX_TO_H5AD {
         --out ${meta.id}_matrix.h5ad
     """
 
-    else if (params.aligner == 'kallisto')
-    """
-    # convert file types
-    mtx_to_h5ad.py \\
-        -m *_kallistobustools_count/counts_unfiltered/*.mtx \\
-        -b *_kallistobustools_count/counts_unfiltered/*.barcodes.txt \\
-        -f *_kallistobustools_count/counts_unfiltered/*.genes.txt \\
-        -o cells_x_genes.h5ad
-
-    gzip -c cells_x_genes.h5ad > cells_x_genes.h5ad.gz
-    """
-
-    else if (params.aligner == 'alevin')
-    """
-    # convert file types
-    mtx_to_h5ad.py \\
-        -m *_alevin_results/alevin/quants_mat.mtx.gz \\
-        -b *_alevin_results/alevin/quants_mat_rows.txt \\
-        -f *_alevin_results/alevin/quants_mat_cols.txt \\
-        -o quants_mat.h5ad
-
-    gzip -c quants_mat.h5ad > quants_mat.h5ad.gz
-    """
-
     stub:
     """
     touch ${meta.id}_matrix.h5ad

@@ -1,7 +1,6 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { GENE_MAP }                          from '../../modules/local/gene_map'
 include { KALLISTOBUSTOOLS_COUNT }            from '../../modules/local/kallistobustools_count'
-include {MTX_TO_H5AD     }                    from '../../modules/local/mtx_to_h5ad.nf'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
@@ -64,12 +63,6 @@ workflow KALLISTO_BUSTOOLS {
         protocol
     )
     ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions)
-
-    // Convert matrix do h5ad
-    MTX_TO_H5AD (
-        KALLISTOBUSTOOLS_COUNT.out.counts
-    )
-
 
     emit:
     ch_versions

@@ -41,19 +41,6 @@ workflow CELLRANGER_ALIGN {
         )
         ch_versions = ch_versions.mix(CELLRANGER_COUNT.out.versions)
 
-        // Convert matrix do h5ad
-        MTX_TO_H5AD (
-            CELLRANGER_COUNT.out.outs.map{ inputs ->
-            meta = [:]
-            // in stub-run variable is string and not an array
-            if (workflow.stubRun) { meta.cellranger_prefix = [inputs][0].toString().tokenize('/')[-3] } 
-            else { meta.cellranger_prefix = inputs[0].toString().tokenize('/')[-3] }
-            meta.id = meta.cellranger_prefix.tokenize('-')[1]
-            
-                [ meta, inputs ]
-            }
-        )
-
     emit:
         ch_versions
         cellranger_out  = CELLRANGER_COUNT.out.outs

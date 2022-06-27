@@ -10,14 +10,14 @@ out.file     <- args[4]
 aligner      <- args[5]
 
 if(aligner %in% c("kallisto", "alevin")) {
-  # for kallisto and alevin, the features file contains only one column and matrix needs to be transposed
-  expression.matrix <- ReadMtx(
-    mtx = mtx_file, features = feature_file, cells = barcode_file, feature.column = 1, mtx.transpose = TRUE
-  )
+    # for kallisto and alevin, the features file contains only one column and matrix needs to be transposed
+    expression.matrix <- ReadMtx(
+        mtx = mtx_file, features = feature_file, cells = barcode_file, feature.column = 1, mtx.transpose = TRUE
+    )
 } else {
-  expression.matrix <- ReadMtx(
-    mtx = mtx_file, features = feature_file, cells = barcode_file
-  )
+    expression.matrix <- ReadMtx(
+        mtx = mtx_file, features = feature_file, cells = barcode_file
+    )
 }
 
 seurat.object <- CreateSeuratObject(counts = expression.matrix)

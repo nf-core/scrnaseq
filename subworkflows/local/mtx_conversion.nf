@@ -1,8 +1,9 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { MTX_TO_H5AD }             from '../../modules/local/mtx_to_h5ad.nf'
-include { CONCAT_H5AD }             from '../../modules/local/concat_h5ad.nf'
+include { MTX_TO_H5AD   }             from '../../modules/local/mtx_to_h5ad.nf'
+include { CONCAT_H5AD   }             from '../../modules/local/concat_h5ad.nf'
+include { MTX_TO_SEURAT }             from '../../modules/local/mtx_to_seurat.nf'
 
-workflow H5AD_CONVERSION {
+workflow MTX_CONVERSION {
 
     take:
     mtx_matrices
@@ -22,6 +23,13 @@ workflow H5AD_CONVERSION {
     CONCAT_H5AD (
         MTX_TO_H5AD.out.h5ad.collect(), // gather all sample-specific files
         samplesheet
+    )
+
+    //
+    // Convert matrix do seurat
+    //
+    MTX_TO_SEURAT (
+        mtx_matrices
     )
 
 }

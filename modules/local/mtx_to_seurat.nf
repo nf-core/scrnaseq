@@ -41,6 +41,6 @@ process MTX_TO_SEURAT {
 
     stub:
     """
-    touch ${meta.id}_matrix.h5ad
+    touch ${meta.id}_matrix.seurat
     """
 }

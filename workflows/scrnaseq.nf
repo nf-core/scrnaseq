@@ -36,6 +36,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK       } from '../subworkflows/local/input_check'
+include { FASTQC_CHECK } from '../subworkflows/local/fastqc'
 include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
@@ -105,6 +106,14 @@ workflow SCRNASEQ {
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
+    // Run FastQC
+    ch_multiqc_fastqc = Channel.empty()
+    if (!params.skip_fastqc){
+      FASTQC_CHECK ( ch_fastq )
+      ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version.first().ifEmpty(null))
+      ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
+    }
+
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
         KALLISTO_BUSTOOLS(
@@ -169,15 +178,17 @@ workflow SCRNASEQ {
     )
 
     if (!params.skip_multiqc) {
+
         ch_workflow_summary = Channel.value(
             WorkflowScrnaseq.paramsSummaryMultiqc(workflow, summary_params)
         ).collectFile(name: 'workflow_summary_mqc.yaml')
 
         MULTIQC(
             ch_multiqc_config,
-            ch_multiqc_custom_config,
+            ch_multiqc_custom_config.collect().ifEmpty([]),
             CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
             ch_workflow_summary,
+            ch_multiqc_fastqc.collect{it[0]}.ifEmpty([]),
             ch_multiqc_alevin,
             ch_multiqc_star
         )

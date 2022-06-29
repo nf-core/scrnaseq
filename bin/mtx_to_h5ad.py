@@ -14,8 +14,8 @@ def mtx_to_adata(
     adata = sc.read_mtx(mtx_file)
     if aligner == 'star': # for some reason star matrix comes transposed and doesn't fit when values are appended directly
         adata = adata.transpose()
-    adata.obs_names = pd.read_csv(barcode_file, header=None)[0].values
-    adata.var_names = pd.read_csv(feature_file, header=None)[0].values
+    adata.obs_names = pd.read_csv(barcode_file, header=None, sep="\t")[0].values
+    adata.var_names = pd.read_csv(feature_file, header=None, sep="\t")[0].values
     adata.obs["sample"] = sample
 
     return adata

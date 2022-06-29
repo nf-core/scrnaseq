@@ -34,7 +34,7 @@ if __name__ == "__main__":
     }
 
     # concat h5ad files
-    adata = ad.concat(dict_of_h5ad, label="sample", merge="unique")
+    adata = ad.concat(dict_of_h5ad, label="sample", merge="unique", index_unique="_")
 
     # merge with data.frame, on sample information
     adata.obs = adata.obs.join(df_samplesheet, on="sample")

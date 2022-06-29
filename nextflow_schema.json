@@ -376,7 +376,7 @@
                 "skip_fastqc": {
                     "type": "boolean",
                     "description": "Skip the FastQC reporting feature in the pipeline."
-                },                
+                },
                 "skip_multiqc": {
                     "type": "boolean",
                     "description": "Skip the MultiQC reporting feature in the pipeline."

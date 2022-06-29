@@ -5,13 +5,15 @@ import argparse
 
 
 def mtx_to_adata(
-    mtx_file: str, barcode_file: str, feature_file: str, sample: str, verbose: bool = False
+    mtx_file: str, barcode_file: str, feature_file: str, sample: str, aligner: str, verbose: bool = False
 ):
 
     if verbose:
         print("Reading in {}".format(mtx_file))
 
     adata = sc.read_mtx(mtx_file)
+    if aligner == 'star': # for some reason star matrix comes transposed and doesn't fit when values are appended directly
+        adata = adata.transpose()
     adata.obs_names = pd.read_csv(barcode_file, header=None)[0].values
     adata.var_names = pd.read_csv(feature_file, header=None)[0].values
     adata.obs["sample"] = sample
@@ -31,11 +33,12 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--barcode", dest="barcode", help="Path to barcode file.")
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
+    parser.add_argument("-a", "--aligner", dest="aligner", help="Which aligner has been used?")
 
     args = vars(parser.parse_args())
 
     adata = mtx_to_adata(
-        args["mtx"], args["barcode"], args["feature"], args["sample"], verbose=args["verbose"]
+        args["mtx"], args["barcode"], args["feature"], args["sample"], args["aligner"],verbose=args["verbose"]
     )
 
     adata.write_h5ad(args["out"], compression="gzip")

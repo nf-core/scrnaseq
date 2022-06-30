@@ -1,9 +1,6 @@
 //
 // Check input samplesheet and get read channels
 //
-
-//TODO --> add skip_fastqc to params
-
 include { FASTQC } from '../../modules/nf-core/modules/fastqc/main'
 
 workflow FASTQC_CHECK {
@@ -18,11 +15,6 @@ workflow FASTQC_CHECK {
   /*
    * FastQ QC using FASTQC
    */
-  fastqc_zip     = Channel.empty()
-  fastqc_html    = Channel.empty()
-  fastqc_multiqc = Channel.empty()
-  fastqc_version = Channel.empty()
-  
   FASTQC ( ch_fastq )
   fastqc_zip     = FASTQC.out.zip
   fastqc_html    = FASTQC.out.html
@@ -34,6 +26,7 @@ workflow FASTQC_CHECK {
       .map { it -> [ it[1] ] }
       .set { fastqc_html_only }
 
+  fastqc_multiqc = Channel.empty()
   fastqc_multiqc = fastqc_multiqc.mix( fastqc_zip_only, fastqc_html_only )
   fastqc_version = FASTQC.out.versions
 

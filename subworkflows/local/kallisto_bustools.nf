@@ -64,7 +64,6 @@ workflow KALLISTO_BUSTOOLS {
     )
     ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions)
 
-
     emit:
     ch_versions
     counts = KALLISTOBUSTOOLS_COUNT.out.counts

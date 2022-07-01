@@ -93,7 +93,7 @@ Cell Ranger is a set of analysis scripts that processes 10X Chromium single cell
   - When supplied with a `--fasta` genome fasta, this contains the extracted transcriptome
   - The GTF file supplied with `--gtf` is used to extract the transcriptome positions appropriately
 
-**Output directory: `results/${params.aligner}/mtx_conversions`
+**Output directory: `results/${params.aligner}/mtx_conversions`**
 
 - `*_matrix.h5ad`
   - `.mtx` files converted to [AnnData](https://anndata.readthedocs.io/en/latest/) in `.h5ad` format, using [scanpy package](https://scanpy.readthedocs.io/en/stable/).

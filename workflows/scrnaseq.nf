@@ -153,6 +153,7 @@ workflow SCRNASEQ {
             other_parameters
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.star_counts)
         ch_multiqc_star = STARSOLO.out.for_multiqc
     }
 

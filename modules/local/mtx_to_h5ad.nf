@@ -16,34 +16,42 @@ process MTX_TO_H5AD {
     path "*.h5ad", emit: h5ad
 
     script:
+    // def file paths for aligners (except cellranger)
+    if (params.aligner == 'kallisto') {
+        mtx_matrix   = "*_kallistobustools_count/counts_unfiltered/*.mtx"
+        barcodes_tsv = "*_kallistobustools_count/counts_unfiltered/*.barcodes.txt"
+        features_tsv = "*_kallistobustools_count/counts_unfiltered/*.genes.txt"
+    } else if (params.aligner == 'alevin') {
+        mtx_matrix   = "*_alevin_results/alevin/quants_mat.mtx.gz"
+        barcodes_tsv = "*_alevin_results/alevin/quants_mat_rows.txt"
+        features_tsv = "*_alevin_results/alevin/quants_mat_cols.txt"
+    } else if (params.aligner == 'star') {
+        mtx_matrix   = "*.Solo.out/Gene/filtered/matrix.mtx"
+        barcodes_tsv = "*.Solo.out/Gene/filtered/barcodes.tsv"
+        features_tsv = "*.Solo.out/Gene/filtered/features.tsv"
+    }
+
+    //
+    // run script
+    //
     if (params.aligner == 'cellranger')
     """
     # convert file types
     cellranger_mtx_to_h5ad.py \\
-        --mtx filtered_feature_bc_matrix \\
+        --mtx filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
         --out ${meta.id}_matrix.h5ad
     """
 
-    else if (params.aligner == 'kallisto')
+    else
     """
     # convert file types
     mtx_to_h5ad.py \\
+        --aligner ${params.aligner} \\
         --sample ${meta.id} \\
-        --mtx *_kallistobustools_count/counts_unfiltered/*.mtx \\
-        --barcode *_kallistobustools_count/counts_unfiltered/*.barcodes.txt \\
-        --feature *_kallistobustools_count/counts_unfiltered/*.genes.txt \\
-        --out ${meta.id}_matrix.h5ad
-    """
-
-    else if (params.aligner == 'alevin')
-    """
-    # convert file types
-    mtx_to_h5ad.py \\
-        --sample ${meta.id} \\
-        --mtx *_alevin_results/alevin/quants_mat.mtx.gz \\
-        --barcode *_alevin_results/alevin/quants_mat_rows.txt \\
-        --feature *_alevin_results/alevin/quants_mat_cols.txt \\
+        --mtx $mtx_matrix \\
+        --barcode $barcodes_tsv \\
+        --feature $features_tsv \\
         --out ${meta.id}_matrix.h5ad
     """
 

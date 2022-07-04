@@ -21,6 +21,7 @@ process STAR_ALIGN {
 
     output:
     tuple val(meta), path('*d.out.bam')       , emit: bam
+    tuple val(meta), path('*.Solo.out')       , emit: counts
     tuple val(meta), path('*Log.final.out')   , emit: log_final
     tuple val(meta), path('*Log.out')         , emit: log_out
     tuple val(meta), path('*Log.progress.out'), emit: log_progress

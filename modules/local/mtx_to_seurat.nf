@@ -29,7 +29,12 @@ process MTX_TO_SEURAT {
         matrix   = "*_alevin_results/alevin/quants_mat.mtx.gz"
         barcodes = "*_alevin_results/alevin/quants_mat_rows.txt"
         features = "*_alevin_results/alevin/quants_mat_cols.txt"
+    } else if (params.aligner == 'star') {
+        matrix   = "*.Solo.out/Gene/filtered/matrix.mtx"
+        barcodes = "*.Solo.out/Gene/filtered/barcodes.tsv"
+        features = "*.Solo.out/Gene/filtered/features.tsv"
     }
+
     """
     mtx_to_seurat.R \\
         $matrix \\

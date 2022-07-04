@@ -13,7 +13,7 @@ process MTX_TO_SEURAT {
     tuple val(meta), path(inputs)
 
     output:
-    path "*.seurat", emit: h5ad
+    path "*.rds", emit: seuratObjects
 
     script:
     def aligner = params.aligner
@@ -40,12 +40,12 @@ process MTX_TO_SEURAT {
         $matrix \\
         $barcodes \\
         $features \\
-        ${meta.id}_matrix.seurat \\
+        ${meta.id}_matrix.rds \\
         ${aligner}
     """
 
     stub:
     """
-    touch ${meta.id}_matrix.seurat
+    touch ${meta.id}_matrix.rds
     """
 }

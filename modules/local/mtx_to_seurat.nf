@@ -22,9 +22,9 @@ process MTX_TO_SEURAT {
         barcodes = "filtered_feature_bc_matrix/barcodes.tsv.gz"
         features = "filtered_feature_bc_matrix/features.tsv.gz"
     } else if (params.aligner == "kallisto") {
-        matrix   = "*_kallistobustools_count/counts_unfiltered/*.mtx"
-        barcodes = "*_kallistobustools_count/counts_unfiltered/*.barcodes.txt"
-        features = "*_kallistobustools_count/counts_unfiltered/*.genes.txt"
+        matrix   = "*count/counts_unfiltered/*.mtx"
+        barcodes = "*count/counts_unfiltered/*.barcodes.txt"
+        features = "*count/counts_unfiltered/*.genes.txt"
     } else if (params.aligner == "alevin") {
         matrix   = "*_alevin_results/alevin/quants_mat.mtx.gz"
         barcodes = "*_alevin_results/alevin/quants_mat_rows.txt"

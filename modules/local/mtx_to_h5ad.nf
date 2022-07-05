@@ -18,9 +18,9 @@ process MTX_TO_H5AD {
     script:
     // def file paths for aligners (except cellranger)
     if (params.aligner == 'kallisto') {
-        mtx_matrix   = "*_kallistobustools_count/counts_unfiltered/*.mtx"
-        barcodes_tsv = "*_kallistobustools_count/counts_unfiltered/*.barcodes.txt"
-        features_tsv = "*_kallistobustools_count/counts_unfiltered/*.genes.txt"
+        mtx_matrix   = "*count/counts_unfiltered/*.mtx"
+        barcodes_tsv = "*count/counts_unfiltered/*.barcodes.txt"
+        features_tsv = "*count/counts_unfiltered/*.genes.txt"
     } else if (params.aligner == 'alevin') {
         mtx_matrix   = "*_alevin_results/alevin/quants_mat.mtx.gz"
         barcodes_tsv = "*_alevin_results/alevin/quants_mat_rows.txt"

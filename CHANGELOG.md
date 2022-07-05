@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
+- Fixed Kallistobustools workflow [#123](https://github.com/nf-core/scrnaseq/issues/123) by upgrading to nf-core/modules module
+
 ## v2.0.0 - 2022-06-17 "Gray Nickel Beagle"
 
 - Pipeline ported to dsl2

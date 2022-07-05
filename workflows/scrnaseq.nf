@@ -41,7 +41,7 @@ include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
-include { H5AD_CONVERSION   } from "../subworkflows/local/conversion_to_h5ad"
+include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,7 +179,7 @@ workflow SCRNASEQ {
     }
 
     // Run mtx to h5ad conversion subworkflow
-    H5AD_CONVERSION (
+    MTX_CONVERSION (
         ch_mtx_matrices,
         ch_input
     )

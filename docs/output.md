@@ -12,6 +12,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [:warning: Please read this documentation on the nf-core website: https://nf-co.re/scrnaseq/output](#warning-please-read-this-documentation-on-the-nf-core-website-httpsnf-corescrnaseqoutput)
   - [Introduction](#introduction)
   - [Pipeline overview](#pipeline-overview)
+  - [FastQC](#fastqc)
   - [Kallisto & Bustools Results](#kallisto--bustools-results)
   - [STARsolo](#starsolo)
   - [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
@@ -19,6 +20,19 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [Other output data](#other-output-data)
   - [MultiQC](#multiqc)
   - [Pipeline information](#pipeline-information)
+
+## FastQC
+
+See [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc) for details about FastQC.
+
+The pipeline analyzes the raw data and generates for each file a FastQC report. All report are collected in MultiQC.
+
+**Output directory: `results/fastqc`**
+
+- `.html`
+  - Contains the FastQC report.
+- `.zip`
+  - Contains additional information, such as individual plots, and FastQC raw data.
 
 ## Kallisto & Bustools Results
 

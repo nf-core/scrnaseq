@@ -13,7 +13,7 @@ process MTX_TO_SEURAT {
     tuple val(meta), path(inputs)
 
     output:
-    path "*.seurat", emit: h5ad
+    path "*.rds", emit: seuratObjects
 
     script:
     def aligner = params.aligner
@@ -22,9 +22,9 @@ process MTX_TO_SEURAT {
         barcodes = "filtered_feature_bc_matrix/barcodes.tsv.gz"
         features = "filtered_feature_bc_matrix/features.tsv.gz"
     } else if (params.aligner == "kallisto") {
-        matrix   = "*_kallistobustools_count/counts_unfiltered/*.mtx"
-        barcodes = "*_kallistobustools_count/counts_unfiltered/*.barcodes.txt"
-        features = "*_kallistobustools_count/counts_unfiltered/*.genes.txt"
+        matrix   = "*count/counts_unfiltered/*.mtx"
+        barcodes = "*count/counts_unfiltered/*.barcodes.txt"
+        features = "*count/counts_unfiltered/*.genes.txt"
     } else if (params.aligner == "alevin") {
         matrix   = "*_alevin_results/alevin/quants_mat.mtx.gz"
         barcodes = "*_alevin_results/alevin/quants_mat_rows.txt"
@@ -40,12 +40,12 @@ process MTX_TO_SEURAT {
         $matrix \\
         $barcodes \\
         $features \\
-        ${meta.id}_matrix.seurat \\
+        ${meta.id}_matrix.rds \\
         ${aligner}
     """
 
     stub:
     """
-    touch ${meta.id}_matrix.seurat
+    touch ${meta.id}_matrix.rds
     """
 }

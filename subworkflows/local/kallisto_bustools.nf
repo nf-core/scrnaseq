@@ -59,7 +59,6 @@ workflow KALLISTO_BUSTOOLS {
         txp2gene,
         t1c,
         t2c,
-        kb_workflow,
         protocol
     )
 

@@ -25,13 +25,13 @@
                 "git_sha": "fa37e0662690c4ec4260dae282fbce08777503e6"
             },
             "kallistobustools/count": {
-                "git_sha": "ed5594bee3eb38874cb282d288bc22ab6262a73e"
+                "git_sha": "ec806cebf121767b95ad492b0d0f93dbdc2f33da"
             },
             "kallistobustools/ref": {
                 "git_sha": "0f1e736212e5ae37036ac7e32b225087a8a9b154"
             },
             "multiqc": {
-                "git_sha": "08376da6843b14c82d84d444784c0b3635bb7fd5"
+                "git_sha": "5138acca0985ca01c38a1c4fba917d83772b1106"
             },
             "salmon/index": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"

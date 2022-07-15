@@ -52,6 +52,7 @@ workflow STARSOLO {
     emit:
     ch_versions
     star_result = STAR_ALIGN.out.tab
+    star_counts = STAR_ALIGN.out.counts
     for_multiqc = STAR_ALIGN.out.log_final.collect{it[1]}.ifEmpty([])
 
 

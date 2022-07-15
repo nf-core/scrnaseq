@@ -1,7 +1,7 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { GFFREAD_TRANSCRIPTOME }             from '../../modules/local/gffread_transcriptome'
-include { SALMON_ALEVIN }                     from '../../modules/local/salmon_alevin'
-include { ALEVINQC }                          from '../../modules/local/alevinqc'
+include { SALMON_ALEVIN         }             from '../../modules/local/salmon_alevin'
+include { ALEVINQC              }             from '../../modules/local/alevinqc'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'

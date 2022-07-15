@@ -12,6 +12,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [:warning: Please read this documentation on the nf-core website: https://nf-co.re/scrnaseq/output](#warning-please-read-this-documentation-on-the-nf-core-website-httpsnf-corescrnaseqoutput)
   - [Introduction](#introduction)
   - [Pipeline overview](#pipeline-overview)
+  - [FastQC](#fastqc)
   - [Kallisto & Bustools Results](#kallisto--bustools-results)
   - [STARsolo](#starsolo)
   - [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
@@ -19,6 +20,19 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [Other output data](#other-output-data)
   - [MultiQC](#multiqc)
   - [Pipeline information](#pipeline-information)
+
+## FastQC
+
+See [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc) for details about FastQC.
+
+The pipeline analyzes the raw data and generates for each file a FastQC report. All report are collected in MultiQC.
+
+**Output directory: `results/fastqc`**
+
+- `.html`
+  - Contains the FastQC report.
+- `.zip`
+  - Contains additional information, such as individual plots, and FastQC raw data.
 
 ## Kallisto & Bustools Results
 
@@ -49,8 +63,9 @@ For details on how to load these into R and perform further downstream analysis,
 
 ## STARsolo
 
-**Output directory: `results/STAR`**
+**Output directory: `results/star`**
 
+- Files will be organized in one directory per sample
 - Contains the mapped BAM files and output metrics created by STARsolo
 
 **Output directory: `results/reference_genome`**
@@ -91,6 +106,12 @@ Cell Ranger is a set of analysis scripts that processes 10X Chromium single cell
 - `extract_transcriptome`
   - When supplied with a `--fasta` genome fasta, this contains the extracted transcriptome
   - The GTF file supplied with `--gtf` is used to extract the transcriptome positions appropriately
+
+**Output directory: `results/${params.aligner}/mtx_conversions`**
+
+- `*_matrix.h5ad`
+  - `.mtx` files converted to [AnnData](https://anndata.readthedocs.io/en/latest/) in `.h5ad` format, using [scanpy package](https://scanpy.readthedocs.io/en/stable/).
+  - One per sample and a single one with all samples concatenated together `combined_matrix.h5ad`
 
 ## MultiQC
 

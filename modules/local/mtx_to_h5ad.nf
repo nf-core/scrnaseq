@@ -26,9 +26,9 @@ process MTX_TO_H5AD {
         barcodes_tsv = "*_alevin_results/alevin/quants_mat_rows.txt"
         features_tsv = "*_alevin_results/alevin/quants_mat_cols.txt"
     } else if (params.aligner == 'star') {
-        mtx_matrix   = "*.Solo.out/Gene*/filtered/matrix.mtx"
-        barcodes_tsv = "*.Solo.out/Gene*/filtered/barcodes.tsv"
-        features_tsv = "*.Solo.out/Gene*/filtered/features.tsv"
+        mtx_matrix   = "*.Solo.out/Gene*/filtered/matrix.mtx.gz"
+        barcodes_tsv = "*.Solo.out/Gene*/filtered/barcodes.tsv.gz"
+        features_tsv = "*.Solo.out/Gene*/filtered/features.tsv.gz"
     }
 
     //

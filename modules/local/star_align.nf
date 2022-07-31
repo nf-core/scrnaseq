@@ -69,6 +69,11 @@ process STAR_ALIGN {
         gzip ${prefix}.unmapped_2.fastq
     fi
 
+    if [ -d ${prefix}.Solo.out ]; then
+        # Backslashes still need to be escaped (https://github.com/nextflow-io/nextflow/issues/67)
+        find ${prefix}.Solo.out \\( -name "*.tsv" -o -name "*.mtx" \\) -exec gzip {} \\;
+    fi
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         star: \$(STAR --version | sed -e "s/STAR_//g")

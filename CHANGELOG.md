@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed Kallistobustools workflow [#123](https://github.com/nf-core/scrnaseq/issues/123) by upgrading to nf-core/modules module
 - Fixed matrix conversion error when running STAR with --soloFeatures GeneFull [#135](https://github.com/nf-core/scrnaseq/pull/135)
+- Fixed seurat matrix conversion error when running with conda profile [#136](https://github.com/nf-core/scrnaseq/pull/136)
 
 ## v2.0.0 - 2022-06-17 "Gray Nickel Beagle"
 

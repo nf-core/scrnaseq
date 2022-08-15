@@ -2,7 +2,7 @@ process MTX_TO_SEURAT {
     tag "$meta.id"
     label 'process_medium'
 
-    conda (params.enable_conda ? "seurat-scripts" : null)
+    conda (params.enable_conda ? "r-seurat" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'docker://satijalab/seurat:4.1.0' :
         'satijalab/seurat:4.1.0' }"
@@ -30,9 +30,9 @@ process MTX_TO_SEURAT {
         barcodes = "*_alevin_results/alevin/quants_mat_rows.txt"
         features = "*_alevin_results/alevin/quants_mat_cols.txt"
     } else if (params.aligner == 'star') {
-        matrix   = "*.Solo.out/Gene/filtered/matrix.mtx"
-        barcodes = "*.Solo.out/Gene/filtered/barcodes.tsv"
-        features = "*.Solo.out/Gene/filtered/features.tsv"
+        matrix   = "*.Solo.out/Gene*/filtered/matrix.mtx.gz"
+        barcodes = "*.Solo.out/Gene*/filtered/barcodes.tsv.gz"
+        features = "*.Solo.out/Gene*/filtered/features.tsv.gz"
     }
 
     if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')

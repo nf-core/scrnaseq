@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixes
 
 - Fixed Kallistobustools workflow [#123](https://github.com/nf-core/scrnaseq/issues/123) by upgrading to nf-core/modules module
-- Fixed Kallistobustools module [#116](https://github.com/nf-core/scrnaseq/issues/116). Module was asking the same amount of memory that was being set as limit and not taking into account the different outputs produced by kallisto standard and non-standard workflows.
-
-
+- Fixed matrix conversion error when running STAR with --soloFeatures GeneFull [#135](https://github.com/nf-core/scrnaseq/pull/135)
+- Fixed seurat matrix conversion error when running with conda profile [#136](https://github.com/nf-core/scrnaseq/pull/136)
+- Fixed Kallistobustools module [#116](https://github.com/nf-core/scrnaseq/issues/116). By updating nf-core module and making sure conversion modules take into account the different outputs produced by kallisto standard and non-standard workflows.
 
 ## v2.0.0 - 2022-06-17 "Gray Nickel Beagle"
 

@@ -35,6 +35,20 @@ process MTX_TO_SEURAT {
         features = "*.Solo.out/Gene*/filtered/features.tsv.gz"
     }
 
+    if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
+    """
+    # convert file types
+    for input_type in spliced unspliced ; do
+        mtx_to_seurat.R \\
+            *count/counts_unfiltered/\${input_type}.mtx \\
+            *count/counts_unfiltered/\${input_type}.barcodes.txt \\
+            *count/counts_unfiltered/\${input_type}.genes.txt \\
+            ${meta.id}_\${input_type}_matrix.rds \\
+            ${aligner}
+    done
+    """
+
+    else
     """
     mtx_to_seurat.R \\
         $matrix \\

@@ -13,8 +13,10 @@ process SIMPLEAF_INDEX {
     path transcript_gtf
 
     output:
-    path "salmon"       , emit: index
-    path "versions.yml" , emit: versions
+    path "salmon/index"              , emit: index
+    path "salmon/ref/*_t2g_3col.tsv" , emit: transcript_tsv
+    path "versions.yml"              , emit: versions
+    path "salmon"
 
     when:
     task.ext.when == null || task.ext.when

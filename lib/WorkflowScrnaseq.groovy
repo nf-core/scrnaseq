@@ -83,19 +83,19 @@ class WorkflowScrnaseq {
         if (aligner == 'alevin') {
             switch (protocol) {
                 case '10XV1':
-                    new_protocol = 'chromium'
+                    new_protocol = '10xv1'
                     chemistry = 'V1'
                     break
                 case '10XV2':
-                    new_protocol = 'chromium'
+                    new_protocol = '10xv2'
                     chemistry = 'V2'
                     break
                 case '10XV3':
-                    new_protocol = 'chromiumV3'
+                    new_protocol = '10xv3'
                     chemistry = 'V3'
                     break
-                case 'dropseq':
-                    new_protocol = 'dropseq'
+                // case 'dropseq':
+                //     new_protocol = 'dropseq'
             }
         }
 

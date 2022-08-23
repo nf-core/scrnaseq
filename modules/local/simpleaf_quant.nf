@@ -1,11 +1,11 @@
-process SALMON_ALEVIN {
+process SIMPLEAF_QUANT {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_high'
 
-    conda (params.enable_conda ? "bioconda::salmon=1.4.0" : null)
+    conda (params.enable_conda ? 'bioconda::simpleaf=0.4.0' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/salmon:1.4.0--h84f40af_1' :
-        'quay.io/biocontainers/salmon:1.4.0--h84f40af_1' }"
+        'https://depot.galaxyproject.org/singularity/simpleaf:0.4.0--h9f5acd7_0' :
+        'quay.io/biocontainers/simpleaf:0.4.0--h9f5acd7_0' }"
 
     input:
     //
@@ -14,6 +14,7 @@ process SALMON_ALEVIN {
     //
     tuple val(meta), path(reads)
     path index
+    path transcript_tsv
     path txp2gene
     val protocol
     path whitelist
@@ -29,19 +30,26 @@ process SALMON_ALEVIN {
     // separate forward from reverse pairs
     def (forward, reverse) = reads.collate(2).transpose()
     """
-    salmon alevin \\
-        -l ISR \\
-        -p $task.cpus \\
-        -1 ${forward.join( " " )} \\
-        -2 ${reverse.join( " " )} \\
-        --${protocol} \\
-        -i $index \\
-        --tgMap $txp2gene \\
-        --dumpFeatures --dumpMtx \\
-        $args \\
-        -o ${prefix}_alevin_results
+    # export required var
+    export ALEVIN_FRY_HOME=.
 
-    gzip -cdf ${whitelist} > ${prefix}_alevin_results/alevin/whitelist.txt
+    # prep simpleaf
+    simpleaf set-paths
+
+    # run simpleaf quant
+    gzip -dcf $whitelist > whitelist.txt
+    simpleaf quant \\
+        -1 ${forward.join( "," )} \\
+        -2 ${reverse.join( "," )} \\
+        -i ${index} \\
+        -o ${prefix}_alevin_results \\
+        -m $transcript_tsv \\
+        -t $task.cpus \\
+        -c $protocol \\
+        -u whitelist.txt \\
+        $args
+    
+    mv whitelist.txt ${prefix}_alevin_results/
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

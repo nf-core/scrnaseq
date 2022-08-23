@@ -154,6 +154,17 @@
                 "star_ignore_sjdbgtf": {
                     "type": "string",
                     "description": "Ignore the SJDB GTF file."
+                },
+                "barcode_length": {
+                    "type": "integer",
+                    "description": "Customize barcode read length."
+                },
+                "star_genomic_features": {
+                    "type": "string",
+                    "description": "Genomic features for which UMI counts per cell barcode are collected, e.g. Gene (default).",
+                    "default": "Gene",
+                    "help_text": "To choose which one to use, please specify either `Gene` or `GeneFull` as a parameter option. By `Gene`, counting reads match gene transcript; by `GeneFull`, counting all reads overlap exons and introns.",
+                    "enum": ["Gene", "GeneFull"]
                 }
             },
             "fa_icon": "fas fa-star"

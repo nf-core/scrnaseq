@@ -18,6 +18,8 @@ process STAR_ALIGN {
     path whitelist
     val protocol
     val other_10x_parameters
+    val barcode_length
+    val star_genomic_features
 
     output:
     tuple val(meta), path('*d.out.bam')       , emit: bam
@@ -51,6 +53,8 @@ process STAR_ALIGN {
         --outFileNamePrefix $prefix. \\
         --soloCBwhitelist <(gzip -cdf $whitelist) \\
         --soloType $protocol \\
+        --soloBarcodeReadLength $barcode_length \\
+        --soloFeatures $star_genomic_features \\
         $other_10x_parameters \\
         $out_sam_type \\
         $ignore_gtf \\

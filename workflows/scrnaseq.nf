@@ -91,6 +91,8 @@ ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 
 //star params
 ch_star_index = params.star_index ? file(params.star_index) : []
+barcode_length = params.barcode_length
+star_genomic_features = params.star_genomic_features
 
 //cellranger params
 ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
@@ -146,7 +148,9 @@ workflow SCRNASEQ {
             protocol,
             ch_barcode_whitelist,
             ch_fastq,
-            other_parameters
+            other_parameters,
+            barcode_length,
+            star_genomic_features
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_star = STARSOLO.out.for_multiqc

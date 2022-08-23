@@ -43,7 +43,7 @@ process MTX_TO_H5AD {
         --out ${meta.id}_matrix.h5ad
     """
 
-    if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
+    else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
     for input_type in spliced unspliced ; do

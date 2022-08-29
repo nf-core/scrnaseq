@@ -31,8 +31,10 @@ workflow SCRNASEQ_ALEVIN {
         """Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf'), or a genome fasta file
         and a transcriptome fasta file ('--transcript_fasta`) if no index is given!""".stripIndent()
 
-    assert txp2gene || gtf:
-        "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
+    if (transcript_fasta) {
+        assert txp2gene:
+            "Since a built transcript was provided ('--transcript_fasta'), must also provide a simpleaf gene map ('--txp2gene') to use with simpleaf quant!"
+    }
 
 
     /*
@@ -46,14 +48,9 @@ workflow SCRNASEQ_ALEVIN {
     }
 
     /*
-    * Build txp2gene map
+    * Select txp2gene map
     */
-    if (!txp2gene){
-        GFFREAD_TXP2GENE( gtf )
-        txp2gene = GFFREAD_TXP2GENE.out.gtf
-        // Only collect version if not already done for gffread
-        ch_versions = ch_versions.mix(GFFREAD_TXP2GENE.out.versions)
-    }
+    if (!txp2gene) { txp2gene = SIMPLEAF_INDEX.out.transcript_tsv }
 
     /*
     * Perform quantification with salmon alevin
@@ -61,7 +58,6 @@ workflow SCRNASEQ_ALEVIN {
     SIMPLEAF_QUANT (
         ch_fastq,
         salmon_index,
-        transcript_tsv,
         txp2gene,
         protocol,
         barcode_whitelist

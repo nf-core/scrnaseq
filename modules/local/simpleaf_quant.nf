@@ -14,7 +14,6 @@ process SIMPLEAF_QUANT {
     //
     tuple val(meta), path(reads)
     path index
-    path transcript_tsv
     path txp2gene
     val protocol
     path whitelist
@@ -43,7 +42,7 @@ process SIMPLEAF_QUANT {
         -2 ${reverse.join( "," )} \\
         -i ${index} \\
         -o ${prefix}_alevin_results \\
-        -m $transcript_tsv \\
+        -m $txp2gene \\
         -t $task.cpus \\
         -c $protocol \\
         -u whitelist.txt \\

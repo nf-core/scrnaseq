@@ -14,6 +14,15 @@ from pathlib import Path
 
 logger = logging.getLogger()
 
+def print_error(error, context="Line", context_str=""):
+    error_str = "ERROR: Please check samplesheet -> {}".format(error)
+    if context != "" and context_str != "":
+        error_str = "ERROR: Please check samplesheet -> {}\n{}: '{}'".format(
+            error, context.strip(), context_str.strip()
+        )
+    print(error_str)
+    sys.exit(1)
+
 
 class RowChecker:
     """

@@ -13,10 +13,10 @@ class Utils {
         Yaml parser = new Yaml()
         def channels = []
         try {
-            def config = parser.load("conda config --show channels".execute().text)
+            def config = parser.load('conda config --show channels'.execute().text)
             channels = config.channels
-        } catch(NullPointerException | IOException e) {
-            log.warn "Could not verify conda channel configuration."
+        } catch (NullPointerException | IOException e) {
+            log.warn 'Could not verify conda channel configuration.'
             return
         }
 

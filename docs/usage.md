@@ -1,12 +1,6 @@
 # nf-core/scrnaseq: Usage
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/scrnaseq/usage](https://nf-co.re/scrnaseq/usage)
-
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
-
-## Introduction
-
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
 
 ## Samplesheet input
 
@@ -29,7 +23,7 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
+The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
 
 A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
 
@@ -52,15 +46,41 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
-## Running the pipeline
+## Aligning options
 
-The typical command for running the pipeline is as follows:
+By default, the pipeline uses [Salmon Alevin](https://salmon.readthedocs.io/en/latest/alevin.html) (i.e. --aligner alevin) to perform pseudo-alignment of reads to the reference genome and to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
 
-```bash
-nextflow run nf-core/scrnaseq --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile docker
+Other aligner options for running the pipeline are:
+
+- [Kallisto](https://pachterlab.github.io/kallisto/about) & [Bustools](https://bustools.github.io/), where kallisto is used for alignment and bustools is used for downstream analysis
+  - `--aligner kallisto`
+- [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md) to perform both alignment and downstream analysis.
+  - `--aligner star`
+- [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
+  - `--aligner cellranger`
+
+### If using cellranger
+
+In order to use cellranger aligner, reads must be named as [required by the tool](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
+
+`[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz`
+
+Besides that, the sample name given in the samplesheet must be the same that is present in the reads name. E.g.
+
+```console
+sample,fastq_1,fastq_2,
+TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
 ```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+## Running the pipeline
+
+The minimum typical command for running the pipeline is as follows:
+
+```bash
+nextflow run nf-core/scrnaseq --input 'samplesheet.csv' --genome_fasta human.fasta --gtf human.gtf -profile docker
+```
+
+This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -83,7 +103,7 @@ nextflow pull nf-core/scrnaseq
 
 It is a good idea to specify a pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
 
-First, go to the [nf-core/scrnaseq releases page](https://github.com/nf-core/scrnaseq/releases) and find the latest version number - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`.
+First, go to the [nf-core/scrnaseq releases page](https://github.com/nf-core/scrnaseq/releases) and find the latest version number - numeric only (eg. `1.0.0`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.0.0`.
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
 
@@ -92,6 +112,8 @@ This version number will be logged in reports when you run the pipeline, so that
 > **NB:** These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
 
 ### `-profile`
+
+Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments. Note that multiple profiles can be loaded, for example: `-profile docker` - the order of arguments is important!
 
 Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments.
 

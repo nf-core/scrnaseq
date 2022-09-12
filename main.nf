@@ -4,20 +4,12 @@
     nf-core/scrnaseq
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/scrnaseq
-Website: https://nf-co.re/scrnaseq
+    Website: https://nf-co.re/scrnaseq
     Slack  : https://nfcore.slack.com/channels/scrnaseq
 ----------------------------------------------------------------------------------------
 */
 
 nextflow.enable.dsl = 2
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    GENOME PARAMETER VALUES
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,10 +28,11 @@ WorkflowMain.initialise(workflow, params, log)
 include { SCRNASEQ } from './workflows/scrnaseq'
 
 //
-// WORKFLOW: Run main nf-core/scrnaseq analysis pipeline
+// WORKFLOW: Run main scrnaseq analysis pipeline
 //
-workflow NFCORE_SCRNASEQ {
-    SCRNASEQ ()
+
+workflow NFCORE_SCRNASEQ{
+    SCRNASEQ()
 }
 
 /*

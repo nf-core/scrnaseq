@@ -47,7 +47,8 @@
                 },
                 "salmon/index": {
                     "branch": "master",
-                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d",
+                    "patch": "modules/nf-core/modules/salmon/index/salmon-index.diff"
                 },
                 "salmon/quant": {
                     "branch": "master",

@@ -1,0 +1,36 @@
+Changes in module 'nf-core/modules/salmon/index'
+--- modules/nf-core/modules/salmon/index/main.nf
++++ modules/nf-core/modules/salmon/index/main.nf
+@@ -20,21 +20,28 @@
+ 
+     script:
+     def args = task.ext.args ?: ''
++    def kmer_argmatch = args =~ /\-k *(\d+)/
++    def k = kmer_argmatch ? kmer_argmatch[0][1] : 31
+     def get_decoy_ids = "grep '^>' $genome_fasta | cut -d ' ' -f 1 > decoys.txt"
+     def gentrome      = "gentrome.fa"
++    def maybe_unzip   = "cat"
+     if (genome_fasta.endsWith('.gz')) {
+         get_decoy_ids = "grep '^>' <(gunzip -c $genome_fasta) | cut -d ' ' -f 1 > decoys.txt"
+         gentrome      = "gentrome.fa.gz"
++        maybe_unzip   = "gunzip -c" 
+     }
+     """
+     $get_decoy_ids
+     sed -i.bak -e 's/>//g' decoys.txt
+-    cat $transcript_fasta $genome_fasta > $gentrome
++    cat $transcript_fasta $genome_fasta \\
++    | $maybe_unzip \\
++    | awk '!/^>/ { next } { getline seq } length(seq) >= $k { print \$0 "\\n" seq }' \\
++    | gzip -c > gentrome.filtered.fasta.gz
+ 
+     salmon \\
+         index \\
+         --threads $task.cpus \\
+-        -t $gentrome \\
++        -t gentrome.filtered.fasta.gz \\
+         -d decoys.txt \\
+         $args \\
+         -i salmon
+
+************************************************************

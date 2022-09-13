@@ -42,7 +42,7 @@ include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
-
+include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -116,11 +116,13 @@ workflow SCRNASEQ {
       ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
     }
 
+    ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
+
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
         KALLISTO_BUSTOOLS(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_kallisto_index,
             ch_txp2gene,
             protocol,
@@ -136,7 +138,7 @@ workflow SCRNASEQ {
     if (params.aligner == "alevin") {
         SCRNASEQ_ALEVIN(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_transcript_fasta,
             ch_salmon_index,
             ch_txp2gene,
@@ -154,7 +156,7 @@ workflow SCRNASEQ {
     if (params.aligner == "star") {
         STARSOLO(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_star_index,
             protocol,
             ch_barcode_whitelist,
@@ -170,7 +172,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellranger") {
         CELLRANGER_ALIGN(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_cellranger_index,
             ch_fastq
         )

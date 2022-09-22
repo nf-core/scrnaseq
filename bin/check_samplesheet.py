@@ -14,15 +14,6 @@ from pathlib import Path
 
 logger = logging.getLogger()
 
-def print_error(error, context="Line", context_str=""):
-    error_str = "ERROR: Please check samplesheet -> {}".format(error)
-    if context != "" and context_str != "":
-        error_str = "ERROR: Please check samplesheet -> {}\n{}: '{}'".format(
-            error, context.strip(), context_str.strip()
-        )
-    print(error_str)
-    sys.exit(1)
-
 
 class RowChecker:
     """
@@ -150,6 +141,16 @@ def read_head(handle, num_lines=10):
     return "".join(lines)
 
 
+def print_error(error, context="Line", context_str=""):
+    error_str = "ERROR: Please check samplesheet -> {}".format(error)
+    if context != "" and context_str != "":
+        error_str = "ERROR: Please check samplesheet -> {}\n{}: '{}'".format(
+            error, context.strip(), context_str.strip()
+        )
+    print(error_str)
+    sys.exit(1)
+
+
 def sniff_format(handle):
     """
     Detect the tabular format.
@@ -210,7 +211,9 @@ def check_samplesheet(file_in, file_out):
         HEADER = ["sample", "fastq_1", "fastq_2"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
         if header[: len(HEADER)] != HEADER:
-            print("ERROR: Please check samplesheet header -> {} != {}".format(",".join(header), ",".join(HEADER)))
+            given = ",".join(header)
+            wanted = ",".join(HEADER)
+            print(f"ERROR: Please check samplesheet header -> {given} != {wanted}")
             sys.exit(1)
 
         ## Check sample entries

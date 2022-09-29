@@ -2,7 +2,7 @@ process ALEVINQC {
     tag "$meta.id"
     label 'process_low'
 
-    conda (params.enable_conda ? "bioconda::bioconductor-alevinqc=1.6.1" : null)
+    conda (params.enable_conda ? "bioconda::bioconductor-alevinqc=1.12.1" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.12.1--r41h9f5acd7_0' :
         'quay.io/biocontainers/bioconductor-alevinqc:1.12.1--r41h9f5acd7_0' }"

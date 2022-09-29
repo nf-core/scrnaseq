@@ -22,7 +22,7 @@ process ALEVINQC {
     alevinFryQCReport(
         mapDir = "${alevin_results}/af_map",
         quantDir = "${alevin_results}/af_quant",
-        permitDir= "${alevin_results}",
+        permitDir= "${alevin_results}/af_quant",
         sampleId = "${prefix}",
         outputFile = "alevin_report_${meta.id}.html",
         outputFormat = "html_document",

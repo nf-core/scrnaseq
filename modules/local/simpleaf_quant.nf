@@ -23,7 +23,7 @@ process SIMPLEAF_QUANT {
     path  "versions.yml"                     , emit: versions
 
     script:
-    def args = task.ext.args ?: ''
+    def args   = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     // separate forward from reverse pairs

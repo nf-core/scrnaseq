@@ -26,6 +26,8 @@ process SIMPLEAF_QUANT {
     def args      = task.ext.args ?: ''
     def args_list = args.tokenize()
     def prefix    = task.ext.prefix ?: "${meta.id}"
+    // WARN: Version information not provided by tool on CLI. Please update version string below when bumping container versions.
+    def VERSION   = '0.5.1'
 
     //
     // check if users are using one of the mutually excludable parameters:
@@ -66,6 +68,7 @@ process SIMPLEAF_QUANT {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
+        simpleaf: $VERSION
         salmon: \$(salmon --version | sed -e "s/salmon //g")
     END_VERSIONS
     """

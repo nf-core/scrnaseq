@@ -24,6 +24,8 @@ process SIMPLEAF_INDEX {
     script:
     def args = task.ext.args ?: ''
     def seq_inputs = (params.transcript_fasta) ? "--refseq $transcript_fasta" : "--gtf $transcript_gtf"
+    // WARN: Version information not provided by tool on CLI. Please update version string below when bumping container versions.
+    def VERSION = '0.5.1'
     """
     # export required var
     export ALEVIN_FRY_HOME=.
@@ -42,7 +44,8 @@ process SIMPLEAF_INDEX {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        simpleaf: TODO: find a way to grab version
+        simpleaf: $VERSION
+        salmon: \$(salmon --version | sed -e "s/salmon //g")
     END_VERSIONS
     """
 }

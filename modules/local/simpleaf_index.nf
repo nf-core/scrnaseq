@@ -39,10 +39,10 @@ process SIMPLEAF_INDEX {
         $seq_inputs \\
         $args \\
         -o salmon
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        simpleaf: 0.4.0
+        simpleaf: TODO: find a way to grab version
     END_VERSIONS
     """
 }

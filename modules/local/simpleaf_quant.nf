@@ -35,8 +35,8 @@ process SIMPLEAF_QUANT {
         unfiltered_command = ""
         save_whitelist     = ""
     } else {
-        unfiltered_command = "-u whitelist.txt"
-        save_whitelist     = "mv whitelist.txt ${prefix}_alevin_results/"
+        unfiltered_command = "-u whitelist.uncompressed.txt"
+        save_whitelist     = "mv whitelist.uncompressed.txt ${prefix}_alevin_results/"
     }
 
     // separate forward from reverse pairs
@@ -49,7 +49,7 @@ process SIMPLEAF_QUANT {
     simpleaf set-paths
 
     # run simpleaf quant
-    gzip -dcf $whitelist > whitelist.txt
+    gzip -dcf $whitelist > whitelist.uncompressed.txt
     simpleaf quant \\
         -1 ${forward.join( "," )} \\
         -2 ${reverse.join( "," )} \\

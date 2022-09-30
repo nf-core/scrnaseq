@@ -23,8 +23,21 @@ process SIMPLEAF_QUANT {
     path  "versions.yml"                     , emit: versions
 
     script:
-    def args   = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    def args      = task.ext.args ?: ''
+    def args_list = args.tokenize()
+    def prefix    = task.ext.prefix ?: "${meta.id}"
+
+    //
+    // check if users are using one of the mutually excludable parameters:
+    //    e.g -k,--knee | -e,--expect-cells | -f, --forced-cells
+    //
+    if (args_list.any { it in ['-k', '--knee', '-e', '--expect-cells', '-f', '--forced-cells']}) {
+        unfiltered_command = ""
+        save_whitelist     = ""
+    } else {
+        unfiltered_command = "-u whitelist.txt"
+        save_whitelist     = "mv whitelist.txt ${prefix}_alevin_results/"
+    }
 
     // separate forward from reverse pairs
     def (forward, reverse) = reads.collate(2).transpose()
@@ -45,11 +58,11 @@ process SIMPLEAF_QUANT {
         -m $txp2gene \\
         -t $task.cpus \\
         -c $protocol \\
-        -u whitelist.txt \\
+        $unfiltered_command \\
         $args
 
-    mv whitelist.txt ${prefix}_alevin_results/
-    cp ${prefix}_alevin_results/af_quant/permit_freq.bin ${prefix}_alevin_results/af_quant/all_freq.bin
+    $save_whitelist
+    [[ ! -f ${prefix}_alevin_results/af_quant/all_freq.bin ]] && cp ${prefix}_alevin_results/af_quant/permit_freq.bin ${prefix}_alevin_results/af_quant/all_freq.bin
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

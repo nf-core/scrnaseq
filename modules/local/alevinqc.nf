@@ -12,7 +12,7 @@ process ALEVINQC {
 
     output:
     tuple val(meta), path("alevin_report_${meta.id}.html"), emit: report
-    path  "versions.yml"                      , emit: versions
+    path  "versions.yml", emit: versions
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"

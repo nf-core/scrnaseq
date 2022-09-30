@@ -47,8 +47,9 @@ process SIMPLEAF_QUANT {
         -c $protocol \\
         -u whitelist.txt \\
         $args
-    
+
     mv whitelist.txt ${prefix}_alevin_results/
+    cp ${prefix}_alevin_results/af_quant/permit_freq.bin ${prefix}_alevin_results/af_quant/all_freq.bin
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

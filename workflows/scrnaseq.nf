@@ -10,7 +10,7 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowScrnaseq.initialise(params, log)
 
 def checkPathParamList = [
-    params.input, params.multiqc_config, params.genome_fasta, params.gtf,
+    params.input, params.multiqc_config, params.fasta, params.gtf,
     params.transcript_fasta, params.salmon_index, params.kallisto_index,
     params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index
 ]
@@ -69,7 +69,7 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
 // general input and params
 ch_input = file(params.input)
-ch_genome_fasta = params.genome_fasta ? file(params.genome_fasta) : []
+ch_genome_fasta = params.fasta ? file(params.fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []

@@ -19,7 +19,7 @@ workflow CELLRANGER_ALIGN {
         ch_versions = Channel.empty()
 
         assert cellranger_index || (fasta && gtf):
-            "Must provide either a cellranger index or both a fasta file ('--genome_fasta') and a gtf file ('--gtf')."
+            "Must provide either a cellranger index or both a fasta file ('--fasta') and a gtf file ('--gtf')."
 
         if (!cellranger_index) {
             // Filter GTF based on gene biotypes passed in params.modules

@@ -28,7 +28,7 @@ workflow SCRNASEQ_ALEVIN {
     ch_versions = Channel.empty()
 
     assert salmon_index || (genome_fasta && gtf) || (genome_fasta && transcript_fasta):
-        """Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf'), or a genome fasta file
+        """Must provide a genome fasta file ('--fasta') and a gtf file ('--gtf'), or a genome fasta file
         and a transcriptome fasta file ('--transcript_fasta`) if no index is given!""".stripIndent()
 
     assert txp2gene || gtf:

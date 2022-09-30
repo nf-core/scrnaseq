@@ -77,7 +77,7 @@ TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
 The minimum typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/scrnaseq --input 'samplesheet.csv' --genome_fasta human.fasta --gtf human.gtf -profile docker
+nextflow run nf-core/scrnaseq --input 'samplesheet.csv' --genome GRCh38 -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.

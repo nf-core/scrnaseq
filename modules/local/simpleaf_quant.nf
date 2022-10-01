@@ -66,7 +66,7 @@ process SIMPLEAF_QUANT {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        simpleaf: \$(simpleaf -V | tr -d '\n')
+        simpleaf: \$(simpleaf -V | tr -d '\\n' | cut -d ' ' -f 2)
         salmon: \$(salmon --version | sed -e "s/salmon //g")
     END_VERSIONS
     """

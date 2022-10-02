@@ -85,11 +85,7 @@ class WorkflowMain {
         if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
             if (params.genomes[ params.genome ].containsKey(attribute)) {
                 return params.genomes[ params.genome ][ attribute ]
-            } else {
-                println "Could not find attribute '$attribute'"
             }
-        } else {
-            println "Could not find genome"
         }
         return null
     }

@@ -26,7 +26,6 @@ workflow CELLRANGER_ALIGN {
             CELLRANGER_MKGTF( gtf )
             ch_versions = ch_versions.mix(CELLRANGER_MKGTF.out.versions)
 
-            CELLRANGER_MKGTF.out.gtf.view()
             // Make reference genome
             CELLRANGER_MKREF( fasta, CELLRANGER_MKGTF.out.gtf, "cellranger_reference" )
             ch_versions = ch_versions.mix(CELLRANGER_MKREF.out.versions)

@@ -22,19 +22,12 @@ process SALMON_INDEX {
     def args = task.ext.args ?: ''
     def kmer_argmatch = args =~ /\-k *(\d+)/
     def k = kmer_argmatch ? kmer_argmatch[0][1] : 31
-    def get_decoy_ids = "grep '^>' $genome_fasta | cut -d ' ' -f 1 > decoys.txt"
-    def gentrome      = "gentrome.fa"
-    def maybe_unzip   = "cat"
-    if (genome_fasta.endsWith('.gz')) {
-        get_decoy_ids = "grep '^>' <(gunzip -c $genome_fasta) | cut -d ' ' -f 1 > decoys.txt"
-        gentrome      = "gentrome.fa.gz"
-        maybe_unzip   = "gunzip -c" 
-    }
     """
-    $get_decoy_ids
-    sed -i.bak -e 's/>//g' decoys.txt
-    cat $transcript_fasta $genome_fasta \\
-    | $maybe_unzip \\
+    grep '^>' $genome_fasta \\
+    | cut -d ' ' -f 1 \\
+    | sed 's/>//g' > decoys.txt
+
+    cat $genome_fasta \\
     | awk '!/^>/ { next } { getline seq } length(seq) >= $k { print \$0 "\\n" seq }' \\
     | gzip -c > gentrome.filtered.fasta.gz
 

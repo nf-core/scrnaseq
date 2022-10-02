@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# Script originally written by Pranathi Vemuri (github.com/pranathivemuri)
+#   modified by Harshil Patel (github.com/drpatelh)
+
 from __future__ import print_function
 import logging
 from itertools import groupby

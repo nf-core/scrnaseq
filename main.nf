@@ -4,7 +4,8 @@
     nf-core/scrnaseq
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/scrnaseq
-Website: https://nf-co.re/scrnaseq
+
+    Website: https://nf-co.re/scrnaseq
     Slack  : https://nfcore.slack.com/channels/scrnaseq
 ----------------------------------------------------------------------------------------
 */

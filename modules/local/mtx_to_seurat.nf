@@ -15,6 +15,9 @@ process MTX_TO_SEURAT {
     output:
     path "*.rds", emit: seuratObjects
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def aligner = params.aligner
     if (params.aligner == "cellranger") {
@@ -26,9 +29,9 @@ process MTX_TO_SEURAT {
         barcodes = "*count/counts_unfiltered/*.barcodes.txt"
         features = "*count/counts_unfiltered/*.genes.txt"
     } else if (params.aligner == "alevin") {
-        matrix   = "*_alevin_results/alevin/quants_mat.mtx.gz"
-        barcodes = "*_alevin_results/alevin/quants_mat_rows.txt"
-        features = "*_alevin_results/alevin/quants_mat_cols.txt"
+        matrix   = "*_alevin_results/af_quant/alevin/quants_mat.mtx"
+        barcodes = "*_alevin_results/af_quant/alevin/quants_mat_rows.txt"
+        features = "*_alevin_results/af_quant/alevin/quants_mat_cols.txt"
     } else if (params.aligner == 'star') {
         matrix   = "*.Solo.out/Gene*/filtered/matrix.mtx.gz"
         barcodes = "*.Solo.out/Gene*/filtered/barcodes.tsv.gz"

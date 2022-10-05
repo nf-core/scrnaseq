@@ -2,61 +2,53 @@
     "name": "nf-core/scrnaseq",
     "homePage": "https://github.com/nf-core/scrnaseq",
     "repos": {
-        "nf-core/modules": {
-            "git_url": "https://github.com/nf-core/modules.git",
+        "https://github.com/nf-core/modules.git": {
             "modules": {
-                "cellranger/count": {
-                    "branch": "master",
-                    "git_sha": "e1a3ae6bf5afce6b23f580e3225e7bdbe1388cd0"
-                },
-                "cellranger/mkgtf": {
-                    "branch": "master",
-                    "git_sha": "e499abe572bc7c1322dfa66b767b0e65fe8c62ca"
-                },
-                "cellranger/mkref": {
-                    "branch": "master",
-                    "git_sha": "61d87bb2bcbcd058e1af6e5f14bb821b8ae4ed3e"
-                },
-                "custom/dumpsoftwareversions": {
-                    "branch": "master",
-                    "git_sha": "682f789f93070bd047868300dd018faf3d434e7c"
-                },
-                "fastqc": {
-                    "branch": "master",
-                    "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
-                },
-                "gffread": {
-                    "branch": "master",
-                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-                },
-                "gunzip": {
-                    "branch": "master",
-                    "git_sha": "fa37e0662690c4ec4260dae282fbce08777503e6"
-                },
-                "kallistobustools/count": {
-                    "branch": "master",
-                    "git_sha": "013035eb5c80c9e3f37f2c89c92a1ae7925df8ea"
-                },
-                "kallistobustools/ref": {
-                    "branch": "master",
-                    "git_sha": "0f1e736212e5ae37036ac7e32b225087a8a9b154"
-                },
-                "multiqc": {
-                    "branch": "master",
-                    "git_sha": "5138acca0985ca01c38a1c4fba917d83772b1106"
-                },
-                "salmon/index": {
-                    "branch": "master",
-                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d",
-                    "patch": "modules/nf-core/modules/salmon/index/salmon-index.diff"
-                },
-                "salmon/quant": {
-                    "branch": "master",
-                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-                },
-                "star/genomegenerate": {
-                    "branch": "master",
-                    "git_sha": "fb6c7bca3d55c19a793372513395e3a567bdd7ba"
+                "nf-core": {
+                    "cellranger/count": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "cellranger/mkgtf": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "cellranger/mkref": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "custom/dumpsoftwareversions": {
+                        "branch": "master",
+                        "git_sha": "8022c68e7403eecbd8ba9c49496f69f8c49d50f0"
+                    },
+                    "fastqc": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "gffread": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "gunzip": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "kallistobustools/count": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "kallistobustools/ref": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "multiqc": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "star/genomegenerate": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    }
                 }
             }
         }

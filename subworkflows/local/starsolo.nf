@@ -2,8 +2,8 @@
 include { STAR_ALIGN }                  from '../../modules/local/star_align'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
-include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/modules/star/genomegenerate/main'
+include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
+include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/star/genomegenerate/main'
 
 
 def multiqc_report    = []

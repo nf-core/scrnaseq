@@ -94,14 +94,10 @@ if __name__ == "__main__":
         action="store_true",
         help="Use version numbers in transcript and gene ids",
     )
-    parser.add_argument(
-        "--skip_gene_names", "-s", action="store_true", help="Do not output gene names"
-    )
+    parser.add_argument("--skip_gene_names", "-s", action="store_true", help="Do not output gene names")
     args = parser.parse_args()
 
     input = sys.stdin
-    r = create_transcript_list(
-        input, use_name=not args.skip_gene_names, use_version=args.use_version
-    )
+    r = create_transcript_list(input, use_name=not args.skip_gene_names, use_version=args.use_version)
     output = sys.stdout
     print_output(output, r)

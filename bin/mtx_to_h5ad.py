@@ -33,16 +33,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Converts mtx output to h5ad.")
 
     parser.add_argument("-m", "--mtx", dest="mtx", help="Path to mtx file.")
-    parser.add_argument(
-        "-v", "--verbose", dest="verbose", help="Toggle verbose messages", default=False
-    )
+    parser.add_argument("-v", "--verbose", dest="verbose", help="Toggle verbose messages", default=False)
     parser.add_argument("-f", "--feature", dest="feature", help="Path to feature file.")
     parser.add_argument("-b", "--barcode", dest="barcode", help="Path to barcode file.")
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
-    parser.add_argument(
-        "-a", "--aligner", dest="aligner", help="Which aligner has been used?"
-    )
+    parser.add_argument("-a", "--aligner", dest="aligner", help="Which aligner has been used?")
 
     args = vars(parser.parse_args())
 

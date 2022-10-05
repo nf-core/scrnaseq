@@ -22,6 +22,13 @@ jobs:
         NXF_VER:
           - "21.10.3"
           - "latest-everything"
+        profile:
+          [
+            "test,docker --aligner alevin",
+            "test,docker --aligner kallisto",
+            "test,docker --aligner star",
+            "test,docker --aligner cellranger -stub",
+          ]
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -32,8 +39,7 @@ jobs:
           version: "${{ matrix.NXF_VER }}"
 
       - name: Run pipeline with test data
-        # TODO nf-core: You can customise CI pipeline run tests as required
         # For example: adding multiple test runs with different parameters
         # Remember that you can parallelise this by using strategy.matrix
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }} --outdir ./results

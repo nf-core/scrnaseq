@@ -9,13 +9,13 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowScrnaseq.initialise(params, log)
 
-// TODO nf-core: Add all file path parameters for the pipeline to the list below
-// Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
+def checkPathParamList = [
+    params.input, params.multiqc_config, params.genome_fasta, params.gtf,
+    params.transcript_fasta, params.salmon_index, params.kallisto_index,
+    params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index
+]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
-// Check mandatory parameters
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,7 +37,13 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { INPUT_CHECK       } from '../subworkflows/local/input_check'
+include { FASTQC_CHECK } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
+include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
+include { STARSOLO          } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
+include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,9 +54,8 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                      } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { MULTIQC } from "../modules/local/multiqc"
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,28 +64,129 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoft
 */
 
 // Info required for completion email and summary
-def multiqc_report = []
+// TODO: Are this channels still necessary?
+ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
+ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
+(protocol, chemistry, other_parameters) = WorkflowScrnaseq.formatProtocol(params.protocol, params.aligner)
+
+// general input and params
+ch_input = file(params.input)
+ch_genome_fasta = params.genome_fasta ? file(params.genome_fasta) : []
+ch_gtf = params.gtf ? file(params.gtf) : []
+ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
+ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
+ch_multiqc_alevin = []
+ch_multiqc_star = []
+if (params.barcode_whitelist) {
+    ch_barcode_whitelist = file(params.barcode_whitelist)
+} else if (params.protocol.contains("10X")) {
+    ch_barcode_whitelist = file("$baseDir/assets/whitelist/10x_${chemistry}_barcode_whitelist.txt.gz", checkIfExists: true)
+} else {
+    ch_barcode_whitelist = []
+}
+
+
+//kallisto params
+ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
+kb_workflow = params.kb_workflow
+
+//salmon params
+ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
+
+//star params
+ch_star_index = params.star_index ? file(params.star_index) : []
+
+//cellranger params
+ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
+
 
 workflow SCRNASEQ {
 
-    ch_versions = Channel.empty()
+    ch_versions     = Channel.empty()
+    ch_mtx_matrices = Channel.empty()
 
-    //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
-    INPUT_CHECK (
-        ch_input
-    )
+    // Check input files and stage input data
+    ch_fastq = INPUT_CHECK( ch_input ).reads
+
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    //
-    // MODULE: Run FastQC
-    //
-    FASTQC (
-        INPUT_CHECK.out.reads
-    )
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+    // Run FastQC
+    ch_multiqc_fastqc = Channel.empty()
+    if (!params.skip_fastqc){
+      FASTQC_CHECK ( ch_fastq )
+      ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
+      ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
+    }
 
+    // Run kallisto bustools pipeline
+    if (params.aligner == "kallisto") {
+        KALLISTO_BUSTOOLS(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_kallisto_index,
+            ch_txp2gene,
+            protocol,
+            chemistry,
+            kb_workflow,
+            ch_fastq
+        )
+        ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.counts)
+    }
+
+    // Run salmon alevin pipeline
+    if (params.aligner == "alevin") {
+        SCRNASEQ_ALEVIN(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_transcript_fasta,
+            ch_salmon_index,
+            ch_txp2gene,
+            ch_barcode_whitelist,
+            protocol,
+            chemistry,
+            ch_fastq
+        )
+        ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
+        ch_multiqc_alevin = SCRNASEQ_ALEVIN.out.for_multiqc
+        ch_mtx_matrices = ch_mtx_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_results)
+    }
+
+    // Run STARSolo pipeline
+    if (params.aligner == "star") {
+        STARSOLO(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_star_index,
+            protocol,
+            ch_barcode_whitelist,
+            ch_fastq,
+            other_parameters
+        )
+        ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.star_counts)
+        ch_multiqc_star = STARSOLO.out.for_multiqc
+    }
+
+    // Run cellranger pipeline
+    if (params.aligner == "cellranger") {
+        CELLRANGER_ALIGN(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_cellranger_index,
+            ch_fastq
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
+    }
+
+    // Run mtx to h5ad conversion subworkflow
+    MTX_CONVERSION (
+        ch_mtx_matrices,
+        ch_input
+    )
+
+    // collect software versions
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
@@ -99,6 +205,8 @@ workflow SCRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin)
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star)
 
     MULTIQC (
         ch_multiqc_files.collect(),

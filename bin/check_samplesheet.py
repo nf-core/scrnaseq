@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# This script is based on the example at: https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
 
 """Provide a command line tool to validate and transform tabular samplesheets."""
 
@@ -85,8 +86,9 @@ class RowChecker:
 
     def _validate_first(self, row):
         """Assert that the first FASTQ entry is non-empty and has the right format."""
-        if len(row[self._first_col]) <= 0:
-            raise AssertionError("At least the first FASTQ file is required.")
+        assert (
+            len(row[self._first_col]) > 0
+        ), "At least the first FASTQ file is required."
         self._validate_fastq_format(row[self._first_col])
 
     def _validate_second(self, row):
@@ -98,10 +100,10 @@ class RowChecker:
         """Assert that read pairs have the same file extension. Report pair status."""
         if row[self._first_col] and row[self._second_col]:
             row[self._single_col] = False
-            first_col_suffix = Path(row[self._first_col]).suffixes[-2:]
-            second_col_suffix = Path(row[self._second_col]).suffixes[-2:]
-            if first_col_suffix != second_col_suffix:
-                raise AssertionError("FASTQ pairs must have the same file extensions.")
+            assert (
+                Path(row[self._first_col]).suffixes[-2:]
+                == Path(row[self._second_col]).suffixes[-2:]
+            ), "FASTQ pairs must have the same file extensions."
         else:
             row[self._single_col] = True
 
@@ -121,13 +123,17 @@ class RowChecker:
         number of times the same sample exist, but with different FASTQ files, e.g., multiple runs per experiment.
 
         """
-        if len(self._seen) != len(self.modified):
-            raise AssertionError("The pair of sample name and FASTQ must be unique.")
-        seen = Counter()
-        for row in self.modified:
-            sample = row[self._sample_col]
-            seen[sample] += 1
-            row[self._sample_col] = f"{sample}_T{seen[sample]}"
+        assert len(self._seen) == len(
+            self.modified
+        ), "The pair of sample name and FASTQ must be unique."
+        if len({pair[0] for pair in self._seen}) < len(self._seen):
+            counts = Counter(pair[0] for pair in self._seen)
+            seen = Counter()
+            for row in self.modified:
+                sample = row[self._sample_col]
+                seen[sample] += 1
+                if counts[sample] > 1:
+                    row[self._sample_col] = f"{sample}_T{seen[sample]}"
 
 
 def read_head(handle, num_lines=10):
@@ -191,32 +197,100 @@ def check_samplesheet(file_in, file_out):
         https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
 
     """
-    required_columns = {"sample", "fastq_1", "fastq_2"}
-    # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
-    with file_in.open(newline="") as in_handle:
-        reader = csv.DictReader(in_handle, dialect=sniff_format(in_handle))
-        # Validate the existence of the expected header columns.
-        if not required_columns.issubset(reader.fieldnames):
-            req_cols = ", ".join(required_columns)
-            logger.critical(f"The sample sheet **must** contain these column headers: {req_cols}.")
+
+    sample_mapping_dict = {}
+    with open(file_in, "r") as fin:
+
+        ## Check header
+        MIN_COLS = 2
+        HEADER = ["sample", "fastq_1", "fastq_2"]
+        header = [x.strip('"') for x in fin.readline().strip().split(",")]
+        if header[: len(HEADER)] != HEADER:
+            print(
+                "ERROR: Please check samplesheet header -> {} != {}".format(
+                    ",".join(header), ",".join(HEADER)
+                )
+            )
             sys.exit(1)
-        # Validate each row.
-        checker = RowChecker()
-        for i, row in enumerate(reader):
-            try:
-                checker.validate_and_transform(row)
-            except AssertionError as error:
-                logger.critical(f"{str(error)} On line {i + 2}.")
-                sys.exit(1)
-        checker.validate_unique_samples()
-    header = list(reader.fieldnames)
-    header.insert(1, "single_end")
-    # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
-    with file_out.open(mode="w", newline="") as out_handle:
-        writer = csv.DictWriter(out_handle, header, delimiter=",")
-        writer.writeheader()
-        for row in checker.modified:
-            writer.writerow(row)
+
+        ## Check sample entries
+        for line in fin:
+            lspl = [x.strip().strip('"') for x in line.strip().split(",")]
+
+            # Check valid number of columns per row
+            if len(lspl) < len(HEADER):
+                print_error(
+                    "Invalid number of columns (minimum = {})!".format(len(HEADER)),
+                    "Line",
+                    line,
+                )
+            num_cols = len([x for x in lspl if x])
+            if num_cols < MIN_COLS:
+                print_error(
+                    "Invalid number of populated columns (minimum = {})!".format(
+                        MIN_COLS
+                    ),
+                    "Line",
+                    line,
+                )
+
+            ## Check sample name entries
+            sample, fastq_1, fastq_2 = lspl[: len(HEADER)]
+            sample = sample.replace(" ", "_")
+            if not sample:
+                print_error("Sample entry has not been specified!", "Line", line)
+
+            ## Check FastQ file extension
+            for fastq in [fastq_1, fastq_2]:
+                if fastq:
+                    if fastq.find(" ") != -1:
+                        print_error("FastQ file contains spaces!", "Line", line)
+                    if not fastq.endswith(".fastq.gz") and not fastq.endswith(".fq.gz"):
+                        print_error(
+                            "FastQ file does not have extension '.fastq.gz' or '.fq.gz'!",
+                            "Line",
+                            line,
+                        )
+
+            ## Auto-detect paired-end/single-end
+            sample_info = []  ## [single_end, fastq_1, fastq_2]
+            if sample and fastq_1 and fastq_2:  ## Paired-end short reads
+                sample_info = ["0", fastq_1, fastq_2]
+            elif sample and fastq_1 and not fastq_2:  ## Single-end short reads
+                sample_info = ["1", fastq_1, fastq_2]
+            else:
+                print_error("Invalid combination of columns provided!", "Line", line)
+
+            ## Create sample mapping dictionary = { sample: [ single_end, fastq_1, fastq_2 ] }
+            if sample not in sample_mapping_dict:
+                sample_mapping_dict[sample] = [sample_info]
+            else:
+                if sample_info in sample_mapping_dict[sample]:
+                    # print_error("Samplesheet contains duplicate rows!", "Line", line)
+                    sample_mapping_dict[sample].append(sample_info)
+                else:
+                    sample_mapping_dict[sample].append(sample_info)
+
+    ## Write validated samplesheet with appropriate columns
+    if len(sample_mapping_dict) > 0:
+        with open(file_out, "w") as fout:
+            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2"]) + "\n")
+            for sample in sorted(sample_mapping_dict.keys()):
+
+                ## Check that multiple runs of the same sample are of the same datatype
+                if not all(
+                    x[0] == sample_mapping_dict[sample][0][0]
+                    for x in sample_mapping_dict[sample]
+                ):
+                    print_error(
+                        "Multiple runs of a sample must be of the same datatype!",
+                        "Sample: {}".format(sample),
+                    )
+
+                for idx, val in enumerate(sample_mapping_dict[sample]):
+                    fout.write(",".join(["{}".format(sample)] + val) + "\n")
+    else:
+        print_error("No entries to process!", "Samplesheet: {}".format(file_in))
 
 
 def parse_args(argv=None):

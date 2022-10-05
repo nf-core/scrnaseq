@@ -75,8 +75,8 @@ ch_genome_fasta = params.genome_fasta ? file(params.genome_fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
-ch_multiqc_alevin = []
-ch_multiqc_star = []
+ch_multiqc_alevin = Channel.empty()
+ch_multiqc_star = Channel.empty()
 if (params.barcode_whitelist) {
     ch_barcode_whitelist = file(params.barcode_whitelist)
 } else if (params.protocol.contains("10X")) {
@@ -205,8 +205,8 @@ workflow SCRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect().ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect{it[1]}.ifEmpty([])),
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect{it[1]}.ifEmpty([])),
 
     MULTIQC (
         ch_multiqc_files.collect(),

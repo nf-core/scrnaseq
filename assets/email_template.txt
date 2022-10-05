@@ -6,7 +6,6 @@
                                         `._,._,'
   nf-core/scrnaseq v${version}
 ----------------------------------------------------
-
 Run Name: $runName
 
 <% if (success){

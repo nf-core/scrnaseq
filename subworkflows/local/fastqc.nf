@@ -1,7 +1,7 @@
 //
 // Check input samplesheet and get read channels
 //
-include { FASTQC } from '../../modules/nf-core/modules/fastqc/main'
+include { FASTQC } from '../../modules/nf-core/fastqc/main'
 
 workflow FASTQC_CHECK {
   take:

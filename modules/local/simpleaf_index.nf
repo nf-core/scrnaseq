@@ -2,7 +2,7 @@ process SIMPLEAF_INDEX {
     tag "$transcript_gtf"
     label "process_medium"
 
-    conda (params.enable_conda ? 'bioconda::simpleaf=0.5.1' : null)
+    conda (params.enable_conda ? 'bioconda::simpleaf=0.5.2' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/simpleaf:0.5.2--h9f5acd7_0' :
         'quay.io/biocontainers/simpleaf:0.5.2--h9f5acd7_0' }"
@@ -16,7 +16,7 @@ process SIMPLEAF_INDEX {
     path "salmon/index"              , emit: index
     path "salmon/ref/*_t2g_3col.tsv" , emit: transcript_tsv
     path "versions.yml"              , emit: versions
-    path "salmon"
+    path "salmon"                    , emit: salmon
 
     when:
     task.ext.when == null || task.ext.when

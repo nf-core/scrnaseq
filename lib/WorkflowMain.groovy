@@ -9,8 +9,10 @@ class WorkflowMain {
     //
     public static String citation(workflow) {
         return "If you use ${workflow.manifest.name} for your analysis please cite:\n\n" +
+            "* The pipeline\n" +
+            "  https://doi.org/10.5281/zenodo.3568187\n\n" +
             "* The nf-core framework\n" +
-            "  https://doi.org/10.5281/zenodo.4643461\n\n" +
+            "  https://doi.org/10.1038/s41587-020-0439-x\n\n" +
             "* Software dependencies\n" +
             "  https://github.com/${workflow.manifest.name}/blob/master/CITATIONS.md"
     }
@@ -56,6 +58,7 @@ class WorkflowMain {
         }
 
         // Print parameter summary log to screen
+
         log.info paramsSummaryLog(workflow, params, log)
 
         // Check that a -profile or Nextflow config has been provided to run the pipeline
@@ -75,17 +78,15 @@ class WorkflowMain {
             System.exit(1)
         }
     }
-
     //
     // Get attribute from genome config file e.g. fasta
     //
-    public static String getGenomeAttribute(params, attribute) {
-        def val = ''
+    public static Object getGenomeAttribute(params, attribute) {
         if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
             if (params.genomes[ params.genome ].containsKey(attribute)) {
-                val = params.genomes[ params.genome ][ attribute ]
+                return params.genomes[ params.genome ][ attribute ]
             }
         }
-        return val
+        return null
     }
 }

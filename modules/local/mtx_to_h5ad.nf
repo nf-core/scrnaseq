@@ -43,6 +43,20 @@ process MTX_TO_H5AD {
         --out ${meta.id}_matrix.h5ad
     """
 
+    else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
+    """
+    # convert file types
+    for input_type in spliced unspliced ; do
+        mtx_to_h5ad.py \\
+            --aligner ${params.aligner} \\
+            --sample ${meta.id} \\
+            --mtx *count/counts_unfiltered/\${input_type}.mtx \\
+            --barcode *count/counts_unfiltered/\${input_type}.barcodes.txt \\
+            --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
+            --out ${meta.id}_\${input_type}_matrix.h5ad ;
+    done
+    """
+
     else
     """
     # convert file types

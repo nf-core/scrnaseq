@@ -14,6 +14,9 @@ process ALEVINQC {
     tuple val(meta), path("alevin_report_${meta.id}.html"), emit: report
     path  "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """

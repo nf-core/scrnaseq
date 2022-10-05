@@ -15,6 +15,9 @@ process MTX_TO_SEURAT {
     output:
     path "*.rds", emit: seuratObjects
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def aligner = params.aligner
     if (params.aligner == "cellranger") {

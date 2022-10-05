@@ -15,6 +15,9 @@ process GFFREAD_TRANSCRIPTOME {
     path "${genome_fasta}.transcriptome.fa", emit: transcriptome_extracted
     path "versions.yml"                    , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     """
     gffread -F $gtf -w "${genome_fasta}.transcriptome.fa" -g $genome_fasta

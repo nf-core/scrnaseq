@@ -22,6 +22,9 @@ process SIMPLEAF_QUANT {
     tuple val(meta), path("*_alevin_results"), emit: alevin_results
     path  "versions.yml"                     , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def args      = task.ext.args ?: ''
     def args_list = args.tokenize()

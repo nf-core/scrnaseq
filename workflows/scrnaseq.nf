@@ -205,8 +205,8 @@ workflow SCRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin)
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star)
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect().ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect().ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect(),

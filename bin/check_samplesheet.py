@@ -86,8 +86,7 @@ class RowChecker:
 
     def _validate_first(self, row):
         """Assert that the first FASTQ entry is non-empty and has the right format."""
-        if len(row[self._first_col]) <= 0:
-            raise AssertionError("At least the first FASTQ file is required.")
+        assert len(row[self._first_col]) > 0, "At least the first FASTQ file is required."
         self._validate_fastq_format(row[self._first_col])
 
     def _validate_second(self, row):
@@ -99,10 +98,9 @@ class RowChecker:
         """Assert that read pairs have the same file extension. Report pair status."""
         if row[self._first_col] and row[self._second_col]:
             row[self._single_col] = False
-            first_col_suffix = Path(row[self._first_col]).suffixes[-2:]
-            second_col_suffix = Path(row[self._second_col]).suffixes[-2:]
-            if first_col_suffix != second_col_suffix:
-                raise AssertionError("FASTQ pairs must have the same file extensions.")
+            assert (
+                Path(row[self._first_col]).suffixes[-2:] == Path(row[self._second_col]).suffixes[-2:]
+            ), "FASTQ pairs must have the same file extensions."
         else:
             row[self._single_col] = True
 
@@ -122,13 +120,15 @@ class RowChecker:
         number of times the same sample exist, but with different FASTQ files, e.g., multiple runs per experiment.
 
         """
-        if len(self._seen) != len(self.modified):
-            raise AssertionError("The pair of sample name and FASTQ must be unique.")
-        seen = Counter()
-        for row in self.modified:
-            sample = row[self._sample_col]
-            seen[sample] += 1
-            row[self._sample_col] = f"{sample}_T{seen[sample]}"
+        assert len(self._seen) == len(self.modified), "The pair of sample name and FASTQ must be unique."
+        if len({pair[0] for pair in self._seen}) < len(self._seen):
+            counts = Counter(pair[0] for pair in self._seen)
+            seen = Counter()
+            for row in self.modified:
+                sample = row[self._sample_col]
+                seen[sample] += 1
+                if counts[sample] > 1:
+                    row[self._sample_col] = f"{sample}_T{seen[sample]}"
 
 
 def read_head(handle, num_lines=10):
@@ -140,12 +140,14 @@ def read_head(handle, num_lines=10):
         lines.append(line)
     return "".join(lines)
 
+
 def print_error(error, context="Line", context_str=""):
     error_str = f"ERROR: Please check samplesheet -> {error}"
     if context != "" and context_str != "":
         error_str = f"ERROR: Please check samplesheet -> {error}\n{context.strip()}: '{context_str.strip()}'"
     print(error_str)
     sys.exit(1)
+
 
 def sniff_format(handle):
     """
@@ -274,7 +276,10 @@ def check_samplesheet(file_in, file_out):
 
                 ## Check that multiple runs of the same sample are of the same datatype
                 if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):
-                    print_error("Multiple runs of a sample must be of the same datatype!", "Sample: {}".format(sample))
+                    print_error(
+                        "Multiple runs of a sample must be of the same datatype!",
+                        "Sample: {}".format(sample),
+                    )
 
                 for idx, val in enumerate(sample_mapping_dict[sample]):
                     fout.write(",".join(["{}".format(sample)] + val) + "\n")

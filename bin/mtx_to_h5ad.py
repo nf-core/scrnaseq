@@ -4,7 +4,14 @@ import pandas as pd
 import argparse
 
 
-def mtx_to_adata(mtx_file: str, barcode_file: str, feature_file: str, sample: str, aligner: str, verbose: bool = False):
+def mtx_to_adata(
+    mtx_file: str,
+    barcode_file: str,
+    feature_file: str,
+    sample: str,
+    aligner: str,
+    verbose: bool = False,
+):
 
     if verbose:
         print("Reading in {}".format(mtx_file))
@@ -36,7 +43,12 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     adata = mtx_to_adata(
-        args["mtx"], args["barcode"], args["feature"], args["sample"], args["aligner"], verbose=args["verbose"]
+        args["mtx"],
+        args["barcode"],
+        args["feature"],
+        args["sample"],
+        args["aligner"],
+        verbose=args["verbose"],
     )
 
     adata.write_h5ad(args["out"], compression="gzip")

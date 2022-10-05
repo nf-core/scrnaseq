@@ -22,7 +22,12 @@ if __name__ == "__main__":
 
     parser.add_argument("-i", "--input", dest="input", help="Path to samplesheet.csv")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
-    parser.add_argument("-s", "--suffix", dest="suffix", help="Suffix of matrices to remove and get sample name")
+    parser.add_argument(
+        "-s",
+        "--suffix",
+        dest="suffix",
+        help="Suffix of matrices to remove and get sample name",
+    )
 
     args = vars(parser.parse_args())
 

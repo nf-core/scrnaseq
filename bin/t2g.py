@@ -89,7 +89,10 @@ if __name__ == "__main__":
         description="Creates transcript to gene info from GTF files\nreads from standard input and writes to standard output",
     )
     parser.add_argument(
-        "--use_version", "-v", action="store_true", help="Use version numbers in transcript and gene ids"
+        "--use_version",
+        "-v",
+        action="store_true",
+        help="Use version numbers in transcript and gene ids",
     )
     parser.add_argument("--skip_gene_names", "-s", action="store_true", help="Do not output gene names")
     args = parser.parse_args()

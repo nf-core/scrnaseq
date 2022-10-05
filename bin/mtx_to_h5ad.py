@@ -38,9 +38,7 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--barcode", dest="barcode", help="Path to barcode file.")
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
-    parser.add_argument(
-        "-a", "--aligner", dest="aligner", help="Which aligner has been used?"
-    )
+    parser.add_argument("-a", "--aligner", dest="aligner", help="Which aligner has been used?")
 
     args = vars(parser.parse_args())
 

@@ -5,8 +5,8 @@ include { SIMPLEAF_INDEX        }             from '../../modules/local/simpleaf
 include { SIMPLEAF_QUANT        }             from '../../modules/local/simpleaf_quant'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
-include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/modules/gffread/main'
+include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
+include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/gffread/main'
 
 def multiqc_report    = []
 

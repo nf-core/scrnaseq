@@ -2,7 +2,7 @@ process SIMPLEAF_QUANT {
     tag "$meta.id"
     label 'process_high'
 
-    conda (params.enable_conda ? 'bioconda::simpleaf=0.5.1' : null)
+    conda (params.enable_conda ? 'bioconda::simpleaf=0.5.2' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/simpleaf:0.5.2--h9f5acd7_0' :
         'quay.io/biocontainers/simpleaf:0.5.2--h9f5acd7_0' }"
@@ -21,6 +21,9 @@ process SIMPLEAF_QUANT {
     output:
     tuple val(meta), path("*_alevin_results"), emit: alevin_results
     path  "versions.yml"                     , emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
     def args      = task.ext.args ?: ''

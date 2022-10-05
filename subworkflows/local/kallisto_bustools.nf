@@ -1,10 +1,10 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { GENE_MAP }                          from '../../modules/local/gene_map'
-include {KALLISTOBUSTOOLS_COUNT }             from '../../modules/nf-core/modules/kallistobustools/count/main'
+include {KALLISTOBUSTOOLS_COUNT }             from '../../modules/nf-core/kallistobustools/count/main'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
-include { KALLISTOBUSTOOLS_REF }        from '../../modules/nf-core/modules/kallistobustools/ref/main'
+include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
+include { KALLISTOBUSTOOLS_REF }        from '../../modules/nf-core/kallistobustools/ref/main'
 
 def multiqc_report    = []
 

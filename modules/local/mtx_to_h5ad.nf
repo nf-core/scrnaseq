@@ -15,6 +15,9 @@ process MTX_TO_H5AD {
     output:
     path "*.h5ad", emit: h5ad
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     // def file paths for aligners (except cellranger)
     if (params.aligner == 'kallisto') {

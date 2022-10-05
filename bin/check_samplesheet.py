@@ -86,9 +86,7 @@ class RowChecker:
 
     def _validate_first(self, row):
         """Assert that the first FASTQ entry is non-empty and has the right format."""
-        assert (
-            len(row[self._first_col]) > 0
-        ), "At least the first FASTQ file is required."
+        assert len(row[self._first_col]) > 0, "At least the first FASTQ file is required."
         self._validate_fastq_format(row[self._first_col])
 
     def _validate_second(self, row):
@@ -101,8 +99,7 @@ class RowChecker:
         if row[self._first_col] and row[self._second_col]:
             row[self._single_col] = False
             assert (
-                Path(row[self._first_col]).suffixes[-2:]
-                == Path(row[self._second_col]).suffixes[-2:]
+                Path(row[self._first_col]).suffixes[-2:] == Path(row[self._second_col]).suffixes[-2:]
             ), "FASTQ pairs must have the same file extensions."
         else:
             row[self._single_col] = True
@@ -123,9 +120,7 @@ class RowChecker:
         number of times the same sample exist, but with different FASTQ files, e.g., multiple runs per experiment.
 
         """
-        assert len(self._seen) == len(
-            self.modified
-        ), "The pair of sample name and FASTQ must be unique."
+        assert len(self._seen) == len(self.modified), "The pair of sample name and FASTQ must be unique."
         if len({pair[0] for pair in self._seen}) < len(self._seen):
             counts = Counter(pair[0] for pair in self._seen)
             seen = Counter()
@@ -212,11 +207,7 @@ def check_samplesheet(file_in, file_out):
         HEADER = ["sample", "fastq_1", "fastq_2"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
         if header[: len(HEADER)] != HEADER:
-            print(
-                "ERROR: Please check samplesheet header -> {} != {}".format(
-                    ",".join(header), ",".join(HEADER)
-                )
-            )
+            print("ERROR: Please check samplesheet header -> {} != {}".format(",".join(header), ",".join(HEADER)))
             sys.exit(1)
 
         ## Check sample entries
@@ -233,9 +224,7 @@ def check_samplesheet(file_in, file_out):
             num_cols = len([x for x in lspl if x])
             if num_cols < MIN_COLS:
                 print_error(
-                    "Invalid number of populated columns (minimum = {})!".format(
-                        MIN_COLS
-                    ),
+                    "Invalid number of populated columns (minimum = {})!".format(MIN_COLS),
                     "Line",
                     line,
                 )
@@ -284,10 +273,7 @@ def check_samplesheet(file_in, file_out):
             for sample in sorted(sample_mapping_dict.keys()):
 
                 ## Check that multiple runs of the same sample are of the same datatype
-                if not all(
-                    x[0] == sample_mapping_dict[sample][0][0]
-                    for x in sample_mapping_dict[sample]
-                ):
+                if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):
                     print_error(
                         "Multiple runs of a sample must be of the same datatype!",
                         "Sample: {}".format(sample),

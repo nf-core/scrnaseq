@@ -21,9 +21,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Converts mtx output to h5ad.")
 
     parser.add_argument("-m", "--mtx", dest="mtx", help="Path to mtx h5 file.")
-    parser.add_argument(
-        "-v", "--verbose", dest="verbose", help="Toggle verbose messages", default=False
-    )
+    parser.add_argument("-v", "--verbose", dest="verbose", help="Toggle verbose messages", default=False)
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
 

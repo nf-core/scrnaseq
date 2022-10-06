@@ -188,6 +188,9 @@ workflow SCRNASEQ {
         ch_input
     )
 
+    //Add Versions from MTX Conversion workflow too
+    ch_versions.mix(MTX_CONVERSION.out.versions)
+
     // collect software versions
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

@@ -32,4 +32,7 @@ workflow MTX_CONVERSION {
         mtx_matrices
     )
 
+    emit:
+    MTX_TO_SEURAT.out.versions
+
 }

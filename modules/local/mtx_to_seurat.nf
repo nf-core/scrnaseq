@@ -14,6 +14,7 @@ process MTX_TO_SEURAT {
 
     output:
     path "*.rds", emit: seuratObjects
+    path  "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when

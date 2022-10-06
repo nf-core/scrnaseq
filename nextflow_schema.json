@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/scrnaseq/master/nextflow_schema.json",
     "title": "nf-core/scrnaseq pipeline parameters",
-    "description": "Pipeline for processing of 10xGenomics single cell rnaseq data",
+    "description": "Pipeline for processing 10x Genomics single cell rnaseq data",
     "type": "object",
     "definitions": {
         "input_output_options": {
@@ -14,9 +14,11 @@
             "properties": {
                 "input": {
                     "type": "string",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
                     "fa_icon": "fas fa-dna",
-                    "description": "Input FastQ files",
-                    "help_text": "Use this to specify the location of your input FastQ files. For example:\n\n```bash\n--input 'path/to/data/sample_*_{1,2}.fastq'\n```\n\nPlease note the following requirements:\n\n1. The path must be enclosed in quotes\n2. The path must have at least one `*` wildcard character\n3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.\n\nIf left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`"
+                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input)."
                 },
                 "outdir": {
                     "type": "string",
@@ -79,7 +81,7 @@
                     "fa_icon": "fas fa-book",
                     "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
                 },
-                "genome_fasta": {
+                "fasta": {
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/plain",
@@ -105,7 +107,7 @@
                 },
                 "transcript_fasta": {
                     "type": "string",
-                    "description": "A cDNA FASTQ file",
+                    "description": "A cDNA FASTA file",
                     "fa_icon": "fas fa-dna"
                 },
                 "gtf": {
@@ -136,6 +138,12 @@
                     "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
                     "help_text": "> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.",
                     "fa_icon": "fas fa-map-marked-alt"
+                },
+                "simpleaf_rlen": {
+                    "type": "integer",
+                    "default": 91,
+                    "description": "It is the target read length the index will be built for, using simpleaf.",
+                    "fa_icon": "fas fa-map-marked-alt"
                 }
             }
         },
@@ -154,6 +162,11 @@
                 "star_ignore_sjdbgtf": {
                     "type": "string",
                     "description": "Ignore the SJDB GTF file."
+                },
+                "seq_center": {
+                    "type": "string",
+                    "description": "Name of sequencing center for BAM read group tag.",
+                    "default": null
                 }
             },
             "fa_icon": "fas fa-star"
@@ -339,11 +352,29 @@
                     "fa_icon": "fas fa-palette",
                     "hidden": true
                 },
+                "hook_url": {
+                    "type": "string",
+                    "description": "Incoming hook URL for messaging service",
+                    "fa_icon": "fas fa-people-group",
+                    "help_text": "Incoming hook URL for messaging service. Currently, only MS Teams is supported.",
+                    "hidden": true
+                },
                 "multiqc_config": {
                     "type": "string",
                     "description": "Custom config file to supply to MultiQC.",
                     "fa_icon": "fas fa-cog",
                     "hidden": true
+                },
+                "multiqc_logo": {
+                    "type": "string",
+                    "description": "Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file",
+                    "fa_icon": "fas fa-image",
+                    "hidden": true
+                },
+                "multiqc_methods_description": {
+                    "type": "string",
+                    "description": "Custom MultiQC yaml file containing HTML including a methods description.",
+                    "fa_icon": "fas fa-cog"
                 },
                 "tracedir": {
                     "type": "string",
@@ -371,6 +402,10 @@
                     "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
                     "hidden": true,
                     "fa_icon": "fas fa-bacon"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip the FastQC reporting feature in the pipeline."
                 },
                 "skip_multiqc": {
                     "type": "boolean",

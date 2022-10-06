@@ -4,6 +4,7 @@
     nf-core/scrnaseq
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/scrnaseq
+
     Website: https://nf-co.re/scrnaseq
     Slack  : https://nfcore.slack.com/channels/scrnaseq
 ----------------------------------------------------------------------------------------
@@ -11,15 +12,16 @@
 
 nextflow.enable.dsl = 2
 
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     VALIDATE & PRINT PARAMETER SUMMARY
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-WorkflowMain.initialise(workflow, params, log)
+params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
+params.gtf   = WorkflowMain.getGenomeAttribute(params, 'gtf')
 
+WorkflowMain.initialise(workflow, params, log)
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

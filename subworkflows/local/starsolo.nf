@@ -2,8 +2,8 @@
 include { STAR_ALIGN }                  from '../../modules/local/star_align'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
-include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/modules/star/genomegenerate/main'
+include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
+include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/star/genomegenerate/main'
 
 
 def multiqc_report    = []
@@ -22,7 +22,7 @@ workflow STARSOLO {
     ch_versions = Channel.empty()
 
     assert star_index || (genome_fasta && gtf):
-        "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
+        "Must provide a genome fasta file ('--fasta') and a gtf file ('--gtf') if no index is given!"
 
     assert gtf: "Must provide a gtf file ('--gtf') for STARSOLO"
 
@@ -52,6 +52,7 @@ workflow STARSOLO {
     emit:
     ch_versions
     star_result = STAR_ALIGN.out.tab
+    star_counts = STAR_ALIGN.out.counts
     for_multiqc = STAR_ALIGN.out.log_final.collect{it[1]}.ifEmpty([])
 
 

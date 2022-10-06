@@ -2,10 +2,10 @@ process STAR_ALIGN {
     tag "$meta.id"
     label 'process_high'
 
-    conda (params.enable_conda ? 'bioconda::star=2.7.8a' : null)
+    conda (params.enable_conda ? 'bioconda::star=2.7.10a' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/star:2.7.8a--h9ee0642_1' :
-        'quay.io/biocontainers/star:2.7.8a--h9ee0642_1' }"
+        'https://depot.galaxyproject.org/singularity/star:2.7.10a--h9ee0642_0' :
+        'quay.io/biocontainers/star:2.7.10a--h9ee0642_0' }"
 
     input:
     //
@@ -21,6 +21,7 @@ process STAR_ALIGN {
 
     output:
     tuple val(meta), path('*d.out.bam')       , emit: bam
+    tuple val(meta), path('*.Solo.out')       , emit: counts
     tuple val(meta), path('*Log.final.out')   , emit: log_final
     tuple val(meta), path('*Log.out')         , emit: log_out
     tuple val(meta), path('*Log.progress.out'), emit: log_progress
@@ -31,6 +32,9 @@ process STAR_ALIGN {
     tuple val(meta), path('*Aligned.unsort.out.bam') , optional:true, emit: bam_unsorted
     tuple val(meta), path('*fastq.gz')               , optional:true, emit: fastq
     tuple val(meta), path('*.tab')                   , optional:true, emit: tab
+
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
@@ -66,6 +70,11 @@ process STAR_ALIGN {
     if [ -f ${prefix}.Unmapped.out.mate2 ]; then
         mv ${prefix}.Unmapped.out.mate2 ${prefix}.unmapped_2.fastq
         gzip ${prefix}.unmapped_2.fastq
+    fi
+
+    if [ -d ${prefix}.Solo.out ]; then
+        # Backslashes still need to be escaped (https://github.com/nextflow-io/nextflow/issues/67)
+        find ${prefix}.Solo.out \\( -name "*.tsv" -o -name "*.mtx" \\) -exec gzip {} \\;
     fi
 
     cat <<-END_VERSIONS > versions.yml

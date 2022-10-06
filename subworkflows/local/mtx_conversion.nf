@@ -32,7 +32,10 @@ workflow MTX_CONVERSION {
         mtx_matrices
     )
 
+    //TODO CONCAT h5ad and MTX to h5ad should also have versions.yaml output
+    ch_version = MTX_TO_SEURAT.out.versions
+
     emit:
-    MTX_TO_SEURAT.out.versions
+    ch_versions
 
 }

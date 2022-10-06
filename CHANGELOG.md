@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.1.1dev -
+
+### Fixes
+
 ## v2.1.0 - 2022-10-06 "Green Mercury Siberian Husky"
 
 - Alevin workflow updated to use Alevin-Fry via simpleaf - thanks to @rob-p for supporting this and @fmalmeida implementing the support

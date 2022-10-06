@@ -22,7 +22,7 @@ workflow STARSOLO {
     ch_versions = Channel.empty()
 
     assert star_index || (genome_fasta && gtf):
-        "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
+        "Must provide a genome fasta file ('--fasta') and a gtf file ('--gtf') if no index is given!"
 
     assert gtf: "Must provide a gtf file ('--gtf') for STARSOLO"
 

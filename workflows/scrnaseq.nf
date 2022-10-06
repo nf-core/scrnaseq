@@ -10,7 +10,7 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowScrnaseq.initialise(params, log)
 
 def checkPathParamList = [
-    params.input, params.multiqc_config, params.genome_fasta, params.gtf,
+    params.input, params.multiqc_config, params.fasta, params.gtf,
     params.transcript_fasta, params.salmon_index, params.kallisto_index,
     params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index
 ]
@@ -44,7 +44,7 @@ include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
-
+include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -71,7 +71,7 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
 // general input and params
 ch_input = file(params.input)
-ch_genome_fasta = params.genome_fasta ? file(params.genome_fasta) : []
+ch_genome_fasta = params.fasta ? file(params.fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
@@ -118,11 +118,13 @@ workflow SCRNASEQ {
       ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
     }
 
+    ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
+
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
         KALLISTO_BUSTOOLS(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_kallisto_index,
             ch_txp2gene,
             protocol,
@@ -138,7 +140,7 @@ workflow SCRNASEQ {
     if (params.aligner == "alevin") {
         SCRNASEQ_ALEVIN(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_transcript_fasta,
             ch_salmon_index,
             ch_txp2gene,
@@ -156,7 +158,7 @@ workflow SCRNASEQ {
     if (params.aligner == "star") {
         STARSOLO(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_star_index,
             protocol,
             ch_barcode_whitelist,
@@ -172,7 +174,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellranger") {
         CELLRANGER_ALIGN(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_cellranger_index,
             ch_fastq
         )

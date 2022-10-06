@@ -1,0 +1,11 @@
+reports:
+  multiqc_report.html:
+    display: "MultiQC HTML report"
+  "**/fastqc/*_fastqc.html":
+    display: "FastQC HTML report"
+  "**/pipeline_info/execution_timeline_*.html":
+    display: "Execution timeline report"
+  "**/pipeline_info/execution_report_*.html":
+    display: "Execution overview report"
+  "**/star/**/*.Log.final.out":
+    display: "Star per-sample report"

@@ -209,7 +209,9 @@ def check_samplesheet(file_in, file_out):
         HEADER = ["sample", "fastq_1", "fastq_2"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
         if header[: len(HEADER)] != HEADER:
-            print("ERROR: Please check samplesheet header -> {} != {}".format(",".join(header), ",".join(HEADER)))
+            given = ",".join(header)
+            wanted = ",".join(HEADER)
+            print(f"ERROR: Please check samplesheet header -> {given} != {wanted}")
             sys.exit(1)
 
         ## Check sample entries

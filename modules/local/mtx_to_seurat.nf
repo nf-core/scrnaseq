@@ -49,6 +49,15 @@ process MTX_TO_SEURAT {
             ${meta.id}_\${input_type}_matrix.rds \\
             ${aligner}
     done
+
+    yaml::write_yaml(
+    list(
+        '${task.process}'=list(
+            'Seurat' = paste(packageVersion('Seurat'), collapse='.')
+        )
+    ),
+    "versions.yml"
+    )
     """
 
     else
@@ -59,6 +68,15 @@ process MTX_TO_SEURAT {
         $features \\
         ${meta.id}_matrix.rds \\
         ${aligner}
+
+    yaml::write_yaml(
+    list(
+        '${task.process}'=list(
+            'Seurat' = paste(packageVersion('Seurat'), collapse='.')
+        )
+    ),
+    "versions.yml"
+    )
     """
 
     stub:

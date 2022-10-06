@@ -23,3 +23,13 @@ if(aligner %in% c("kallisto", "alevin")) {
 seurat.object <- CreateSeuratObject(counts = expression.matrix)
 
 saveRDS(seurat.object, file = out.file)
+
+
+yaml::write_yaml(
+list(
+    'MTX_TO_SEURAT'=list(
+        'Seurat' = paste(packageVersion('Seurat'), collapse='.')
+    )
+),
+"versions.yml"
+)

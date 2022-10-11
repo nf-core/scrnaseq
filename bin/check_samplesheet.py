@@ -14,6 +14,7 @@ from pathlib import Path
 
 logger = logging.getLogger()
 
+
 def read_head(handle, num_lines=10):
     """Read the specified number of lines from the current position in the file."""
     lines = []
@@ -95,7 +96,7 @@ def check_samplesheet(file_in, file_out):
 
         unknown_header = 0
         min_header_count = 0
-        colmap = { "sample":0, "fastq_1":1, "fastq2":2 }
+        colmap = {"sample":0, "fastq_1":1, "fastq2":2}
         i = 0
         for h in header:
             if h not in MIN_HEADER and h not in OPT_HEADER:
@@ -144,7 +145,7 @@ def check_samplesheet(file_in, file_out):
             seq_center = ""
             if "seq_center" in header:
                 seq_center = lspl[colmap["seq_center"]]
-                    
+
             ## Check FastQ file extension
             for fastq in [fastq_1, fastq_2]:
                 if fastq:
@@ -222,6 +223,7 @@ def parse_args(argv=None):
     )
     return parser.parse_args(argv)
 
+
 def is_integer(n):
     try:
         float(n)
@@ -229,6 +231,7 @@ def is_integer(n):
         return False
     else:
         return float(n).is_integer()
+
 
 def main(argv=None):
     """Coordinate argument parsing and program execution."""

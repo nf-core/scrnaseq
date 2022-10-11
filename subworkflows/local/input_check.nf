@@ -1,8 +1,10 @@
+
 //
 // Check input samplesheet and get read channels
 //
 
 include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'
+include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK2 } from '../../modules/local/samplesheet_check'
 
 workflow INPUT_CHECK {
     take:
@@ -27,8 +29,10 @@ workflow INPUT_CHECK {
 def create_fastq_channel(LinkedHashMap row) {
     // create meta map
     def meta = [:]
-    meta.id         = row.sample
-    meta.single_end = row.single_end.toBoolean()
+    meta.id             = row.sample
+    meta.single_end     = row.single_end.toBoolean()
+    meta.expected_cells = row.expected_cells ? row.expected_cells : null
+    meta.seq_center     = row.seq_center ? row.seq_center : params.seq_center
 
     // add path(s) of the fastq file(s) to the meta map
     def fastq_meta = []

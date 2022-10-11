@@ -62,7 +62,7 @@ process STAR_ALIGN {
         $out_sam_type \\
         $ignore_gtf \\
         $seq_center \\
-	$cell_filter \\
+        $cell_filter \\
         $args \\
 
     $mv_unsorted_bam

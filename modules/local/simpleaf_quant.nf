@@ -34,13 +34,16 @@ process SIMPLEAF_QUANT {
     // check if users are using one of the mutually excludable parameters:
     //    e.g -k,--knee | -e,--expect-cells | -f, --forced-cells
     //
-    if (args_list.any { it in ['-k', '--knee', '-e', '--expect-cells', '-f', '--forced-cells']}) {
+    if (args_list.any { it in ['-k', '--knee', '-e', '--expect-cells', '-f', '--forced-cells']} || meta.expected_cells) {
         unfiltered_command = ""
         save_whitelist     = ""
     } else {
         unfiltered_command = "-u whitelist.uncompressed.txt"
         save_whitelist     = "mv whitelist.uncompressed.txt ${prefix}_alevin_results/"
     }
+
+    // expected cells
+    def expect_cells = meta.expected_cells ? "--expect-cells $meta.expected_cells" : ''
 
     // separate forward from reverse pairs
     def (forward, reverse) = reads.collate(2).transpose()
@@ -61,6 +64,7 @@ process SIMPLEAF_QUANT {
         -m $txp2gene \\
         -t $task.cpus \\
         -c $protocol \\
+	$expect_cells \\
         $unfiltered_command \\
         $args
 

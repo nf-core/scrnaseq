@@ -136,15 +136,18 @@ def check_samplesheet(file_in, file_out):
             if not sample:
                 print_error("Sample entry has not been specified!", "Line", line)
 
+            ## Check expected cells is an integer if present
             expected_cells = ""
             if "expected_cells" in header:
                 expected_cells = lspl[colmap["expected_cells"]]
                 if not is_integer(expected_cells):
                     print_error("Expected cells must be an integer", "Line", line)
 
+            ## If present, replace spaces with _ in sequencing center name
             seq_center = ""
             if "seq_center" in header:
                 seq_center = lspl[colmap["seq_center"]]
+                seq_center = seq_center.replace(" ", "_")
 
             ## Check FastQ file extension
             for fastq in [fastq_1, fastq_2]:

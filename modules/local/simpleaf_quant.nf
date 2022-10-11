@@ -64,7 +64,7 @@ process SIMPLEAF_QUANT {
         -m $txp2gene \\
         -t $task.cpus \\
         -c $protocol \\
-	$expect_cells \\
+        $expect_cells \\
         $unfiltered_command \\
         $args
 

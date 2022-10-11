@@ -96,7 +96,7 @@ def check_samplesheet(file_in, file_out):
 
         unknown_header = 0
         min_header_count = 0
-        colmap = {"sample":0, "fastq_1":1, "fastq2":2}
+        colmap = {"sample": 0, "fastq_1": 1, "fastq2": 2}
         i = 0
         for h in header:
             if h not in MIN_HEADER and h not in OPT_HEADER:

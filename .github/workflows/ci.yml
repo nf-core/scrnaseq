@@ -11,6 +11,10 @@ on:
 env:
   NXF_ANSI_LOG: false
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Run pipeline with test data

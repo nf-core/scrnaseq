@@ -46,4 +46,4 @@ jobs:
         # For example: adding multiple test runs with different parameters
         # Remember that you can parallelise this by using strategy.matrix
         run: |
-          nextflow run ${GITHUB_WORKSPACE}${{ matrix.profile }} --outdir ./results
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }} --outdir ./results

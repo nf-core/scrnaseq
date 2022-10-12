@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
+- Autocanceling previous CI runs when new changes are pushed.
+
 ## v2.1.0 - 2022-10-06 "Green Mercury Siberian Husky"
 
 - Alevin workflow updated to use Alevin-Fry via simpleaf - thanks to @rob-p for supporting this and @fmalmeida implementing the support

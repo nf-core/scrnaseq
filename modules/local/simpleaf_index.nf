@@ -2,10 +2,10 @@ process SIMPLEAF_INDEX {
     tag "$transcript_gtf"
     label "process_medium"
 
-    conda (params.enable_conda ? 'bioconda::simpleaf=0.5.2' : null)
+    conda (params.enable_conda ? 'bioconda::simpleaf=0.5.3' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/simpleaf:0.5.2--h9f5acd7_0' :
-        'quay.io/biocontainers/simpleaf:0.5.2--h9f5acd7_0' }"
+        'https://depot.galaxyproject.org/singularity/simpleaf:0.5.3--h9f5acd7_0' :
+        'quay.io/biocontainers/simpleaf:0.5.3--h9f5acd7_0' }"
 
     input:
     path genome_fasta

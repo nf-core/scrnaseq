@@ -17,6 +17,7 @@ process STAR_ALIGN {
     path  gtf
     path whitelist
     val protocol
+    val star_feature
     val other_10x_parameters
 
     output:
@@ -55,6 +56,7 @@ process STAR_ALIGN {
         --outFileNamePrefix $prefix. \\
         --soloCBwhitelist <(gzip -cdf $whitelist) \\
         --soloType $protocol \\
+        --soloFeatures $star_feature \\
         $other_10x_parameters \\
         $out_sam_type \\
         $ignore_gtf \\

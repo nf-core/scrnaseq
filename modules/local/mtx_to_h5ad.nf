@@ -11,6 +11,7 @@ process MTX_TO_H5AD {
     // inputs from cellranger nf-core module does not come in a single sample dir
     // for each sample, the sub-folders and files come directly in array.
     tuple val(meta), path(inputs)
+    path txp2gene
 
     output:
     path "*.h5ad", emit: h5ad
@@ -56,6 +57,7 @@ process MTX_TO_H5AD {
             --mtx *count/counts_unfiltered/\${input_type}.mtx \\
             --barcode *count/counts_unfiltered/\${input_type}.barcodes.txt \\
             --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
+            --txp2gene ${txp2gene} \\
             --out ${meta.id}_\${input_type}_matrix.h5ad ;
     done
     """
@@ -69,6 +71,7 @@ process MTX_TO_H5AD {
         --mtx $mtx_matrix \\
         --barcode $barcodes_tsv \\
         --feature $features_tsv \\
+        --txp2gene ${txp2gene} \\
         --out ${meta.id}_matrix.h5ad
     """
 

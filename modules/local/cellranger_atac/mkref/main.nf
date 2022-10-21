@@ -1,17 +1,18 @@
 process CELLRANGER_ATAC_MKREF {
-    tag "$fasta"
-    label 'process_high'
+    tag "$reference_config"
+    label 'process_medium'
 
     if (params.enable_conda) {
         exit 1, "Conda environments cannot be used when using the Cell Ranger tool. Please use docker or singularity containers."
     }
-    container "heylf/cellranger-atac"
+    container "heylf/cellranger-atac:2.1.0"
 
     input:
-    val ref_config_name
+    path reference_config
+    val reference_name
 
     output:
-    path "${ref_config_name}", emit: reference
+    path "${reference_name}", emit: reference
     path "versions.yml"     , emit: versions
 
     when:
@@ -22,7 +23,7 @@ process CELLRANGER_ATAC_MKREF {
     """
     cellranger-atac \\
         mkref \\
-        --config=$ref_config_name
+        --config=$reference_config
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -19,7 +19,7 @@ workflow CELLRANGER_ATAC_ALIGN {
 
         if (!cellranger_atac_index) {
             // Make reference genome
-            CELLRANGER_ATAC_MKREF( reference_config )
+            CELLRANGER_ATAC_MKREF( reference_config, "cellranger_atac_reference" )
             ch_versions = ch_versions.mix(CELLRANGER_ATAC_MKREF.out.versions)
             cellranger_atac_index = CELLRANGER_ATAC_MKREF.out.reference
         }
@@ -37,5 +37,6 @@ workflow CELLRANGER_ATAC_ALIGN {
 
     emit:
         ch_versions
-        cellranger_atac_out  = CELLRANGER_ATAC_COUNT.out.outs
+        cellranger_atac_index
+        //cellranger_atac_out  = CELLRANGER_ATAC_COUNT.out.outs
 }

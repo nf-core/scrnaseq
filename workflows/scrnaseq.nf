@@ -187,16 +187,17 @@ workflow SCRNASEQ {
     }
 
     // Run cellranger atac pipeline
-    if (params.aligner == "cellranger_atac") {
+    if (params.aligner == "cellranger-atac") {
         CELLRANGER_ATAC_ALIGN(
             ch_reference_config,
             ch_cellranger_index,
             ch_fastq
         )
         ch_versions = ch_versions.mix(CELLRANGER_ATAC_ALIGN.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ATAC_ALIGN.out.cellranger_out)
+        //ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ATAC_ALIGN.out.cellranger_out)
     }
 
+    /*
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (
         ch_mtx_matrices,
@@ -236,6 +237,7 @@ workflow SCRNASEQ {
     )
     multiqc_report = MULTIQC.out.report.toList()
     ch_versions    = ch_versions.mix(MULTIQC.out.versions)
+    */
 }
 
 /*

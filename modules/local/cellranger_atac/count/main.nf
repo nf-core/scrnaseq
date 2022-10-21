@@ -5,7 +5,7 @@ process CELLRANGER_ATAC_COUNT {
     if (params.enable_conda) {
         exit 1, "Conda environments cannot be used when using the Cell Ranger tool. Please use docker or singularity containers."
     }
-    container "heylf/cellranger-atac"
+    container "heylf/cellranger-atac:2.1.0"
 
     input:
     tuple val(meta), path(reads)

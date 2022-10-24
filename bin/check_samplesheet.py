@@ -107,7 +107,7 @@ def check_samplesheet(file_in, file_out):
             i = i + 1
         if unknown_header or min_header_count < len(MIN_HEADER):
             given = ",".join(header)
-            wanted = ",".join(HEADER)
+            wanted = ",".join(MIN_HEADER)
             print(f"ERROR: Please check samplesheet header -> {given} != {wanted}")
             sys.exit(1)
 

@@ -24,7 +24,6 @@ workflow CELLRANGER_ATAC_ALIGN {
             cellranger_atac_index = CELLRANGER_ATAC_MKREF.out.reference
         }
 
-        /*
         // Obtain read counts
         CELLRANGER_ATAC_COUNT (
             // TODO what is `gem` and why is it needed?
@@ -32,11 +31,9 @@ workflow CELLRANGER_ATAC_ALIGN {
             cellranger_atac_index
         )
         ch_versions = ch_versions.mix(CELLRANGER_ATAC_COUNT.out.versions)
-        */
-
-
+        
     emit:
         ch_versions
         cellranger_atac_index
-        //cellranger_atac_out  = CELLRANGER_ATAC_COUNT.out.outs
+        cellranger_atac_out  = CELLRANGER_ATAC_COUNT.out.outs
 }

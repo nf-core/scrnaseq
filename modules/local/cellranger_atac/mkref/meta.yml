@@ -20,7 +20,7 @@ input:
 output:
   - reference:
       type: folder
-      description: Folder containing all the reference indices needed by Cell Ranger ATAC
+      description: Folder called cellranger_atac_reference containing all the reference indices needed by Cell Ranger ATAC
   - versions:
       type: file
       description: File containing software version

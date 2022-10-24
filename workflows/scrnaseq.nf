@@ -186,6 +186,9 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
     }
 
+
+    //TODO cellranger-atac requires that neither --genome nor --fasta + --gtf has to be present
+
     // Run cellranger atac pipeline
     if (params.aligner == "cellranger-atac") {
         CELLRANGER_ATAC_ALIGN(
@@ -194,7 +197,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(CELLRANGER_ATAC_ALIGN.out.ch_versions)
-        //ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ATAC_ALIGN.out.cellranger_out)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ATAC_ALIGN.out.cellranger_atac_out)
     }
 
     /*

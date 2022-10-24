@@ -17,6 +17,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [STARsolo](#starsolo)
   - [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
   - [Cellranger](#cellranger)
+  - [Cellranger-atac](#cellranger-atac)
   - [Other output data](#other-output-data)
   - [MultiQC](#multiqc)
   - [Pipeline information](#pipeline-information)
@@ -96,6 +97,15 @@ Cell Ranger is a set of analysis scripts that processes 10X Chromium single cell
 **Output directory: `results/cellranger`**
 
 - Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger
+
+## Cellranger-atac
+
+Cell Ranger ATAC is a set of analysis scripts that processes 10X Chromium single cell ATAC data to align reads, generate feature-barcode matrices, perform clustering and other secondary analysis. See [Cellranger-atac](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/what-is-cell-ranger-atac) for more information on Cellranger ATAC.
+
+**Output directory: `results/cellranger-atac`**
+
+- Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger
+
 
 ## Other output data
 

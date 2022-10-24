@@ -43,6 +43,7 @@ include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_ARC_ALIGN  } from "../subworkflows/local/align_cellranger_arc"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
 /*
@@ -71,6 +72,8 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
 // general input and params
 ch_input = file(params.input)
+ch_fastq = Channel.empty()
+ch_folders = Channel.empty()
 ch_genome_fasta = params.fasta ? file(params.fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
@@ -99,6 +102,8 @@ ch_star_index = params.star_index ? file(params.star_index) : []
 //cellranger params
 ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
 
+// cellranger params
+ch_cellranger_arc_index = params.cellranger_arc_index ? file(params.cellranger_arc_index) : []
 
 workflow SCRNASEQ {
 
@@ -106,16 +111,24 @@ workflow SCRNASEQ {
     ch_mtx_matrices = Channel.empty()
 
     // Check input files and stage input data
-    ch_fastq = INPUT_CHECK( ch_input ).reads
+    if ( params.aligner == "cellranger-arc" ) {
+        ch_fastq = INPUT_CHECK( ch_input ).reads
 
-    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+        // Run FastQC
+        ch_multiqc_fastqc = Channel.empty()
+        if (!params.skip_fastqc){
+            FASTQC_CHECK ( ch_fastq )
+            ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
+            ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
+        }
 
-    // Run FastQC
-    ch_multiqc_fastqc = Channel.empty()
-    if (!params.skip_fastqc){
-      FASTQC_CHECK ( ch_fastq )
-      ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
-      ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
+        ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+
+    } else {
+        
+        ch_folders = INPUT_CHECK_CELLRANGER_ARC( ch_input ).reads
+
+        ch_versions = ch_versions.mix(INPUT_CHECK_CELLRANGER_ARC.out.versions)
     }
 
     ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
@@ -180,6 +193,18 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
+    }
+
+    // Run cellranger pipeline
+    if (params.aligner == "cellranger-arc") {
+        CELLRANGER_ARC_ALIGN(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_cellranger_index,
+            ch_folders
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_ARC_ALIGN.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ARC_ALIGN.out.cellranger_out)
     }
 
     // Run mtx to h5ad conversion subworkflow

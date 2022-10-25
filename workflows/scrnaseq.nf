@@ -188,6 +188,7 @@ workflow SCRNASEQ {
 
 
     //TODO cellranger-atac requires that neither --genome nor --fasta + --gtf has to be present
+    //TODO cellranger-atac does not support --expected-cells
 
     // Run cellranger atac pipeline
     if (params.aligner == "cellranger-atac") {

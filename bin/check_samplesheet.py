@@ -91,7 +91,7 @@ def check_samplesheet(file_in, file_out):
         ## Check header
         MIN_COLS = 2
         MIN_HEADER = ["sample", "fastq_1", "fastq_2"]
-        OPT_HEADER = ["expected_cells", "seq_center"]
+        OPT_HEADER = ["expected_cells", "seq_center", "fastq_barcode"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
 
         unknown_header = 0
@@ -150,7 +150,14 @@ def check_samplesheet(file_in, file_out):
                 seq_center = seq_center.replace(" ", "_")
 
             ## Check FastQ file extension
-            for fastq in [fastq_1, fastq_2]:
+            fastq_list = [fastq_1, fastq_2]
+
+            fastq_barcode = ""
+            if "fastq_barcode" in header:
+                fastq_barcode = lspl[colmap["fastq_barcode"]]
+                fastq_list.append(fastq_barcode)
+
+            for fastq in fastq_list:
                 if fastq:
                     if fastq.find(" ") != -1:
                         print_error("FastQ file contains spaces!", "Line", line)
@@ -164,9 +171,9 @@ def check_samplesheet(file_in, file_out):
             ## Auto-detect paired-end/single-end
             sample_info = []  ## [single_end, fastq_1, fastq_2]
             if sample and fastq_1 and fastq_2:  ## Paired-end short reads
-                sample_info = ["0", fastq_1, fastq_2, expected_cells, seq_center]
+                sample_info = ["0", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode]
             elif sample and fastq_1 and not fastq_2:  ## Single-end short reads
-                sample_info = ["1", fastq_1, fastq_2, expected_cells, seq_center]
+                sample_info = ["1", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode]
             else:
                 print_error("Invalid combination of columns provided!", "Line", line)
 
@@ -183,7 +190,7 @@ def check_samplesheet(file_in, file_out):
     ## Write validated samplesheet with appropriate columns
     if len(sample_mapping_dict) > 0:
         with open(file_out, "w") as fout:
-            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center"]) + "\n")
+            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center" , "fastq_barcode"]) + "\n")
             for sample in sorted(sample_mapping_dict.keys()):
 
                 ## Check that multiple runs of the same sample are of the same datatype

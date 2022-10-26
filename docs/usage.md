@@ -88,12 +88,16 @@ In order to use cellranger aligner, reads must be named as [required by the tool
 
 `[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz`
 
-Besides that, the sample name given in the samplesheet must be the same that is present in the reads name. E.g.
+Besides that, the sample name given in the samplesheet must be the same that is present in the reads name. Furthermore, you ned to provide a barcode file as stated [here](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/using/fastq-input). E.g.
 
 ```console
-sample,fastq_1,fastq_2,
-TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
+sample,fastq_1,fastq_2,fastq_barcode
+TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R3_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
 ```
+- I1: Dual index i7 read (optional)
+- R1: Read 1
+- R2: Dual index i5 read
+- R3: Read 2
 
 References in order to use cellranger aligner can be downloaded [here](https://support.10xgenomics.com/single-cell-atac/software/downloads/latest). If you cannot find a pre-built index then you can also creating your own reference by providing a config file to the pipeline with --reference_config. Follow [this](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/advanced/references#mkref) and [this tutorial](https://support.10xgenomics.com/single-cell-atac/software/release-notes/references#GRCh38-2020-A) to create such a config file. What is **important to note:** set the genome in the config file to `cellranger_atac_reference` else the pipeline will throw an error that it will not find your reference. 
 

@@ -17,9 +17,16 @@ class WorkflowScrnaseq {
             System.exit(1)
         }
 
-        if (!params.fasta) {
-            log.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
-            System.exit(1)
+        if (params.aligner == "cellranger-atac") {
+            if(!params.cellranger_index && !params.reference_config){
+                log.error "Reference index or config not specified for cellranger-atac with e.g. '--cellranger_index index' or '--reference_config config'."
+                System.exit(1)
+            }            
+        } else {        
+            if (!params.fasta) {
+                log.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
+                System.exit(1)
+            }
         }
     }
 

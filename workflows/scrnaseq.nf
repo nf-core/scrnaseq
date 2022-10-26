@@ -12,7 +12,8 @@ WorkflowScrnaseq.initialise(params, log)
 def checkPathParamList = [
     params.input, params.multiqc_config, params.fasta, params.gtf,
     params.transcript_fasta, params.salmon_index, params.kallisto_index,
-    params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index
+    params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index,
+    params.reference_config
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -101,8 +102,6 @@ ch_star_index = params.star_index ? file(params.star_index) : []
 //cellranger params
 ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
 
-// cellranger atac params
-ch_cellranger_atac_index = params.cellranger_atac_index ? file(params.cellranger_atac_index) : []
 
 workflow SCRNASEQ {
 
@@ -122,7 +121,10 @@ workflow SCRNASEQ {
       ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
     }
 
-    ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
+    ch_filter_gtf = Channel.empty()
+    if (params.aligner != "cellranger-atac"){
+        ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
+    }
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
@@ -186,8 +188,6 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
     }
 
-
-    //TODO cellranger-atac requires that neither --genome nor --fasta + --gtf has to be present
     //TODO cellranger-atac does not support --expected-cells
 
     // Run cellranger atac pipeline

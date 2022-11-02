@@ -28,6 +28,7 @@ This is a community effort in building a pipeline capable to support:
 - STARSolo
 - Kallisto + BUStools
 - Cellranger
+- Cellranger-atac
 
 ## Documentation
 

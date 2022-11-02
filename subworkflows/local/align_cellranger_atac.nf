@@ -7,6 +7,9 @@ include {CELLRANGER_ATAC_COUNT} from "../../modules/local/cellranger_atac/count/
 // Define workflow to subset and index a genome region fasta file
 workflow CELLRANGER_ATAC_ALIGN {
     take:
+        fasta
+        gtf
+        motifs
         reference_config
         cellranger_index
         ch_fastq
@@ -14,12 +17,12 @@ workflow CELLRANGER_ATAC_ALIGN {
     main:
         ch_versions = Channel.empty()
 
-        assert cellranger_index || reference_config:
-            "Must provide either a cellranger-atac index or reference_config ('--reference_config')."
+        assert cellranger_index || (fasta && gtf && motifs && reference_config):
+            "Must provide either a cellranger-atac index or a bundle of a fasta file ('--fasta') + gtf file ('--gtf') + motif file (--motifs) + reference_config ('--reference_config')."
 
         if (!cellranger_index) {
             // Make reference genome
-            CELLRANGER_ATAC_MKREF( reference_config, "cellranger_atac_reference" )
+            CELLRANGER_ATAC_MKREF( fasta, gtf, motifs, reference_config, "cellranger_atac_reference" )
             ch_versions = ch_versions.mix(CELLRANGER_ATAC_MKREF.out.versions)
             cellranger_index = CELLRANGER_ATAC_MKREF.out.reference
         }

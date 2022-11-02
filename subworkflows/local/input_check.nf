@@ -47,8 +47,6 @@ def create_fastq_channel(LinkedHashMap row) {
         }
         fastqs = [ file(row.fastq_1), file(row.fastq_2) ]
         if (params.aligner == "cellranger-atac") {
-            print("YES")
-            print(row.fastq_barcode)
             if (!file(row.fastq_barcode).exists()) {
                 exit 1, "ERROR: Please check input samplesheet -> Barcode FastQ (Dual index i5 read) file does not exist!\n${row.fastq_barcode}"
             }

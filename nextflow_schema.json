@@ -235,6 +235,10 @@
                 "reference_config": {
                     "type": "string",
                     "description": "Specify a config file to create a cellranger-atac index. Look into cellranger-atac mkref to know how to prepare a config file."
+                },
+                "motifs": {
+                    "type": "string",
+                    "description": "Specify a motif file to create a cellranger-atac index. Can be taken, e.g., from the JASPAR database."
                 }
             }
         },

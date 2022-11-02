@@ -8,6 +8,9 @@ process CELLRANGER_ATAC_MKREF {
     container "heylf/cellranger-atac:2.1.0"
 
     input:
+    path fasta
+    path gtf
+    path motifs
     path reference_config
     val reference_name
 

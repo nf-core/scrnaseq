@@ -75,6 +75,7 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 ch_input = file(params.input)
 ch_genome_fasta = params.fasta ? file(params.fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
+ch_motifs = params.motifs ? file(params.motifs) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
 ch_reference_config = params.reference_config ? file(params.reference_config) : []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
@@ -122,10 +123,7 @@ workflow SCRNASEQ {
       ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
     }
 
-    ch_filter_gtf = Channel.empty()
-    if (params.aligner != "cellranger-atac"){
-        ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
-    }
+    ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
@@ -193,6 +191,9 @@ workflow SCRNASEQ {
     // Run cellranger atac pipeline
     if (params.aligner == "cellranger-atac") {
         CELLRANGER_ATAC_ALIGN(
+            ch_genome_fasta,
+            ch_gtf,
+            ch_motifs,
             ch_reference_config,
             ch_cellranger_index,
             ch_fastq

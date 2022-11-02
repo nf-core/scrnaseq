@@ -207,6 +207,7 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ARC_ALIGN.out.cellranger_out)
     }
 
+    /*
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (
         ch_mtx_matrices,
@@ -246,6 +247,8 @@ workflow SCRNASEQ {
     )
     multiqc_report = MULTIQC.out.report.toList()
     ch_versions    = ch_versions.mix(MULTIQC.out.versions)
+    */
+    
 }
 
 /*

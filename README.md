@@ -34,6 +34,8 @@ This is a community effort in building a pipeline capable to support:
 
 The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage](https://nf-co.re/scrnaseq/usage), [parameters](https://nf-co.re/scrnaseq/parameters) and [output](https://nf-co.re/scrnaseq/output).
 
+![scrnaseq workflow](docs/images/scrnaseq_pipeline_v1.0_metro_clean.png)
+
 ## Quick Start
 
 1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=21.10.3`)

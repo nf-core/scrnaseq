@@ -225,10 +225,6 @@
             "description": "Params related to the Cellranger pipeline",
             "default": "",
             "properties": {
-                "cellranger_atac_index": {
-                    "type": "string",
-                    "description": "Specify a pre-calculated cellranger-atac index. Readily prepared indexes can be obtained from the 10x Genomics website. "
-                },
                 "reference_config": {
                     "type": "string",
                     "description": "Specify a config file to create a cellranger-atac index. Look into cellranger-atac mkref to know how to prepare a config file."
@@ -451,6 +447,9 @@
         },
         {
             "$ref": "#/definitions/cellranger_options"
+        },
+        {
+            "$ref": "#/definitions/cellranger_atac_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

@@ -102,33 +102,22 @@ ch_star_index = params.star_index ? file(params.star_index) : []
 //cellranger params
 ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
 
-// cellranger params
-ch_cellranger_arc_index = params.cellranger_arc_index ? file(params.cellranger_arc_index) : []
-
 workflow SCRNASEQ {
 
     ch_versions     = Channel.empty()
     ch_mtx_matrices = Channel.empty()
 
     // Check input files and stage input data
-    if ( params.aligner == "cellranger-arc" ) {
-        ch_fastq = INPUT_CHECK( ch_input ).reads
+    ch_fastq = INPUT_CHECK( ch_input ).reads
 
-        // Run FastQC
-        ch_multiqc_fastqc = Channel.empty()
-        if (!params.skip_fastqc){
-            FASTQC_CHECK ( ch_fastq )
-            ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
-            ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
-        }
+    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-        ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-
-    } else {
-        
-        ch_folders = INPUT_CHECK_CELLRANGER_ARC( ch_input ).reads
-
-        ch_versions = ch_versions.mix(INPUT_CHECK_CELLRANGER_ARC.out.versions)
+    // Run FastQC
+    ch_multiqc_fastqc = Channel.empty()
+    if (!params.skip_fastqc){
+      FASTQC_CHECK ( ch_fastq )
+      ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
+      ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
     }
 
     ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf

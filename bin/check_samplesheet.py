@@ -190,7 +190,12 @@ def check_samplesheet(file_in, file_out):
     ## Write validated samplesheet with appropriate columns
     if len(sample_mapping_dict) > 0:
         with open(file_out, "w") as fout:
-            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center" , "fastq_barcode"]) + "\n")
+            fout.write(
+                ",".join(
+                    ["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center", "fastq_barcode"]
+                )
+                + "\n"
+            )
             for sample in sorted(sample_mapping_dict.keys()):
 
                 ## Check that multiple runs of the same sample are of the same datatype

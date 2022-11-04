@@ -106,7 +106,6 @@ Cell Ranger ATAC is a set of analysis scripts that processes 10X Chromium single
 
 - Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger
 
-
 ## Other output data
 
 **Output directory: `results/reference_genome`**

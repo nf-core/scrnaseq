@@ -94,6 +94,7 @@ Besides that, the sample name given in the samplesheet must be the same that is 
 sample,fastq_1,fastq_2,fastq_barcode
 TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R3_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
 ```
+
 - I1: Dual index i7 read (optional)
 - R1: Read 1
 - R2: Dual index i5 read

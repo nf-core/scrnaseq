@@ -35,6 +35,7 @@ def create_fastq_channel(LinkedHashMap row) {
 
     // add path(s) of the fastq file(s) to the meta map
     def fastq_meta = []
+    def fastqs = []
     if (!file(row.fastq_1).exists()) {
         exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
     }
@@ -44,7 +45,14 @@ def create_fastq_channel(LinkedHashMap row) {
         if (!file(row.fastq_2).exists()) {
             exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
         }
-        fastq_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ] ]
+        fastqs = [ file(row.fastq_1), file(row.fastq_2) ]
+        if (params.aligner == "cellranger-atac" ) {
+            if (!file(row.fastq_barcode).exists()) {
+                exit 1, "ERROR: Please check input samplesheet -> Barcode FastQ (Dual index i5 read) file does not exist!\n${row.fastq_barcode}"
+            }
+            fastqs.add(row.fastq_barcode)
+        }
+        fastq_meta = [ meta, fastqs ]
     }
     return fastq_meta
 }

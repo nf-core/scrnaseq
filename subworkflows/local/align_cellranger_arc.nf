@@ -14,8 +14,7 @@ workflow CELLRANGER_ARC_ALIGN {
         motifs
         reference_config
         cellranger_index
-        lib_csv
-        ch_fastq
+        ch_folders
 
     main:
         ch_versions = Channel.empty()

@@ -11,22 +11,22 @@ def mtx_to_adata(mtx_h5: str, sample: str, aligner: str, verbose: bool = False):
 
     adata = None
 
-    if (aligner == "cellranger"):
+    if aligner == "cellranger":
         adata = sc.read_10x_h5(mtx_h5)
         adata.var["gene_symbols"] = adata.var_names
         adata.var.set_index("gene_ids", inplace=True)
 
-    if (aligner == "cellranger-atac_peak"):
+    if aligner == "cellranger-atac_peak":
         adata = mu.read_10x_h5(mtx_h5)
         adata.var["peak_coords"] = adata.var_names
         adata.var.set_index("gene_ids", inplace=True)
 
-    if (aligner == "cellranger-atac_tf"):
+    if aligner == "cellranger-atac_tf":
         adata = mu.read_10x_h5(mtx_h5)
         adata.var["tf_symbols"] = adata.var_names
         adata.var.set_index("gene_ids", inplace=True)
 
-    adata.obs["sample"] = sample   
+    adata.obs["sample"] = sample
 
     return adata
 

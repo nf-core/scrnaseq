@@ -2,7 +2,8 @@ process MTX_TO_H5AD {
     tag "$meta.id"
     label 'process_medium'
 
-    conda (params.enable_conda ? "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg" : null)
+    //TODO mising container for muon
+    conda (params.enable_conda ? "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg conda-forge::muon" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/scanpy:1.7.2--pyhdfd78af_0' :
         'quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
@@ -43,6 +44,22 @@ process MTX_TO_H5AD {
     cellranger_mtx_to_h5ad.py \\
         --mtx filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
+        --aligner cellranger
+        --out ${meta.id}_matrix.h5ad
+    """
+
+    else if (params.aligner == 'cellranger-atac')
+    """
+    # convert file types
+    cellranger_mtx_to_h5ad.py \\
+        --mtx filtered_peak_bc_matrix.h5 \\
+        --sample ${meta.id} \\
+        --aligner cellranger-atac_peak
+        --out ${meta.id}_matrix.h5ad
+    cellranger_mtx_to_h5ad.py \\
+        --mtx filtered_tf_bc_matrix.h5 \\
+        --sample ${meta.id} \\
+        --aligner cellranger-atac_tf
         --out ${meta.id}_matrix.h5ad
     """
 

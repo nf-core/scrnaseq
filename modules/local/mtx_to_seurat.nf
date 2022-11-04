@@ -25,6 +25,13 @@ process MTX_TO_SEURAT {
         matrix   = "filtered_feature_bc_matrix/matrix.mtx.gz"
         barcodes = "filtered_feature_bc_matrix/barcodes.tsv.gz"
         features = "filtered_feature_bc_matrix/features.tsv.gz"
+    } else if (params.aligner == "cellranger-atac") {
+        matrix_peak   = "filtered_peak_bc_matrix/matrix.mtx.gz"
+        barcodes_peak = "filtered_peak_bc_matrix/barcodes.tsv.gz"
+        features_peak = "filtered_peak_bc_matrix/peaks.bed"
+        matrix_tf   = "filtered_peak_bc_matrix/matrix.mtx.gz"
+        barcodes_tf = "filtered_peak_bc_matrix/barcodes.tsv.gz"
+        features_tf = "filtered_peak_bc_matrix/motifs.tsv"
     } else if (params.aligner == "kallisto") {
         matrix   = "*count/counts_unfiltered/*.mtx"
         barcodes = "*count/counts_unfiltered/*.barcodes.txt"
@@ -50,6 +57,22 @@ process MTX_TO_SEURAT {
             ${meta.id}_\${input_type}_matrix.rds \\
             ${aligner}
     done
+    """
+
+    else if (params.aligner == 'cellranger-atac')
+    """
+    mtx_to_seurat.R \\
+        $matrix_peak \\
+        $barcodes_peak \\
+        $features_peak \\
+        ${meta.id}_matrix_peak.rds \\
+        ${aligner}
+    mtx_to_seurat.R \\
+        $matrix_tf \\
+        $barcodes_tf \\
+        $features_tf \\
+        ${meta.id}_matrix_tf.rds \\
+        ${aligner}
     """
 
     else

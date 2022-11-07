@@ -14,7 +14,8 @@ process MTX_TO_H5AD {
     path txp2gene
 
     output:
-    path "*.h5ad", emit: h5ad
+    path "${meta.id}/*h5ad", emit: h5ad
+    path "${meta.id}/*", emit: counts
 
     when:
     task.ext.when == null || task.ext.when
@@ -44,7 +45,7 @@ process MTX_TO_H5AD {
     cellranger_mtx_to_h5ad.py \\
         --mtx filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
-        --out ${meta.id}_matrix.h5ad
+        --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 
     else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
@@ -58,7 +59,7 @@ process MTX_TO_H5AD {
             --barcode *count/counts_unfiltered/\${input_type}.barcodes.txt \\
             --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
             --txp2gene ${txp2gene} \\
-            --out ${meta.id}_\${input_type}_matrix.h5ad ;
+            --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;
     done
     """
 
@@ -72,11 +73,11 @@ process MTX_TO_H5AD {
         --barcode $barcodes_tsv \\
         --feature $features_tsv \\
         --txp2gene ${txp2gene} \\
-        --out ${meta.id}_matrix.h5ad
+        --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 
     stub:
     """
-    touch ${meta.id}_matrix.h5ad
+    touch ${meta.id}/matrix.h5ad
     """
 }

@@ -153,7 +153,6 @@ workflow SCRNASEQ {
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
         ch_multiqc_alevin = SCRNASEQ_ALEVIN.out.for_multiqc
         ch_mtx_matrices = ch_mtx_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_results)
-        ch_txp2gene = SCRNASEQ_ALEVIN.out.txp2gene // NOT WORKING
     }
 
     // Run STARSolo pipeline
@@ -189,6 +188,8 @@ workflow SCRNASEQ {
         ch_mtx_matrices,
         ch_input,
         ch_txp2gene
+        // ch_genome_fasta,
+        // ch_filter_gtf
     )
 
     //Add Versions from MTX Conversion workflow too

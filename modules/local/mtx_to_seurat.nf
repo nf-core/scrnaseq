@@ -13,7 +13,7 @@ process MTX_TO_SEURAT {
     tuple val(meta), path(inputs)
 
     output:
-    path "*.rds", emit: seuratObjects
+    path "${meta.id}/*.rds", emit: seuratObjects
     path "versions.yml", emit: versions
 
     when:
@@ -38,6 +38,9 @@ process MTX_TO_SEURAT {
         barcodes = "*.Solo.out/Gene*/filtered/barcodes.tsv.gz"
         features = "*.Solo.out/Gene*/filtered/features.tsv.gz"
     }
+    """
+    mkdir ${meta.id}
+    """
 
     if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
@@ -47,7 +50,7 @@ process MTX_TO_SEURAT {
             *count/counts_unfiltered/\${input_type}.mtx \\
             *count/counts_unfiltered/\${input_type}.barcodes.txt \\
             *count/counts_unfiltered/\${input_type}.genes.txt \\
-            ${meta.id}_\${input_type}_matrix.rds \\
+            ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
             ${aligner}
     done
     """
@@ -58,12 +61,12 @@ process MTX_TO_SEURAT {
         $matrix \\
         $barcodes \\
         $features \\
-        ${meta.id}_matrix.rds \\
+        ${meta.id}/${meta.id}_matrix.rds \\
         ${aligner}
     """
 
     stub:
     """
-    touch ${meta.id}_matrix.rds
+    touch ${meta.id}/${meta.id}_matrix.rds
     """
 }

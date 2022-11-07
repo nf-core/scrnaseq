@@ -13,8 +13,8 @@ workflow MTX_CONVERSION {
     main:
         ch_versions = Channel.empty()
 
-
-        // Convert matrix do h5ad
+        //
+        // Convert matrix to h5ad
         //
         MTX_TO_H5AD (
             mtx_matrices,

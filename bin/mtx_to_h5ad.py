@@ -44,16 +44,16 @@ def write_counts(
     except FileExistsError:
         # directory already exists
         pass
-    # read txp2gene file to add gene names to features file
-    t2g = pd.read_table(txp2gene, header=None)
-    id2name = {e[1]: e[2] for _, e in t2g.iterrows()}
 
-    print('t2g file contents')
-    print(t2g)
-    # export features file with gene names
     features = pd.DataFrame()
     features["id"] = adata.var.index
-    features["name"] = adata.var.index.map(id2name)
+
+    # if txp2gene file is available enrich features file with gene names
+    if txp2gene:
+        t2g = pd.read_table(txp2gene, header=None)
+        id2name = {e[1]: e[2] for _, e in t2g.iterrows()}
+        features["name"] = adata.var.index.map(id2name)
+
     features.to_csv(os.path.join(out, "features.tsv"), sep="\t", index=False, header=None)
     pd.DataFrame(adata.obs.index).to_csv(os.path.join(out, "barcodes.tsv"), sep="\t", index=False, header=None)
     scipy.io.mmwrite(os.path.join(out, "matrix.mtx"), adata.X.T, field="integer")
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
     parser.add_argument("-a", "--aligner", dest="aligner", help="Which aligner has been used?")
-    parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.")
+    parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs='?', const='')
 
     args = vars(parser.parse_args())
 

@@ -67,7 +67,7 @@ workflow KALLISTO_BUSTOOLS {
     emit:
     ch_versions
     counts = KALLISTOBUSTOOLS_COUNT.out.count
-    txp2gene
+    txp2gene = txp2gene.collect()
 
 
 }

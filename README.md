@@ -60,7 +60,18 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage
    nextflow run nf-core/scrnaseq --input samplesheet.csv --outdir <OUTDIR> --genome_fasta GRCm38.p6.genome.chr19.fa --gtf gencode.vM19.annotation.chr19.gtf --protocol 10XV2 --aligner <alevin/kallisto/star/cellranger> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
 
+## Decision Tree for users
 
+The nf-core/scrnaseq pipeline features several paths to analyze your single cell data. Future additions will also be done soon, e.g. the addition of multi-ome analysis types. To aid users in analyzing their data, we have added a decision tree to help people decide on what type of analysis they want to run and how to choose appropriate parameters for that.
+
+```mermaid
+graph TD
+    A[sc RNA] -->|alevin-fry| B(h5ad/seurat/mtx matrices)
+    A[sc RNA] -->|CellRanger| B(h5ad/seurat/mtx matrices)
+    A[sc RNA] -->|kbpython| B(h5ad/seurat/mtx matrices)
+    A[sc RNA] -->|STARsolo| B(h5ad/seurat/mtx matrices)
+    A[sc RNA] -->|Universc| B(h5ad/seurat/mtx matrices)
+```
 
 ## Credits
 

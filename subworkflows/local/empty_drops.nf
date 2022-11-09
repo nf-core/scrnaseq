@@ -1,7 +1,7 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { EMPTYDROPS_FILTER   }             from '../../modules/local/empty_drops_filter.nf'
 
-workflow emptydrops {
+workflow EMPTYDROPS {
 
     take:
     mtx_matrices
@@ -13,3 +13,5 @@ workflow emptydrops {
     EMPTYDROPS_FILTER (
         mtx_matrices
     )
+
+}

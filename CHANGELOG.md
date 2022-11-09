@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixes
 
 - Autocanceling previous CI runs when new changes are pushed.
+- Fixed [#177](https://github.com/nf-core/scrnaseq/issues/177) by adjusting the channels generation and usage when skipping fastqc
 
 ## v2.1.0 - 2022-10-06 "Green Mercury Siberian Husky"
 

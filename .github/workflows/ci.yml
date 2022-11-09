@@ -22,11 +22,13 @@ jobs:
         NXF_VER:
           - "21.10.3"
           - "latest-everything"
-        parameters:
-          - "--aligner alevin"
-          - "--aligner kallisto"
-          - "--aligner star"
-          - "--aligner cellranger -stub"
+        profile:
+          [
+            "test,docker --aligner alevin",
+            "test,docker --aligner kallisto",
+            "test,docker --aligner star",
+            "test,docker --aligner cellranger -stub",
+          ]
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2

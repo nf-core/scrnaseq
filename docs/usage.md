@@ -77,7 +77,7 @@ TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
 The minimum typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/scrnaseq --input 'samplesheet.csv' --genome_fasta human.fasta --gtf human.gtf -profile docker
+nextflow run nf-core/scrnaseq --input 'samplesheet.csv' --genome GRCh38 -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.
@@ -258,6 +258,14 @@ In most cases, you will only need to create a custom config as a one-off but if 
 See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for more information about creating your own configuration files.
 
 If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack) on the [`#configs` channel](https://nfcore.slack.com/channels/configs).
+
+## Azure Resource Requests
+
+To be used with the `azurebatch` profile by specifying the `-profile azurebatch`.
+We recommend providing a compute `params.vm_type` of `Standard_D16_v3` VMs by default but these options can be changed if required.
+
+Note that the choice of VM size depends on your quota and the overall workload during the analysis.
+For a thorough list, please refer the [Azure Sizes for virtual machines in Azure](https://docs.microsoft.com/en-us/azure/virtual-machines/sizes).
 
 ## Running in the background
 

@@ -2,9 +2,9 @@
  * Alignment with Cellranger
  */
 
-include {CELLRANGER_MKGTF} from "../../modules/nf-core/modules/cellranger/mkgtf/main.nf"
-include {CELLRANGER_MKREF} from "../../modules/nf-core/modules/cellranger/mkref/main.nf"
-include {CELLRANGER_COUNT} from "../../modules/nf-core/modules/cellranger/count/main.nf"
+include {CELLRANGER_MKGTF} from "../../modules/nf-core/cellranger/mkgtf/main.nf"
+include {CELLRANGER_MKREF} from "../../modules/nf-core/cellranger/mkref/main.nf"
+include {CELLRANGER_COUNT} from "../../modules/nf-core/cellranger/count/main.nf"
 include {MTX_TO_H5AD     } from "../../modules/local/mtx_to_h5ad.nf"
 
 // Define workflow to subset and index a genome region fasta file
@@ -19,14 +19,13 @@ workflow CELLRANGER_ALIGN {
         ch_versions = Channel.empty()
 
         assert cellranger_index || (fasta && gtf):
-            "Must provide either a cellranger index or both a fasta file ('--genome_fasta') and a gtf file ('--gtf')."
+            "Must provide either a cellranger index or both a fasta file ('--fasta') and a gtf file ('--gtf')."
 
         if (!cellranger_index) {
             // Filter GTF based on gene biotypes passed in params.modules
             CELLRANGER_MKGTF( gtf )
             ch_versions = ch_versions.mix(CELLRANGER_MKGTF.out.versions)
 
-            CELLRANGER_MKGTF.out.gtf.view()
             // Make reference genome
             CELLRANGER_MKREF( fasta, CELLRANGER_MKGTF.out.gtf, "cellranger_reference" )
             ch_versions = ch_versions.mix(CELLRANGER_MKREF.out.versions)

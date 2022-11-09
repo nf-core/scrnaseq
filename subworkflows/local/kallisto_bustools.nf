@@ -1,10 +1,10 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { GENE_MAP }                          from '../../modules/local/gene_map'
-include {KALLISTOBUSTOOLS_COUNT }             from '../../modules/nf-core/modules/kallistobustools/count/main'
+include {KALLISTOBUSTOOLS_COUNT }             from '../../modules/nf-core/kallistobustools/count/main'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/modules/gunzip/main'
-include { KALLISTOBUSTOOLS_REF }        from '../../modules/nf-core/modules/kallistobustools/ref/main'
+include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
+include { KALLISTOBUSTOOLS_REF }        from '../../modules/nf-core/kallistobustools/ref/main'
 
 def multiqc_report    = []
 
@@ -23,7 +23,7 @@ workflow KALLISTO_BUSTOOLS {
     ch_versions = Channel.empty()
 
     assert kallisto_index || (genome_fasta && gtf):
-        "Must provide a genome fasta file ('--genome_fasta') and a gtf file ('--gtf') if no index is given!"
+        "Must provide a genome fasta file ('--fasta') and a gtf file ('--gtf') if no index is given!"
 
     assert txp2gene || gtf:
         "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"

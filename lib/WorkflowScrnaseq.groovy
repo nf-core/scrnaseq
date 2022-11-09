@@ -2,6 +2,8 @@
 // This file holds several functions specific to the workflow/scrnaseq.nf in the nf-core/scrnaseq pipeline
 //
 
+import groovy.text.SimpleTemplateEngine
+
 class WorkflowScrnaseq {
 
     //
@@ -12,6 +14,11 @@ class WorkflowScrnaseq {
 
         if (!params.input) {
             log.error "Please provide an input samplesheet with --input"
+            System.exit(1)
+        }
+
+        if (!params.fasta) {
+            log.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
             System.exit(1)
         }
     }
@@ -43,6 +50,22 @@ class WorkflowScrnaseq {
         return yaml_file_text
     }
 
+    public static String methodsDescriptionText(run_workflow, mqc_methods_yaml) {
+        // Convert  to a named map so can be used as with familar NXF ${workflow} variable syntax in the MultiQC YML file
+        def meta = [:]
+        meta.workflow = run_workflow.toMap()
+        meta["manifest_map"] = run_workflow.manifest.toMap()
+
+        meta["doi_text"] = meta.manifest_map.doi ? "(doi: <a href=\'https://doi.org/${meta.manifest_map.doi}\'>${meta.manifest_map.doi}</a>)" : ""
+        meta["nodoi_text"] = meta.manifest_map.doi ? "": "<li>If available, make sure to update the text to include the Zenodo DOI of version of the pipeline used. </li>"
+
+        def methods_text = mqc_methods_yaml.text
+
+        def engine =  new SimpleTemplateEngine()
+        def description_html = engine.createTemplate(methods_text).make(meta)
+
+        return description_html
+    }//
     // Exit pipeline if incorrect --genome key provided
     static void genomeExists(params, log) {
         if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
@@ -70,19 +93,19 @@ class WorkflowScrnaseq {
         if (aligner == 'alevin') {
             switch (protocol) {
                 case '10XV1':
-                    new_protocol = 'chromium'
+                    new_protocol = '10xv1'
                     chemistry = 'V1'
                     break
                 case '10XV2':
-                    new_protocol = 'chromium'
+                    new_protocol = '10xv2'
                     chemistry = 'V2'
                     break
                 case '10XV3':
-                    new_protocol = 'chromiumV3'
+                    new_protocol = '10xv3'
                     chemistry = 'V3'
                     break
-                case 'dropseq':
-                    new_protocol = 'dropseq'
+                // case 'dropseq':
+                //     new_protocol = 'dropseq'
             }
         }
 

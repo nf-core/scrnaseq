@@ -60,12 +60,15 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage
    nextflow run nf-core/scrnaseq --input samplesheet.csv --outdir <OUTDIR> --genome_fasta GRCm38.p6.genome.chr19.fa --gtf gencode.vM19.annotation.chr19.gtf --protocol 10XV2 --aligner <alevin/kallisto/star/cellranger> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
 
+
+
 ## Credits
 
 nf-core/scrnaseq was originally written by Bailey PJ, Botvinnik O, Marques de Almeida F, Gabernet G, Peltzer A, Sturm G.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
+- @heylf
 - @KevinMenden
 - @FloWuenne
 - @rob-p

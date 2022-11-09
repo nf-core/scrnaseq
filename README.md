@@ -73,6 +73,8 @@ graph TD
     A[sc RNA] -->|Universc| B(h5ad/seurat/mtx matrices)
 ```
 
+Options for the respective alignment method can be found [here](https://github.com/nf-core/scrnaseq/blob/dev/docs/usage.md#aligning-options) to choose between methods.
+
 ## Credits
 
 nf-core/scrnaseq was originally written by Bailey PJ, Botvinnik O, Marques de Almeida F, Gabernet G, Peltzer A, Sturm G.

@@ -38,13 +38,14 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { FASTQC_CHECK } from '../subworkflows/local/fastqc'
+include { FASTQC_CHECK      } from '../subworkflows/local/fastqc'
 include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
+include { EMPTYDROPS_FILTER } from '../modules/local/empty_drops_filter'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -182,9 +183,19 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
     }
 
+    // Run emptydrops matrix filter
+    if (params.filter_emptydrops) {
+        ch_mtx_matrices.view()
+        EMPTYDROPS_FILTER( ch_mtx_matrices )
+        EMPTYDROPS_FILTER.out.mtx.view()
+        ch_filtered_matrices = EMPTYDROPS_FILTER.out.mtx
+    } else {
+        ch_filtered_matrices = ch_mtx_matrices
+    }
+
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (
-        ch_mtx_matrices,
+        ch_filtered_matrices,
         ch_input
     )
 

@@ -38,7 +38,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { FASTQC_CHECK } from '../subworkflows/local/fastqc'
+include { FASTQC_CHECK      } from '../subworkflows/local/fastqc'
 include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
@@ -55,7 +55,7 @@ include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
 // MODULE: Installed directly from nf-core/modules
 //
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { MULTIQC } from "../modules/nf-core/multiqc/main"
+include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,10 +113,12 @@ workflow SCRNASEQ {
 
     // Run FastQC
     ch_multiqc_fastqc = Channel.empty()
-    if (!params.skip_fastqc){
-      FASTQC_CHECK ( ch_fastq )
-      ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
-      ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
+    if (!params.skip_fastqc) {
+        FASTQC_CHECK ( ch_fastq )
+        ch_versions       = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
+        ch_multiqc_fastqc = FASTQC_CHECK.out.fastqc_zip
+    } else {
+        ch_multiqc_fastqc = Channel.empty()
     }
 
     ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
@@ -211,7 +213,7 @@ workflow SCRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_fastqc.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect{it[1]}.ifEmpty([])),
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect{it[1]}.ifEmpty([])),
 

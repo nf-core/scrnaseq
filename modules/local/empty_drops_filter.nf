@@ -13,7 +13,7 @@ process EMPTYDROPS_FILTER {
     tuple val(meta), path(inputs)
 
     output:
-    path "*.mtx", emit: mtx
+    tuple val(meta), path("*.mtx"), emit: mtx
 
     script:
     // TODO:
@@ -22,8 +22,8 @@ process EMPTYDROPS_FILTER {
     """
     # filter mtx files
     filter_by_emptydrops.py \\
-        --mtx_dir ${inputs} 
-        --out_dir ${}   
+        --mtx_dir $inputs \\
+        --out_dir . \\
         --version ${meta.version} ;
     """
 

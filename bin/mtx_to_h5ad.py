@@ -39,12 +39,6 @@ def write_counts(
     if verbose:
         print("Reading in {}".format(txp2gene))
 
-    try:
-        os.makedirs(out)
-    except FileExistsError:
-        # directory already exists
-        pass
-
     features = pd.DataFrame()
     features["id"] = adata.var.index
 
@@ -76,6 +70,13 @@ if __name__ == "__main__":
     parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs='?', const='')
 
     args = vars(parser.parse_args())
+
+    # create the directory with the sample name
+    try:
+        os.makedirs(os.path.dirname(args["out"]))
+    except FileExistsError:
+        # directory already exists
+        pass
 
     adata = mtx_to_adata(
         args["mtx"],

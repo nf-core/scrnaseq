@@ -41,5 +41,6 @@ workflow MTX_CONVERSION {
 
     emit:
     ch_versions
+    counts = MTX_TO_H5AD.out.counts
 
 }

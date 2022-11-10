@@ -65,6 +65,13 @@
                     "default": "10XV2",
                     "fa_icon": "fas fa-cogs",
                     "enum": ["10XV3", "10XV2", "10XV1", "dropseq"]
+                },
+                "sample_type": {
+                    "type": "string",
+                    "description": "The type of single cell data, e.g. gex (default).",
+                    "default": "gex",
+                    "fa_icon": "fas fa-fish",
+                    "enum": ["gex", "atac"]
                 }
             },
             "fa_icon": "fas fa-terminal"
@@ -451,6 +458,9 @@
         },
         {
             "$ref": "#/definitions/cellranger_options"
+        },
+        {
+            "$ref": "#/definitions/cellranger_arc_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

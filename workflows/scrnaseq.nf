@@ -38,7 +38,6 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { INPUT_CHECK_MULTIOME       } from '../subworkflows/local/input_check_multiome'
 include { FASTQC_CHECK } from '../subworkflows/local/fastqc'
 include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
@@ -107,17 +106,10 @@ workflow SCRNASEQ {
 
     ch_versions     = Channel.empty()
     ch_mtx_matrices = Channel.empty()
-    ch_folders      = Channel.empty()
 
     // Check input files and stage input data
     ch_fastq = INPUT_CHECK( ch_input ).reads
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-
-    // Check input files and stage input data for multiome
-    if (params.aligner == "cellranger-arc"){
-        ch_folders = INPUT_CHECK_MULTIOME( ch_input ).reads
-        ch_versions = ch_versions.mix(INPUT_CHECK_MULTIOME.out.versions)
-    }
 
     // Run FastQC
     ch_multiqc_fastqc = Channel.empty()
@@ -199,7 +191,7 @@ workflow SCRNASEQ {
             ch_motifs,
             ch_reference_config,
             ch_cellranger_index,
-            ch_folders
+            ch_fastq
         )
         ch_versions = ch_versions.mix(CELLRANGER_ARC_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ARC_ALIGN.out.cellranger_out)

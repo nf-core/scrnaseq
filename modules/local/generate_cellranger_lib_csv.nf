@@ -8,7 +8,7 @@ process GENERATE_LIB_CSV {
         'quay.io/biocontainers/python:3.8.3' }"
 
     input:
-    tuple val(meta), path(folders)
+    tuple val(meta), path(fastqs)
 
     output:
     path '*.csv'       , emit: csv
@@ -18,15 +18,13 @@ process GENERATE_LIB_CSV {
     task.ext.when == null || task.ext.when
 
     script: // This script is bundled with the pipeline, in nf-core/scrnaseq/bin/
-    def folder_GEX = meta.folders[0]
-    def folder_ATAC = meta.folders[1]
-    def sample_arg = meta.id
-    def lib_csv = sample_arg + "_lib.csv"
+    def sample_types = meta.sample_types.join(",")
+    def samples_names = meta.sub_sample.join(",")
+    def lib_csv = meta.id + "_lib.csv"
     """
     generate_lib_csv.py \\
-        --in_GEX $folder_GEX \\
-        --in_ATAC $folder_ATAC \\
-        --sample $sample_arg \\
+        --sample_types $sample_types
+        --samples_names $samples_names
         --out $lib_csv
 
     cat <<-END_VERSIONS > versions.yml

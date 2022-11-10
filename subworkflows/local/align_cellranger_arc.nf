@@ -4,7 +4,8 @@
 
 include {CELLRANGER_ARC_MKGTF} from "../../modules/local/cellranger_arc/mkgtf/main.nf"
 include {CELLRANGER_ARC_MKREF} from "../../modules/nf-core/modules/cellranger_arc/mkref/main.nf"
-//include {CELLRANGER_ARC_COUNT} from "../../modules/local/cellranger_arc/count/main.nf"
+include {GENERATE_LIB_CSV} from "../../modules/local/generate_cellranger_lib_csv.nf"
+include {CELLRANGER_ARC_COUNT} from "../../modules/local/cellranger_arc/count/main.nf"
 
 // Define workflow to subset and index a genome region fasta file
 workflow CELLRANGER_ARC_ALIGN {
@@ -14,7 +15,7 @@ workflow CELLRANGER_ARC_ALIGN {
         motifs
         reference_config
         cellranger_index
-        ch_folders
+        ch_fastq
 
     main:
         ch_versions = Channel.empty()
@@ -33,14 +34,18 @@ workflow CELLRANGER_ARC_ALIGN {
             cellranger_arc_index = CELLRANGER_ARC_MKREF.out.reference
         }
 
+        //TOFLO do I need to copy the files just for the meta data?
+        GENERATE_LIB_CSV( ch_fastq )
+
         // Obtain read counts
-        /*CELLRANGER_ARC_COUNT (
-            ch_folders,
+        CELLRANGER_ARC_COUNT (
+            ch_fastq,
+            GENERATE_LIB_CSV.out.csv,
             cellranger_arc_index
         )
         ch_versions = ch_versions.mix(CELLRANGER_ARC_COUNT.out.versions)
-        */
+        
     emit:
         ch_versions
-        //cellranger_arc_out  = CELLRANGER_ARC_COUNT.out.outs
+        cellranger_arc_out  = CELLRANGER_ARC_COUNT.out.outs
 }

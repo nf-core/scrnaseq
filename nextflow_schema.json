@@ -219,6 +219,22 @@
                 }
             }
         },
+        "cellranger_arc_options": {
+            "title": "Cellranger ARC Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "reference_config": {
+                    "type": "string",
+                    "description": "Specify a config file to create a cellranger-arc index. Look into cellranger-arc mkref to know how to prepare a config file."
+                },
+                "motifs": {
+                    "type": "string",
+                    "description": "Specify a motif file to create a cellranger-arc index. Can be taken, e.g., from the JASPAR database."
+                }
+            }
+        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",

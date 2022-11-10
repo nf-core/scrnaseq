@@ -3,7 +3,7 @@ import scanpy as sc
 import pandas as pd
 import argparse
 import os
-import scipy
+from scipy import io
 from anndata import AnnData
 
 def mtx_to_adata(
@@ -33,6 +33,7 @@ def mtx_to_adata(
 def write_counts(
     adata: AnnData,
     txp2gene: str,
+    star_index: str,
     out: str,
     verbose: bool = True,):
 
@@ -48,9 +49,15 @@ def write_counts(
         id2name = {e[1]: e[2] for _, e in t2g.iterrows()}
         features["name"] = adata.var.index.map(id2name)
 
+    # if star_index file is available enrich features file with gene names
+    if star_index:
+        t2g = pd.read_table(f"{star_index}/geneInfo.tab", header=None, skiprows=1)
+        id2name = {e[0]: e[1] for _, e in t2g.iterrows()}
+        features["name"] = adata.var.index.map(id2name)
+
     features.to_csv(os.path.join(out, "features.tsv"), sep="\t", index=False, header=None)
     pd.DataFrame(adata.obs.index).to_csv(os.path.join(out, "barcodes.tsv"), sep="\t", index=False, header=None)
-    scipy.io.mmwrite(os.path.join(out, "matrix.mtx"), adata.X.T, field="integer")
+    io.mmwrite(os.path.join(out, "matrix.mtx"), adata.X.T, field="integer")
 
     if verbose:
         print("Wrote features.tsv, barcodes.tsv, and matrix.mtx files to {}".format(args["out"]))
@@ -68,6 +75,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
     parser.add_argument("-a", "--aligner", dest="aligner", help="Which aligner has been used?")
     parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs='?', const='')
+    parser.add_argument("--star_index", dest="star_index", help="Star index folder containing geneInfo.tab.", nargs='?', const='')
 
     args = vars(parser.parse_args())
 
@@ -90,6 +98,7 @@ if __name__ == "__main__":
     write_counts(
         adata,
         args["txp2gene"],
+        args["star_index"],
         args["sample"],
         verbose=args["verbose"]
     )

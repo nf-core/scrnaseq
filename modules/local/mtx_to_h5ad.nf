@@ -12,6 +12,7 @@ process MTX_TO_H5AD {
     // for each sample, the sub-folders and files come directly in array.
     tuple val(meta), path(inputs)
     path txp2gene
+    path star_index
 
     output:
     path "${meta.id}/*h5ad", emit: h5ad
@@ -45,6 +46,7 @@ process MTX_TO_H5AD {
     cellranger_mtx_to_h5ad.py \\
         --mtx filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
+        --txp2gene ${txp2gene} \\
         --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 
@@ -59,6 +61,7 @@ process MTX_TO_H5AD {
             --barcode *count/counts_unfiltered/\${input_type}.barcodes.txt \\
             --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
             --txp2gene ${txp2gene} \\
+            --star_index ${star_index} \\
             --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;
     done
     """
@@ -73,6 +76,7 @@ process MTX_TO_H5AD {
         --barcode $barcodes_tsv \\
         --feature $features_tsv \\
         --txp2gene ${txp2gene} \\
+        --star_index ${star_index} \\
         --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 

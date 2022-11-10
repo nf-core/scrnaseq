@@ -9,6 +9,7 @@ workflow MTX_CONVERSION {
     mtx_matrices
     samplesheet
     txp2gene
+    star_index
 
     main:
         ch_versions = Channel.empty()
@@ -18,7 +19,8 @@ workflow MTX_CONVERSION {
         //
         MTX_TO_H5AD (
             mtx_matrices,
-            txp2gene
+            txp2gene,
+            star_index
         )
 
         //

@@ -116,7 +116,7 @@
                     "fa_icon": "fas fa-code-branch"
                 },
                 "save_reference": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
                     "fa_icon": "fas fa-bookmark"
                 }

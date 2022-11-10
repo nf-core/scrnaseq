@@ -91,7 +91,8 @@ def check_samplesheet(file_in, file_out):
         ## Check header
         MIN_COLS = 2
         MIN_HEADER = ["sample", "fastq_1", "fastq_2"]
-        OPT_HEADER = ["expected_cells", "seq_center", "fastq_barcode", "folder_GEX", "folder_ATAC"]
+        OPT_HEADER = ["expected_cells", "seq_center", "fastq_barcode", "sample_type"]
+        SAMPLE_TYPES = ["gex", "atac"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
 
         unknown_header = 0
@@ -157,11 +158,11 @@ def check_samplesheet(file_in, file_out):
                 fastq_barcode = lspl[colmap["fastq_barcode"]]
                 fastq_list.append(fastq_barcode)
 
-            folder_GEX = ""
-            folder_ATAC = ""
-            if "folder_GEX" in header and "folder_ATAC" in header:
-                folder_GEX = lspl[colmap["folder_GEX"]]
-                folder_ATAC = lspl[colmap["folder_ATAC"]]
+            sample_type = ""
+            if "sample_type" in header:
+                sample_type = lspl[colmap["sample_type"]]
+                if (sample_type not in SAMPLE_TYPES):
+                    print_error("Sample type {} is not supported!".format(sample_type), "Line", line)
 
             for fastq in fastq_list:
                 if fastq:
@@ -177,9 +178,9 @@ def check_samplesheet(file_in, file_out):
             ## Auto-detect paired-end/single-end
             sample_info = []  ## [single_end, fastq_1, fastq_2]
             if sample and fastq_1 and fastq_2:  ## Paired-end short reads
-                sample_info = ["0", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode, folder_GEX, folder_ATAC]
+                sample_info = ["0", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode, sample_type]
             elif sample and fastq_1 and not fastq_2:  ## Single-end short reads
-                sample_info = ["1", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode, folder_GEX, folder_ATAC]
+                sample_info = ["1", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode, sample_type]
             else:
                 print_error("Invalid combination of columns provided!", "Line", line)
 
@@ -196,7 +197,7 @@ def check_samplesheet(file_in, file_out):
     ## Write validated samplesheet with appropriate columns
     if len(sample_mapping_dict) > 0:
         with open(file_out, "w") as fout:
-            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center" , "fastq_barcode", "folder_GEX", "folder_ATAC"]) + "\n")
+            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center" , "fastq_barcode", "sample_type"]) + "\n")
             for sample in sorted(sample_mapping_dict.keys()):
 
                 ## Check that multiple runs of the same sample are of the same datatype

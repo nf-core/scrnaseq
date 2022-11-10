@@ -32,6 +32,8 @@ def create_fastq_channel(LinkedHashMap row) {
     meta.single_end     = row.single_end.toBoolean()
     meta.expected_cells = row.expected_cells != null ? row.expected_cells : null
     meta.seq_center     = row.seq_center ? row.seq_center : params.seq_center
+    meta.sample_type    = row.sample_type ? row.sample_type : param.sample_type
+    meta.sub_sample     = null
 
     // add path(s) of the fastq file(s) to the meta map
     def fastq_meta = []
@@ -46,7 +48,7 @@ def create_fastq_channel(LinkedHashMap row) {
             exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
         }
         fastqs = [ file(row.fastq_1), file(row.fastq_2) ]
-        if (params.aligner == "cellranger-atac" ) {
+        if (meta.sample_type == "atac") {
             if (!file(row.fastq_barcode).exists()) {
                 exit 1, "ERROR: Please check input samplesheet -> Barcode FastQ (Dual index i5 read) file does not exist!\n${row.fastq_barcode}"
             }
@@ -54,5 +56,15 @@ def create_fastq_channel(LinkedHashMap row) {
         }
         fastq_meta = [ meta, fastqs ]
     }
+
+    if (params.aligner == "cellranger-arc"){
+        meta.sub_sample = row.fastq_1.replaceAll("_S[0-9]+_L001_R1_001.fastq.gz","")
+        fastqs.each{
+            if(!it.contains(meta.sub_sample)){
+                exit 1, "ERROR: Please check input samplesheet -> Some files do not have the same sample name in common!\n${it}"
+            }
+        }
+    }
+
     return fastq_meta
 }

@@ -6,6 +6,7 @@ import pandas as pd
 from scipy import io
 from anndata import AnnData
 
+
 def mtx_to_adata(mtx_h5: str, sample: str, verbose: bool = False):
 
     if verbose:
@@ -18,11 +19,13 @@ def mtx_to_adata(mtx_h5: str, sample: str, verbose: bool = False):
 
     return adata
 
+
 def write_counts(
     adata: AnnData,
     txp2gene: str,
     out: str,
-    verbose: bool = True,):
+    verbose: bool = True,
+):
 
     features = pd.DataFrame()
     features["id"] = adata.var.index
@@ -43,7 +46,6 @@ def write_counts(
         print("Wrote features.tsv, barcodes.tsv, and matrix.mtx files to {}".format(args["out"]))
 
 
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Converts mtx output to h5ad.")
@@ -53,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
     parser.add_argument("--export_mtx", dest="export_mtx", help="Export 10x count files.")
-    parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs='?', const='')
+    parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs="?", const="")
 
     args = vars(parser.parse_args())
 
@@ -67,12 +69,7 @@ if __name__ == "__main__":
     adata = mtx_to_adata(args["mtx"], args["sample"], verbose=args["verbose"])
 
     if args["export_mtx"] == "true":
-        write_counts(
-            adata,
-            args["txp2gene"],
-            args["sample"],
-            verbose=args["verbose"]
-        )
+        write_counts(adata, args["txp2gene"], args["sample"], verbose=args["verbose"])
 
     adata.write_h5ad(args["out"], compression="gzip")
 

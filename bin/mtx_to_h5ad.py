@@ -6,6 +6,7 @@ import os
 from scipy import io
 from anndata import AnnData
 
+
 def mtx_to_adata(
     mtx_file: str,
     barcode_file: str,
@@ -27,15 +28,16 @@ def mtx_to_adata(
     adata.var_names = pd.read_csv(feature_file, header=None, sep="\t")[0].values
     adata.obs["sample"] = sample
 
-
     return adata
+
 
 def write_counts(
     adata: AnnData,
     txp2gene: str,
     star_index: str,
     out: str,
-    verbose: bool = False,):
+    verbose: bool = False,
+):
 
     if verbose:
         print("Reading in {}".format(txp2gene))
@@ -75,8 +77,10 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
     parser.add_argument("-a", "--aligner", dest="aligner", help="Which aligner has been used?")
     parser.add_argument("--export_mtx", dest="export_mtx", help="Export 10x count files.")
-    parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs='?', const='')
-    parser.add_argument("--star_index", dest="star_index", help="Star index folder containing geneInfo.tab.", nargs='?', const='')
+    parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs="?", const="")
+    parser.add_argument(
+        "--star_index", dest="star_index", help="Star index folder containing geneInfo.tab.", nargs="?", const=""
+    )
 
     args = vars(parser.parse_args())
 
@@ -88,22 +92,11 @@ if __name__ == "__main__":
         pass
 
     adata = mtx_to_adata(
-        args["mtx"],
-        args["barcode"],
-        args["feature"],
-        args["sample"],
-        args["aligner"],
-        verbose=args["verbose"]
+        args["mtx"], args["barcode"], args["feature"], args["sample"], args["aligner"], verbose=args["verbose"]
     )
 
     if args["export_mtx"] == "true":
-        write_counts(
-            adata,
-            args["txp2gene"],
-            args["star_index"],
-            args["sample"],
-            verbose=args["verbose"]
-        )
+        write_counts(adata, args["txp2gene"], args["star_index"], args["sample"], verbose=args["verbose"])
 
     adata.write_h5ad(args["out"], compression="gzip")
 

@@ -112,13 +112,14 @@ workflow SCRNASEQ {
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     // Run FastQC
+    /*
     ch_multiqc_fastqc = Channel.empty()
     if (!params.skip_fastqc){
       FASTQC_CHECK ( ch_fastq )
       ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
       ch_multiqc_fastqc    = FASTQC_CHECK.out.fastqc_multiqc.ifEmpty([])
     }
-
+    */
     ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
 
     // Run kallisto bustools pipeline
@@ -183,6 +184,7 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
     }
 
+    /*
     // Run cellranger pipeline
     if (params.aligner == "cellranger-arc") {
         CELLRANGER_ARC_ALIGN(
@@ -196,6 +198,7 @@ workflow SCRNASEQ {
         ch_versions = ch_versions.mix(CELLRANGER_ARC_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ARC_ALIGN.out.cellranger_out)
     }
+    */
 
     /*
     // Run mtx to h5ad conversion subworkflow

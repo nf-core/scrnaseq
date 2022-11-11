@@ -52,6 +52,7 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", dest="verbose", help="Toggle verbose messages", default=False)
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
+    parser.add_argument("--export_mtx", dest="export_mtx", help="Export 10x count files.")
     parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs='?', const='')
 
     args = vars(parser.parse_args())
@@ -65,12 +66,13 @@ if __name__ == "__main__":
 
     adata = mtx_to_adata(args["mtx"], args["sample"], verbose=args["verbose"])
 
-    write_counts(
-        adata,
-        args["txp2gene"],
-        args["sample"],
-        verbose=args["verbose"]
-    )
+    if args["export_mtx"] == "true":
+        write_counts(
+            adata,
+            args["txp2gene"],
+            args["sample"],
+            verbose=args["verbose"]
+        )
 
     adata.write_h5ad(args["out"], compression="gzip")
 

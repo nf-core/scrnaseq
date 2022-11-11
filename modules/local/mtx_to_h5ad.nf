@@ -37,12 +37,28 @@ process MTX_TO_H5AD {
     //
     // run script
     //
-    if (params.aligner == 'cellranger')
+    if (params.aligner == 'cellranger' || params.aligner == 'cellranger-arc' )
     """
     # convert file types
     cellranger_mtx_to_h5ad.py \\
         --mtx filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
+        --aligner cellranger
+        --out ${meta.id}_matrix.h5ad
+    """
+
+    else if (params.aligner == 'cellranger-atac')
+    """
+    # convert file types
+    cellranger_mtx_to_h5ad.py \\
+        --mtx filtered_peak_bc_matrix.h5 \\
+        --sample ${meta.id} \\
+        --aligner cellranger-atac_peak
+        --out ${meta.id}_matrix.h5ad
+    cellranger_mtx_to_h5ad.py \\
+        --mtx filtered_tf_bc_matrix.h5 \\
+        --sample ${meta.id} \\
+        --aligner cellranger-atac_tf
         --out ${meta.id}_matrix.h5ad
     """
 

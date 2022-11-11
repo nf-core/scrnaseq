@@ -86,6 +86,7 @@ process MTX_TO_H5AD {
 
     stub:
     """
+    mkdir ${meta.id}
     touch ${meta.id}/matrix.h5ad
     """
 }

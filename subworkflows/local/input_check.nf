@@ -49,18 +49,21 @@ def create_fastq_channel(LinkedHashMap row) {
         }
         fastqs = [ file(row.fastq_1), file(row.fastq_2) ]
         if (meta.sample_type == "atac") {
+            if (row.fastq_barcode == "") {
+                exit 1, "ERROR: Please check input samplesheet -> Barcode FastQ (Dual index i5 read) file is missing!\n"
+            }
             if (!file(row.fastq_barcode).exists()) {
                 exit 1, "ERROR: Please check input samplesheet -> Barcode FastQ (Dual index i5 read) file does not exist!\n${row.fastq_barcode}"
             }
-            fastqs.add(row.fastq_barcode)
+            fastqs.add(file(row.fastq_barcode))
         }
         fastq_meta = [ meta, fastqs ]
     }
 
     if (params.aligner == "cellranger-arc"){
-        meta.sub_sample = row.fastq_1.replaceAll("_S[0-9]+_L001_R1_001.fastq.gz","")
+        meta.sub_sample = row.fastq_1.split("/")[-1].replaceAll("_S[0-9]+_L001_R1_001.fastq.gz","")
         fastqs.each{
-            if(!it.contains(meta.sub_sample)){
+            if(!it.name.contains(meta.sub_sample)){
                 exit 1, "ERROR: Please check input samplesheet -> Some files do not have the same sample name in common!\n${it}"
             }
         }

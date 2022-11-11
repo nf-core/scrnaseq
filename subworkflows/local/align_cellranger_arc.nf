@@ -3,7 +3,7 @@
  */
 
 include {CELLRANGER_ARC_MKGTF} from "../../modules/local/cellranger_arc/mkgtf/main.nf"
-include {CELLRANGER_ARC_MKREF} from "../../modules/nf-core/modules/cellranger_arc/mkref/main.nf"
+include {CELLRANGER_ARC_MKREF} from "../../modules/local/cellranger_arc/mkref/main.nf"
 include {GENERATE_LIB_CSV} from "../../modules/local/generate_cellranger_lib_csv.nf"
 include {CELLRANGER_ARC_COUNT} from "../../modules/local/cellranger_arc/count/main.nf"
 

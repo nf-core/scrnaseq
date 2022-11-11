@@ -1,3 +1,4 @@
+
 //
 // Check input samplesheet and get read channels
 //
@@ -27,8 +28,10 @@ workflow INPUT_CHECK {
 def create_fastq_channel(LinkedHashMap row) {
     // create meta map
     def meta = [:]
-    meta.id         = row.sample
-    meta.single_end = row.single_end.toBoolean()
+    meta.id             = row.sample
+    meta.single_end     = row.single_end.toBoolean()
+    meta.expected_cells = row.expected_cells != null ? row.expected_cells : null
+    meta.seq_center     = row.seq_center ? row.seq_center : params.seq_center
 
     // add path(s) of the fastq file(s) to the meta map
     def fastq_meta = []

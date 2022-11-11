@@ -16,6 +16,7 @@ workflow STARSOLO {
     protocol
     barcode_whitelist
     ch_fastq
+    star_feature
     other_10x_parameters
 
     main:
@@ -44,6 +45,7 @@ workflow STARSOLO {
         gtf,
         barcode_whitelist,
         protocol,
+        star_feature,
         other_10x_parameters
     )
     ch_versions = ch_versions.mix(STAR_ALIGN.out.versions)

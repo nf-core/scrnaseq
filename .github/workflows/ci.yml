@@ -12,7 +12,7 @@ env:
   NXF_ANSI_LOG: false
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -46,4 +46,4 @@ jobs:
         # For example: adding multiple test runs with different parameters
         # Remember that you can parallelise this by using strategy.matrix
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }} --outdir ./results
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }} --outdir ./results

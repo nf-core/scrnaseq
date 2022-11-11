@@ -35,7 +35,7 @@ def write_counts(
     txp2gene: str,
     star_index: str,
     out: str,
-    verbose: bool = True,):
+    verbose: bool = False,):
 
     if verbose:
         print("Reading in {}".format(txp2gene))
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Converts mtx output to h5ad.")
 
     parser.add_argument("-m", "--mtx", dest="mtx", help="Path to mtx file.")
-    parser.add_argument("-v", "--verbose", dest="verbose", help="Toggle verbose messages", default=True)
+    parser.add_argument("-v", "--verbose", dest="verbose", help="Toggle verbose messages", default=False)
     parser.add_argument("-f", "--feature", dest="feature", help="Path to feature file.")
     parser.add_argument("-b", "--barcode", dest="barcode", help="Path to barcode file.")
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")

@@ -60,11 +60,7 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     # create the directory with the sample name
-    try:
-        os.makedirs(os.path.dirname(args["out"]))
-    except FileExistsError:
-        # directory already exists
-        pass
+    os.makedirs(os.path.dirname(args["out"]), exist_ok=True)
 
     adata = mtx_to_adata(args["mtx"], args["sample"], verbose=args["verbose"])
 

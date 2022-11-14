@@ -24,6 +24,7 @@ def mtx_to_adata(
         aligner == "star"
     ):  # for some reason star matrix comes transposed and doesn't fit when values are appended directly
         adata = adata.transpose()
+
     adata.obs_names = pd.read_csv(barcode_file, header=None, sep="\t")[0].values
     adata.var_names = pd.read_csv(feature_file, header=None, sep="\t")[0].values
     adata.obs["sample"] = sample
@@ -42,23 +43,18 @@ def write_counts(
     if verbose:
         print("Reading in {}".format(txp2gene))
 
-    features = pd.DataFrame()
-    features["id"] = adata.var.index
-
-    # if txp2gene file is available enrich features file with gene names
     if txp2gene:
-        t2g = pd.read_table(txp2gene, header=None)
-        id2name = {e[1]: e[2] for _, e in t2g.iterrows()}
-        features["name"] = adata.var.index.map(id2name)
+        t2g = pd.read_table(txp2gene, header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2])
+    elif star_index:
+        t2g = pd.read_table(f"{star_index}/geneInfo.tab", header=None, skiprows=1, names=["transcript_id", "gene_symbol"])
 
-    # if star_index file is available enrich features file with gene names
-    if star_index:
-        t2g = pd.read_table(f"{star_index}/geneInfo.tab", header=None, skiprows=1)
-        id2name = {e[0]: e[1] for _, e in t2g.iterrows()}
-        features["name"] = adata.var.index.map(id2name)
+    # when assigning a pandas column to a dataframe, pandas already takes care of matching the index.
+    # therefore, setting the index is enough.
+    t2g = t2g.drop_duplicates(subset='gene_id').set_index("gene_id")
+    adata.var["gene_symbol"] = t2g["gene_symbol"]
 
-    features.to_csv(os.path.join(out, "features.tsv"), sep="\t", index=False, header=None)
     pd.DataFrame(adata.obs.index).to_csv(os.path.join(out, "barcodes.tsv"), sep="\t", index=False, header=None)
+    pd.DataFrame(adata.var).to_csv(os.path.join(out, "features.tsv"), sep="\t", index=True, header=None)
     io.mmwrite(os.path.join(out, "matrix.mtx"), adata.X.T, field="integer")
 
     if verbose:
@@ -76,7 +72,6 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
     parser.add_argument("-a", "--aligner", dest="aligner", help="Which aligner has been used?")
-    parser.add_argument("--export_mtx", dest="export_mtx", help="Export 10x count files.")
     parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs="?", const="")
     parser.add_argument(
         "--star_index", dest="star_index", help="Star index folder containing geneInfo.tab.", nargs="?", const=""
@@ -85,18 +80,13 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     # create the directory with the sample name
-    try:
-        os.makedirs(os.path.dirname(args["out"]))
-    except FileExistsError:
-        # directory already exists
-        pass
+    os.makedirs(os.path.dirname(args["out"]), exist_ok=True)
 
     adata = mtx_to_adata(
         args["mtx"], args["barcode"], args["feature"], args["sample"], args["aligner"], verbose=args["verbose"]
     )
 
-    if args["export_mtx"] == "true":
-        write_counts(adata, args["txp2gene"], args["star_index"], args["sample"], verbose=args["verbose"])
+    write_counts(adata, args["txp2gene"], args["star_index"], args["sample"], verbose=args["verbose"])
 
     adata.write_h5ad(args["out"], compression="gzip")
 

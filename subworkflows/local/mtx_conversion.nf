@@ -8,7 +8,6 @@ workflow MTX_CONVERSION {
     take:
     mtx_matrices
     samplesheet
-    export_mtx
     txp2gene
     star_index
 
@@ -21,8 +20,7 @@ workflow MTX_CONVERSION {
         MTX_TO_H5AD (
             mtx_matrices,
             txp2gene,
-            star_index,
-            export_mtx
+            star_index
         )
 
         //

@@ -77,7 +77,6 @@ ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): [
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = Channel.empty()
 ch_multiqc_star = Channel.empty()
-ch_export_mtx = params.export_mtx
 if (params.barcode_whitelist) {
     ch_barcode_whitelist = file(params.barcode_whitelist)
 } else if (params.protocol.contains("10X")) {
@@ -194,7 +193,6 @@ workflow SCRNASEQ {
     MTX_CONVERSION (
         ch_mtx_matrices,
         ch_input,
-        ch_export_mtx,
         ch_txp2gene,
         ch_star_index
     )

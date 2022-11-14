@@ -13,7 +13,6 @@ process MTX_TO_H5AD {
     tuple val(meta), path(inputs)
     path txp2gene
     path star_index
-    val export_mtx
 
     output:
     path "${meta.id}/*h5ad", emit: h5ad
@@ -48,7 +47,6 @@ process MTX_TO_H5AD {
         --mtx filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
         --txp2gene ${txp2gene} \\
-        --export_mtx ${export_mtx} \\
         --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 
@@ -64,7 +62,6 @@ process MTX_TO_H5AD {
             --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
             --txp2gene ${txp2gene} \\
             --star_index ${star_index} \\
-            --export_mtx ${export_mtx} \\
             --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;
     done
     """
@@ -80,7 +77,6 @@ process MTX_TO_H5AD {
         --feature $features_tsv \\
         --txp2gene ${txp2gene} \\
         --star_index ${star_index} \\
-        --export_mtx ${export_mtx} \\
         --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 

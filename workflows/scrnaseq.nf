@@ -186,7 +186,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
-        ch_txp2gene = CELLRANGER_ALIGN.out.txp2gene
+        ch_star_index = CELLRANGER_ALIGN.out.star_index
     }
 
     // Run mtx to h5ad conversion subworkflow

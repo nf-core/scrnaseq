@@ -17,6 +17,7 @@ process MTX_TO_H5AD {
     output:
     path "${meta.id}/*h5ad", emit: h5ad
     path "${meta.id}/*", emit: counts
+    path  "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -43,10 +44,10 @@ process MTX_TO_H5AD {
     if (params.aligner == 'cellranger')
     """
     # convert file types
-    cellranger_mtx_to_h5ad.py \\
-        --mtx filtered_feature_bc_matrix.h5 \\
+    mtx_to_h5ad.py \\
+        --aligner ${params.aligner} \\
+        --input filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
-        --txp2gene ${txp2gene} \\
         --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 
@@ -57,7 +58,7 @@ process MTX_TO_H5AD {
         mtx_to_h5ad.py \\
             --aligner ${params.aligner} \\
             --sample ${meta.id} \\
-            --mtx *count/counts_unfiltered/\${input_type}.mtx \\
+            --input *count/counts_unfiltered/\${input_type}.mtx \\
             --barcode *count/counts_unfiltered/\${input_type}.barcodes.txt \\
             --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
             --txp2gene ${txp2gene} \\
@@ -72,7 +73,7 @@ process MTX_TO_H5AD {
     mtx_to_h5ad.py \\
         --aligner ${params.aligner} \\
         --sample ${meta.id} \\
-        --mtx $mtx_matrix \\
+        --input $mtx_matrix \\
         --barcode $barcodes_tsv \\
         --feature $features_tsv \\
         --txp2gene ${txp2gene} \\
@@ -84,5 +85,6 @@ process MTX_TO_H5AD {
     """
     mkdir ${meta.id}
     touch ${meta.id}/${meta.id}_matrix.h5ad
+    touch versions.yml
     """
 }

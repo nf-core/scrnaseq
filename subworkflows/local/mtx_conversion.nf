@@ -39,7 +39,7 @@ workflow MTX_CONVERSION {
         )
 
         //TODO CONCAT h5ad and MTX to h5ad should also have versions.yaml output
-        ch_version = ch_versions.mix(MTX_TO_SEURAT.out.versions)
+        ch_version = ch_versions.mix(MTX_TO_H5AD.out.versions, MTX_TO_SEURAT.out.versions)
 
     emit:
     ch_versions

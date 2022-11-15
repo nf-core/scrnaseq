@@ -42,5 +42,5 @@ workflow CELLRANGER_ALIGN {
     emit:
         ch_versions
         cellranger_out  = CELLRANGER_COUNT.out.outs
-        txp2gene = cellranger_index
+        star_index = cellranger_index
 }

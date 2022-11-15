@@ -6,6 +6,7 @@ import os
 from scipy import io
 from anndata import AnnData
 
+
 def _10x_h5_to_adata(mtx_h5: str, sample: str):
     adata = sc.read_10x_h5(mtx_h5)
     adata.var["gene_symbols"] = adata.var_names
@@ -13,7 +14,7 @@ def _10x_h5_to_adata(mtx_h5: str, sample: str):
     adata.obs["sample"] = sample
 
     # reorder columns for 10x mtx files
-    adata.var = adata.var[['gene_symbols', 'feature_types', 'genome']]
+    adata.var = adata.var[["gene_symbols", "feature_types", "genome"]]
 
     return adata
 
@@ -37,6 +38,7 @@ def _mtx_to_adata(
 
     return adata
 
+
 def input_to_adata(
     input_data: str,
     barcode_file: str,
@@ -49,7 +51,7 @@ def input_to_adata(
     if verbose:
         print("Reading in {}".format(input_data))
 
-    if aligner == 'cellranger':
+    if aligner == "cellranger":
         return _10x_h5_to_adata(input_data, sample)
     else:
         return _mtx_to_adata(input_data, barcode_file, feature_file, sample, aligner)
@@ -71,10 +73,12 @@ def write_counts(
     if txp2gene:
         t2g = pd.read_table(txp2gene, header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2])
     elif star_index:
-        t2g = pd.read_table(f"{star_index}/geneInfo.tab", header=None, skiprows=1, names=["gene_id", "gene_symbol"], usecols=[0, 1])
+        t2g = pd.read_table(
+            f"{star_index}/geneInfo.tab", header=None, skiprows=1, names=["gene_id", "gene_symbol"], usecols=[0, 1]
+        )
 
     if txp2gene or star_index:
-        t2g = t2g.drop_duplicates(subset='gene_id').set_index("gene_id")
+        t2g = t2g.drop_duplicates(subset="gene_id").set_index("gene_id")
         adata.var["gene_symbol"] = t2g["gene_symbol"]
 
     # when assigning a pandas column to a dataframe, pandas already takes care of matching the index.
@@ -86,9 +90,11 @@ def write_counts(
     if verbose:
         print("Wrote features.tsv, barcodes.tsv, and matrix.mtx files to {}".format(args["out"]))
 
+
 def dump_versions():
     import pkg_resources
-    with open('versions.yml', 'w') as f:
+
+    with open("versions.yml", "w") as f:
         f.write("\n".join([f"{pkg.key}: {pkg.version}" for pkg in pkg_resources.working_set]))
 
 

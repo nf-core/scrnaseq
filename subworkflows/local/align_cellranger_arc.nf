@@ -29,7 +29,7 @@ workflow CELLRANGER_ARC_ALIGN {
             ch_versions = ch_versions.mix(CELLRANGER_ARC_MKGTF.out.versions)
 
             // Make reference genome
-            CELLRANGER_ARC_MKREF( fasta, CELLRANGER_ARC_MKGTF.out.gtf, motifs, reference_config, "cellranger_reference" )
+            CELLRANGER_ARC_MKREF( fasta, CELLRANGER_ARC_MKGTF.out.gtf, motifs, reference_config, "cellranger_arc_reference" )
             ch_versions = ch_versions.mix(CELLRANGER_ARC_MKREF.out.versions)
             cellranger_arc_index = CELLRANGER_ARC_MKREF.out.reference
         }

@@ -192,7 +192,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellranger-atac") {
         CELLRANGER_ATAC_ALIGN(
             ch_genome_fasta,
-            ch_gtf,
+            ch_filter_gtf,
             ch_motifs,
             ch_reference_config,
             ch_cellranger_index,

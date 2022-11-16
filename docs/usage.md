@@ -100,7 +100,12 @@ TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R3_001.fastq.gz,TEST1_S1_L001_
 - R2: Dual index i5 read
 - R3: Read 2
 
-References in order to use cellranger-atac aligner can be downloaded [here](https://support.10xgenomics.com/single-cell-atac/software/downloads/latest). If you cannot find a pre-built index then you can also create your own reference. You need a fasta and gtf file of your organism, plus a motif and config file. Follow [this](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/advanced/references#mkref) and [this tutorial](https://support.10xgenomics.com/single-cell-atac/software/release-notes/references#GRCh38-2020-A) for more information.
+#### Config file
+References in order to use cellranger-atac aligner can be downloaded [here](https://support.10xgenomics.com/single-cell-atac/software/downloads/latest). If you cannot find a pre-built index then you can also create your own reference. You need a fasta and gtf file of your organism, plus a motif and config file. Follow [this](https://support.10xgenomics.com/single-cell-atac/software/pipelines/latest/advanced/references#mkref) and [this tutorial](https://support.10xgenomics.com/single-cell-atac/software/release-notes/references#GRCh38-2020-A) for more information, especially for the **config file**. **Important to note:**
+
+- The pipeline will not create the config file for you, because you can apply the filter "non_nuclear_contigs", which is not a default, and it is yet unclear if the format of the config file will change in the future.
+- The name of genome must be `cellranger_arc_reference`.
+- you have to add to the name of the genome.gtf a .filtered, e.g., `genome.filtered.gtf`, because the pipeline will filter your gtf.
 
 ## Running the pipeline
 

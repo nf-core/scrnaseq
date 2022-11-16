@@ -76,7 +76,9 @@ ch_fastq = Channel.empty()
 ch_folders = Channel.empty()
 ch_genome_fasta = params.fasta ? file(params.fasta) : []
 ch_gtf = params.gtf ? file(params.gtf) : []
+ch_motifs = params.motifs ? file(params.motifs) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
+ch_reference_config = params.reference_config ? file(params.reference_config) : []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = Channel.empty()
 ch_multiqc_star = Channel.empty()
@@ -121,6 +123,8 @@ workflow SCRNASEQ {
     }
     */
     ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
+
+    print(ch_fastq.view())
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
@@ -195,7 +199,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(CELLRANGER_ARC_ALIGN.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ARC_ALIGN.out.cellranger_out)
+        //ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ARC_ALIGN.out.cellranger_arc_out)
     }
 
     /*

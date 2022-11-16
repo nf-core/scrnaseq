@@ -23,7 +23,7 @@ workflow CELLRANGER_ARC_ALIGN {
         assert cellranger_index || (fasta && gtf && motifs && reference_config):
             "Must provide either a cellranger-atac index or a bundle of a fasta file ('--fasta') + gtf file ('--gtf') + motif file (--motifs) + reference_config ('--reference_config')."
 
-        if (!cellranger_arc_index) {
+        if (!cellranger_index) {
             // Filter GTF based on gene biotypes passed in params.modules
             CELLRANGER_ARC_MKGTF( gtf )
             ch_versions = ch_versions.mix(CELLRANGER_ARC_MKGTF.out.versions)
@@ -31,21 +31,22 @@ workflow CELLRANGER_ARC_ALIGN {
             // Make reference genome
             CELLRANGER_ARC_MKREF( fasta, CELLRANGER_ARC_MKGTF.out.gtf, motifs, reference_config, "cellranger_arc_reference" )
             ch_versions = ch_versions.mix(CELLRANGER_ARC_MKREF.out.versions)
-            cellranger_arc_index = CELLRANGER_ARC_MKREF.out.reference
+            cellranger_index = CELLRANGER_ARC_MKREF.out.reference
         }
 
         //TOFLO do I need to copy the files just for the meta data?
         GENERATE_LIB_CSV( ch_fastq )
 
+        /*
         // Obtain read counts
         CELLRANGER_ARC_COUNT (
             ch_fastq,
             GENERATE_LIB_CSV.out.csv,
-            cellranger_arc_index
+            cellranger_index
         )
         ch_versions = ch_versions.mix(CELLRANGER_ARC_COUNT.out.versions)
-        
+        */
     emit:
         ch_versions
-        cellranger_arc_out  = CELLRANGER_ARC_COUNT.out.outs
+        //cellranger_arc_out  = CELLRANGER_ARC_COUNT.out.outs
 }

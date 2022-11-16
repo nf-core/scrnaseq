@@ -64,7 +64,7 @@
                     "description": "The protocol that was used to generate the single cell data, e.g. 10XV2 (default).",
                     "default": "10XV2",
                     "fa_icon": "fas fa-cogs",
-                    "enum": ["10XV3", "10XV2", "10XV1", "dropseq"]
+                    "enum": ["10XV3", "10XV2", "10XV1", "dropseq", "10xmultiome"]
                 },
                 "sample_type": {
                     "type": "string",

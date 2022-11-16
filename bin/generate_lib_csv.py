@@ -7,6 +7,7 @@ if __name__ == "__main__":
 
     parser.add_argument("-t", "--sample_types", dest="sample_types", help="Comma seperated list of sample types.")
     parser.add_argument("-n", "--sample_names", dest="sample_names", help="Comma seperated list of sample names.")
+    parser.add_argument("-f", "--fastq_folder", dest="fastq_folder", help="Folder of FASTQ files.")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
 
     args = vars(parser.parse_args())
@@ -22,9 +23,9 @@ if __name__ == "__main__":
 
     for i in range(0,len(sample_types)):
         if(sample_types[i] == "gex"):
-            lib_csv.write("\n.,{},{}".format(sample_names[i],"Gene Expression"))
+            lib_csv.write("\n{},{},{}".format(args["fastq_folder"], sample_names[i],"Gene Expression"))
         else:
-            lib_csv.write("\n.,{},{}".format(sample_names[i],"Chromatin Accessibility"))
+            lib_csv.write("\n{},{},{}".format(args["fastq_folder"], sample_names[i],"Chromatin Accessibility"))
 
     lib_csv.close()
 

@@ -1,5 +1,5 @@
 process CELLRANGER_ARC_COUNT {
-    tag "$meta.gem"
+    tag "$meta.id"
     label 'process_high'
 
     if (params.enable_conda) {
@@ -8,29 +8,44 @@ process CELLRANGER_ARC_COUNT {
     container "heylf/cellranger-arc:2.0.2"
 
     input:
-    tuple val(meta), path(reads)
-    path  lib_csv
+    tuple val(meta), val(multi_meta), path(reads)
     path  reference
 
     output:
-    tuple val(meta), path("sample-${meta.gem}/outs/*"), emit: outs
-    path "versions.yml"                               , emit: versions
+    tuple val(meta), path("${meta.id}/outs/*"), emit: outs
+    path "versions.yml"                       , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
-    def sample_arg = meta.samples.unique().join(",")
-    def lib_csv_name = lib_csv.name
+    def sample_arg = meta.id
     def reference_name = reference.name
+
+    def multi_meta_info = multi_meta.collate(2).transpose()
+    def sample_types = multi_meta_info[0].join(",")
+    def sample_names = multi_meta_info[1].join(",")
+    def lib_csv = meta.id + "_lib.csv"
+
     """
+    # The following ugly three commands are required because cellranger-arc only deals with abolsute paths
+    mkdir fastqs
+
+    #TOFLO check beforehand if they exists
+    mv *.fastq.gz fastqs/
+
+    generate_lib_csv.py \\
+        --sample_types $sample_types \\
+        --sample_names $sample_names \\
+        --fastq_folder \$(readlink -f fastqs)\\
+        --out $lib_csv
+
     cellranger-arc \\
         count \\
-        --id='sample-${meta.gem}' \\
-        --libraries=$lib_csv_name \\
+        --id='${meta.id}' \\
+        --libraries=$lib_csv \\
         --reference=$reference_name \\
-        --sample=$sample_arg \\
         --localcores=$task.cpus \\
         --localmem=${task.memory.toGiga()} \\
         $args
@@ -43,8 +58,8 @@ process CELLRANGER_ARC_COUNT {
 
     stub:
     """
-    mkdir -p "sample-${meta.gem}/outs/"
-    touch sample-${meta.gem}/outs/fake_file.txt
+    mkdir -p "sample-${meta.id}/outs/"
+    touch sample-${meta.id}/outs/fake_file.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

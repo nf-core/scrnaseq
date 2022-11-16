@@ -184,7 +184,6 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
     }
 
-    /*
     // Run cellranger pipeline
     if (params.aligner == "cellranger-arc") {
         CELLRANGER_ARC_ALIGN(
@@ -198,7 +197,6 @@ workflow SCRNASEQ {
         ch_versions = ch_versions.mix(CELLRANGER_ARC_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ARC_ALIGN.out.cellranger_out)
     }
-    */
 
     /*
     // Run mtx to h5ad conversion subworkflow

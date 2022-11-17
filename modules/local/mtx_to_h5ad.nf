@@ -71,6 +71,7 @@ process MTX_TO_H5AD {
     """
     # convert file types
     mtx_to_h5ad.py \\
+        --task_process ${task.process} \\
         --aligner ${params.aligner} \\
         --sample ${meta.id} \\
         --input $mtx_matrix \\

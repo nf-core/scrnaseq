@@ -45,31 +45,22 @@ def input_to_adata(
     feature_file: str,
     sample: str,
     aligner: str,
+    txp2gene: str,
+    star_index: str,
     verbose: bool = True,
 ):
 
-    if verbose:
+    if verbose and (txp2gene or star_index):
         print("Reading in {}".format(input_data))
 
     if aligner == "cellranger":
-        return _10x_h5_to_adata(input_data, sample)
+        adata = _10x_h5_to_adata(input_data, sample)
     else:
-        return _mtx_to_adata(input_data, barcode_file, feature_file, sample, aligner)
+        adata = _mtx_to_adata(input_data, barcode_file, feature_file, sample, aligner)
 
-
-def write_counts(
-    adata: AnnData,
-    txp2gene: str,
-    star_index: str,
-    aligner: str,
-    out: str,
-    verbose: bool = False,
-):
-
-    if verbose:
+    if verbose and (txp2gene or star_index):
         print("Reading in {}".format(txp2gene))
 
-    t2g = None
     if txp2gene:
         t2g = pd.read_table(txp2gene, header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2])
     elif star_index:
@@ -81,6 +72,15 @@ def write_counts(
         t2g = t2g.drop_duplicates(subset="gene_id").set_index("gene_id")
         adata.var["gene_symbol"] = t2g["gene_symbol"]
 
+    return adata
+
+
+def write_counts(
+    adata: AnnData,
+    out: str,
+    verbose: bool = False,
+):
+
     pd.DataFrame(adata.obs.index).to_csv(os.path.join(out, "barcodes.tsv"), sep="\t", index=False, header=None)
     pd.DataFrame(adata.var).to_csv(os.path.join(out, "features.tsv"), sep="\t", index=True, header=None)
     io.mmwrite(os.path.join(out, "matrix.mtx"), adata.X.T, field="integer")
@@ -89,11 +89,12 @@ def write_counts(
         print("Wrote features.tsv, barcodes.tsv, and matrix.mtx files to {}".format(args["out"]))
 
 
-def dump_versions():
+def dump_versions(task_process):
     import pkg_resources
 
     with open("versions.yml", "w") as f:
-        f.write("\n".join([f"{pkg.key}: {pkg.version}" for pkg in pkg_resources.working_set]))
+        f.write(f"{task_process}:\n\t")
+        f.write("\n\t".join([f"{pkg.key}: {pkg.version}" for pkg in pkg_resources.working_set]))
 
 
 if __name__ == "__main__":
@@ -107,6 +108,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
     parser.add_argument("-a", "--aligner", dest="aligner", help="Which aligner has been used?")
+    parser.add_argument("--task_process", dest="task_process", help="Task process name.")
     parser.add_argument("--txp2gene", dest="txp2gene", help="Transcript to gene (t2g) file.", nargs="?", const="")
     parser.add_argument(
         "--star_index", dest="star_index", help="Star index folder containing geneInfo.tab.", nargs="?", const=""
@@ -117,15 +119,21 @@ if __name__ == "__main__":
     # create the directory with the sample name
     os.makedirs(os.path.dirname(args["out"]), exist_ok=True)
 
-    print(args)
     adata = input_to_adata(
-        args["input_data"], args["barcode"], args["feature"], args["sample"], args["aligner"], verbose=args["verbose"]
+        input_data=args["input_data"],
+        barcode_file=args["barcode"],
+        feature_file=args["feature"],
+        sample=args["sample"],
+        aligner=args["aligner"],
+        txp2gene=args["txp2gene"],
+        star_index=args["star_index"],
+        verbose=args["verbose"],
     )
 
-    write_counts(adata, args["txp2gene"], args["star_index"], args["aligner"], args["sample"], verbose=args["verbose"])
+    write_counts(adata=adata, out=args["sample"], verbose=args["verbose"])
 
     adata.write_h5ad(args["out"], compression="gzip")
 
     print("Wrote h5ad file to {}".format(args["out"]))
 
-    dump_versions()
+    dump_versions(task_process=args["task_process"])

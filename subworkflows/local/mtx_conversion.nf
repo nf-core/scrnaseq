@@ -8,13 +8,19 @@ workflow MTX_CONVERSION {
     take:
     mtx_matrices
     samplesheet
+    txp2gene
+    star_index
 
     main:
         ch_versions = Channel.empty()
-        // Convert matrix do h5ad
+
+        //
+        // Convert matrix to h5ad
         //
         MTX_TO_H5AD (
-            mtx_matrices
+            mtx_matrices,
+            txp2gene,
+            star_index
         )
 
         //
@@ -33,9 +39,10 @@ workflow MTX_CONVERSION {
         )
 
         //TODO CONCAT h5ad and MTX to h5ad should also have versions.yaml output
-        ch_version = ch_versions.mix(MTX_TO_SEURAT.out.versions)
+        ch_version = ch_versions.mix(MTX_TO_H5AD.out.versions, MTX_TO_SEURAT.out.versions)
 
     emit:
     ch_versions
+    counts = MTX_TO_H5AD.out.counts
 
 }

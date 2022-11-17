@@ -137,6 +137,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.counts)
+        ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
     // Run salmon alevin pipeline
@@ -171,6 +172,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.star_counts)
+        ch_star_index = STARSOLO.out.star_index
         ch_multiqc_star = STARSOLO.out.for_multiqc
     }
 
@@ -184,12 +186,15 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
+        ch_star_index = CELLRANGER_ALIGN.out.star_index
     }
 
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (
         ch_mtx_matrices,
-        ch_input
+        ch_input,
+        ch_txp2gene,
+        ch_star_index
     )
 
     //Add Versions from MTX Conversion workflow too

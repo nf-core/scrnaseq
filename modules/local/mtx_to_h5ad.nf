@@ -11,9 +11,13 @@ process MTX_TO_H5AD {
     // inputs from cellranger nf-core module does not come in a single sample dir
     // for each sample, the sub-folders and files come directly in array.
     tuple val(meta), path(inputs)
+    path txp2gene
+    path star_index
 
     output:
-    path "*.h5ad", emit: h5ad
+    path "${meta.id}/*h5ad", emit: h5ad
+    path "${meta.id}/*", emit: counts
+    path  "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -40,10 +44,11 @@ process MTX_TO_H5AD {
     if (params.aligner == 'cellranger')
     """
     # convert file types
-    cellranger_mtx_to_h5ad.py \\
-        --mtx filtered_feature_bc_matrix.h5 \\
+    mtx_to_h5ad.py \\
+        --aligner ${params.aligner} \\
+        --input filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
-        --out ${meta.id}_matrix.h5ad
+        --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 
     else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
@@ -53,10 +58,12 @@ process MTX_TO_H5AD {
         mtx_to_h5ad.py \\
             --aligner ${params.aligner} \\
             --sample ${meta.id} \\
-            --mtx *count/counts_unfiltered/\${input_type}.mtx \\
+            --input *count/counts_unfiltered/\${input_type}.mtx \\
             --barcode *count/counts_unfiltered/\${input_type}.barcodes.txt \\
             --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
-            --out ${meta.id}_\${input_type}_matrix.h5ad ;
+            --txp2gene ${txp2gene} \\
+            --star_index ${star_index} \\
+            --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;
     done
     """
 
@@ -64,16 +71,21 @@ process MTX_TO_H5AD {
     """
     # convert file types
     mtx_to_h5ad.py \\
+        --task_process ${task.process} \\
         --aligner ${params.aligner} \\
         --sample ${meta.id} \\
-        --mtx $mtx_matrix \\
+        --input $mtx_matrix \\
         --barcode $barcodes_tsv \\
         --feature $features_tsv \\
-        --out ${meta.id}_matrix.h5ad
+        --txp2gene ${txp2gene} \\
+        --star_index ${star_index} \\
+        --out ${meta.id}/${meta.id}_matrix.h5ad
     """
 
     stub:
     """
-    touch ${meta.id}_matrix.h5ad
+    mkdir ${meta.id}
+    touch ${meta.id}/${meta.id}_matrix.h5ad
+    touch versions.yml
     """
 }

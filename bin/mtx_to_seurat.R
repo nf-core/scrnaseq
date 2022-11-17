@@ -22,6 +22,8 @@ if(aligner %in% c("kallisto", "alevin")) {
 
 seurat.object <- CreateSeuratObject(counts = expression.matrix)
 
+dir.create(basename(dirname(out.file)), showWarnings = FALSE)
+
 saveRDS(seurat.object, file = out.file)
 
 

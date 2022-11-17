@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v2.1.1dev -
 
 - Added support to output 10x count files in text format.
+- Add gene symbols to count matrices
 
 ### Fixes
 

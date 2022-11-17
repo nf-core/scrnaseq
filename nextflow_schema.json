@@ -229,7 +229,7 @@
         "biomage_upload": {
             "title": "Biomage Upload",
             "type": "object",
-            "description": "Upload results into Biomage to view analysis of your data",
+            "description": "Upload results into Biomage to view plots and tables of your data. Create an account in https://scp.biomage.net and input your credentials below. The results will be automatically uploaded to your Biomage account.",
             "default": "",
             "properties": {
                 "biomage_email": {
@@ -245,7 +245,7 @@
                 "biomage_instance_url": {
                     "type": "string",
                     "fa_icon": "fas fa-external-link-alt",
-                    "description": "URL to Biomage Instance (do not include 'https://' in the url)",
+                    "description": "Leave as default if you made your account in https://scp.biomage.net/. Otherwise, provide URL to Biomage Instance (do not include 'https://' in the url)",
                     "default": "scp.biomage.net"
                 }
             },

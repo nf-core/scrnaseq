@@ -226,6 +226,31 @@
                 }
             }
         },
+        "biomage_upload": {
+            "title": "Biomage Upload",
+            "type": "object",
+            "description": "Upload results into Biomage to view analysis of your data",
+            "default": "",
+            "properties": {
+                "biomage_email": {
+                    "type": "string",
+                    "fa_icon": "fas fa-envelope",
+                    "description": "Email address in Biomage"
+                },
+                "biomage_password": {
+                    "type": "string",
+                    "fa_icon": "fas fa-unlock",
+                    "description": "Password in Biomage"
+                },
+                "biomage_instance_url": {
+                    "type": "string",
+                    "fa_icon": "fas fa-external-link-alt",
+                    "description": "URL to Biomage Instance (do not include 'https://' in the url)",
+                    "default": "scp.biomage.net"
+                }
+            },
+            "fa_icon": "fas fa-bacterium"
+        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",
@@ -442,6 +467,9 @@
         },
         {
             "$ref": "#/definitions/cellranger_options"
+        },
+        {
+            "$ref": "#/definitions/biomage_upload"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

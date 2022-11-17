@@ -45,6 +45,7 @@ include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
+include { BIOMAGE_UPLOAD    } from '../modules/local/biomage_upload'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -77,6 +78,12 @@ ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): [
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = Channel.empty()
 ch_multiqc_star = Channel.empty()
+
+// biomage inputs
+ch_biomage_email = params.biomage_email
+ch_biomage_password = params.biomage_password
+ch_biomage_instance_url = params.biomage_instance_url
+
 if (params.barcode_whitelist) {
     ch_barcode_whitelist = file(params.barcode_whitelist)
 } else if (params.protocol.contains("10X")) {
@@ -196,6 +203,15 @@ workflow SCRNASEQ {
         ch_txp2gene,
         ch_star_index
     )
+
+    if (ch_biomage_email) {
+        BIOMAGE_UPLOAD(
+            ch_biomage_email,
+            ch_biomage_password,
+            ch_biomage_instance_url,
+            MTX_CONVERSION.out.counts.collect()
+        ) | view
+    }
 
     //Add Versions from MTX Conversion workflow too
     ch_versions.mix(MTX_CONVERSION.out.ch_versions)

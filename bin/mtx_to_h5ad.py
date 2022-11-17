@@ -81,8 +81,6 @@ def write_counts(
         t2g = t2g.drop_duplicates(subset="gene_id").set_index("gene_id")
         adata.var["gene_symbol"] = t2g["gene_symbol"]
 
-    # when assigning a pandas column to a dataframe, pandas already takes care of matching the index.
-    # therefore, setting the index is enough.
     pd.DataFrame(adata.obs.index).to_csv(os.path.join(out, "barcodes.tsv"), sep="\t", index=False, header=None)
     pd.DataFrame(adata.var).to_csv(os.path.join(out, "features.tsv"), sep="\t", index=True, header=None)
     io.mmwrite(os.path.join(out, "matrix.mtx"), adata.X.T, field="integer")

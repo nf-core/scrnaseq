@@ -75,5 +75,4 @@ workflow SCRNASEQ_ALEVIN {
     alevin_results = SIMPLEAF_QUANT.out.alevin_results
     alevinqc = ALEVINQC.out.report
     for_multiqc = SIMPLEAF_QUANT.out.alevin_results.collect{it[1]}.ifEmpty([])
-
 }

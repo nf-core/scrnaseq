@@ -17,6 +17,7 @@ process STAR_ALIGN {
     path  gtf
     path whitelist
     val protocol
+    val star_feature
     val other_10x_parameters
 
     output:
@@ -40,10 +41,13 @@ process STAR_ALIGN {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def ignore_gtf = params.star_ignore_sjdbgtf ? '' : "--sjdbGTFfile $gtf"
-    def seq_center = params.seq_center ? "--outSAMattrRGline ID:$prefix 'CN:$params.seq_center' 'SM:$prefix'" : "--outSAMattrRGline ID:$prefix 'SM:$prefix'"
+    def seq_center = meta.seq_center ? "--outSAMattrRGline ID:$prefix 'CN:$meta.seq_center' 'SM:$prefix'" : "--outSAMattrRGline ID:$prefix 'SM:$prefix'"
     def out_sam_type = (args.contains('--outSAMtype')) ? '' : '--outSAMtype BAM Unsorted'
     def mv_unsorted_bam = (args.contains('--outSAMtype BAM Unsorted SortedByCoordinate')) ? "mv ${prefix}.Aligned.out.bam ${prefix}.Aligned.unsort.out.bam" : ''
     // def read_pair = params.protocol.contains("chromium") ? "${reads[1]} ${reads[0]}" : "${reads[0]} ${reads[1]}" -- commented out to be removed is it is not being used
+
+    // default values max percentile for UMI count 0.99 and max to min ratio for UMI count 10 taken from STARsolo usage
+    def cell_filter = meta.expected_cells ? "--soloCellFilter CellRanger2.2 $meta.expected_cells 0.99 10" : ''
 
     // separate forward from reverse pairs
     def (forward, reverse) = reads.collate(2).transpose()
@@ -55,10 +59,12 @@ process STAR_ALIGN {
         --outFileNamePrefix $prefix. \\
         --soloCBwhitelist <(gzip -cdf $whitelist) \\
         --soloType $protocol \\
+        --soloFeatures $star_feature \\
         $other_10x_parameters \\
         $out_sam_type \\
         $ignore_gtf \\
         $seq_center \\
+        $cell_filter \\
         $args \\
 
     $mv_unsorted_bam

@@ -116,7 +116,7 @@
                     "fa_icon": "fas fa-code-branch"
                 },
                 "save_reference": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
                     "fa_icon": "fas fa-bookmark"
                 }
@@ -167,6 +167,13 @@
                     "type": "string",
                     "description": "Name of sequencing center for BAM read group tag.",
                     "default": null
+                },
+                "star_feature": {
+                    "type": "string",
+                    "default": "Gene",
+                    "enum": ["Gene", "GeneFull", "Gene Velocyto"],
+                    "description": "Quantification type of different transcriptomic feature. Use `GeneFull` on pre-mRNA count for single-nucleus RNA-seq reads. Use `Gene Velocyto` to generate RNA velocity matrix.",
+                    "fa_icon": "fas fa-asterisk"
                 }
             },
             "fa_icon": "fas fa-star"

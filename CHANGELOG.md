@@ -3,6 +3,17 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.1.1dev -
+
+- Added support to output 10x count files in text format.
+- Add gene symbols to count matrices
+
+### Fixes
+
+- Autocanceling previous CI runs when new changes are pushed.
+- Fixed [#177](https://github.com/nf-core/scrnaseq/issues/177) by adjusting the channels generation and usage when skipping fastqc
+- Fixed [#173](https://github.com/nf-core/scrnaseq/issues/173) by adjusting parameter type and adding them to modules.config
+
 ## v2.1.0 - 2022-10-06 "Green Mercury Siberian Husky"
 
 - Alevin workflow updated to use Alevin-Fry via simpleaf - thanks to @rob-p for supporting this and @fmalmeida implementing the support

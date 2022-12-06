@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        aligner: ["alevin", "kallisto", "star", "cellranger"]
+        aligner: ["alevin", "kallisto", "star", "cellranger", "universc"]
     steps:
       - name: Launch workflow via tower
         uses: nf-core/tower-action@v3

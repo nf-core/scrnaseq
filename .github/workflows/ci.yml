@@ -32,6 +32,7 @@ jobs:
             "test,docker --aligner kallisto",
             "test,docker --aligner star",
             "test,docker --aligner cellranger -stub",
+            "test,docker --aligner universc -stub",
           ]
     steps:
       - name: Check out pipeline code

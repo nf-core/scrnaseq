@@ -232,10 +232,10 @@
             "description": "Params related to the Cellranger pipeline",
             "default": "",
             "properties": {
-                "cellranger_index": {
+                "universc_index": {
                     "type": "string",
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
-                }
+                },
                 "universc_technology": {
                     "type": "string",
                     "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details. "

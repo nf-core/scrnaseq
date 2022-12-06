@@ -12,17 +12,17 @@ workflow UNIVERSC_ALIGN {
     take:
         fasta
         gtf
-        cellranger_index
+        universc_index
         universc_technology
         ch_fastq
 
     main:
         ch_versions = Channel.empty()
 
-        assert cellranger_index || (fasta && gtf):
+        assert universc_index || (fasta && gtf):
             "Must provide either a cellranger index or both a fasta file ('--fasta') and a gtf file ('--gtf')."
 
-        if (!cellranger_index) {
+        if (!universc_index) {
             // Filter GTF based on gene biotypes passed in params.modules
             UNIVERSC_MKGTF( gtf )
             ch_versions = ch_versions.mix(UNIVERSC_MKGTF.out.versions)
@@ -30,14 +30,14 @@ workflow UNIVERSC_ALIGN {
             // Make reference genome
             UNIVERSC_MKREF( fasta, UNIVERSC_MKGTF.out.gtf, "cellranger_reference" )
             ch_versions = ch_versions.mix(UNIVERSC_MKREF.out.versions)
-            cellranger_index = UNIVERSC_MKREF.out.reference
+            universc_index = UNIVERSC_MKREF.out.reference
         }
 
         // Obtain read counts
         UNIVERSC_LAUNCH (
             // TODO add technology and chemistry input parameters and set defaults
             ch_fastq.map{ meta, reads -> [meta + ["id": meta.id, "samples:", meta.id, "technology": universc_technology, "single_end:", false, "strandedness:", 'forward'], reads] },
-            cellranger_index
+            universc_index
         )
         ch_versions = ch_versions.mix(UNIVERSC_LAUNCH.out.versions)
 

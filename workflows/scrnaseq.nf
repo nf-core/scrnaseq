@@ -12,7 +12,7 @@ WorkflowScrnaseq.initialise(params, log)
 def checkPathParamList = [
     params.input, params.multiqc_config, params.fasta, params.gtf,
     params.transcript_fasta, params.salmon_index, params.kallisto_index,
-    params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index
+    params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index, params.universc_technology
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -43,6 +43,7 @@ include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
+include { UNIVERSC_ALIGN  } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
 /*
@@ -98,6 +99,9 @@ ch_star_index = params.star_index ? file(params.star_index) : []
 
 //cellranger params
 ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
+
+//universc params
+ch_universc_technology = params.universc_technology ? file(params.universc_technology) : []
 
 
 workflow SCRNASEQ {
@@ -180,6 +184,19 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
+    }
+
+    // Run cellranger pipeline
+    if (params.aligner == "universc") {
+        UNIVERSC_ALIGN(
+            ch_genome_fasta,
+            ch_filter_gtf,
+            ch_cellranger_index,
+            ch_universc_technology,
+            ch_fastq
+        )
+        ch_versions = ch_versions.mix(UNIVERSC_ALIGN.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
     }
 
     // Run mtx to h5ad conversion subworkflow

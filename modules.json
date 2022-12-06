@@ -17,6 +17,18 @@
                         "branch": "master",
                         "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
                     },
+                    "universc/launch": {
+                        "branch": "master",
+                        "git_sha": "acc63a2bc7a3fe83bf5733e099348c5b694c0fd7"
+                    },
+                    "universc/mkgtf": {
+                        "branch": "master",
+                        "git_sha": "acc63a2bc7a3fe83bf5733e099348c5b694c0fd7"
+                    },
+                    "universc/mkref": {
+                        "branch": "master",
+                        "git_sha": "acc63a2bc7a3fe83bf5733e099348c5b694c0fd7"
+                    },
                     "custom/dumpsoftwareversions": {
                         "branch": "master",
                         "git_sha": "8022c68e7403eecbd8ba9c49496f69f8c49d50f0"

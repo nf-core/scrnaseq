@@ -17,6 +17,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [STARsolo](#starsolo)
   - [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
   - [Cellranger](#cellranger)
+  - [UniverSC](#universc)
   - [Other output data](#other-output-data)
   - [MultiQC](#multiqc)
   - [Pipeline information](#pipeline-information)
@@ -96,6 +97,22 @@ Cell Ranger is a set of analysis scripts that processes 10X Chromium single cell
 **Output directory: `results/cellranger`**
 
 - Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger
+
+## UniverSC
+
+UniverSC is a wrapper that calls an open-source implementation of Cell Ranger v3.0.2 and adjusts run parameters for compatibility with a wide ranger of technologies.
+Custom inputs and at least 40 preset technologies are supported. UniverSC is developed independently from 10X Genomics and all software are not subject
+to the 10X Genomics End User License Agreement which restricts usage on other platforms. Therefore in principle UniverSC can be run on any scRNA-Seq technology
+without restrictions to align reads, generate feature-barcode matrices, perform clustering and other secondary analysis.
+See [UniverSC](https://github.com/minoda-lab/universc) for more information on UniverSC.
+
+UniverSC has been published in _Nature Communications_.
+
+Battenberg, K., Kelly, S.T., Ras, R.A., Hetherington, N.A., Hayashi, K., and Minoda, A. (2022) A flexible cross-platform single-cell data processing pipeline. Nat Commun 13(1): 1-7. https://doi.org/10.1038/s41467-022-34681-z
+
+**Output directory: `results/universc`**
+
+- Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by the open-source implementation of Cell Ranger run via UniverSC
 
 ## Other output data
 

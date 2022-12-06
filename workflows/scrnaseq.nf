@@ -13,7 +13,7 @@ def checkPathParamList = [
     params.input, params.multiqc_config, params.fasta, params.gtf,
     params.transcript_fasta, params.salmon_index, params.kallisto_index,
     params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index,
-    params.universc_index, params.universc_technology
+    params.universc_index
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -104,7 +104,7 @@ ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : 
 
 //universc params
 ch_universc_index = params.universc_index ? file(params.universc_index) : []
-ch_universc_technology = params.universc_technology ? file(params.universc_technology) : []
+universc_technology = params.universc_technology
 
 
 workflow SCRNASEQ {

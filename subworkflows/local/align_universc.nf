@@ -43,5 +43,5 @@ workflow UNIVERSC_ALIGN {
 
     emit:
         ch_versions
-        cellranger_out  = UNIVERSC_LAUNCH.out.outs
+        universc_out  = UNIVERSC_LAUNCH.out.outs
 }

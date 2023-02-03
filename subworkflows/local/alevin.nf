@@ -5,8 +5,8 @@ include { SIMPLEAF_INDEX        }             from '../../modules/local/simpleaf
 include { SIMPLEAF_QUANT        }             from '../../modules/local/simpleaf_quant'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
-include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/gffread/main'
+include { GUNZIP }                 from '../../modules/nf-core/gunzip/main'
+include { GFFREAD as GFFREAD_TXP } from '../../modules/nf-core/gffread/main'
 
 def multiqc_report    = []
 
@@ -41,9 +41,11 @@ workflow SCRNASEQ_ALEVIN {
     * Build salmon index
     */
     if (!salmon_index) {
-        SIMPLEAF_INDEX( genome_fasta, transcript_fasta, gtf )
+        GFFREAD_TXP(gtf)
+        SIMPLEAF_INDEX( genome_fasta, transcript_fasta, GFFREAD_TXP.out.gtf )
         salmon_index = SIMPLEAF_INDEX.out.index.collect()
         transcript_tsv = SIMPLEAF_INDEX.out.transcript_tsv.collect()
+        ch_versions = ch_versions.mix(GFFREAD_TXP.out.versions)
         ch_versions = ch_versions.mix(SIMPLEAF_INDEX.out.versions)
     }
 

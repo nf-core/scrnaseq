@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Autocanceling previous CI runs when new changes are pushed.
 - Fixed [#177](https://github.com/nf-core/scrnaseq/issues/177) by adjusting the channels generation and usage when skipping fastqc
 - Fixed [#173](https://github.com/nf-core/scrnaseq/issues/173) by adjusting parameter type and adding them to modules.config
+- Fixed [#196](https://github.com/nf-core/scrnaseq/issues/196) by adjusting runtime requirements for AlevinQC
 
 ## v2.1.0 - 2022-10-06 "Green Mercury Siberian Husky"
 

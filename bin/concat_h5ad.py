@@ -17,7 +17,6 @@ def read_samplesheet(samplesheet):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Concatenates h5ad files and merge metadata from samplesheet")
 
     parser.add_argument("-i", "--input", dest="input", help="Path to samplesheet.csv")

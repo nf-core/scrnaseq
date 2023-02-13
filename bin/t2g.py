@@ -83,7 +83,6 @@ def print_output(output, r, use_name=True):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(
         add_help=True,
         description="Creates transcript to gene info from GTF files\nreads from standard input and writes to standard output",

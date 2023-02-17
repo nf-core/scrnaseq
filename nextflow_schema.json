@@ -69,6 +69,23 @@
             },
             "fa_icon": "fas fa-terminal"
         },
+        "skip_tools": {
+            "title": "Skip Tools",
+            "type": "object",
+            "description": "This section can be used to  disable certain tools in the pipeline",
+            "default": "",
+            "fa_icon": "fas fa-forward",
+            "properties": {
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "description": "Skip MultiQC Report"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC"
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -166,7 +183,7 @@
                 "seq_center": {
                     "type": "string",
                     "description": "Name of sequencing center for BAM read group tag.",
-                    "default": null
+                    "default": "None"
                 },
                 "star_feature": {
                     "type": "string",
@@ -419,6 +436,9 @@
         },
         {
             "$ref": "#/definitions/mandatory_arguments"
+        },
+        {
+            "$ref": "#/definitions/skip_tools"
         },
         {
             "$ref": "#/definitions/reference_genome_options"

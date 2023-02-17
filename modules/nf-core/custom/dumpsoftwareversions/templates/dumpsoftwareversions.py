@@ -4,17 +4,13 @@
 """Provide functions to merge multiple versions.yml files."""
 
 
-
-"""Provide functions to merge multiple versions.yml files."""
-
-
-import yaml
 import platform
 from textwrap import dedent
 
+import yaml
+
 
 def _make_versions_html(versions):
-    """Generate a tabular HTML output of all versions for MultiQC."""
     """Generate a tabular HTML output of all versions for MultiQC."""
     html = [
         dedent(
@@ -61,32 +57,10 @@ def main():
         "python": platform.python_version(),
         "yaml": yaml.__version__,
     }
-def main():
-    """Load all version files and generate merged output."""
-    versions_this_module = {}
-    versions_this_module["${task.process}"] = {
-        "python": platform.python_version(),
-        "yaml": yaml.__version__,
-    }
 
     with open("$versions") as f:
         versions_by_process = yaml.load(f, Loader=yaml.BaseLoader) | versions_this_module
-    with open("$versions") as f:
-        versions_by_process = yaml.load(f, Loader=yaml.BaseLoader) | versions_this_module
 
-    # aggregate versions by the module name (derived from fully-qualified process name)
-    versions_by_module = {}
-    for process, process_versions in versions_by_process.items():
-        module = process.split(":")[-1]
-        try:
-            if versions_by_module[module] != process_versions:
-                raise AssertionError(
-                    "We assume that software versions are the same between all modules. "
-                    "If you see this error-message it means you discovered an edge-case "
-                    "and should open an issue in nf-core/tools. "
-                )
-        except KeyError:
-            versions_by_module[module] = process_versions
     # aggregate versions by the module name (derived from fully-qualified process name)
     versions_by_module = {}
     for process, process_versions in versions_by_process.items():
@@ -105,19 +79,7 @@ def main():
         "Nextflow": "$workflow.nextflow.version",
         "$workflow.manifest.name": "$workflow.manifest.version",
     }
-    versions_by_module["Workflow"] = {
-        "Nextflow": "$workflow.nextflow.version",
-        "$workflow.manifest.name": "$workflow.manifest.version",
-    }
 
-    versions_mqc = {
-        "id": "software_versions",
-        "section_name": "${workflow.manifest.name} Software Versions",
-        "section_href": "https://github.com/${workflow.manifest.name}",
-        "plot_type": "html",
-        "description": "are collected at run time from the software output.",
-        "data": _make_versions_html(versions_by_module),
-    }
     versions_mqc = {
         "id": "software_versions",
         "section_name": "${workflow.manifest.name} Software Versions",
@@ -131,19 +93,9 @@ def main():
         yaml.dump(versions_by_module, f, default_flow_style=False)
     with open("software_versions_mqc.yml", "w") as f:
         yaml.dump(versions_mqc, f, default_flow_style=False)
-    with open("software_versions.yml", "w") as f:
-        yaml.dump(versions_by_module, f, default_flow_style=False)
-    with open("software_versions_mqc.yml", "w") as f:
-        yaml.dump(versions_mqc, f, default_flow_style=False)
 
     with open("versions.yml", "w") as f:
         yaml.dump(versions_this_module, f, default_flow_style=False)
-    with open("versions.yml", "w") as f:
-        yaml.dump(versions_this_module, f, default_flow_style=False)
-
-
-if __name__ == "__main__":
-    main()
 
 
 if __name__ == "__main__":

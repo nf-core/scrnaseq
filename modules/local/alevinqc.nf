@@ -4,8 +4,8 @@ process ALEVINQC {
 
     conda (params.enable_conda ? "bioconda::bioconductor-alevinqc=1.12.1" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.12.1--r41h9f5acd7_0' :
-        'quay.io/biocontainers/bioconductor-alevinqc:1.12.1--r41h9f5acd7_0' }"
+        'https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.14.0--r42hc247a5b_0' :
+        'quay.io/biocontainers/bioconductor-alevinqc:1.14.0--r42hc247a5b_0' }"
 
     input:
     tuple val(meta), path(alevin_results)

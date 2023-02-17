@@ -14,17 +14,12 @@ nextflow.enable.dsl = 2
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    GENOME PARAMETER VALUES
+    VALIDATE & PRINT PARAMETER SUMMARY
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    VALIDATE & PRINT PARAMETER SUMMARY
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
+params.gtf   = WorkflowMain.getGenomeAttribute(params, 'gtf')
 
 WorkflowMain.initialise(workflow, params, log)
 
@@ -37,10 +32,11 @@ WorkflowMain.initialise(workflow, params, log)
 include { SCRNASEQ } from './workflows/scrnaseq'
 
 //
-// WORKFLOW: Run main nf-core/scrnaseq analysis pipeline
+// WORKFLOW: Run main scrnaseq analysis pipeline
 //
-workflow NFCORE_SCRNASEQ {
-    SCRNASEQ ()
+
+workflow NFCORE_SCRNASEQ{
+    SCRNASEQ()
 }
 
 /*

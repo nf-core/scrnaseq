@@ -2,7 +2,7 @@ process MTX_TO_SEURAT {
     tag "$meta.id"
     label 'process_medium'
 
-    conda (params.enable_conda ? "r-seurat" : null)
+    conda "r-seurat"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'docker://satijalab/seurat:4.1.0' :
         'satijalab/seurat:4.1.0' }"

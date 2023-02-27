@@ -49,7 +49,6 @@ def input_to_adata(
     star_index: str,
     verbose: bool = True,
 ):
-
     if verbose and (txp2gene or star_index):
         print("Reading in {}".format(input_data))
 
@@ -80,7 +79,6 @@ def write_counts(
     out: str,
     verbose: bool = False,
 ):
-
     pd.DataFrame(adata.obs.index).to_csv(os.path.join(out, "barcodes.tsv"), sep="\t", index=False, header=None)
     pd.DataFrame(adata.var).to_csv(os.path.join(out, "features.tsv"), sep="\t", index=True, header=None)
     io.mmwrite(os.path.join(out, "matrix.mtx"), adata.X.T, field="integer")
@@ -98,7 +96,6 @@ def dump_versions(task_process):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Converts mtx output to h5ad.")
 
     parser.add_argument("-i", "--input_data", dest="input_data", help="Path to either mtx or mtx h5 file.")

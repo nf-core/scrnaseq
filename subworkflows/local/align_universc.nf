@@ -1,11 +1,11 @@
 /*
- * Alignment with Cellranger
+ * Alignment with Cellranger open-source implementation called by UniverSC
  */
 
-include {UNIVERSC_MKGTF} from "../../modules/nf-core/universc/mkgtf/main.nf"
-include {UNIVERSC_MKREF} from "../../modules/nf-core/universc/mkref/main.nf"
-include {UNIVERSC_LAUNCH} from "../../modules/nf-core/universc/launch/main.nf"
-include {MTX_TO_H5AD     } from "../../modules/local/mtx_to_h5ad.nf"
+include {CELLRANGER_MKGTF} from "../../modules/nf-core/universc/mkgtf/main.nf"
+include {CELLRANGER_MKREF} from "../../modules/nf-core/universc/mkref/main.nf"
+include {UNIVERSC} from "../../modules/nf-core/universc/main.nf"
+include {MTX_TO_H5AD} from "../../modules/local/mtx_to_h5ad.nf"
 
 // Define workflow to subset and index a genome region fasta file
 workflow UNIVERSC_ALIGN {
@@ -24,24 +24,24 @@ workflow UNIVERSC_ALIGN {
 
         if (!universc_index) {
             // Filter GTF based on gene biotypes passed in params.modules
-            UNIVERSC_MKGTF( gtf )
-            ch_versions = ch_versions.mix(UNIVERSC_MKGTF.out.versions)
+            CELLRANGER_MKGTF( gtf )
+            ch_versions = ch_versions.mix(CELLRANGER_MKGTF.out.versions)
 
             // Make reference genome
-            UNIVERSC_MKREF( fasta, UNIVERSC_MKGTF.out.gtf, "cellranger_reference" )
-            ch_versions = ch_versions.mix(UNIVERSC_MKREF.out.versions)
-            universc_index = UNIVERSC_MKREF.out.reference
+            CELLRANGER_MKREF( fasta, CELLRANGER_MKGTF.out.gtf, "cellranger_reference" )
+            ch_versions = ch_versions.mix(CELLRANGER_MKREF.out.versions)
+            universc_index = CELLRANGER_MKREF.out.reference
         }
 
         // Obtain read counts
-        UNIVERSC_LAUNCH (
+        UNIVERSC (
             // TODO add technology and chemistry input parameters and set defaults
             ch_fastq.map{ meta, reads -> [meta + ["id": meta.id, "samples:", meta.id, "technology": universc_technology, "single_end:", false, "strandedness:", 'forward'], reads] },
             universc_index
         )
-        ch_versions = ch_versions.mix(UNIVERSC_LAUNCH.out.versions)
+        ch_versions = ch_versions.mix(UNIVERSC.out.versions)
 
     emit:
         ch_versions
-        universc_out  = UNIVERSC_LAUNCH.out.outs
+        universc_out  = UNIVERSC.out.outs
 }

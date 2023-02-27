@@ -17,17 +17,9 @@
                         "branch": "master",
                         "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
                     },
-                    "universc/launch": {
+                    "universc": {
                         "branch": "master",
-                        "git_sha": "acc63a2bc7a3fe83bf5733e099348c5b694c0fd7"
-                    },
-                    "universc/mkgtf": {
-                        "branch": "master",
-                        "git_sha": "acc63a2bc7a3fe83bf5733e099348c5b694c0fd7"
-                    },
-                    "universc/mkref": {
-                        "branch": "master",
-                        "git_sha": "acc63a2bc7a3fe83bf5733e099348c5b694c0fd7"
+                        "git_sha": "7a522f4ba5b97368c975b314db25929f6931648d"
                     },
                     "custom/dumpsoftwareversions": {
                         "branch": "master",

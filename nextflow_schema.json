@@ -69,6 +69,23 @@
             },
             "fa_icon": "fas fa-terminal"
         },
+        "skip_tools": {
+            "title": "Skip Tools",
+            "type": "object",
+            "description": "This section can be used to  disable certain tools in the pipeline",
+            "default": "",
+            "fa_icon": "fas fa-forward",
+            "properties": {
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "description": "Skip MultiQC Report"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC"
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -166,7 +183,7 @@
                 "seq_center": {
                     "type": "string",
                     "description": "Name of sequencing center for BAM read group tag.",
-                    "default": null
+                    "default": "None"
                 },
                 "star_feature": {
                     "type": "string",
@@ -322,6 +339,12 @@
                     "fa_icon": "fas fa-question-circle",
                     "hidden": true
                 },
+                "version": {
+                    "type": "boolean",
+                    "description": "Display version and exit.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
+                },
                 "publish_dir_mode": {
                     "type": "string",
                     "default": "copy",
@@ -363,7 +386,7 @@
                     "type": "string",
                     "description": "Incoming hook URL for messaging service",
                     "fa_icon": "fas fa-people-group",
-                    "help_text": "Incoming hook URL for messaging service. Currently, only MS Teams is supported.",
+                    "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
                     "hidden": true
                 },
                 "multiqc_config": {
@@ -421,6 +444,9 @@
         },
         {
             "$ref": "#/definitions/mandatory_arguments"
+        },
+        {
+            "$ref": "#/definitions/skip_tools"
         },
         {
             "$ref": "#/definitions/reference_genome_options"

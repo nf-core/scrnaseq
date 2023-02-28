@@ -2,10 +2,10 @@ process STAR_ALIGN {
     tag "$meta.id"
     label 'process_high'
 
-    conda 'bioconda::star=2.7.10a'
+    conda 'bioconda::star=2.7.10b'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/star:2.7.10a--h9ee0642_0' :
-        'quay.io/biocontainers/star:2.7.10a--h9ee0642_0' }"
+        'https://depot.galaxyproject.org/singularity/star:2.7.10b--h9ee0642_0' :
+        'quay.io/biocontainers/star:2.7.10b--h9ee0642_0' }"
 
     input:
     //

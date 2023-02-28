@@ -2,7 +2,7 @@ process SIMPLEAF_QUANT {
     tag "$meta.id"
     label 'process_high'
 
-    conda (params.enable_conda ? 'bioconda::simpleaf=10.0' : null)
+    conda 'bioconda::simpleaf=10.0'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/simpleaf:0.10.0--h9f5acd7_0' :
         'quay.io/biocontainers/simpleaf:0.10.0--h9f5acd7_0' }"

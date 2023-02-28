@@ -43,5 +43,5 @@ workflow UNIVERSC_ALIGN {
     emit:
         ch_versions
         universc_out  = UNIVERSC.out.outs
-        star_index = cellranger_index
+        star_index = universc_index
 }

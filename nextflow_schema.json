@@ -426,14 +426,6 @@
                     "description": "Show all params when using `--help`",
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
-                },
-                "skip_fastqc": {
-                    "type": "boolean",
-                    "description": "Skip the FastQC reporting feature in the pipeline."
-                },
-                "skip_multiqc": {
-                    "type": "boolean",
-                    "description": "Skip the MultiQC reporting feature in the pipeline."
                 }
             }
         }

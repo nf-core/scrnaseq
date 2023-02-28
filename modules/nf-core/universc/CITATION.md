@@ -19,7 +19,7 @@ package version 1.2.5.1. [https://github.com/minoda-lab/universc](https://github
         publisher = {Cold Spring Harbor Laboratory},
         abstract = {Single-cell RNA-sequencing analysis to quantify RNA molecules in individual cells has become popular owing to the large amount of information one can obtain from each experiment. We have developed UniverSC (https://github.com/minoda-lab/universc), a universal single-cell processing tool that supports any UMI-based platform. Our command-line tool enables consistent and comprehensive integration, comparison, and evaluation across data generated from a wide range of platforms.Competing Interest StatementThe authors have declared no competing interest.},
         eprint = {https://www.biorxiv.org/content/early/2021/01/19/2021.01.19.427209.full.pdf},
-        journal = {{bioRxiv}},
+        journal = "{bioRxiv}",
         note = {package version 1.2.5.1},
         URL = {https://github.com/minoda-lab/universc},
 }

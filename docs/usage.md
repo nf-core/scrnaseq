@@ -86,7 +86,7 @@ TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
 
 #### UniverSC technology configuration
 
-UniverSC automatically updates the barcode whitelist and chemistry parameters. Use the "universc_technology" to set the 'technology' parameter to configure the run.
+UniverSC automatically updates the barcode whitelist and chemistry parameters. Use "universc_technology" to set the 'technology' parameter to configure the run.
 
 Currently only 3\' scRNA-Seq parameters are supported in nextflow, although chemistry parameters for 5\' scRNA-Seq and full-length scRNA-Seq libraries are supported by teh container.
 

@@ -104,7 +104,7 @@ ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : 
 
 //universc params
 ch_universc_index = params.universc_index ? file(params.universc_index) : []
-universc_technology = params.universc_technology
+ch_universc_technology = params.universc_technology
 
 
 workflow SCRNASEQ {

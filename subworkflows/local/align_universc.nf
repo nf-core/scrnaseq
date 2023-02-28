@@ -35,7 +35,7 @@ workflow UNIVERSC_ALIGN {
         // Obtain read counts
         UNIVERSC (
             // TODO add technology and chemistry input parameters and set defaults
-            ch_fastq.map{ meta, reads -> [meta + ["id": [meta.id], "samples:", [meta.id], "technology": [universc_technology], "single_end:", false, "strandedness:", 'forward'], reads] },
+            ch_fastq.map{ meta, reads -> [meta + ["id": meta.id, "samples": [meta.id], "technology": [universc_technology], "single_end": false, "strandedness": "forward"], reads] },
             universc_index
         )
         ch_versions = ch_versions.mix(UNIVERSC.out.versions)

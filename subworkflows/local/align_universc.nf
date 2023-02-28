@@ -2,10 +2,9 @@
  * Alignment with Cellranger open-source implementation called by UniverSC
  */
 
-include {CELLRANGER_MKGTF} from "../../modules/nf-core/universc/mkgtf/main.nf"
-include {CELLRANGER_MKREF} from "../../modules/nf-core/universc/mkref/main.nf"
+include {CELLRANGER_MKGTF} from "../../modules/nf-core/cellranger/mkgtf/main.nf"
+include {CELLRANGER_MKREF} from "../../modules/nf-core/cellranger/mkref/main.nf"
 include {UNIVERSC} from "../../modules/nf-core/universc/main.nf"
-include {MTX_TO_H5AD} from "../../modules/local/mtx_to_h5ad.nf"
 
 // Define workflow to subset and index a genome region fasta file
 workflow UNIVERSC_ALIGN {
@@ -36,7 +35,7 @@ workflow UNIVERSC_ALIGN {
         // Obtain read counts
         UNIVERSC (
             // TODO add technology and chemistry input parameters and set defaults
-            ch_fastq.map{ meta, reads -> [meta + ["id": meta.id, "samples:", meta.id, "technology": universc_technology, "single_end:", false, "strandedness:", 'forward'], reads] },
+            ch_fastq.map{ meta, reads -> [meta + ["id": [meta.id], "samples:", [meta.id], "technology": [universc_technology], "single_end:", false, "strandedness:", 'forward'], reads] },
             universc_index
         )
         ch_versions = ch_versions.mix(UNIVERSC.out.versions)
@@ -44,4 +43,5 @@ workflow UNIVERSC_ALIGN {
     emit:
         ch_versions
         universc_out  = UNIVERSC.out.outs
+        star_index = cellranger_index
 }

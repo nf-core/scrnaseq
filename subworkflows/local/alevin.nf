@@ -33,7 +33,7 @@ workflow SCRNASEQ_ALEVIN {
 
     if (transcript_fasta || salmon_index) {
         assert txp2gene:
-            "Since a built transcript was provided ('--transcript_fasta'), must also provide a simpleaf gene map ('--txp2gene') to use with simpleaf quant!"
+            "Since either a built transcript or a built salmon index was provided ('--transcript_fasta' or '--salmon_index'), user must also provide a simpleaf gene map ('--txp2gene') to use with simpleaf quant!"
     }
 
 

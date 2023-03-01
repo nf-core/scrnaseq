@@ -68,8 +68,10 @@ Other aligner options for running the pipeline are:
   - `--aligner star`
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
   - `--aligner cellranger`
+- [UniverSC](https://github.com/minoda-lab/universc) to run an open-source version of Cell Ranger on any technology
+  - '--aligner universc'
 
-### If using cellranger
+### If using cellranger or universc
 
 In order to use cellranger aligner, reads must be named as [required by the tool](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
 
@@ -81,6 +83,14 @@ Besides that, the sample name given in the samplesheet must be the same that is 
 sample,fastq_1,fastq_2,
 TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
 ```
+
+#### UniverSC technology configuration
+
+UniverSC automatically updates the barcode whitelist and chemistry parameters. Use "universc_technology" to set the 'technology' parameter to configure the run.
+
+Currently only 3\' scRNA-Seq parameters are supported in nextflow, although chemistry parameters for 5\' scRNA-Seq and full-length scRNA-Seq libraries are supported by teh container.
+
+Filenames are recommended to be the same format as for Cell Ranger but automated correction is attempted before calling Cell Ranger.
 
 ## Running the pipeline
 

@@ -31,7 +31,7 @@ workflow SCRNASEQ_ALEVIN {
         """Must provide a genome fasta file ('--fasta') and a gtf file ('--gtf'), or a genome fasta file
         and a transcriptome fasta file ('--transcript_fasta`) if no index is given!""".stripIndent()
 
-    if (transcript_fasta) {
+    if (transcript_fasta || salmon_index) {
         assert txp2gene:
             "Since a built transcript was provided ('--transcript_fasta'), must also provide a simpleaf gene map ('--txp2gene') to use with simpleaf quant!"
     }
@@ -45,12 +45,13 @@ workflow SCRNASEQ_ALEVIN {
         salmon_index = SIMPLEAF_INDEX.out.index.collect()
         transcript_tsv = SIMPLEAF_INDEX.out.transcript_tsv.collect()
         ch_versions = ch_versions.mix(SIMPLEAF_INDEX.out.versions)
+
+        if (!txp2gene) { 
+            txp2gene = SIMPLEAF_INDEX.out.transcript_tsv 
+        }
     }
 
-    /*
-    * Select txp2gene map
-    */
-    if (!txp2gene) { txp2gene = SIMPLEAF_INDEX.out.transcript_tsv }
+
 
     /*
     * Perform quantification with salmon alevin

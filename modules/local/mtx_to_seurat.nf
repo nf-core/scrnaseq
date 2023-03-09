@@ -3,9 +3,7 @@ process MTX_TO_SEURAT {
     label 'process_medium'
 
     conda "r-seurat"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'docker://satijalab/seurat:4.1.0' :
-        'satijalab/seurat:4.1.0' }"
+    container 'satijalab/seurat:4.3.0'
 
     input:
     // inputs from cellranger nf-core module does not come in a single sample dir

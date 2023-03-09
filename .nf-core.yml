@@ -1,1 +1,4 @@
 repository_type: pipeline
+lint:
+  template_strings:
+    - modules/nf-core/universc/CITATION.md

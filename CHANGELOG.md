@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support to output 10x count files in text format.
 - Add gene symbols to count matrices
 - Added UniverSC aligner to implement open-source version of Cell Ranger with wrapper for 40 technologies
+- Update cellranger to v7.1.0 ([#205](https://github.com/nf-core/scrnaseq/pull/205)).
 
 ### Fixes
 

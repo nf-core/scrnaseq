@@ -7,22 +7,18 @@
                 "nf-core": {
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "c62b41a07a00fee11ec73e2a0d4a1aec771a742b",
+                        "git_sha": "abe9c71bdc56686abd337995580fbf35a6e5e013",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
-                        "git_sha": "c62b41a07a00fee11ec73e2a0d4a1aec771a742b",
+                        "git_sha": "abe9c71bdc56686abd337995580fbf35a6e5e013",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
                         "branch": "master",
-                        "git_sha": "c62b41a07a00fee11ec73e2a0d4a1aec771a742b",
+                        "git_sha": "abe9c71bdc56686abd337995580fbf35a6e5e013",
                         "installed_by": ["modules"]
-                    },
-                    "universc": {
-                        "branch": "master",
-                        "git_sha": "7a522f4ba5b97368c975b314db25929f6931648d"
                     },
                     "custom/dumpsoftwareversions": {
                         "branch": "master",
@@ -41,17 +37,17 @@
                     },
                     "gunzip": {
                         "branch": "master",
-                        "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/ref": {
                         "branch": "master",
-                        "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
@@ -62,6 +58,11 @@
                     "star/genomegenerate": {
                         "branch": "master",
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "installed_by": ["modules"]
+                    },
+                    "universc": {
+                        "branch": "master",
+                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
                         "installed_by": ["modules"]
                     }
                 }

@@ -50,11 +50,13 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 
 ### Expected cells
 
-This parameter may be used for three of the four supported aligning options.
+This parameter is currently supported by
 
 - [Salmon Alevin](https://salmon.readthedocs.io/en/latest/alevin.html#expectcells)
-- [Cellranger](https://software.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/release-notes) - NB: Current recommendation is to use auto-estimation of expected cells
 - [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md)
+
+In the future, support for this paramter will be added to cellranger and UniverSC. Note that since cellranger v7,
+it is not recommended anymore to supply the `--expected-cells` parameter.
 
 ## Aligning options
 

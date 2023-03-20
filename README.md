@@ -4,9 +4,7 @@
 [![GitHub Actions Linting Status](https://github.com/nf-core/scrnaseq/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/scrnaseq/actions?query=workflow%3A%22nf-core+linting%22)
 [![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?logo=Amazon%20AWS)](https://nf-co.re/scrnaseq/results)
 [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.3568187-1073c8)](https://doi.org/10.5281/zenodo.3568187)
-[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.6656322)](https://doi.org/10.5281/zenodo.6656322)
-
-[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
@@ -28,14 +26,17 @@ This is a community effort in building a pipeline capable to support:
 - STARSolo
 - Kallisto + BUStools
 - Cellranger
+- UniverSC
 
 ## Documentation
 
 The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage](https://nf-co.re/scrnaseq/usage), [parameters](https://nf-co.re/scrnaseq/parameters) and [output](https://nf-co.re/scrnaseq/output).
 
+![scrnaseq workflow](docs/images/scrnaseq_pipeline_v1.0_metro_clean.png)
+
 ## Quick Start
 
-1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=21.10.3`)
+1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=22.10.1`)
 
 2. Install any of [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) (you can follow [this tutorial](https://singularity-tutorial.github.io/01-installation/)), [`Podman`](https://podman.io/), [`Shifter`](https://nersc.gitlab.io/development/shifter/how-to-use/) or [`Charliecloud`](https://hpc.github.io/charliecloud/) for full pipeline reproducibility _(you can use [`Conda`](https://conda.io/miniconda.html) both to install Nextflow itself and also to manage software within pipelines. Please only use it within pipelines as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_.
 
@@ -55,8 +56,23 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage
 4. Start running your own analysis!
 
    ```console
-   nextflow run nf-core/scrnaseq --input samplesheet.csv --outdir <OUTDIR> --genome_fasta GRCm38.p6.genome.chr19.fa --gtf gencode.vM19.annotation.chr19.gtf --protocol 10XV2 --aligner <alevin/kallisto/star/cellranger> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+   nextflow run nf-core/scrnaseq --input samplesheet.csv --outdir <OUTDIR> --genome_fasta GRCm38.p6.genome.chr19.fa --gtf gencode.vM19.annotation.chr19.gtf --protocol 10XV2 --aligner <alevin/kallisto/star/cellranger/universc> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
+
+## Decision Tree for users
+
+The nf-core/scrnaseq pipeline features several paths to analyze your single cell data. Future additions will also be done soon, e.g. the addition of multi-ome analysis types. To aid users in analyzing their data, we have added a decision tree to help people decide on what type of analysis they want to run and how to choose appropriate parameters for that.
+
+```mermaid
+graph TD
+    A[sc RNA] -->|alevin-fry| B(h5ad/seurat/mtx matrices)
+    A[sc RNA] -->|CellRanger| B(h5ad/seurat/mtx matrices)
+    A[sc RNA] -->|kbpython| B(h5ad/seurat/mtx matrices)
+    A[sc RNA] -->|STARsolo| B(h5ad/seurat/mtx matrices)
+    A[sc RNA] -->|Universc| B(h5ad/seurat/mtx matrices)
+```
+
+Options for the respective alignment method can be found [here](https://github.com/nf-core/scrnaseq/blob/dev/docs/usage.md#aligning-options) to choose between methods.
 
 ## Credits
 
@@ -64,6 +80,7 @@ nf-core/scrnaseq was originally written by Bailey PJ, Botvinnik O, Marques de Al
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
+- @heylf
 - @KevinMenden
 - @FloWuenne
 - @rob-p

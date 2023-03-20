@@ -2,10 +2,8 @@ process MTX_TO_SEURAT {
     tag "$meta.id"
     label 'process_medium'
 
-    conda (params.enable_conda ? "r-seurat" : null)
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'docker://satijalab/seurat:4.1.0' :
-        'satijalab/seurat:4.1.0' }"
+    conda "r-seurat"
+    container 'satijalab/seurat:4.3.0'
 
     input:
     // inputs from cellranger nf-core module does not come in a single sample dir
@@ -13,7 +11,7 @@ process MTX_TO_SEURAT {
     tuple val(meta), path(inputs)
 
     output:
-    path "*.rds", emit: seuratObjects
+    path "${meta.id}/*.rds", emit: seuratObjects
     path "versions.yml", emit: versions
 
     when:
@@ -38,6 +36,9 @@ process MTX_TO_SEURAT {
         barcodes = "*.Solo.out/Gene*/filtered/barcodes.tsv.gz"
         features = "*.Solo.out/Gene*/filtered/features.tsv.gz"
     }
+    """
+    mkdir ${meta.id}
+    """
 
     if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
@@ -47,7 +48,7 @@ process MTX_TO_SEURAT {
             *count/counts_unfiltered/\${input_type}.mtx \\
             *count/counts_unfiltered/\${input_type}.barcodes.txt \\
             *count/counts_unfiltered/\${input_type}.genes.txt \\
-            ${meta.id}_\${input_type}_matrix.rds \\
+            ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
             ${aligner}
     done
     """
@@ -58,12 +59,14 @@ process MTX_TO_SEURAT {
         $matrix \\
         $barcodes \\
         $features \\
-        ${meta.id}_matrix.rds \\
+        ${meta.id}/${meta.id}_matrix.rds \\
         ${aligner}
     """
 
     stub:
     """
-    touch ${meta.id}_matrix.rds
+    mkdir ${meta.id}
+    touch ${meta.id}/${meta.id}_matrix.rds
+    touch versions.yml
     """
 }

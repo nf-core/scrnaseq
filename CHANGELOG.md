@@ -3,6 +3,23 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.2.0
+
+- Added support to output 10x count files in text format.
+- Add gene symbols to count matrices
+- Added UniverSC aligner to implement open-source version of Cell Ranger with wrapper for 40 technologies
+- Update cellranger to v7.1.0 ([#205](https://github.com/nf-core/scrnaseq/pull/205)).
+
+### Fixes
+
+- Autocanceling previous CI runs when new changes are pushed.
+- Fixed [#193](https://github.com/nf-core/scrnaseq/issues/177) by updating the Seurat container directive
+- Fixed [#177](https://github.com/nf-core/scrnaseq/issues/177) by adjusting the channels generation and usage when skipping fastqc
+- Fixed [#173](https://github.com/nf-core/scrnaseq/issues/173) by adjusting parameter type and adding them to modules.config
+- Fixed [#170](https://github.com/nf-core/scrnaseq/issues/170) by adding UniverSC subworkflow using new module
+- Fixed [#196](https://github.com/nf-core/scrnaseq/issues/196) by adjusting runtime requirements for AlevinQC
+- Fixed [#191](https://github.com/nf-core/scrnaseq/issues/191) by updating simpleAF containers to latest version
+
 ## v2.1.0 - 2022-10-06 "Green Mercury Siberian Husky"
 
 - Alevin workflow updated to use Alevin-Fry via simpleaf - thanks to @rob-p for supporting this and @fmalmeida implementing the support

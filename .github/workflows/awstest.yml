@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        aligner: ["alevin", "kallisto", "star", "cellranger"]
+        aligner: ["alevin", "kallisto", "star", "cellranger", "universc"]
     steps:
       # Launch workflow using Tower CLI tool action
       - name: Launch workflow via tower

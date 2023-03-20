@@ -57,7 +57,7 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
-                    "enum": ["kallisto", "star", "alevin", "cellranger"]
+                    "enum": ["kallisto", "star", "alevin", "cellranger", "universc"]
                 },
                 "protocol": {
                     "type": "string",
@@ -68,6 +68,23 @@
                 }
             },
             "fa_icon": "fas fa-terminal"
+        },
+        "skip_tools": {
+            "title": "Skip Tools",
+            "type": "object",
+            "description": "This section can be used to  disable certain tools in the pipeline",
+            "default": "",
+            "fa_icon": "fas fa-forward",
+            "properties": {
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "description": "Skip MultiQC Report"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC"
+                }
+            }
         },
         "reference_genome_options": {
             "title": "Reference genome options",
@@ -116,7 +133,7 @@
                     "fa_icon": "fas fa-code-branch"
                 },
                 "save_reference": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
                     "fa_icon": "fas fa-bookmark"
                 }
@@ -166,7 +183,14 @@
                 "seq_center": {
                     "type": "string",
                     "description": "Name of sequencing center for BAM read group tag.",
-                    "default": null
+                    "default": "None"
+                },
+                "star_feature": {
+                    "type": "string",
+                    "default": "Gene",
+                    "enum": ["Gene", "GeneFull", "Gene Velocyto"],
+                    "description": "Quantification type of different transcriptomic feature. Use `GeneFull` on pre-mRNA count for single-nucleus RNA-seq reads. Use `Gene Velocyto` to generate RNA velocity matrix.",
+                    "fa_icon": "fas fa-asterisk"
                 }
             },
             "fa_icon": "fas fa-star"
@@ -216,6 +240,22 @@
                 "cellranger_index": {
                     "type": "string",
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                }
+            }
+        },
+        "universc_options": {
+            "title": "UniverSC Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "universc_index": {
+                    "type": "string",
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                },
+                "universc_technology": {
+                    "type": "string",
+                    "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details. "
                 }
             }
         },
@@ -315,6 +355,12 @@
                     "fa_icon": "fas fa-question-circle",
                     "hidden": true
                 },
+                "version": {
+                    "type": "boolean",
+                    "description": "Display version and exit.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
+                },
                 "publish_dir_mode": {
                     "type": "string",
                     "default": "copy",
@@ -356,7 +402,7 @@
                     "type": "string",
                     "description": "Incoming hook URL for messaging service",
                     "fa_icon": "fas fa-people-group",
-                    "help_text": "Incoming hook URL for messaging service. Currently, only MS Teams is supported.",
+                    "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
                     "hidden": true
                 },
                 "multiqc_config": {
@@ -396,20 +442,6 @@
                     "description": "Show all params when using `--help`",
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
-                },
-                "enable_conda": {
-                    "type": "boolean",
-                    "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-bacon"
-                },
-                "skip_fastqc": {
-                    "type": "boolean",
-                    "description": "Skip the FastQC reporting feature in the pipeline."
-                },
-                "skip_multiqc": {
-                    "type": "boolean",
-                    "description": "Skip the MultiQC reporting feature in the pipeline."
                 }
             }
         }
@@ -420,6 +452,9 @@
         },
         {
             "$ref": "#/definitions/mandatory_arguments"
+        },
+        {
+            "$ref": "#/definitions/skip_tools"
         },
         {
             "$ref": "#/definitions/reference_genome_options"
@@ -435,6 +470,9 @@
         },
         {
             "$ref": "#/definitions/cellranger_options"
+        },
+        {
+            "$ref": "#/definitions/universc_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

@@ -1,26 +1,27 @@
 /*
- * Alignment with Cellranger
+ * Alignment with Cellranger open-source implementation called by UniverSC
  */
 
 include {CELLRANGER_MKGTF} from "../../modules/nf-core/cellranger/mkgtf/main.nf"
 include {CELLRANGER_MKREF} from "../../modules/nf-core/cellranger/mkref/main.nf"
-include {CELLRANGER_COUNT} from "../../modules/nf-core/cellranger/count/main.nf"
+include {UNIVERSC} from "../../modules/nf-core/universc/main.nf"
 
 // Define workflow to subset and index a genome region fasta file
-workflow CELLRANGER_ALIGN {
+workflow UNIVERSC_ALIGN {
     take:
         fasta
         gtf
-        cellranger_index
+        universc_index
+        universc_technology
         ch_fastq
 
     main:
         ch_versions = Channel.empty()
 
-        assert cellranger_index || (fasta && gtf):
+        assert universc_index || (fasta && gtf):
             "Must provide either a cellranger index or both a fasta file ('--fasta') and a gtf file ('--gtf')."
 
-        if (!cellranger_index) {
+        if (!universc_index) {
             // Filter GTF based on gene biotypes passed in params.modules
             CELLRANGER_MKGTF( gtf )
             ch_versions = ch_versions.mix(CELLRANGER_MKGTF.out.versions)
@@ -28,19 +29,19 @@ workflow CELLRANGER_ALIGN {
             // Make reference genome
             CELLRANGER_MKREF( fasta, CELLRANGER_MKGTF.out.gtf, "cellranger_reference" )
             ch_versions = ch_versions.mix(CELLRANGER_MKREF.out.versions)
-            cellranger_index = CELLRANGER_MKREF.out.reference
+            universc_index = CELLRANGER_MKREF.out.reference
         }
 
         // Obtain read counts
-        CELLRANGER_COUNT (
-            // TODO what is `gem` and why is it needed?
-            ch_fastq.map{ meta, reads -> [meta + ["gem": meta.id, "samples": [meta.id]], reads] },
-            cellranger_index
+        UNIVERSC (
+            // TODO add technology and chemistry input parameters and set defaults
+            ch_fastq.map{ meta, reads -> [meta + ["id": meta.id, "samples": [meta.id], "technology": [universc_technology], "single_end": false, "strandedness": "forward"], reads] },
+            universc_index
         )
-        ch_versions = ch_versions.mix(CELLRANGER_COUNT.out.versions)
+        ch_versions = ch_versions.mix(UNIVERSC.out.versions)
 
     emit:
         ch_versions
-        cellranger_out  = CELLRANGER_COUNT.out.outs
-        star_index = cellranger_index
+        universc_out  = UNIVERSC.out.outs
+        star_index = universc_index
 }

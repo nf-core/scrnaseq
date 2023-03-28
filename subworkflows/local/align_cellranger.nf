@@ -5,6 +5,7 @@
 include {CELLRANGER_MKGTF} from "../../modules/nf-core/cellranger/mkgtf/main.nf"
 include {CELLRANGER_MKREF} from "../../modules/nf-core/cellranger/mkref/main.nf"
 include {CELLRANGER_COUNT} from "../../modules/nf-core/cellranger/count/main.nf"
+include {SAMPLESHEET_CHECK} from "../../modules/local/samplesheet_check"
 
 // Define workflow to subset and index a genome region fasta file
 workflow CELLRANGER_ALIGN {
@@ -13,7 +14,7 @@ workflow CELLRANGER_ALIGN {
         gtf
         cellranger_index
         ch_fastq
-
+        renamed_fastq
     main:
         ch_versions = Channel.empty()
 
@@ -34,7 +35,7 @@ workflow CELLRANGER_ALIGN {
         // Obtain read counts
         CELLRANGER_COUNT (
             // TODO what is `gem` and why is it needed?
-            ch_fastq.map{ meta, reads -> [meta + ["gem": meta.id, "samples": [meta.id]], reads] },
+            renamed_fastq.map{ meta, reads -> [meta + ["gem": meta.id, "samples": [meta.id]], reads] },
             cellranger_index
         )
         ch_versions = ch_versions.mix(CELLRANGER_COUNT.out.versions)

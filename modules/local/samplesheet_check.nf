@@ -22,7 +22,11 @@ process SAMPLESHEET_CHECK {
     check_samplesheet.py \\
         $samplesheet \\
         samplesheet.valid.csv
-
+    if("${params.aligner}"=="cellranger") {
+        samplesheet_cellranger_conform.py \\
+        samplesheet.valid.csv \\
+        samplesheet_cellranger.csv
+    }
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         python: \$(python --version | sed 's/Python //g')

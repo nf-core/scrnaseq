@@ -13,7 +13,8 @@ process SAMPLESHEET_CHECK {
     output:
     path '*.csv'       , emit: csv
     path "versions.yml", emit: versions
-
+    path '*.fasq.gz'   , emit: renamed_fastq, optional: true
+    
     when:
     task.ext.when == null || task.ext.when
 
@@ -22,10 +23,12 @@ process SAMPLESHEET_CHECK {
     check_samplesheet.py \\
         $samplesheet \\
         samplesheet.valid.csv
-    if("${params.aligner}"=="cellranger") {
+    if [ "${params.aligner}"=="cellranger" ]
+    then
         samplesheet_cellranger_conform.py \\
         samplesheet.valid.csv \\
         samplesheet_cellranger.csv
+    fi
     }
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

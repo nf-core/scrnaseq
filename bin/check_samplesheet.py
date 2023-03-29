@@ -162,7 +162,7 @@ def check_samplesheet(file_in, file_out):
             if "sample_type" in header:
                 sample_type = lspl[colmap["sample_type"]]
                 if (sample_type not in SAMPLE_TYPES):
-                    print_error("Sample type {} is not supported!".format(sample_type), "Line", line)
+                    print_error("Sample type {} is not supported! Please specify either {}".format(sample_type, " or ".join(SAMPLE_TYPES)), "Line", line)
 
             for fastq in fastq_list:
                 if fastq:

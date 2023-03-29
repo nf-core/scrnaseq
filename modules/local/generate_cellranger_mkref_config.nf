@@ -26,7 +26,7 @@ process GENERATE_CONFIG {
         --fasta $fasta \\
         --gtf $gtf \\
         --motifs $motifs \\
-        --add $args
+        $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

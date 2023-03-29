@@ -20,7 +20,6 @@ process CELLRANGER_ARC_COUNT {
 
     script:
     def args = task.ext.args ?: ''
-    def sample_arg = meta.id
     def reference_name = reference.name
 
     def multi_meta_info = multi_meta.collate(2).transpose()
@@ -29,10 +28,12 @@ process CELLRANGER_ARC_COUNT {
     def lib_csv = meta.id + "_lib.csv"
 
     """
-    # The following ugly three commands are required because cellranger-arc only deals with abolsute paths
-    mkdir fastqs
+    # The following ugly three commands (mkdir, mv, generate_lib_csv)
+    # are required because cellranger-arc only deals with abolsute paths
+    if [ ! -d "fastqs" ]; then
+        mkdir fastqs
+    fi
 
-    #TOFLO check beforehand if they exists
     mv *.fastq.gz fastqs/
 
     generate_lib_csv.py \\
@@ -58,8 +59,8 @@ process CELLRANGER_ARC_COUNT {
 
     stub:
     """
-    mkdir -p "sample-${meta.id}/outs/"
-    touch sample-${meta.id}/outs/fake_file.txt
+    mkdir -p "${meta.id}/outs/"
+    touch ${meta.id}/outs/fake_file.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

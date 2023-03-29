@@ -40,8 +40,8 @@ workflow CELLRANGER_ARC_ALIGN {
         }
 
         //TOFLO do I need to copy the files just for the meta data?
-        GENERATE_LIB_CSV( ch_fastq )
-        ch_versions.mix(GENERATE_LIB_CSV.out.versions)
+        //GENERATE_LIB_CSV( ch_fastq )
+        //ch_versions.mix(GENERATE_LIB_CSV.out.versions)
 
         // Obtain read counts
         CELLRANGER_ARC_COUNT (

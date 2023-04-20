@@ -182,8 +182,7 @@
                 },
                 "seq_center": {
                     "type": "string",
-                    "description": "Name of sequencing center for BAM read group tag.",
-                    "default": "None"
+                    "description": "Name of sequencing center for BAM read group tag."
                 },
                 "star_feature": {
                     "type": "string",
@@ -251,11 +250,12 @@
             "properties": {
                 "universc_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website."
                 },
                 "universc_technology": {
                     "type": "string",
-                    "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details. "
+                    "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details.",
+                    "default": "10x"
                 }
             }
         },

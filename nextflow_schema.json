@@ -206,16 +206,6 @@
                     "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
                     "fa_icon": "fas fa-fish"
                 },
-                "bustools_correct": {
-                    "type": "boolean",
-                    "description": "If set to false, skip the correct steps after mapping with Kallisto.",
-                    "fa_icon": "fas fa-bus-alt"
-                },
-                "skip_bustools": {
-                    "type": "boolean",
-                    "description": "Skip BUStools entirely in workflow",
-                    "fa_icon": "fas fa-forward"
-                },
                 "kallisto_index": {
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",

@@ -104,8 +104,6 @@ ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : 
 
 //universc params
 ch_universc_index = params.universc_index ? file(params.universc_index) : []
-ch_universc_technology = params.universc_technology
-
 
 workflow SCRNASEQ {
 
@@ -201,7 +199,7 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_universc_index,
-            ch_universc_technology,
+            params.universc_technology,
             ch_fastq
         )
         ch_versions = ch_versions.mix(UNIVERSC_ALIGN.out.ch_versions)

@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v2.3.0dev
 
 - Fix problem on samplesheet check related to amount of columns ([[#211](https://github.com/nf-core/scrnaseq/issues/211)])
+- Fixed bug in starsolo output cardinality.
 
 ## v2.2.0
 

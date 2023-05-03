@@ -104,7 +104,8 @@ def check_samplesheet(file_in, file_out):
                 min_header_count = min_header_count + 1
             colmap[h] = i
             i = i + 1
-        if unknown_header or min_header_count < len(MIN_HEADER):
+        if min_header_count < len(MIN_HEADER):
+            # code was checking for unknown_header or min_header_count however looking at the ifelse, unknown_header does not seem that it should be tested
             given = ",".join(header)
             wanted = ",".join(MIN_HEADER)
             print(f"ERROR: Please check samplesheet header -> {given} != {wanted}")

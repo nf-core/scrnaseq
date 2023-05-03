@@ -104,8 +104,6 @@ ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : 
 
 //universc params
 ch_universc_index = params.universc_index ? file(params.universc_index) : []
-ch_universc_technology = params.universc_technology
-
 
 workflow SCRNASEQ {
 
@@ -201,7 +199,7 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_universc_index,
-            ch_universc_technology,
+            params.universc_technology,
             ch_fastq
         )
         ch_versions = ch_versions.mix(UNIVERSC_ALIGN.out.ch_versions)
@@ -238,8 +236,8 @@ workflow SCRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_fastqc.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect{it[1]}.ifEmpty([])),
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect{it[1]}.ifEmpty([])),
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect(),

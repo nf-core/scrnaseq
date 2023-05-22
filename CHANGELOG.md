@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.4.0dev - [date]
 
+- Add `public_aws_ecr` config for using the AWS mirror of containers where possible
+
 ## v2.3.0 Steelblue Waspaloy Dachshund
 
 - Fix problem on samplesheet check related to amount of columns ([[#211](https://github.com/nf-core/scrnaseq/issues/211)])

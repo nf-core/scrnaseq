@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.4.0dev - [date]
 
-- Add `public_aws_ecr` config for using the AWS mirror of containers where possible
+- Add `public_aws_ecr` config for using the AWS mirror of containers where possible ([#225](https://github.com/nf-core/scrnaseq/pull/225))
 
 ## v2.3.0 Steelblue Waspaloy Dachshund
 

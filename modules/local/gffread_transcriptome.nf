@@ -5,7 +5,7 @@ process GFFREAD_TRANSCRIPTOME {
     conda "bioconda::gffread=0.12.7"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gffread:0.12.7--hd03093a_1' :
-        'quay.io/biocontainers/gffread:0.12.7--hd03093a_1' }"
+        'biocontainers/gffread:0.12.7--hd03093a_1' }"
 
     input:
     path genome_fasta

@@ -193,7 +193,7 @@ workflow SCRNASEQ {
         ch_star_index = CELLRANGER_ALIGN.out.star_index
     }
 
-    // Run cellranger pipeline
+    // Run universc pipeline
     if (params.aligner == "universc") {
         UNIVERSC_ALIGN(
             ch_genome_fasta,

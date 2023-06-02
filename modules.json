@@ -7,62 +7,62 @@
                 "nf-core": {
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "abe9c71bdc56686abd337995580fbf35a6e5e013",
+                        "git_sha": "d68b2e6526fcd22a2a6349e0859dbdc9924df93d",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
-                        "git_sha": "abe9c71bdc56686abd337995580fbf35a6e5e013",
+                        "git_sha": "d68b2e6526fcd22a2a6349e0859dbdc9924df93d",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
                         "branch": "master",
-                        "git_sha": "abe9c71bdc56686abd337995580fbf35a6e5e013",
+                        "git_sha": "d68b2e6526fcd22a2a6349e0859dbdc9924df93d",
                         "installed_by": ["modules"]
                     },
                     "custom/dumpsoftwareversions": {
                         "branch": "master",
-                        "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {
                         "branch": "master",
-                        "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
                         "installed_by": ["modules"]
                     },
                     "gffread": {
                         "branch": "master",
-                        "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
                         "installed_by": ["modules"]
                     },
                     "gunzip": {
                         "branch": "master",
-                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
+                        "git_sha": "5c460c5a4736974abde2843294f35307ee2b0e5e",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
+                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/ref": {
                         "branch": "master",
-                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
+                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "ee80d14721e76e2e079103b8dcd5d57129e584ba",
+                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
                         "installed_by": ["modules"]
                     },
                     "star/genomegenerate": {
                         "branch": "master",
-                        "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "git_sha": "603ecbd9f45300c9788f197d2a15a005685b4220",
                         "installed_by": ["modules"]
                     },
                     "universc": {
                         "branch": "master",
-                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
+                        "git_sha": "b9829e1064382745d8dff7f1d74d2138d2864f71",
                         "installed_by": ["modules"]
                     }
                 }

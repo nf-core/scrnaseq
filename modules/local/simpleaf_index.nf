@@ -5,7 +5,7 @@ process SIMPLEAF_INDEX {
     conda 'bioconda::simpleaf=0.10.0-1'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/simpleaf:0.10.0--h9f5acd7_1' :
-        'quay.io/biocontainers/simpleaf:0.10.0--h9f5acd7_1' }"
+        'biocontainers/simpleaf:0.10.0--h9f5acd7_1' }"
 
     input:
     path genome_fasta

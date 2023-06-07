@@ -7,17 +7,17 @@
                 "nf-core": {
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "d68b2e6526fcd22a2a6349e0859dbdc9924df93d",
+                        "git_sha": "4b7d4863a5883b76e6bff13b6e52468fab090c5b",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
-                        "git_sha": "d68b2e6526fcd22a2a6349e0859dbdc9924df93d",
+                        "git_sha": "4b7d4863a5883b76e6bff13b6e52468fab090c5b",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
                         "branch": "master",
-                        "git_sha": "d68b2e6526fcd22a2a6349e0859dbdc9924df93d",
+                        "git_sha": "4b7d4863a5883b76e6bff13b6e52468fab090c5b",
                         "installed_by": ["modules"]
                     },
                     "custom/dumpsoftwareversions": {
@@ -42,7 +42,7 @@
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
+                        "git_sha": "de204d3c950f091336539ad74f0e47ddffe69ed4",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/ref": {
@@ -62,7 +62,7 @@
                     },
                     "universc": {
                         "branch": "master",
-                        "git_sha": "b9829e1064382745d8dff7f1d74d2138d2864f71",
+                        "git_sha": "4b7d4863a5883b76e6bff13b6e52468fab090c5b",
                         "installed_by": ["modules"]
                     }
                 }

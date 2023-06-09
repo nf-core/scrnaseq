@@ -3,7 +3,7 @@ process MTX_TO_SEURAT {
     label 'process_medium'
 
     conda "r-seurat"
-    container 'docker.io/satijalab/seurat:4.3.0'
+    container "nf-core/seurat:4.3.0"
 
     input:
     // inputs from cellranger nf-core module does not come in a single sample dir

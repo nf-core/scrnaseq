@@ -20,9 +20,9 @@ process MTX_TO_SEURAT {
     script:
     def aligner = params.aligner
     if (params.aligner == "cellranger") {
-        matrix   = "filtered_feature_bc_matrix/matrix.mtx.gz"
-        barcodes = "filtered_feature_bc_matrix/barcodes.tsv.gz"
-        features = "filtered_feature_bc_matrix/features.tsv.gz"
+        matrix   = "matrix.mtx.gz"
+        barcodes = "barcodes.tsv.gz"
+        features = "features.tsv.gz"
     } else if (params.aligner == "kallisto") {
         matrix   = "*count/counts_unfiltered/*.mtx"
         barcodes = "*count/counts_unfiltered/*.barcodes.txt"

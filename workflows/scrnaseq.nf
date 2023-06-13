@@ -158,7 +158,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
-        ch_multiqc_alevin = SCRNASEQ_ALEVIN.out.for_multiqc
+        ch_multiqc_alevin = SCRNASEQ_ALEVIN.out.alevin_results
         ch_mtx_matrices = ch_mtx_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_results)
     }
 

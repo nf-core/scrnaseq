@@ -3,8 +3,9 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## dev
+## [Unpublished Version / DEV]
 
+- [#237](https://github.com/nf-core/scrnaseq/pull/237) Add `singularity.registry = 'quay.io'` and bump NF version to 23.04.0
 - Fixed issue with file collisions while using cellranger ([#232](https://github.com/nf-core/scrnaseq/pull/232))
 - Fix issue where multiqc inputs tried to access objects that did not exist ([#239](https://github.com/nf-core/scrnaseq/pull/239))
 

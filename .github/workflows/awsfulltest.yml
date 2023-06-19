@@ -28,7 +28,7 @@ jobs:
               "outdir": "s3://${{ secrets.AWS_S3_BUCKET }}/scrnaseq/results-${{ github.sha }}/aligner_${{ matrix.aligner }}",
               "aligner": "${{ matrix.aligner }}"
             }
-          profiles: test_full,public_aws_ecr
+          profiles: test_full
       - uses: actions/upload-artifact@v3
         with:
           name: Tower debug log file

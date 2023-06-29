@@ -79,6 +79,7 @@ ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): [
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = Channel.empty()
 ch_multiqc_star = Channel.empty()
+ch_multiqc_cellranger = Channel.empty()
 if (params.barcode_whitelist) {
     ch_barcode_whitelist = file(params.barcode_whitelist)
 } else if (params.protocol.contains("10X")) {

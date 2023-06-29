@@ -191,6 +191,9 @@ workflow SCRNASEQ {
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
         ch_star_index = CELLRANGER_ALIGN.out.star_index
+        ch_multiqc_cellranger = CELLRANGER_ALIGN.out.cellranger_out.map{
+            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
+        }
     }
 
     // Run universc pipeline
@@ -242,6 +245,7 @@ workflow SCRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_fastqc.collect{ meta, qcfile -> qcfile }.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect{ meta, qcfile -> qcfile }.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect{ meta, qcfile -> qcfile }.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_cellranger.collect().ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect(),

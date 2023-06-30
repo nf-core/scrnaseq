@@ -44,6 +44,7 @@ include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
+include { CELLRANGERARC_ALIGN  } from "../subworkflows/local/align_cellranger_arc"
 include { UNIVERSC_ALIGN    } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
@@ -116,6 +117,7 @@ workflow SCRNASEQ {
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     // Run FastQC
+    /*
     ch_multiqc_fastqc = Channel.empty()
     if (!params.skip_fastqc) {
         FASTQC_CHECK ( ch_fastq )
@@ -124,6 +126,7 @@ workflow SCRNASEQ {
     } else {
         ch_multiqc_fastqc = Channel.empty()
     }
+    */
 
     ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
 
@@ -206,6 +209,20 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
     }
 
+    // Run cellranger pipeline
+    if (params.aligner == "cellranger-arc") {
+        CELLRANGER_ARC_ALIGN(
+            ch_genome_fasta,
+            ch_filter_gtf,
+            ch_motifs,
+            ch_cellranger_index,
+            ch_fastq
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_ARC_ALIGN.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ARC_ALIGN.out.cellranger_arc_out)
+    }
+
+    /*
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (
         ch_mtx_matrices,
@@ -213,6 +230,7 @@ workflow SCRNASEQ {
         ch_txp2gene,
         ch_star_index
     )
+    */
 
     //Add Versions from MTX Conversion workflow too
     ch_versions.mix(MTX_CONVERSION.out.ch_versions)

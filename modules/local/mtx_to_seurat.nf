@@ -1,9 +1,10 @@
 process MTX_TO_SEURAT {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_low' //TOFLO set to medium
 
     conda "r-seurat"
-    container "nf-core/seurat:4.3.0"
+    //TOFLO remove quay.io
+    container "quay.io/nf-core/seurat:4.3.0"
 
     input:
     // inputs from cellranger nf-core module does not come in a single sample dir
@@ -19,10 +20,10 @@ process MTX_TO_SEURAT {
 
     script:
     def aligner = params.aligner
-    if (params.aligner == "cellranger") {
-        matrix   = "matrix.mtx.gz"
-        barcodes = "barcodes.tsv.gz"
-        features = "features.tsv.gz"
+    if (params.aligner == "cellranger" || params.aligner == "cellrangerarc") {
+        matrix   = "filtered_feature_bc_matrix/matrix.mtx.gz"
+        barcodes = "filtered_feature_bc_matrix/barcodes.tsv.gz"
+        features = "filtered_feature_bc_matrix/features.tsv.gz"
     } else if (params.aligner == "kallisto") {
         matrix   = "*count/counts_unfiltered/*.mtx"
         barcodes = "*count/counts_unfiltered/*.barcodes.txt"

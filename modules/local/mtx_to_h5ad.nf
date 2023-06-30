@@ -1,11 +1,12 @@
 process MTX_TO_H5AD {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_low' //TOFLO set to medium
 
+    //TOFLO quay.io/ 
     conda "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/scanpy:1.7.2--pyhdfd78af_0' :
-        'biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
+        'quay.io/biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
 
     input:
     // inputs from cellranger nf-core module does not come in a single sample dir
@@ -41,11 +42,11 @@ process MTX_TO_H5AD {
     //
     // run script
     //
-    if (params.aligner == 'cellranger')
+    if (params.aligner == 'cellranger' || params.aligner == 'cellrangerarc')
     """
     # convert file types
     mtx_to_h5ad.py \\
-        --aligner ${params.aligner} \\
+        --aligner cellranger \\
         --input filtered_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
         --out ${meta.id}/${meta.id}_matrix.h5ad

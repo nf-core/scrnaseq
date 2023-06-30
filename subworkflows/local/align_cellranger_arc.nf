@@ -4,7 +4,6 @@
 
 include {CELLRANGERARC_MKGTF} from "../../modules/local/cellrangerarc/mkgtf/main.nf"
 include {CELLRANGERARC_MKREF} from "../../modules/local/cellrangerarc/mkref/main.nf"
-include {GENERATELIBCSV} from "../../modules/local/generate_cellranger_lib_csv.nf"
 include {GENERATECONFIG} from "../../modules/local/generate_cellranger_mkref_config.nf"
 include {CELLRANGERARC_COUNT} from "../../modules/local/cellrangerarc/count/main.nf"
 

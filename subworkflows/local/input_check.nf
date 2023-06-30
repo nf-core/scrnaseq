@@ -14,7 +14,7 @@ workflow INPUT_CHECK {
     reads = null
     versions = null
 
-    if (params.aligner == "cellranger-arc"){
+    if (params.aligner == "cellrangerarc"){
         SAMPLESHEET_CHECK ( samplesheet )
             .csv
             .splitCsv ( header:true, sep:',' )
@@ -85,7 +85,7 @@ def create_fastq_channel(LinkedHashMap row) {
     def multi_meta  = []
     multi_meta      = row.sample_type ? [row.sample_type] : [param.sample_type]
 
-    if (params.aligner == "cellranger-arc"){
+    if (params.aligner == "cellrangerarc"){
         sub_sample = row.fastq_1.split("/")[-1].replaceAll("_S[0-9]+_L[0-9]+_R1_[0-9]+.fastq.gz","")
         fastqs.each{
             if(!it.name.contains(sub_sample)){
@@ -98,7 +98,7 @@ def create_fastq_channel(LinkedHashMap row) {
 
     fastq_meta = [ meta, fastqs ]
 
-    if (params.aligner == "cellranger-arc"){
+    if (params.aligner == "cellrangerarc"){
         fastq_meta = [ meta, multi_meta, fastqs ]
     }
 

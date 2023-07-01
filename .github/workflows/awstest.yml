@@ -9,6 +9,9 @@ jobs:
     name: Run AWS tests
     if: github.repository == 'nf-core/scrnaseq'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        aligner: ["alevin", "kallisto", "star", "cellranger", "universc"]
     steps:
       # Launch workflow using Tower CLI tool action
       - name: Launch workflow via tower
@@ -21,10 +24,10 @@ jobs:
           workdir: s3://${{ secrets.AWS_S3_BUCKET }}/work/scrnaseq/work-${{ github.sha }}
           parameters: |
             {
-              "outdir": "s3://${{ secrets.AWS_S3_BUCKET }}/scrnaseq/results-test-${{ github.sha }}"
+              "outdir": "s3://${{ secrets.AWS_S3_BUCKET }}/scrnaseq/results-test-${{ github.sha }}/aligner_${{ matrix.aligner }}",
+              "aligner": "${{ matrix.aligner }}"
             }
           profiles: test
-
       - uses: actions/upload-artifact@v3
         with:
           name: Tower debug log file

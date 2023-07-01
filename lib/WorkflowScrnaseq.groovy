@@ -14,8 +14,7 @@ class WorkflowScrnaseq {
         genomeExists(params, log)
 
         if (!params.input) {
-            log.error "Please provide an input samplesheet with --input"
-            System.exit(1)
+            Nextflow.error "Please provide an input samplesheet with --input"
         }
 
         if (!params.fasta) {

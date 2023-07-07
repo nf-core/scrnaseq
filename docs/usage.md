@@ -75,24 +75,27 @@ Other aligner options for running the pipeline are:
 
 ### If using cellranger or universc
 
-In order to use cellranger aligner, reads must be named as [required by the tool](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
+This pipeline automatically renames input FASTQ files to follow the
+[naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
 
-`[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz`
-
-Besides that, the sample name given in the samplesheet must be the same that is present in the reads name. E.g.
-
-```console
-sample,fastq_1,fastq_2,
-TEST1,TEST1_S1_L001_R1_001.fastq.gz,TEST1_S1_L001_R2_001.fastq.gz
 ```
+[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz
+```
+
+For more details, see
+
+- [this issue](https://github.com/nf-core/scrnaseq/issues/241), discussing various mechanisms to deal with non-conformant filenames
+- [the README of the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/README.md) which demonstrates that renaming files does not affect the results.
+- [the code for renaming files in the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/templates/cellranger_count.py)
+- [the code for renaming files in UniverSC](https://github.com/minoda-lab/universc/blob/99a20652430c1dc9f962536a2793536f643810b7/launch_universc.sh#L1411-L1609)
+
+As a sanity check, we verify that filenames of a pair of FASTQ files only differ by `R1`/`R2`.
 
 #### UniverSC technology configuration
 
 UniverSC automatically updates the barcode whitelist and chemistry parameters. Use "universc_technology" to set the 'technology' parameter to configure the run.
 
 Currently only 3\' scRNA-Seq parameters are supported in nextflow, although chemistry parameters for 5\' scRNA-Seq and full-length scRNA-Seq libraries are supported by teh container.
-
-Filenames are recommended to be the same format as for Cell Ranger but automated correction is attempted before calling Cell Ranger.
 
 ## Running the pipeline
 

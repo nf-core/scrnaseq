@@ -1,1 +1,3 @@
 repository_type: pipeline
+lint:
+  template_strings: False

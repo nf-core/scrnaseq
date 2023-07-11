@@ -3,6 +3,19 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.3.2 - 2023-06-07 Patched Yellow Strontium Pinscher
+
+- Move containers for pipeline to quay.io ([#233](https://github.com/nf-core/scrnaseq/pull/233))
+
+## v2.3.1 - 2023-06-02 Yellow Strontium Pinscher
+
+- Add `public_aws_ecr` config for using the AWS mirror of containers where possible ([#225](https://github.com/nf-core/scrnaseq/pull/225))
+
+## v2.3.0 Steelblue Waspaloy Dachshund
+
+- Fix problem on samplesheet check related to amount of columns ([[#211](https://github.com/nf-core/scrnaseq/issues/211)])
+- Fixed bug in starsolo output cardinality.
+
 ## v2.2.0
 
 - Added support to output 10x count files in text format.

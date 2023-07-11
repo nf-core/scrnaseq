@@ -15,7 +15,7 @@ jobs:
     steps:
       # Launch workflow using Tower CLI tool action
       - name: Launch workflow via tower
-        uses: nf-core/tower-action@v3
+        uses: seqeralabs/action-tower-launch@v1
         with:
           workspace_id: ${{ secrets.TOWER_WORKSPACE_ID }}
           access_token: ${{ secrets.TOWER_ACCESS_TOKEN }}
@@ -26,7 +26,7 @@ jobs:
               "outdir": "s3://${{ secrets.AWS_S3_BUCKET }}/scrnaseq/results-test-${{ github.sha }}/aligner_${{ matrix.aligner }}",
               "aligner": "${{ matrix.aligner }}"
             }
-          profiles: test,aws_tower
+          profiles: test,public_aws_ecr
       - uses: actions/upload-artifact@v3
         with:
           name: Tower debug log file

@@ -56,7 +56,5 @@ workflow STARSOLO {
     star_index  = star_index
     star_result = STAR_ALIGN.out.tab
     star_counts = STAR_ALIGN.out.counts
-    for_multiqc = STAR_ALIGN.out.log_final.collect{it[1]}.ifEmpty([])
-
-
+    for_multiqc = STAR_ALIGN.out.log_final
 }

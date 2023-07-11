@@ -182,8 +182,7 @@
                 },
                 "seq_center": {
                     "type": "string",
-                    "description": "Name of sequencing center for BAM read group tag.",
-                    "default": "None"
+                    "description": "Name of sequencing center for BAM read group tag."
                 },
                 "star_feature": {
                     "type": "string",
@@ -206,16 +205,6 @@
                     "type": "string",
                     "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
                     "fa_icon": "fas fa-fish"
-                },
-                "bustools_correct": {
-                    "type": "boolean",
-                    "description": "If set to false, skip the correct steps after mapping with Kallisto.",
-                    "fa_icon": "fas fa-bus-alt"
-                },
-                "skip_bustools": {
-                    "type": "boolean",
-                    "description": "Skip BUStools entirely in workflow",
-                    "fa_icon": "fas fa-forward"
                 },
                 "kallisto_index": {
                     "type": "string",
@@ -251,11 +240,12 @@
             "properties": {
                 "universc_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website."
                 },
                 "universc_technology": {
                     "type": "string",
-                    "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details. "
+                    "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details.",
+                    "default": "10x"
                 }
             }
         },

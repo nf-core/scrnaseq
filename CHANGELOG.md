@@ -3,6 +3,18 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unpublished Version / DEV]
+
+- [#237](https://github.com/nf-core/scrnaseq/pull/237) Add `singularity.registry = 'quay.io'` and bump NF version to 23.04.0
+- Fixed issue with file collisions while using cellranger ([#232](https://github.com/nf-core/scrnaseq/pull/232))
+- Fix issue where multiqc inputs tried to access objects that did not exist ([#239](https://github.com/nf-core/scrnaseq/pull/239))
+- Removed `public_aws_ecr` profile
+- Include cellranger in MultiQC report ([#244](https://github.com/nf-core/scrnaseq/pull/244))
+- Nf-core template update to v2.9 ([#245](https://github.com/nf-core/scrnaseq/pull/245))
+- Update cellranger and fastqc module ([#246](https://github.com/nf-core/scrnaseq/pull/246)).
+  The [updated cellranger module](https://github.com/nf-core/modules/pull/3537) now automatically renames input FASTQ
+  files to match the expected naming conventions.
+
 ## v2.3.2 - 2023-06-07 Patched Yellow Strontium Pinscher
 
 - Move containers for pipeline to quay.io ([#233](https://github.com/nf-core/scrnaseq/pull/233))

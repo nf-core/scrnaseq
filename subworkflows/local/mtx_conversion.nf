@@ -14,6 +14,14 @@ workflow MTX_CONVERSION {
     main:
         ch_versions = Channel.empty()
 
+        // Cellranger module output contains too many files which cause path collisions, we filter to the ones we need.
+        if ( params.aligner == "cellranger" ) {
+            mtx_matrices = mtx_matrices.map { meta, mtx_files ->
+                    [ meta, mtx_files.findAll { it.toString().contains("filtered_feature_bc_matrix") } ]
+                }
+                .filter { meta, mtx_files -> mtx_files } // Remove any that are missing the relevant files
+        }
+
         //
         // Convert matrix to h5ad
         //
@@ -39,7 +47,7 @@ workflow MTX_CONVERSION {
         )
 
         //TODO CONCAT h5ad and MTX to h5ad should also have versions.yaml output
-        ch_version = ch_versions.mix(MTX_TO_H5AD.out.versions, MTX_TO_SEURAT.out.versions)
+        ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions, MTX_TO_SEURAT.out.versions)
 
     emit:
     ch_versions

@@ -1,13 +1,12 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    VALIDATE INPUTS
+    PRINT PARAMS SUMMARY
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
+include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
 
-// Validate input parameters
-WorkflowScrnaseq.initialise(params, log)
+def summary_params = paramsSummaryMap(workflow)
 
 def checkPathParamList = [
     params.input, params.multiqc_config, params.fasta, params.gtf,
@@ -79,6 +78,7 @@ ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): [
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = Channel.empty()
 ch_multiqc_star = Channel.empty()
+ch_multiqc_cellranger = Channel.empty()
 if (params.barcode_whitelist) {
     ch_barcode_whitelist = file(params.barcode_whitelist)
 } else if (params.protocol.contains("10X")) {
@@ -114,6 +114,9 @@ workflow SCRNASEQ {
     ch_fastq = INPUT_CHECK( ch_input ).reads
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    // TODO: OPTIONAL, you can use nf-validation plugin to create an input channel from the samplesheet with Channel.fromSamplesheet("input")
+    // See the documentation https://nextflow-io.github.io/nf-validation/samplesheets/fromSamplesheet/
+    // ! There is currently no tooling to help you write a sample sheet schema
 
     // Run FastQC
     ch_multiqc_fastqc = Channel.empty()
@@ -158,7 +161,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
-        ch_multiqc_alevin = SCRNASEQ_ALEVIN.out.for_multiqc
+        ch_multiqc_alevin = SCRNASEQ_ALEVIN.out.alevin_results
         ch_mtx_matrices = ch_mtx_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_results)
     }
 
@@ -191,6 +194,9 @@ workflow SCRNASEQ {
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
         ch_star_index = CELLRANGER_ALIGN.out.star_index
+        ch_multiqc_cellranger = CELLRANGER_ALIGN.out.cellranger_out.map{
+            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
+        }
     }
 
     // Run universc pipeline
@@ -228,16 +234,21 @@ workflow SCRNASEQ {
     workflow_summary    = WorkflowScrnaseq.paramsSummaryMultiqc(workflow, summary_params)
     ch_workflow_summary = Channel.value(workflow_summary)
 
-    methods_description    = WorkflowScrnaseq.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
+    methods_description    = WorkflowScrnaseq.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description, params)
     ch_methods_description = Channel.value(methods_description)
+
+    ch_multiqc_fastqc.dump(tag: 'fastqc', pretty: true)
+    ch_multiqc_alevin.dump(tag: 'alevin', pretty: true)
+    ch_multiqc_star.dump(tag: 'star', pretty: true)
 
     ch_multiqc_files = Channel.empty()
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_fastqc.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_fastqc.collect{ meta, qcfile -> qcfile }.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_alevin.collect{ meta, qcfile -> qcfile }.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_star.collect{ meta, qcfile -> qcfile }.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_cellranger.collect().ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect(),

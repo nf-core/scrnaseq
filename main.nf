@@ -13,7 +13,7 @@ nextflow.enable.dsl = 2
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    GENOME PARAMETER VALUES
+    VALIDATE & PRINT PARAMETER SUMMARY
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -21,12 +21,7 @@ nextflow.enable.dsl = 2
 //   This is an example of how to use getGenomeAttribute() to fetch parameters
 //   from igenomes.config using `--genome`
 params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    VALIDATE & PRINT PARAMETER SUMMARY
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
+params.gtf   = WorkflowMain.getGenomeAttribute(params, 'gtf')
 
 include { validateParameters; paramsHelp } from 'plugin/nf-validation'
 
@@ -55,10 +50,11 @@ WorkflowMain.initialise(workflow, params, log)
 include { SCRNASEQ } from './workflows/scrnaseq'
 
 //
-// WORKFLOW: Run main nf-core/scrnaseq analysis pipeline
+// WORKFLOW: Run main scrnaseq analysis pipeline
 //
-workflow NFCORE_SCRNASEQ {
-    SCRNASEQ ()
+
+workflow NFCORE_SCRNASEQ{
+    SCRNASEQ()
 }
 
 /*

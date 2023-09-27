@@ -19,8 +19,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/scrnaseq/usage#samplesheet-input).",
-                    "fa_icon": "fas fa-file-csv"
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input)."
                 },
                 "outdir": {
                     "type": "string",
@@ -39,6 +38,52 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                }
+            }
+        },
+        "mandatory_arguments": {
+            "title": "Mandatory arguments",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "barcode_whitelist": {
+                    "type": "string",
+                    "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
+                    "fa_icon": "fas fa-barcode"
+                },
+                "aligner": {
+                    "type": "string",
+                    "description": "Name of the tool to use for scRNA (pseudo-) alignment.",
+                    "default": "alevin",
+                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "fa_icon": "fas fa-align-center",
+                    "enum": ["kallisto", "star", "alevin", "cellranger", "universc"]
+                },
+                "protocol": {
+                    "type": "string",
+                    "description": "The protocol that was used to generate the single cell data, e.g. 10XV2 (default).",
+                    "default": "10XV2",
+                    "fa_icon": "fas fa-cogs",
+                    "enum": ["10XV3", "10XV2", "10XV1", "dropseq"]
+                }
+            },
+            "fa_icon": "fas fa-terminal"
+        },
+        "skip_tools": {
+            "title": "Skip Tools",
+            "type": "object",
+            "description": "This section can be used to  disable certain tools in the pipeline",
+            "default": "",
+            "fa_icon": "fas fa-forward",
+            "properties": {
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "description": "Skip MultiQC Report"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC"
                 }
             }
         },
@@ -70,6 +115,131 @@
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                },
+                "transcript_fasta": {
+                    "type": "string",
+                    "description": "A cDNA FASTA file",
+                    "fa_icon": "fas fa-dna"
+                },
+                "gtf": {
+                    "type": "string",
+                    "description": "Reference GTF annotation file",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "save_reference": {
+                    "type": "boolean",
+                    "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
+                    "fa_icon": "fas fa-bookmark"
+                }
+            }
+        },
+        "alevin_options": {
+            "title": "Alevin Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "salmon_index": {
+                    "type": "string",
+                    "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
+                    "fa_icon": "fas fa-fish"
+                },
+                "txp2gene": {
+                    "type": "string",
+                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
+                    "help_text": "> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.",
+                    "fa_icon": "fas fa-map-marked-alt"
+                },
+                "simpleaf_rlen": {
+                    "type": "integer",
+                    "default": 91,
+                    "description": "It is the target read length the index will be built for, using simpleaf.",
+                    "fa_icon": "fas fa-map-marked-alt"
+                }
+            }
+        },
+        "starsolo_options": {
+            "title": "STARSolo Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "star_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed STAR index.",
+                    "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
+                    "fa_icon": "fas fa-asterisk"
+                },
+                "star_ignore_sjdbgtf": {
+                    "type": "string",
+                    "description": "Ignore the SJDB GTF file."
+                },
+                "seq_center": {
+                    "type": "string",
+                    "description": "Name of sequencing center for BAM read group tag."
+                },
+                "star_feature": {
+                    "type": "string",
+                    "default": "Gene",
+                    "enum": ["Gene", "GeneFull", "Gene Velocyto"],
+                    "description": "Quantification type of different transcriptomic feature. Use `GeneFull` on pre-mRNA count for single-nucleus RNA-seq reads. Use `Gene Velocyto` to generate RNA velocity matrix.",
+                    "fa_icon": "fas fa-asterisk"
+                }
+            },
+            "fa_icon": "fas fa-star"
+        },
+        "kallisto_bus_options": {
+            "title": "Kallisto/BUS Options",
+            "type": "object",
+            "description": "Params related to Kallisto/BUS tool",
+            "default": "",
+            "fa_icon": "fas fa-fish",
+            "properties": {
+                "kallisto_gene_map": {
+                    "type": "string",
+                    "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
+                    "fa_icon": "fas fa-fish"
+                },
+                "kallisto_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed Kallisto index.",
+                    "fa_icon": "fas fa-fish"
+                },
+                "kb_workflow": {
+                    "type": "string",
+                    "default": "standard",
+                    "description": "Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite: 10xFB` for 10x Genomics Feature Barcoding technology. (default: standard)",
+                    "fa_icon": "fas fa-fish",
+                    "enum": ["standard", "lamanno", "nucleus", "kite", "kite: 10xFB"]
+                }
+            }
+        },
+        "cellranger_options": {
+            "title": "Cellranger Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "cellranger_index": {
+                    "type": "string",
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                }
+            }
+        },
+        "universc_options": {
+            "title": "UniverSC Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "universc_index": {
+                    "type": "string",
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website."
+                },
+                "universc_technology": {
+                    "type": "string",
+                    "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details.",
+                    "default": "10x"
                 }
             }
         },
@@ -273,7 +443,28 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
+            "$ref": "#/definitions/mandatory_arguments"
+        },
+        {
+            "$ref": "#/definitions/skip_tools"
+        },
+        {
             "$ref": "#/definitions/reference_genome_options"
+        },
+        {
+            "$ref": "#/definitions/alevin_options"
+        },
+        {
+            "$ref": "#/definitions/starsolo_options"
+        },
+        {
+            "$ref": "#/definitions/kallisto_bus_options"
+        },
+        {
+            "$ref": "#/definitions/cellranger_options"
+        },
+        {
+            "$ref": "#/definitions/universc_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

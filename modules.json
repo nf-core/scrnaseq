@@ -7,7 +7,7 @@
                 "nf-core": {
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "1288cb1bff6f478affa34bf866e8ff13110607de",
+                        "git_sha": "5df79e0383386a9e43462a6e81bf978ce0a6db09",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
@@ -27,7 +27,7 @@
                     },
                     "fastqc": {
                         "branch": "master",
-                        "git_sha": "bd8092b67b5103bdd52e300f75889442275c3117",
+                        "git_sha": "9a4517e720bc812e95b56d23d15a1653b6db4f53",
                         "installed_by": ["modules"]
                     },
                     "gffread": {
@@ -57,7 +57,7 @@
                     },
                     "star/genomegenerate": {
                         "branch": "master",
-                        "git_sha": "603ecbd9f45300c9788f197d2a15a005685b4220",
+                        "git_sha": "cc08a888069f67cab8120259bddab8032d4c0fe3",
                         "installed_by": ["modules"]
                     },
                     "universc": {

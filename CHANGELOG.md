@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix whitelist logic for dropseq ([#267](https://github.com/nf-core/scrnaseq/pull/267))
 - Fix false-positive filename check in cellranger module ([#261](https://github.com/nf-core/scrnaseq/pull/261))
+- Template update to v2.10 ([#269](https://github.com/nf-core/scrnaseq/pull/269))
 
 ## v2.4.0 - 2023-08-16 Lime Platinum Crab
 

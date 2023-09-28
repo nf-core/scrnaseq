@@ -13,7 +13,7 @@ process STAR_ALIGN {
     // Input array for a sample is created in the same order reads appear in samplesheet as pairs from replicates are appended to array.
     //
     tuple val(meta), path(reads)
-    path  index
+    tuple val(meta2), path(index)
     path  gtf
     path whitelist
     val protocol

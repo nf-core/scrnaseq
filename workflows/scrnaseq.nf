@@ -72,7 +72,7 @@ ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
 // general input and params
 ch_input = file(params.input)
-ch_genome_fasta = params.fasta ? file(params.fasta) : []
+ch_genome_fasta = Channel.value(params.fasta ? file(params.fasta) : [])
 ch_gtf = params.gtf ? file(params.gtf) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
@@ -269,6 +269,7 @@ workflow.onComplete {
     if (params.email || params.email_on_fail) {
         NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
     }
+    NfcoreTemplate.dump_parameters(workflow, params)
     NfcoreTemplate.summary(workflow, params, log)
     if (params.hook_url) {
         NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)

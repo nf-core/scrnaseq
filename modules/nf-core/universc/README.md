@@ -48,7 +48,7 @@ process {
         container = "nf-core/universc:1.2.5.1"
     }
     withName: CELLRANGER_MKREF{
-        container = "nf-core/universc:1.2.5.1"
+       container = "nf-core/universc:1.2.5.1"
     }
 ...
 }

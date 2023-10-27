@@ -69,6 +69,9 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 protocol_config = WorkflowScrnaseq.getProtocol(workflow, params.aligner, params.protocol)
+if (protocol_config['protocol'] == 'auto' && aligner != "cellranger") {
+    error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
+}
 
 // general input and params
 ch_input = file(params.input)

@@ -1,44 +1,90 @@
 {
     "alevin": {
-      "10XV1": {"protocol": "10xv1"},
-      "10XV2": {"protocol": "10xv2"},
-      "10XV3": {"protocol": "10xv3"},
-      "dropseq": {"protocol": "dropseq"}
+        "10XV1": {
+            "protocol": "10xv1",
+            "whitelist": "assets/whitelist/10x_V1_barcode_whitelist.txt.gz"
+        },
+        "10XV2": {
+            "protocol": "10xv2",
+            "whitelist": "assets/whitelist/10x_V2_barcode_whitelist.txt.gz"
+        },
+        "10XV3": {
+            "protocol": "10xv3",
+            "whitelist": "assets/whitelist/10x_V3_barcode_whitelist.txt.gz"
+        },
+        "dropseq": {
+            "protocol": "dropseq"
+        }
     },
     "cellranger": {
-      "auto": {"protocol": "auto"},
-      "10XV1": {"protocol": "SC3Pv1"},
-      "10XV2": {"protocol": "SC3Pv2"},
-      "10XV3": {"protocol": "SC3Pv3"}
+        "auto": {
+            "protocol": "auto"
+        },
+        "10XV1": {
+            "protocol": "SC3Pv1"
+        },
+        "10XV2": {
+            "protocol": "SC3Pv2"
+        },
+        "10XV3": {
+            "protocol": "SC3Pv3"
+        }
     },
     "star": {
-      "10XV1": {
-        "protocol": "CB_UMI_Simple",
-        "args": "--soloUMIlen 10"
-      },
-      "10XV2": {
-        "protocol": "CB_UMI_Simple",
-        "args": "--soloUMIlen 10"
-      },
-      "10XV3": {
-        "protocol": "CB_UMI_Simple",
-        "args": "--soloUMIlen 12"
-      },
-      "dropseq": {"protocol": "CB_UMI_Simple"},
-      "smartseq": {"protocol": "SmartSeq"}
+        "10XV1": {
+            "protocol": "CB_UMI_Simple",
+            "extra_args": "--soloUMIlen 10",
+            "whitelist": "assets/whitelist/10x_V1_barcode_whitelist.txt.gz"
+        },
+        "10XV2": {
+            "protocol": "CB_UMI_Simple",
+            "extra_args": "--soloUMIlen 10",
+            "whitelist": "assets/whitelist/10x_V2_barcode_whitelist.txt.gz"
+        },
+        "10XV3": {
+            "protocol": "CB_UMI_Simple",
+            "extra_args": "--soloUMIlen 12",
+            "whitelist": "assets/whitelist/10x_V3_barcode_whitelist.txt.gz"
+        },
+        "dropseq": {
+            "protocol": "CB_UMI_Simple"
+        },
+        "smartseq": {
+            "protocol": "SmartSeq"
+        }
     },
     "kallisto": {
-      "10XV1": {"protocol": "10XV1"},
-      "10XV2": {"protocol": "10XV2"},
-      "10XV3": {"protocol": "10XV3"},
-      "dropseq": {"protocol": "DROPSEQ"},
-      "smartseq": {"protocol": "SMARTSEQ"}
+        "10XV1": {
+            "protocol": "10XV1"
+        },
+        "10XV2": {
+            "protocol": "10XV2"
+        },
+        "10XV3": {
+            "protocol": "10XV3"
+        },
+        "dropseq": {
+            "protocol": "DROPSEQ"
+        },
+        "smartseq": {
+            "protocol": "SMARTSEQ"
+        }
     },
     "universc": {
-      "auto": {"protocol": "10x"},
-      "10XV1": {"protocol": "10x-v1"},
-      "10XV2": {"protocol": "10x-v2"},
-      "10XV3": {"protocol": "10x-v3"},
-      "dropseq": {"protocol": "dropseq"}
+        "auto": {
+            "protocol": "10x"
+        },
+        "10XV1": {
+            "protocol": "10x-v1"
+        },
+        "10XV2": {
+            "protocol": "10x-v2"
+        },
+        "10XV3": {
+            "protocol": "10x-v3"
+        },
+        "dropseq": {
+            "protocol": "dropseq"
+        }
     }
-  }
+}

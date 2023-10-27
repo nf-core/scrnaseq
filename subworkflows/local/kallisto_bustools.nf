@@ -15,7 +15,6 @@ workflow KALLISTO_BUSTOOLS {
     kallisto_index
     txp2gene
     protocol
-    chemistry
     kb_workflow
     ch_fastq
 

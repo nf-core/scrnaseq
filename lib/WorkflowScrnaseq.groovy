@@ -127,14 +127,15 @@ class WorkflowScrnaseq {
     // Retrieve the aligner-specific protocol based on the specified protocol.
     // Returns a map ["protocol": protocol, "extra_args": <extra args>, "whitelist": <path to whitelist>]
     // extra_args and whitelist are optional.
-    static getProtocol(workflow, String aligner, String protocol) {
+    public static Map getProtocol(workflow, log, aligner, protocol) {
         def jsonSlurper = new JsonSlurper()
-        def protocols = jsonSlurper.parse(new File("${workflow.projectDir}/assets/protocols.json"))
-        aligner_map = protocols[aligner]
-        if aligner_map.containsKey(protocol) {
+        def json = new File("${workflow.projectDir}/assets/protocols.json").text
+        def protocols = jsonSlurper.parseText(json)
+        def aligner_map = protocols[aligner]
+        if(aligner_map.containsKey(protocol)) {
             return aligner_map[protocol]
         } else {
-            Nextflow.warn("Protocol '${protocol}' not recognized by the pipeline. Passing on the protocol to the aligner unmodified.")
+            log.warn("Protocol '${protocol}' not recognized by the pipeline. Passing on the protocol to the aligner unmodified.")
             return ["protocol": protocol]
         }
     }

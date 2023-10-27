@@ -4,6 +4,8 @@
 
 import nextflow.Nextflow
 import groovy.text.SimpleTemplateEngine
+import groovy.json.JsonSlurper
+
 
 class WorkflowScrnaseq {
 
@@ -121,90 +123,19 @@ class WorkflowScrnaseq {
         }
     }
 
-    /*
-    * Format the protocol
-    * Given the protocol paramter (params.protocol) and the aligner (params.aligner),
-    * this function formats the protocol such that it is fit for the respective
-    * subworkflow
-    */
-    static formatProtocol(protocol, aligner) {
-        String new_protocol = protocol
-        String chemistry = ''
-        String other_parameters = ''
-
-        // alevin
-        if (aligner == 'alevin') {
-            switch (protocol) {
-                case '10XV1':
-                    new_protocol = '10xv1'
-                    chemistry = 'V1'
-                    break
-                case '10XV2':
-                    new_protocol = '10xv2'
-                    chemistry = 'V2'
-                    break
-                case '10XV3':
-                    new_protocol = '10xv3'
-                    chemistry = 'V3'
-                    break
-                // case 'dropseq':
-                //     new_protocol = 'dropseq'
-            }
+    //
+    // Retrieve the aligner-specific protocol based on the specified protocol.
+    // Returns a tuple [protocol, extra_args]
+    static getProtocol(workflow, String aligner, String protocol) {
+        def jsonSlurper = new JsonSlurper()
+        def protocols = jsonSlurper.parse(new File("${workflow.projectDir}/assets/protocols.json"))
+        aligner_map = protocols[aligner]
+        if aligner_map.containsKey(protocol) {
+            return [aligner_map[protocol]["protocol"], aligner_map[protocol].get("args", "")]
+        } else {
+            Nextflow.warn("Protocol '${protocol}' not recognized by the pipeline. Passing on the protocol to the aligner unmodified.")
+            return [protocol, ""]
         }
-
-        // star
-        else if (aligner == 'star') {
-            switch (protocol) {
-                case '10XV1':
-                    new_protocol = 'CB_UMI_Simple'
-                    chemistry = 'V1'
-                    other_parameters = '--soloUMIlen 10'
-                    break
-                case '10XV2':
-                    new_protocol = 'CB_UMI_Simple'
-                    chemistry = 'V2'
-                    other_parameters = '--soloUMIlen 10'
-                    break
-                case '10XV3':
-                    new_protocol = 'CB_UMI_Simple'
-                    chemistry = 'V3'
-                    other_parameters = '--soloUMIlen 12'
-                    break
-                case 'dropseq':
-                    new_protocol = 'CB_UMI_Simple'
-                    break
-                case 'smartseq':
-                    new_protocol = 'SmartSeq'
-            }
-        }
-
-        // kallisto bustools
-        else if (aligner = 'kallisto' ) {
-            switch (protocol) {
-                case '10XV1':
-                    new_protocol = '10XV1'
-                    chemistry = 'V1'
-                    break
-                case '10XV2':
-                    new_protocol = '10XV2'
-                    chemistry = 'V2'
-                    break
-                case '10XV3':
-                    new_protocol = '10XV3'
-                    chemistry = 'V3'
-                    break
-                case 'dropseq':
-                    new_protocol = 'DROPSEQ'
-                    break
-                case 'smartseq':
-                    new_protocol = 'SMARTSEQ'
-            }
-        }
-        else {
-            exit 1, 'Aligner not recognized.'
-        }
-
-        return [new_protocol, chemistry, other_parameters]
     }
 
 }

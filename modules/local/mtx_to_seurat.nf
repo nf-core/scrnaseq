@@ -1,10 +1,10 @@
 process MTX_TO_SEURAT {
     tag "$meta.id"
-    label 'process_low' //TOFLO set to medium
+    label 'process_medium'
 
     conda "r-seurat"
-    //TOFLO remove quay.io
-    container "quay.io/nf-core/seurat:4.3.0"
+    
+    container "nf-core/seurat:4.3.0"
 
     input:
     // inputs from cellranger nf-core module does not come in a single sample dir

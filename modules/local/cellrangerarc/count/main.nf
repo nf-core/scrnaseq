@@ -1,6 +1,6 @@
 process CELLRANGERARC_COUNT {
     tag "$meta.id"
-    label 'process_low' //TOFLO turn to high
+    label 'process_high'
 
     container "heylf/cellranger-arc:2.0.2"
 

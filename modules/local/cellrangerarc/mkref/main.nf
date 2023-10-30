@@ -1,6 +1,6 @@
 process CELLRANGERARC_MKREF {
     tag "$reference_config"
-    label 'process_low' //TOFLO change to medium
+    label 'process_medium'
 
     container "heylf/cellranger-arc:2.0.2"
 

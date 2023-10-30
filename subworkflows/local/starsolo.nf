@@ -31,7 +31,10 @@ workflow STARSOLO {
     * Build STAR index if not supplied
     */
     if (!star_index) {
-        STAR_GENOMEGENERATE( genome_fasta, gtf )
+        STAR_GENOMEGENERATE(
+            genome_fasta.map{ f -> [[id: f.baseName], f]},
+            gtf.map{ g -> [[id: g.baseName], g]}
+        )
         star_index = STAR_GENOMEGENERATE.out.index.collect()
         ch_versions = ch_versions.mix(STAR_GENOMEGENERATE.out.versions)
     }
@@ -53,7 +56,8 @@ workflow STARSOLO {
 
     emit:
     ch_versions
-    star_index  = star_index
+    // get rid of meta for star index
+    star_index  = star_index.map{ meta, index -> index}
     star_result = STAR_ALIGN.out.tab
     star_counts = STAR_ALIGN.out.counts
     for_multiqc = STAR_ALIGN.out.log_final

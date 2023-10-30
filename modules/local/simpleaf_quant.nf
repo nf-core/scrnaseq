@@ -34,12 +34,15 @@ process SIMPLEAF_QUANT {
     // check if users are using one of the mutually excludable parameters:
     //    e.g -k,--knee | -e,--expect-cells | -f, --forced-cells
     //
-    if (args_list.any { it in ['-k', '--knee', '-e', '--expect-cells', '-f', '--forced-cells']} || meta.expected_cells) {
-        unfiltered_command = ""
-        save_whitelist     = ""
-    } else {
-        unfiltered_command = "-u whitelist.uncompressed.txt"
-        save_whitelist     = "mv whitelist.uncompressed.txt ${prefix}_alevin_results/"
+    unzip_whitelist = ""
+    unfiltered_command = ""
+    save_whitelist     = ""
+    if (!(args_list.any { it in ['-k', '--knee', '-e', '--expect-cells', '-f', '--forced-cells']} || meta.expected_cells)) {
+        if (whitelist) {
+            unzip_whitelist = "gzip -dcf $whitelist > whitelist.uncompressed.txt"
+            unfiltered_command = "-u whitelist.uncompressed.txt"
+            save_whitelist     = "mv whitelist.uncompressed.txt ${prefix}_alevin_results/"
+        }
     }
 
     // expected cells
@@ -55,7 +58,7 @@ process SIMPLEAF_QUANT {
     simpleaf set-paths
 
     # run simpleaf quant
-    gzip -dcf $whitelist > whitelist.uncompressed.txt
+    $unzip_whitelist
     simpleaf quant \\
         -1 ${forward.join( "," )} \\
         -2 ${reverse.join( "," )} \\

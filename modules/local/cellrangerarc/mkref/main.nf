@@ -2,7 +2,7 @@ process CELLRANGERARC_MKREF {
     tag "$reference_config"
     label 'process_medium'
 
-    container "heylf/cellranger-arc:2.0.2"
+    container "nf-core/cellranger-arc:2.0.2"
 
     // Exit if running this module with -profile conda / -profile mamba
     if (workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1) {

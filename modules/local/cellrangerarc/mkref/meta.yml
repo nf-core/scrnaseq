@@ -29,12 +29,12 @@ input:
       description: JSON-like file holding organism, genome, reference fasta path, reference annotation gtf path, contigs that should be excluded and sequence format motif file path
       pattern: config
   - reference_name:
-      type: val
+      type: string
       description: The name to give the new reference folder
       pattern: str
 output:
   - reference:
-      type: folder
+      type: directory
       description: Folder called like the reference_name containing all the reference indices needed by Cell Ranger Arc
   - versions:
       type: file

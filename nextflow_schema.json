@@ -247,6 +247,10 @@
                 "motifs": {
                     "type": "string",
                     "description": "Specify a motif file to create a cellranger-arc index. Can be taken, e.g., from the JASPAR database."
+                },
+                "sample_type": {
+                    "type": "string",
+                    "description": "Specify the type of data (gex or atac)."
                 }
             }
         },

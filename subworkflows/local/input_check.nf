@@ -83,7 +83,7 @@ def create_fastq_channel(LinkedHashMap row) {
 
     // define meta_data for multiome
     def multi_meta  = []
-    multi_meta      = row.sample_type ? [row.sample_type] : [param.sample_type]
+    multi_meta      = row.sample_type ? [row.sample_type] : [params.sample_type]
 
     if (params.aligner == "cellrangerarc"){
         sub_sample = row.fastq_1.split("/")[-1].replaceAll("_S[0-9]+_L[0-9]+_R1_[0-9]+.fastq.gz","")

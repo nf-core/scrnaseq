@@ -158,8 +158,14 @@ def check_samplesheet(file_in, file_out):
             sample_type = ""
             if "sample_type" in header:
                 sample_type = lspl[colmap["sample_type"]]
-                if (sample_type not in SAMPLE_TYPES):
-                    print_error("Sample type {} is not supported! Please specify either {}".format(sample_type, " or ".join(SAMPLE_TYPES)), "Line", line)
+                if sample_type not in SAMPLE_TYPES:
+                    print_error(
+                        "Sample type {} is not supported! Please specify either {}".format(
+                            sample_type, " or ".join(SAMPLE_TYPES)
+                        ),
+                        "Line",
+                        line,
+                    )
 
             for fastq in fastq_list:
                 if fastq:
@@ -194,7 +200,21 @@ def check_samplesheet(file_in, file_out):
     ## Write validated samplesheet with appropriate columns
     if len(sample_mapping_dict) > 0:
         with open(file_out, "w") as fout:
-            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center" , "fastq_barcode", "sample_type"]) + "\n")
+            fout.write(
+                ",".join(
+                    [
+                        "sample",
+                        "single_end",
+                        "fastq_1",
+                        "fastq_2",
+                        "expected_cells",
+                        "seq_center",
+                        "fastq_barcode",
+                        "sample_type",
+                    ]
+                )
+                + "\n"
+            )
             for sample in sorted(sample_mapping_dict.keys()):
 
                 ## Check that multiple runs of the same sample are of the same datatype

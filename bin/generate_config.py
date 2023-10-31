@@ -16,12 +16,12 @@ if __name__ == "__main__":
 
     config = open("config", "w")
     config.write("{\n")
-    config.write("\torganism: \"{}\"\n".format(args["fasta"].split(".")[0]))
-    config.write("\tgenome: [\"cellrangerarc_reference\"]\n")
-    config.write("\tinput_fasta: [\"{}\"]\n".format(args["fasta"]))
-    config.write("\tinput_gtf: [\"{}\"]\n".format(args["gtf"]))
-    config.write("\tinput_motifs: \"{}\"\n".format(args["motifs"]))
-    if(args["add"] != "none"):
+    config.write('\torganism: "{}"\n'.format(args["fasta"].split(".")[0]))
+    config.write('\tgenome: ["cellrangerarc_reference"]\n')
+    config.write('\tinput_fasta: ["{}"]\n'.format(args["fasta"]))
+    config.write('\tinput_gtf: ["{}"]\n'.format(args["gtf"]))
+    config.write('\tinput_motifs: "{}"\n'.format(args["motifs"]))
+    if args["add"] != "none":
         config.write(args["add"] + "\n")
     config.write("}")
     config.close()

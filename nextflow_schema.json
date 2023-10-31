@@ -19,27 +19,27 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input)."
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input).",
                 },
                 "outdir": {
                     "type": "string",
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                    "fa_icon": "fas fa-folder-open"
+                    "fa_icon": "fas fa-folder-open",
                 },
                 "email": {
                     "type": "string",
                     "description": "Email address for completion summary.",
                     "fa_icon": "fas fa-envelope",
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
                 },
                 "multiqc_title": {
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
-                    "fa_icon": "fas fa-file-signature"
-                }
-            }
+                    "fa_icon": "fas fa-file-signature",
+                },
+            },
         },
         "mandatory_arguments": {
             "title": "Mandatory arguments",
@@ -50,7 +50,7 @@
                 "barcode_whitelist": {
                     "type": "string",
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
-                    "fa_icon": "fas fa-barcode"
+                    "fa_icon": "fas fa-barcode",
                 },
                 "aligner": {
                     "type": "string",
@@ -58,17 +58,17 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
-                    "enum": ["kallisto", "star", "alevin", "cellranger", "cellrangerarc", "universc"]
+                    "enum": ["kallisto", "star", "alevin", "cellranger", "cellrangerarc", "universc"],
                 },
                 "protocol": {
                     "type": "string",
                     "description": "The protocol that was used to generate the single cell data, e.g. 10XV2 (default).",
                     "default": "10XV2",
                     "fa_icon": "fas fa-cogs",
-                    "enum": ["10XV3", "10XV2", "10XV1", "dropseq"]
-                }
+                    "enum": ["10XV3", "10XV2", "10XV1", "dropseq"],
+                },
             },
-            "fa_icon": "fas fa-terminal"
+            "fa_icon": "fas fa-terminal",
         },
         "skip_tools": {
             "title": "Skip Tools",
@@ -77,15 +77,9 @@
             "default": "",
             "fa_icon": "fas fa-forward",
             "properties": {
-                "skip_multiqc": {
-                    "type": "boolean",
-                    "description": "Skip MultiQC Report"
-                },
-                "skip_fastqc": {
-                    "type": "boolean",
-                    "description": "Skip FastQC"
-                }
-            }
+                "skip_multiqc": {"type": "boolean", "description": "Skip MultiQC Report"},
+                "skip_fastqc": {"type": "boolean", "description": "Skip FastQC"},
+            },
         },
         "reference_genome_options": {
             "title": "Reference genome options",
@@ -97,7 +91,7 @@
                     "type": "string",
                     "description": "Name of iGenomes reference.",
                     "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
+                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details.",
                 },
                 "fasta": {
                     "type": "string",
@@ -107,29 +101,25 @@
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
                     "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
+                    "fa_icon": "far fa-file-code",
                 },
                 "igenomes_ignore": {
                     "type": "boolean",
                     "description": "Do not load the iGenomes reference config.",
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.",
                 },
-                "transcript_fasta": {
-                    "type": "string",
-                    "description": "A cDNA FASTA file",
-                    "fa_icon": "fas fa-dna"
-                },
+                "transcript_fasta": {"type": "string", "description": "A cDNA FASTA file", "fa_icon": "fas fa-dna"},
                 "gtf": {
                     "type": "string",
                     "description": "Reference GTF annotation file",
-                    "fa_icon": "fas fa-code-branch"
+                    "fa_icon": "fas fa-code-branch",
                 },
                 "save_reference": {
                     "type": "boolean",
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
-                    "fa_icon": "fas fa-bookmark"
+                    "fa_icon": "fas fa-bookmark",
                 },
                 "igenomes_base": {
                     "type": "string",
@@ -137,9 +127,9 @@
                     "description": "Directory / URL base for iGenomes references.",
                     "default": "s3://ngi-igenomes/igenomes",
                     "fa_icon": "fas fa-cloud-download-alt",
-                    "hidden": true
-                }
-            }
+                    "hidden": true,
+                },
+            },
         },
         "alevin_options": {
             "title": "Alevin Options",
@@ -150,21 +140,21 @@
                 "salmon_index": {
                     "type": "string",
                     "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-fish",
                 },
                 "txp2gene": {
                     "type": "string",
                     "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
                     "help_text": "> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.",
-                    "fa_icon": "fas fa-map-marked-alt"
+                    "fa_icon": "fas fa-map-marked-alt",
                 },
                 "simpleaf_rlen": {
                     "type": "integer",
                     "default": 91,
                     "description": "It is the target read length the index will be built for, using simpleaf.",
-                    "fa_icon": "fas fa-map-marked-alt"
-                }
-            }
+                    "fa_icon": "fas fa-map-marked-alt",
+                },
+            },
         },
         "starsolo_options": {
             "title": "STARSolo Options",
@@ -176,25 +166,19 @@
                     "type": "string",
                     "description": "Specify a path to the precomputed STAR index.",
                     "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
-                    "fa_icon": "fas fa-asterisk"
+                    "fa_icon": "fas fa-asterisk",
                 },
-                "star_ignore_sjdbgtf": {
-                    "type": "string",
-                    "description": "Ignore the SJDB GTF file."
-                },
-                "seq_center": {
-                    "type": "string",
-                    "description": "Name of sequencing center for BAM read group tag."
-                },
+                "star_ignore_sjdbgtf": {"type": "string", "description": "Ignore the SJDB GTF file."},
+                "seq_center": {"type": "string", "description": "Name of sequencing center for BAM read group tag."},
                 "star_feature": {
                     "type": "string",
                     "default": "Gene",
                     "enum": ["Gene", "GeneFull", "Gene Velocyto"],
                     "description": "Quantification type of different transcriptomic feature. Use `GeneFull` on pre-mRNA count for single-nucleus RNA-seq reads. Use `Gene Velocyto` to generate RNA velocity matrix.",
-                    "fa_icon": "fas fa-asterisk"
-                }
+                    "fa_icon": "fas fa-asterisk",
+                },
             },
-            "fa_icon": "fas fa-star"
+            "fa_icon": "fas fa-star",
         },
         "kallisto_bus_options": {
             "title": "Kallisto/BUS Options",
@@ -206,21 +190,21 @@
                 "kallisto_gene_map": {
                     "type": "string",
                     "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-fish",
                 },
                 "kallisto_index": {
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-fish",
                 },
                 "kb_workflow": {
                     "type": "string",
                     "default": "standard",
                     "description": "Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite: 10xFB` for 10x Genomics Feature Barcoding technology. (default: standard)",
                     "fa_icon": "fas fa-fish",
-                    "enum": ["standard", "lamanno", "nucleus", "kite", "kite: 10xFB"]
-                }
-            }
+                    "enum": ["standard", "lamanno", "nucleus", "kite", "kite: 10xFB"],
+                },
+            },
         },
         "cellranger_options": {
             "title": "Cellranger Options",
@@ -230,9 +214,9 @@
             "properties": {
                 "cellranger_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. ",
                 }
-            }
+            },
         },
         "cellrangerarc_options": {
             "title": "Cellranger ARC Options",
@@ -242,17 +226,14 @@
             "properties": {
                 "cellrangerarc_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. ",
                 },
                 "motifs": {
                     "type": "string",
-                    "description": "Specify a motif file to create a cellranger-arc index. Can be taken, e.g., from the JASPAR database."
+                    "description": "Specify a motif file to create a cellranger-arc index. Can be taken, e.g., from the JASPAR database.",
                 },
-                "sample_type": {
-                    "type": "string",
-                    "description": "Specify the type of data (gex or atac)."
-                }
-            }
+                "sample_type": {"type": "string", "description": "Specify the type of data (gex or atac)."},
+            },
         },
         "universc_options": {
             "title": "UniverSC Options",
@@ -262,14 +243,14 @@
             "properties": {
                 "universc_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website."
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website.",
                 },
                 "universc_technology": {
                     "type": "string",
                     "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details.",
-                    "default": "10x"
-                }
-            }
+                    "default": "10x",
+                },
+            },
         },
         "institutional_config_options": {
             "title": "Institutional config options",
@@ -283,7 +264,7 @@
                     "description": "Git commit id for Institutional configs.",
                     "default": "master",
                     "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
+                    "fa_icon": "fas fa-users-cog",
                 },
                 "custom_config_base": {
                     "type": "string",
@@ -291,33 +272,33 @@
                     "default": "https://raw.githubusercontent.com/nf-core/configs/master",
                     "hidden": true,
                     "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
-                    "fa_icon": "fas fa-users-cog"
+                    "fa_icon": "fas fa-users-cog",
                 },
                 "config_profile_name": {
                     "type": "string",
                     "description": "Institutional config name.",
                     "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
+                    "fa_icon": "fas fa-users-cog",
                 },
                 "config_profile_description": {
                     "type": "string",
                     "description": "Institutional config description.",
                     "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
+                    "fa_icon": "fas fa-users-cog",
                 },
                 "config_profile_contact": {
                     "type": "string",
                     "description": "Institutional config contact information.",
                     "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
+                    "fa_icon": "fas fa-users-cog",
                 },
                 "config_profile_url": {
                     "type": "string",
                     "description": "Institutional config URL link.",
                     "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                }
-            }
+                    "fa_icon": "fas fa-users-cog",
+                },
+            },
         },
         "max_job_request_options": {
             "title": "Max job request options",
@@ -332,7 +313,7 @@
                     "default": 16,
                     "fa_icon": "fas fa-microchip",
                     "hidden": true,
-                    "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
+                    "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`",
                 },
                 "max_memory": {
                     "type": "string",
@@ -341,7 +322,7 @@
                     "fa_icon": "fas fa-memory",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "hidden": true,
-                    "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
+                    "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`",
                 },
                 "max_time": {
                     "type": "string",
@@ -350,9 +331,9 @@
                     "fa_icon": "far fa-clock",
                     "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$",
                     "hidden": true,
-                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
-                }
-            }
+                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`",
+                },
+            },
         },
         "generic_options": {
             "title": "Generic options",
@@ -365,13 +346,13 @@
                     "type": "boolean",
                     "description": "Display help text.",
                     "fa_icon": "fas fa-question-circle",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",
                     "fa_icon": "fas fa-question-circle",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "publish_dir_mode": {
                     "type": "string",
@@ -380,7 +361,7 @@
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
                     "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
-                    "hidden": true
+                    "hidden": true,
                 },
                 "email_on_fail": {
                     "type": "string",
@@ -388,13 +369,13 @@
                     "fa_icon": "fas fa-exclamation-triangle",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
                     "help_text": "An email address to send a summary email to when the pipeline is completed - ONLY sent if the pipeline does not exit successfully.",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "plaintext_email": {
                     "type": "boolean",
                     "description": "Send plain-text email instead of HTML.",
                     "fa_icon": "fas fa-remove-format",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "max_multiqc_email_size": {
                     "type": "string",
@@ -402,109 +383,83 @@
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "default": "25.MB",
                     "fa_icon": "fas fa-file-upload",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "monochrome_logs": {
                     "type": "boolean",
                     "description": "Do not use coloured log outputs.",
                     "fa_icon": "fas fa-palette",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "hook_url": {
                     "type": "string",
                     "description": "Incoming hook URL for messaging service",
                     "fa_icon": "fas fa-people-group",
                     "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "multiqc_config": {
                     "type": "string",
                     "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
                     "fa_icon": "fas fa-cog",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "multiqc_logo": {
                     "type": "string",
                     "description": "Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file",
                     "fa_icon": "fas fa-image",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "multiqc_methods_description": {
                     "type": "string",
                     "description": "Custom MultiQC yaml file containing HTML including a methods description.",
-                    "fa_icon": "fas fa-cog"
+                    "fa_icon": "fas fa-cog",
                 },
                 "validate_params": {
                     "type": "boolean",
                     "description": "Boolean whether to validate parameters against the schema at runtime",
                     "default": true,
                     "fa_icon": "fas fa-check-square",
-                    "hidden": true
+                    "hidden": true,
                 },
                 "validationShowHiddenParams": {
                     "type": "boolean",
                     "fa_icon": "far fa-eye-slash",
                     "description": "Show all params when using `--help`",
                     "hidden": true,
-                    "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
+                    "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters.",
                 },
                 "validationFailUnrecognisedParams": {
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Validation of parameters fails when an unrecognised parameter is found.",
                     "hidden": true,
-                    "help_text": "By default, when an unrecognised parameter is found, it returns a warinig."
+                    "help_text": "By default, when an unrecognised parameter is found, it returns a warinig.",
                 },
                 "validationLenientMode": {
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Validation of parameters in lenient more.",
                     "hidden": true,
-                    "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
-                }
-            }
-        }
+                    "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode).",
+                },
+            },
+        },
     },
     "allOf": [
-        {
-            "$ref": "#/definitions/input_output_options"
-        },
-        {
-            "$ref": "#/definitions/mandatory_arguments"
-        },
-        {
-            "$ref": "#/definitions/skip_tools"
-        },
-        {
-            "$ref": "#/definitions/reference_genome_options"
-        },
-        {
-            "$ref": "#/definitions/alevin_options"
-        },
-        {
-            "$ref": "#/definitions/starsolo_options"
-        },
-        {
-            "$ref": "#/definitions/kallisto_bus_options"
-        },
-        {
-            "$ref": "#/definitions/cellranger_options"
-        },
-        {
-            "$ref": "#/definitions/cellrangerarc_options"
-        },
-        {
-            "$ref": "#/definitions/universc_options"
-        },
-        {
-            "$ref": "#/definitions/institutional_config_options"
-        },
-        {
-            "$ref": "#/definitions/max_job_request_options"
-        },
-        {
-            "$ref": "#/definitions/generic_options"
-        }
-    ]
+        {"$ref": "#/definitions/input_output_options"},
+        {"$ref": "#/definitions/mandatory_arguments"},
+        {"$ref": "#/definitions/skip_tools"},
+        {"$ref": "#/definitions/reference_genome_options"},
+        {"$ref": "#/definitions/alevin_options"},
+        {"$ref": "#/definitions/starsolo_options"},
+        {"$ref": "#/definitions/kallisto_bus_options"},
+        {"$ref": "#/definitions/cellranger_options"},
+        {"$ref": "#/definitions/cellrangerarc_options"},
+        {"$ref": "#/definitions/universc_options"},
+        {"$ref": "#/definitions/institutional_config_options"},
+        {"$ref": "#/definitions/max_job_request_options"},
+        {"$ref": "#/definitions/generic_options"},
+    ],
 }

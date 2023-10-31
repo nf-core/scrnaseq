@@ -3,7 +3,6 @@ process MTX_TO_SEURAT {
     label 'process_medium'
 
     conda "r-seurat"
-    
     container "nf-core/seurat:4.3.0"
 
     input:

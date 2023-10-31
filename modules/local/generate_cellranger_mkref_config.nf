@@ -8,7 +8,7 @@ process CELLRANGERARC_GENERATECONFIG {
         'quay.io/biocontainers/python:3.8.3' }"
 
     input:
-    val(fasta) 
+    val(fasta)
     val(gtf)
     val(motifs)
 

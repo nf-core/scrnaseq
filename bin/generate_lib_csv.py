@@ -3,7 +3,6 @@ import argparse
 import os
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Generate the lib.csv for cellranger-arc.")
 
     parser.add_argument("-t", "--sample_types", dest="sample_types", help="Comma seperated list of sample types.")

@@ -2,7 +2,6 @@
 import argparse
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Generate the lib.csv for cellranger-arc.")
 
     parser.add_argument("-f", "--fasta", dest="fasta", help="Name of the fasta file.")

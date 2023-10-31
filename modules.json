@@ -64,9 +64,9 @@
                         "branch": "master",
                         "git_sha": "cf67a6d7d043e2bd6a3099be84c72046fc71508f",
                         "installed_by": ["modules"]
-                    },
+                    }
                 }
             }
         }
-    },
+    }
 }

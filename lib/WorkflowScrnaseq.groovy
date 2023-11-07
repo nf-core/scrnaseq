@@ -131,6 +131,7 @@ class WorkflowScrnaseq {
         def jsonSlurper = new JsonSlurper()
         def json = new File("${workflow.projectDir}/assets/protocols.json").text
         def protocols = jsonSlurper.parseText(json)
+        aligner = (aligner == 'cellrangermulti') ? 'cellranger' : aligner
         def aligner_map = protocols[aligner]
         if(aligner_map.containsKey(protocol)) {
             return aligner_map[protocol]

@@ -69,7 +69,7 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 protocol_config = WorkflowScrnaseq.getProtocol(workflow, log, params.aligner, params.protocol)
-if (protocol_config['protocol'] == 'auto' && aligner != "cellranger") {
+if (protocol_config['protocol'] == 'auto' && params.aligner != "cellranger" && params.aligner != "cellrangermulti") {
     error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
 }
 
@@ -114,12 +114,14 @@ workflow SCRNASEQ {
     ch_mtx_matrices = Channel.empty()
 
     // Check input files and stage input data
-    ch_fastq = INPUT_CHECK( ch_input ).reads
+    ch_fastq = INPUT_CHECK( ch_input ).reads.view()
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
     // TODO: OPTIONAL, you can use nf-validation plugin to create an input channel from the samplesheet with Channel.fromSamplesheet("input")
     // See the documentation https://nextflow-io.github.io/nf-validation/samplesheets/fromSamplesheet/
     // ! There is currently no tooling to help you write a sample sheet schema
+
+    return
 
     // Run FastQC
     ch_multiqc_fastqc = Channel.empty()

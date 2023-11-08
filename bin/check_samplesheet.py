@@ -87,7 +87,7 @@ def check_samplesheet(file_in, file_out):
         ## Check header
         MIN_COLS = 2
         MIN_HEADER = ["sample", "fastq_1", "fastq_2"]
-        OPT_HEADER = ["expected_cells", "seq_center"]
+        OPT_HEADER = ["expected_cells", "seq_center", "feature_type", "cmo_barcodes"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
 
         unknown_header = 0
@@ -146,6 +146,18 @@ def check_samplesheet(file_in, file_out):
                 seq_center = lspl[colmap["seq_center"]]
                 seq_center = seq_center.replace(" ", "_")
 
+            ## If present, replace spaces with _ in sequencing center name
+            feature_type = ""
+            if "feature_type" in header:
+                feature_type = lspl[colmap["feature_type"]]
+                feature_type = feature_type.replace(" ", "_")
+
+            ## If present, replace spaces with _ in sequencing center name
+            cmo_barcodes = ""
+            if "cmo_barcodes" in header:
+                cmo_barcodes = lspl[colmap["cmo_barcodes"]]
+                cmo_barcodes = seq_center.replace(" ", "_")
+
             ## Check FastQ file extension
             for fastq in [fastq_1, fastq_2]:
                 if fastq:
@@ -161,9 +173,9 @@ def check_samplesheet(file_in, file_out):
             ## Auto-detect paired-end/single-end
             sample_info = []  ## [single_end, fastq_1, fastq_2]
             if sample and fastq_1 and fastq_2:  ## Paired-end short reads
-                sample_info = ["0", fastq_1, fastq_2, expected_cells, seq_center]
+                sample_info = ["0", fastq_1, fastq_2, expected_cells, seq_center, feature_type, cmo_barcodes]
             elif sample and fastq_1 and not fastq_2:  ## Single-end short reads
-                sample_info = ["1", fastq_1, fastq_2, expected_cells, seq_center]
+                sample_info = ["1", fastq_1, fastq_2, expected_cells, seq_center, feature_type, cmo_barcodes]
             else:
                 print_error("Invalid combination of columns provided!", "Line", line)
 
@@ -180,7 +192,7 @@ def check_samplesheet(file_in, file_out):
     ## Write validated samplesheet with appropriate columns
     if len(sample_mapping_dict) > 0:
         with open(file_out, "w") as fout:
-            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center"]) + "\n")
+            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2", "expected_cells", "seq_center", "feature_type", "cmo_barcodes"]) + "\n")
             for sample in sorted(sample_mapping_dict.keys()):
                 ## Check that multiple runs of the same sample are of the same datatype
                 if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):

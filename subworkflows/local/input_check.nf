@@ -11,12 +11,20 @@ workflow INPUT_CHECK {
 
     main:
     SAMPLESHEET_CHECK ( samplesheet )
-        .csv
+
+    if (params.aligner == 'cellrangermulti') {
+        SAMPLESHEET_CHECK.out.csv
+        .splitCsv ( header:true, sep:',' )
+        .map { create_fastq_channel(it) }
+        .set { reads }
+    } else {
+        SAMPLESHEET_CHECK.out.csv
         .splitCsv ( header:true, sep:',' )
         .map { create_fastq_channel(it) }
         .groupTuple(by: [0]) // group replicate files together, modifies channel to [ val(meta), [ [reads_rep1], [reads_repN] ] ]
         .map { meta, reads -> [ meta, reads.flatten() ] } // needs to flatten due to last "groupTuple", so we now have reads as a single array as expected by nf-core modules: [ val(meta), [ reads ] ]
         .set { reads }
+    }
 
     emit:
     reads                                     // channel: [ val(meta), [ reads ] ]
@@ -30,8 +38,9 @@ def create_fastq_channel(LinkedHashMap row) {
     def meta = [:]
     meta.id             = row.sample
     meta.single_end     = row.single_end.toBoolean()
-    meta.expected_cells = row.expected_cells != null ? row.expected_cells : null
-    meta.seq_center     = row.seq_center ? row.seq_center : params.seq_center
+    meta.expected_cells = row.expected_cells ?: null
+    meta.seq_center     = row.seq_center ?: params.seq_center
+    meta.feature_type   = row.feature_type ?: null
 
     // add path(s) of the fastq file(s) to the meta map
     def fastq_meta = []

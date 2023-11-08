@@ -40,7 +40,11 @@ def create_fastq_channel(LinkedHashMap row) {
     meta.single_end     = row.single_end.toBoolean()
     meta.expected_cells = row.expected_cells ?: null
     meta.seq_center     = row.seq_center ?: params.seq_center
-    meta.feature_type   = row.feature_type ?: null
+
+    if (params.aligner == 'cellrangermulti') {
+        meta.feature_type   = row.feature_type ?: null
+        meta.cmo_barcodes   = row.cmo_barcodes ? true : false
+    }
 
     // add path(s) of the fastq file(s) to the meta map
     def fastq_meta = []

@@ -10,21 +10,12 @@ workflow INPUT_CHECK {
     samplesheet // file: /path/to/samplesheet.csv
 
     main:
-    SAMPLESHEET_CHECK ( samplesheet )
-
-    if (params.aligner == 'cellrangermulti') {
-        SAMPLESHEET_CHECK.out.csv
-        .splitCsv ( header:true, sep:',' )
-        .map { create_fastq_channel(it) }
-        .set { reads }
-    } else {
-        SAMPLESHEET_CHECK.out.csv
+    SAMPLESHEET_CHECK ( samplesheet ).csv
         .splitCsv ( header:true, sep:',' )
         .map { create_fastq_channel(it) }
         .groupTuple(by: [0]) // group replicate files together, modifies channel to [ val(meta), [ [reads_rep1], [reads_repN] ] ]
         .map { meta, reads -> [ meta, reads.flatten() ] } // needs to flatten due to last "groupTuple", so we now have reads as a single array as expected by nf-core modules: [ val(meta), [ reads ] ]
         .set { reads }
-    }
 
     emit:
     reads                                     // channel: [ val(meta), [ reads ] ]

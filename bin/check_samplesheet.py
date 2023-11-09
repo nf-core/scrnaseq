@@ -113,23 +113,6 @@ class RowChecker:
                 f"It should be one of: {', '.join(self.VALID_FORMATS)}"
             )
 
-    def validate_unique_samples(self):
-        """
-        Assert that the combination of sample name and FASTQ filename is unique.
-
-        In addition to the validation, also rename all samples to have a suffix of _T{n}, where n is the
-        number of times the same sample exist, but with different FASTQ files, e.g., multiple runs per experiment.
-
-        """
-        if len(self._seen) != len(self.modified):
-            raise AssertionError("The pair of sample name and FASTQ must be unique.")
-        seen = Counter()
-        for row in self.modified:
-            sample = row[self._sample_col]
-            seen[sample] += 1
-            row[self._sample_col] = f"{sample}_T{seen[sample]}"
-
-
 def read_head(handle, num_lines=10):
     """Read the specified number of lines from the current position in the file."""
     lines = []
@@ -206,7 +189,6 @@ def check_samplesheet(file_in, file_out):
             except AssertionError as error:
                 logger.critical(f"{str(error)} On line {i + 2}.")
                 sys.exit(1)
-        checker.validate_unique_samples()
     header = list(reader.fieldnames)
     header.insert(1, "single_end")
     # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.

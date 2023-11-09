@@ -43,6 +43,7 @@ include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_MULTI  } from "../subworkflows/local/align_cellrangermulti"
 include { UNIVERSC_ALIGN    } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
@@ -222,12 +223,17 @@ workflow SCRNASEQ {
         // then, inside the subworkflow, it can be parsed to manage inputs to the module
         INPUT_CHECK.out.reads
         .map { meta, fastqs ->
-            def parsed_meta = meta.clone() + [ "${meta.feature_type}": fastqs ]
+            def parsed_meta = meta.clone() + [ "${meta.feature_type.toString()}": fastqs ]
             [ parsed_meta.id , parsed_meta ]
         }
         .groupTuple( by: 0 )
         .map{ it[1] }
         .set{ ch_cellrangermulti_collected_channel }
+
+        // Run cellranger multi
+        CELLRANGER_MULTI(
+            ch_cellrangermulti_collected_channel
+        )
 
     }
 

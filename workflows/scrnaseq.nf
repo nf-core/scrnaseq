@@ -114,14 +114,12 @@ workflow SCRNASEQ {
     ch_mtx_matrices = Channel.empty()
 
     // Check input files and stage input data
-    ch_fastq = INPUT_CHECK( ch_input ).reads.view()
+    ch_fastq = INPUT_CHECK( ch_input ).reads
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
     // TODO: OPTIONAL, you can use nf-validation plugin to create an input channel from the samplesheet with Channel.fromSamplesheet("input")
     // See the documentation https://nextflow-io.github.io/nf-validation/samplesheets/fromSamplesheet/
     // ! There is currently no tooling to help you write a sample sheet schema
-
-    return
 
     // Run FastQC
     ch_multiqc_fastqc = Channel.empty()
@@ -214,6 +212,23 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(UNIVERSC_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
+    }
+
+    // Run cellrangermulti pipeline
+    if (params.aligner == 'cellrangermulti') {
+
+        // parse the input data to generate a collected channel per sample, which will have
+        // the metadata and data for each data-type of every sample.
+        // then, inside the subworkflow, it can be parsed to manage inputs to the module
+        INPUT_CHECK.out.reads
+        .map { meta, fastqs ->
+            def parsed_meta = meta.clone() + [ "${meta.feature_type}": fastqs ]
+            [ parsed_meta.id , parsed_meta ]
+        }
+        .groupTuple( by: 0 )
+        .map{ it[1] }
+        .set{ ch_cellrangermulti_collected_channel }
+
     }
 
     // Run mtx to h5ad conversion subworkflow

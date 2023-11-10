@@ -10,7 +10,7 @@ process CELLRANGERARC_COUNT {
     }
 
     input:
-    tuple val(meta), val(multi_meta), path(reads)
+    tuple val(meta), val(multi_meta), path(reads, stageAs: "fastqs/*")
     path  reference
 
     output:
@@ -31,14 +31,6 @@ process CELLRANGERARC_COUNT {
     def lib_csv = meta.id + "_lib.csv"
 
     """
-    # The following ugly three commands (mkdir, mv, generate_lib_csv)
-    # are required because cellranger-arc only deals with abolsute paths
-    if [ ! -d "fastqs" ]; then
-        mkdir fastqs
-    fi
-
-    mv *.fastq.gz fastqs/
-
     generate_lib_csv.py \\
         --sample_types $sample_types \\
         --sample_names $sample_names \\

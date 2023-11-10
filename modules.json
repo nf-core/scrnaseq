@@ -12,12 +12,17 @@
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
-                        "git_sha": "716ef3019b66772a817b417078edce2f7b337858",
+                        "git_sha": "516189e968feb4ebdd9921806988b4c12b4ac2dc",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
                         "branch": "master",
-                        "git_sha": "716ef3019b66772a817b417078edce2f7b337858",
+                        "git_sha": "516189e968feb4ebdd9921806988b4c12b4ac2dc",
+                        "installed_by": ["modules"]
+                    },
+                    "cellranger/mkvdjref": {
+                        "branch": "master",
+                        "git_sha": "516189e968feb4ebdd9921806988b4c12b4ac2dc",
                         "installed_by": ["modules"]
                     },
                     "custom/dumpsoftwareversions": {

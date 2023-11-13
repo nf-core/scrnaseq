@@ -111,7 +111,7 @@ ch_universc_index = params.universc_index ? file(params.universc_index) : []
 
 //cellrangermulti params
 cellranger_gex_index = params.cellranger_gex_index ? file(params.cellranger_gex_index) : []
-// ch_vdj_reference = params.vdj_reference ? file(params.vdj_reference) : Channel.value( empty_file ) // needs to be the empty_value
+cellranger_vdj_index = params.cellranger_vdj_index ? file(params.cellranger_vdj_index) : []
 
 workflow SCRNASEQ {
 
@@ -239,7 +239,8 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_cellrangermulti_collected_channel,
-            cellranger_gex_index
+            cellranger_gex_index,
+            cellranger_vdj_index
         )
 
     }

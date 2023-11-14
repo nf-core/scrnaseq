@@ -37,16 +37,16 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { FASTQC_CHECK      } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
-include { STARSOLO          } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
-include { CELLRANGER_MULTI  } from "../subworkflows/local/align_cellrangermulti"
-include { UNIVERSC_ALIGN    } from "../subworkflows/local/align_universc"
-include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
-include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
+include { INPUT_CHECK            } from '../subworkflows/local/input_check'
+include { FASTQC_CHECK           } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS      } from '../subworkflows/local/kallisto_bustools'
+include { SCRNASEQ_ALEVIN        } from '../subworkflows/local/alevin'
+include { STARSOLO               } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN       } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_MULTI_ALIGN } from "../subworkflows/local/align_cellrangermulti"
+include { UNIVERSC_ALIGN         } from "../subworkflows/local/align_universc"
+include { MTX_CONVERSION         } from "../subworkflows/local/mtx_conversion"
+include { GTF_GENE_FILTER        } from '../modules/local/gtf_gene_filter'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -110,8 +110,9 @@ ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : 
 ch_universc_index = params.universc_index ? file(params.universc_index) : []
 
 //cellrangermulti params
-cellranger_gex_index = params.cellranger_gex_index ? file(params.cellranger_gex_index) : []
-cellranger_vdj_index = params.cellranger_vdj_index ? file(params.cellranger_vdj_index) : []
+cellranger_gex_index              = params.cellranger_gex_index ? file(params.cellranger_gex_index) : []
+cellranger_vdj_index              = params.cellranger_vdj_index ? file(params.cellranger_vdj_index) : []
+empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
 
 workflow SCRNASEQ {
 
@@ -231,16 +232,41 @@ workflow SCRNASEQ {
             [ parsed_meta.id , parsed_meta ]
         }
         .groupTuple( by: 0 )
-        .map{ it[1] }
+        .map{ sample_id, collected_map ->
+            // Now we must check if every data possibility taken into account in the .branch() operation
+            // performed inside the CELLRANGER_MULTI_ALIGN subworkflow are initialized, even with empty files
+            // This to ensure that the sizes of each data channel is the same, and the the order and the data types
+            // are used together with its rightful pairs
+            //
+            // data.types: gex, vdj, ab, beam, crispr, cmo
+
+            // clone to avoid mutating the input
+            def collected_map_clone = collected_map
+
+            // generate the expected EMPTY tuple when a data type is not used
+            // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,
+            // allowing to have multiple samples in the sheet, having all the data-type tuples initialized,
+            // either empty or populated. It will be branched inside the subworkflow.
+            if (!collected_map_clone.findAll{ it.containsKey('gex') })    { collected_map_clone.add( [id: 'EMPTY', feature_type: 'gex'   , ab: empty_file, options:[:] ] ) }
+            if (!collected_map_clone.findAll{ it.containsKey('vdj') })    { collected_map_clone.add( [id: 'EMPTY', feature_type: 'vdj'   , ab: empty_file, options:[:] ] ) }
+            if (!collected_map_clone.findAll{ it.containsKey('ab') })     { collected_map_clone.add( [id: 'EMPTY', feature_type: 'ab'    , ab: empty_file, options:[:] ] ) }
+            if (!collected_map_clone.findAll{ it.containsKey('beam') })   { collected_map_clone.add( [id: 'EMPTY', feature_type: 'beam'  , ab: empty_file, options:[:] ] ) }
+            if (!collected_map_clone.findAll{ it.containsKey('crispr') }) { collected_map_clone.add( [id: 'EMPTY', feature_type: 'crispr', ab: empty_file, options:[:] ] ) }
+            if (!collected_map_clone.findAll{ it.containsKey('cmo') })    { collected_map_clone.add( [id: 'EMPTY', feature_type: 'cmo'   , ab: empty_file, options:[:] ] ) }
+
+            // return final map
+            collected_map_clone
+        }
         .set{ ch_cellrangermulti_collected_channel }
 
         // Run cellranger multi
-        CELLRANGER_MULTI(
+        CELLRANGER_MULTI_ALIGN(
             ch_genome_fasta,
             ch_filter_gtf,
             ch_cellrangermulti_collected_channel,
             cellranger_gex_index,
-            cellranger_vdj_index
+            cellranger_vdj_index,
+            empty_file
         )
 
     }

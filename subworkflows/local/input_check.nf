@@ -35,9 +35,8 @@ def create_fastq_channel(LinkedHashMap row) {
     // check for cellranger multi
     if (params.aligner == 'cellrangermulti') {
         assert row.feature_type, "Error. Running ${params.aligner} aligner but forgot to add feature_type column. See sample ${row.sample}"
-        if (row.feature_type == 'cmo') assert row.cmo_barcodes, "Error. Input is feature_type==cmo, but cmo_barcodes was not given. See sample ${row.sample}"
+        if (row.feature_type == 'cmo') assert params.cmo_barcode_csv, "Error. Input is feature_type==cmo, but cmo_barcodes was not given. See sample ${row.sample}"
         meta.feature_type   = row.feature_type
-        meta.cmo_barcodes   = row.cmo_barcodes ? file( row.cmo_barcodes ) : false
     }
 
     // add path(s) of the fastq file(s) to the meta map

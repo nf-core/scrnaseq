@@ -57,8 +57,7 @@ workflow CELLRANGER_MULTI_ALIGN {
         ch_vdj_primer_index       = params.vdj_inner_enrichment_primers ? file(params.vdj_inner_enrichment_primers) : empty_file
         ch_beam_antigen_panel_csv = params.beam_antigen_csv   ? file(params.beam_antigen_csv)   : empty_file
         ch_frna_sample_csv        = params.frna_sample_csv    ? file(params.frna_sample_csv)    : empty_file
-        // ch_cmo_barcode_csv        = ch_grouped_fastq.cmo.map { it[0].cmo_barcodes }.ifEmpty{ empty_file }
-        ch_cmo_barcode_csv = empty_file
+        ch_cmo_barcode_csv        = params.cmo_barcode_csv    ? file(params.cmo_barcode_csv)    : empty_file
 
         //
         // Prepare GTF
@@ -111,7 +110,7 @@ workflow CELLRANGER_MULTI_ALIGN {
         // MODULE: cellranger multi
         //
         CELLRANGER_MULTI(
-            ch_grouped_fastq.gex.map{ it[0] }.view(),
+            ch_grouped_fastq.gex.map{ it[0] },
             ch_grouped_fastq.gex,
             ch_grouped_fastq.vdj,
             ch_grouped_fastq.ab,

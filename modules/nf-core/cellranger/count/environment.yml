@@ -1,4 +1,4 @@
-name: cellranger_multi
+name: cellranger_count
 channels:
   - conda-forge
   - bioconda

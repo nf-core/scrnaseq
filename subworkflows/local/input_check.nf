@@ -4,15 +4,25 @@
 //
 
 include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'
+include { RENAME_READS      } from '../../modules/local/rename_reads'
 
 workflow INPUT_CHECK {
     take:
     samplesheet // file: /path/to/samplesheet.csv
 
     main:
-    SAMPLESHEET_CHECK ( samplesheet ).csv
+    ch_parsed_reads =
+        SAMPLESHEET_CHECK ( samplesheet ).csv
         .splitCsv ( header:true, sep:',' )
         .map { create_fastq_channel(it) }
+
+    if (params.aligner == 'cellrangermulti') {
+        ch_renamed_reads = RENAME_READS ( ch_parsed_reads ).reads
+    } else {
+        ch_renamed_reads = ch_parsed_reads
+    }
+
+    ch_renamed_reads
         .groupTuple(by: [0]) // group replicate files together, modifies channel to [ val(meta), [ [reads_rep1], [reads_repN] ] ]
         .map { meta, reads -> [ meta, reads.flatten() ] } // needs to flatten due to last "groupTuple", so we now have reads as a single array as expected by nf-core modules: [ val(meta), [ reads ] ]
         .set { reads }

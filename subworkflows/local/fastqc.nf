@@ -8,9 +8,16 @@ workflow FASTQC_CHECK {
   ch_fastq
 
   main:
-  ch_fastq
-      .map { ch -> [ ch[0], ch[1] ] }
-      .set { ch_fastq }
+
+  if( params.aligner == 'cellrangerarc'){
+    ch_fastq
+        .map { ch -> [ ch[0], ch[3] ] }
+        .set { ch_fastq }
+  } else {
+    ch_fastq
+        .map { ch -> [ ch[0], ch[1] ] }
+        .set { ch_fastq }
+  }
 
   /*
    * FastQ QC using FASTQC

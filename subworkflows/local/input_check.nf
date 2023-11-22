@@ -23,8 +23,9 @@ workflow INPUT_CHECK {
             // [ val(meta), [ multimeta_s1, multimeta_s1 ], [ [reads_rep1], [reads_repN] ] ]
             .groupTuple(by: [0])
             // needs to flatten due to last "groupTuple", so we now have reads as a single array as expected by 
-            // nf-core modules: [ val(meta), [multi_meta], [ reads ] ]
-            .map { meta, multi_meta, reads -> [ meta, multi_meta.flatten(), reads.flatten() ] } 
+            // nf-core modules: [ val(meta), [sample_type], [sub_sample], [ reads ] ]
+            .map { meta, sample_type, sub_sample, reads -> [ meta, sample_type.flatten(), sub_sample.flatten(), 
+                                                             reads.flatten() ] } 
             .set { reads }
         versions = SAMPLESHEET_CHECK.out.versions
     } else {
@@ -42,7 +43,7 @@ workflow INPUT_CHECK {
     }
 
     emit:
-    reads                                     // channel: [ val(meta), [multi_meta], [ reads ] ]
+    reads                                     // channel: [ val(meta), [*], [ reads ] ]
     versions = SAMPLESHEET_CHECK.out.versions // channel: [ versions.yml ]
 }
 
@@ -82,9 +83,9 @@ def create_fastq_channel(LinkedHashMap row) {
     }
 
     // define meta_data for multiome
-    def multi_meta  = []
-    multi_meta      = row.sample_type ? [row.sample_type] : [params.sample_type]
+    def sample_type      = row.sample_type ? [row.sample_type] : [params.sample_type]
 
+    def sub_sample = ""
     if (params.aligner == "cellrangerarc"){
         sub_sample = row.fastq_1.split("/")[-1].replaceAll("_S[0-9]+_L[0-9]+_R1_[0-9]+.fastq.gz","")
         fastqs.each{
@@ -93,13 +94,12 @@ def create_fastq_channel(LinkedHashMap row) {
                         "${sub_sample} in common!\n${it}"
             }
         }
-        multi_meta.add(sub_sample)
     }
 
     fastq_meta = [ meta, fastqs ]
 
     if (params.aligner == "cellrangerarc"){
-        fastq_meta = [ meta, multi_meta, fastqs ]
+        fastq_meta = [ meta, sample_type, sub_sample, fastqs ]
     }
 
     return fastq_meta

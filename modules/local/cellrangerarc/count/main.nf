@@ -10,7 +10,7 @@ process CELLRANGERARC_COUNT {
     }
 
     input:
-    tuple val(meta), val(multi_meta), path(reads, stageAs: "fastqs/*")
+    tuple val(meta), val(sample_type), val(sub_sample), path(reads, stageAs: "fastqs/*")
     path  reference
 
     output:
@@ -25,9 +25,9 @@ process CELLRANGERARC_COUNT {
     def args = task.ext.args ?: ''
     def reference_name = reference.name
 
-    def multi_meta_info = multi_meta.collate(2).transpose()
-    def sample_types = multi_meta_info[0].join(",")
-    def sample_names = multi_meta_info[1].join(",")
+    //def multi_meta_info = multi_meta.collate(2).transpose()
+    def sample_types = sample_type.join(",")
+    def sample_names = sub_sample.join(",")
     def lib_csv = meta.id + "_lib.csv"
 
     """

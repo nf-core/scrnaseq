@@ -20,7 +20,7 @@ workflow INPUT_CHECK {
             .splitCsv ( header:true, sep:',' )
             .map { create_fastq_channel(it) }
             // group replicate files together, modifies channel to 
-            // [ val(meta), [ multimeta_s1, multimeta_s1 ], [ [reads_rep1], [reads_repN] ] ]
+            // [ val(meta), [sample_type], [sub_sample], [ [reads_rep1], [reads_repN] ] ]
             .groupTuple(by: [0])
             // needs to flatten due to last "groupTuple", so we now have reads as a single array as expected by 
             // nf-core modules: [ val(meta), [sample_type], [sub_sample], [ reads ] ]

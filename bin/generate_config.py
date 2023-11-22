@@ -2,10 +2,12 @@
 import argparse
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate the config for cellranger-arc mkref. \
+    parser = argparse.ArgumentParser(
+        description="Generate the config for cellranger-arc mkref. \
                                      cellranger-arc mkref takes as input a configuration file that bundles various inputs to the tool. \
                                      You can also create a config file on your own, please find more information here:\
-                                     https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/advanced/references")
+                                     https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/advanced/references"
+    )
 
     parser.add_argument("-f", "--fasta", dest="fasta", help="Name of the fasta file.")
     parser.add_argument("-g", "--gtf", dest="gtf", help="Name of the gtf file.")

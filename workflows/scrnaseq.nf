@@ -270,12 +270,12 @@ workflow SCRNASEQ {
             // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,
             // allowing to have multiple samples in the sheet, having all the data-type tuples initialized,
             // either empty or populated. It will be branched inside the subworkflow.
-            if (!collected_map_clone.findAll{ it.containsKey('gex') })    { collected_map_clone.add( [id: 'EMPTY', feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
-            if (!collected_map_clone.findAll{ it.containsKey('vdj') })    { collected_map_clone.add( [id: 'EMPTY', feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
-            if (!collected_map_clone.findAll{ it.containsKey('ab') })     { collected_map_clone.add( [id: 'EMPTY', feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
-            if (!collected_map_clone.findAll{ it.containsKey('beam') })   { collected_map_clone.add( [id: 'EMPTY', feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) }
-            if (!collected_map_clone.findAll{ it.containsKey('crispr') }) { collected_map_clone.add( [id: 'EMPTY', feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
-            if (!collected_map_clone.findAll{ it.containsKey('cmo') })    { collected_map_clone.add( [id: 'EMPTY', feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
+            if (!collected_map_clone.any{ it.feature_type == 'gex' })    { collected_map_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
+            if (!collected_map_clone.any{ it.feature_type == 'vdj' })    { collected_map_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
+            if (!collected_map_clone.any{ it.feature_type == 'ab' })     { collected_map_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
+            if (!collected_map_clone.any{ it.feature_type == 'beam' })   { collected_map_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) }
+            if (!collected_map_clone.any{ it.feature_type == 'crispr' }) { collected_map_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
+            if (!collected_map_clone.any{ it.feature_type == 'cmo' })    { collected_map_clone.add( [id: sample_id, feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
 
             // return final map
             collected_map_clone

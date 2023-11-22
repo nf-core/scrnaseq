@@ -135,4 +135,5 @@ workflow CELLRANGER_MULTI_ALIGN {
 
     emit:
         ch_versions
+        cellrangermulti_out  = CELLRANGER_MULTI.out.outs
 }

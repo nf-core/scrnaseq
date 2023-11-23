@@ -41,12 +41,12 @@ process MTX_TO_H5AD {
     //
     // run script
     //
-    if (params.aligner == 'cellranger')
+    if (params.aligner in [ "cellranger", "cellrangermulti"])
     """
     # convert file types
     mtx_to_h5ad.py \\
-        --aligner ${params.aligner} \\
-        --input filtered_feature_bc_matrix.h5 \\
+        --aligner cellranger \\
+        --input *_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
         --out ${meta.id}/${meta.id}_matrix.h5ad
     """

@@ -478,5 +478,51 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "cellranger_gex_index": {
+            "type": "string",
+            "default": null
+        },
+        "cellranger_vdj_index": {
+            "type": "string",
+            "default": null
+        },
+        "gex_frna_probe_set": {
+            "type": "string",
+            "default": null
+        },
+        "gex_target_panel": {
+            "type": "string",
+            "default": null
+        },
+        "gex_cmo_set": {
+            "type": "string",
+            "default": null
+        },
+        "fb_reference": {
+            "type": "string",
+            "default": null
+        },
+        "vdj_inner_enrichment_primers": {
+            "type": "string",
+            "default": null
+        },
+        "beam_antigen_csv": {
+            "type": "string",
+            "default": null
+        },
+        "frna_sample_csv": {
+            "type": "string",
+            "default": null
+        },
+        "gex_barcode_sample_assignment": {
+            "type": "string",
+            "default": null
+        },
+        "cmo_barcode_csv": {
+            "type": "string",
+            "default": null
+        }
+    }
 }

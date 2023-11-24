@@ -14,32 +14,22 @@ workflow INPUT_CHECK {
     reads = null
     versions = null
 
-    if (params.aligner == "cellrangerarc"){
-        SAMPLESHEET_CHECK ( samplesheet )
-            .csv
-            .splitCsv ( header:true, sep:',' )
-            .map { create_fastq_channel(it) }
-            // group replicate files together, modifies channel to 
-            // [ val(meta), [sample_type], [sub_sample], [ [reads_rep1], [reads_repN] ] ]
-            .groupTuple(by: [0])
-            // needs to flatten due to last "groupTuple", so we now have reads as a single array as expected by 
-            // nf-core modules: [ val(meta), [sample_type], [sub_sample], [ reads ] ]
-            .map { meta, sample_type, sub_sample, reads -> [ meta, sample_type.flatten(), sub_sample.flatten(), 
-                                                             reads.flatten() ] } 
-            .set { reads }
-        versions = SAMPLESHEET_CHECK.out.versions
+    grouped_ch =
+    SAMPLESHEET_CHECK ( samplesheet )
+        .csv
+        .splitCsv ( header:true, sep:',' )
+        .map { create_fastq_channel(it) }
+        // group replicate files together, modifies channel to [ val(meta), [ [reads_rep1], [reads_repN] ] ]
+        .groupTuple(by: [0])
+
+    if (params.aligner == 'cellrangerarc' ) {
+        grouped_ch
+        .map { meta, sample_type, sub_sample, reads -> [ meta, sample_type.flatten(), sub_sample.flatten(), reads.flatten() ] } 
+        .set { reads }
     } else {
-        SAMPLESHEET_CHECK ( samplesheet )
-            .csv
-            .splitCsv ( header:true, sep:',' )
-            .map { create_fastq_channel(it) }
-            // group replicate files together, modifies channel to [ val(meta), [ [reads_rep1], [reads_repN] ] ]
-            .groupTuple(by: [0])
-            // needs to flatten due to last "groupTuple", so we now have reads as a single array as expected by 
-            // nf-core modules: [ val(meta), [ reads ] ]
-            .map { meta, reads -> [ meta, reads.flatten() ] } 
-            .set { reads }
-        versions = SAMPLESHEET_CHECK.out.versions
+        grouped_ch
+        .map { meta, reads -> [ meta, reads.flatten() ] } 
+        .set { reads }
     }
 
     emit:

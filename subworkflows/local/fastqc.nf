@@ -9,15 +9,8 @@ workflow FASTQC_CHECK {
 
   main:
 
-  if( params.aligner == 'cellrangerarc'){
-    ch_fastq
-        .map { ch -> [ ch[0], ch[3] ] }
-        .set { ch_fastq }
-  } else {
-    ch_fastq
-        .map { ch -> [ ch[0], ch[1] ] }
-        .set { ch_fastq }
-  }
+  def n = (params.aligner == 'cellrangerarc') ? 3 : 1
+  ch_fastq.map { ch -> [ ch[0], ch[n] ] }.set { ch_fastq }
 
   /*
    * FastQ QC using FASTQC

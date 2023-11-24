@@ -15,7 +15,7 @@ workflow MTX_CONVERSION {
         ch_versions = Channel.empty()
 
         // Cellranger module output contains too many files which cause path collisions, we filter to the ones we need.
-        if ( params.aligner == "cellranger" ||  params.aligner == "cellrangerarc" ) {
+        if (params.aligner in [ 'cellranger', 'cellrangerarc' ]) {
             mtx_matrices = mtx_matrices.map { meta, mtx_files ->
                     [ meta, mtx_files.findAll { it.toString().contains("filtered_feature_bc_matrix") } ]
                 }

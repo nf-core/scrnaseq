@@ -12,7 +12,7 @@ def checkPathParamList = [
     params.input, params.multiqc_config, params.fasta, params.gtf,
     params.transcript_fasta, params.salmon_index, params.kallisto_index,
     params.star_index, params.txp2gene, params.barcode_whitelist, params.cellranger_index,
-    params.cellrangerarc_index, params.universc_index
+    params.universc_index
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -104,9 +104,6 @@ star_feature = params.star_feature
 
 //cellranger params
 ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
-
-//cellrangerarc params
-ch_cellrangerarc_index = params.cellrangerarc_index ? file(params.cellrangerarc_index) : []
 
 //universc params
 ch_universc_index = params.universc_index ? file(params.universc_index) : []
@@ -224,7 +221,7 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_motifs,
-            ch_cellrangerarc_index,
+            ch_cellranger_index,
             ch_fastq
         )
         ch_versions = ch_versions.mix(CELLRANGERARC_ALIGN.out.ch_versions)

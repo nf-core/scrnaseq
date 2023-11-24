@@ -13,16 +13,16 @@ workflow CELLRANGERARC_ALIGN {
         fasta
         gtf
         motifs
-        cellrangerarc_index
+        cellranger_index
         ch_fastq
 
     main:
         ch_versions = Channel.empty()
 
-        assert cellrangerarc_index || (fasta && gtf && motifs):
+        assert cellranger_index || (fasta && gtf && motifs):
             "Must provide either a cellranger-atac index or a bundle of a fasta file ('--fasta') + gtf file ('--gtf') + motif file (--motifs)."
 
-        if (!cellrangerarc_index) {
+        if (!cellranger_index) {
             // Filter GTF based on gene biotypes passed in params.modules
             CELLRANGERARC_MKGTF( gtf )
             filtered_gtf = CELLRANGERARC_MKGTF.out.gtf
@@ -35,13 +35,13 @@ workflow CELLRANGERARC_ALIGN {
             // Make reference genome
             CELLRANGERARC_MKREF( fasta, filtered_gtf, motifs, CELLRANGERARC_GENERATECONFIG.out.config, "cellrangerarc_reference" )
             ch_versions = ch_versions.mix(CELLRANGERARC_MKREF.out.versions)
-            cellrangerarc_index = CELLRANGERARC_MKREF.out.reference
+            cellranger_index = CELLRANGERARC_MKREF.out.reference
         }
 
         // Obtain read counts
         CELLRANGERARC_COUNT (
             ch_fastq,
-            cellrangerarc_index
+            cellranger_index
         )
         ch_versions = ch_versions.mix(CELLRANGERARC_COUNT.out.versions)
 

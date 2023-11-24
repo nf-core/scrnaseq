@@ -19,7 +19,7 @@ process MTX_TO_SEURAT {
 
     script:
     def aligner = params.aligner
-    if (params.aligner == "cellranger" || params.aligner == "cellrangerarc") {
+    if (params.aligner in [ 'cellranger', 'cellrangerarc' ]) {
         matrix   = "filtered_feature_bc_matrix/matrix.mtx.gz"
         barcodes = "filtered_feature_bc_matrix/barcodes.tsv.gz"
         features = "filtered_feature_bc_matrix/features.tsv.gz"

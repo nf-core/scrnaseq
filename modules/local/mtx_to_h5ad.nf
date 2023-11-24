@@ -41,7 +41,7 @@ process MTX_TO_H5AD {
     //
     // run script
     //
-    if (params.aligner == 'cellranger' || params.aligner == 'cellrangerarc')
+    if (params.aligner in [ 'cellranger', 'cellrangerarc' ])
     """
     # convert file types
     mtx_to_h5ad.py \\

@@ -20,7 +20,7 @@ workflow CELLRANGERARC_ALIGN {
         ch_versions = Channel.empty()
 
         assert cellranger_index || (fasta && gtf && motifs):
-            "Must provide either a cellranger-atac index or a bundle of a fasta file ('--fasta') + gtf file ('--gtf') + motif file (--motifs)."
+            "Must provide either a cellranger index or a bundle of a fasta file ('--fasta') + gtf file ('--gtf') + motif file (--motifs)."
 
         if (!cellranger_index) {
             // Filter GTF based on gene biotypes passed in params.modules

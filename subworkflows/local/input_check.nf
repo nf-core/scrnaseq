@@ -73,7 +73,7 @@ def create_fastq_channel(LinkedHashMap row) {
     }
 
     // define meta_data for multiome
-    def sample_type      = row.sample_type ? [row.sample_type] : [params.sample_type]
+    def sample_type      = row.sample_type ? [row.sample_type] : ['gex']
 
     def sub_sample = ""
     if (params.aligner == "cellrangerarc"){

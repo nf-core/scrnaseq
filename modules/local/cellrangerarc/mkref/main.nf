@@ -1,5 +1,5 @@
 process CELLRANGERARC_MKREF {
-    tag "$reference_config"
+    tag "$reference_name"
     label 'process_medium'
 
     container "nf-core/cellranger-arc:2.0.2"
@@ -18,17 +18,39 @@ process CELLRANGERARC_MKREF {
 
     output:
     path "${reference_name}", emit: reference
+    path "config"           , emit: config
     path "versions.yml"     , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
+    def fast_name = fasta.name
+    def gtf_name = gtf.name
+    def motifs_name = motifs.name
+    def reference_config = reference_config.name
     def args = task.ext.args ?: ''
+
+    if ( !reference_name ){
+        reference_name = "cellrangerarc_reference"
+    }
+
     """
+    if [ $reference_config == [] ]; then
+        generate_config.py \\
+            --fasta $fast_name \\
+            --gtf $gtf_name \\
+            --motifs $motifs_name \\
+            $args
+    else
+        if [ ! -f config ]; then
+            mv -i $reference_config config
+        fi
+    fi
+
     cellranger-arc \\
         mkref \\
-        --config=$reference_config \\
+        --config=config \\
         $args
 
     cat <<-END_VERSIONS > versions.yml

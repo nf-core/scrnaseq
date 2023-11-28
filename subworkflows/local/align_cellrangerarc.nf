@@ -4,7 +4,6 @@
 
 include {CELLRANGERARC_MKGTF} from "../../modules/local/cellrangerarc/mkgtf/main.nf"
 include {CELLRANGERARC_MKREF} from "../../modules/local/cellrangerarc/mkref/main.nf"
-include {CELLRANGERARC_GENERATECONFIG} from "../../modules/local/generate_cellranger_mkref_config.nf"
 include {CELLRANGERARC_COUNT} from "../../modules/local/cellrangerarc/count/main.nf"
 
 // Define workflow to subset and index a genome region fasta file
@@ -15,6 +14,7 @@ workflow CELLRANGERARC_ALIGN {
         motifs
         cellranger_index
         ch_fastq
+        cellrangerarc_config
 
     main:
         ch_versions = Channel.empty()
@@ -28,12 +28,19 @@ workflow CELLRANGERARC_ALIGN {
             filtered_gtf = CELLRANGERARC_MKGTF.out.gtf
             ch_versions = ch_versions.mix(CELLRANGERARC_MKGTF.out.versions)
 
-            // Generate the config for mkref
-            CELLRANGERARC_GENERATECONFIG(fasta.name, filtered_gtf.name, motifs.name)
-            ch_versions = ch_versions.mix(CELLRANGERARC_GENERATECONFIG.out.versions)
-
             // Make reference genome
-            CELLRANGERARC_MKREF( fasta, filtered_gtf, motifs, CELLRANGERARC_GENERATECONFIG.out.config, "cellrangerarc_reference" )
+            if ( ( params.cellrangerarc_reference && !cellrangerarc_config ) || 
+                 ( !params.cellrangerarc_reference && cellrangerarc_config ) ) {
+                exit 1, "ERROR: If you provide a config file you also have to specific the reference name and vice versa."
+            } else {
+
+                cellrangerarc_reference = 'cellrangerarc_reference'
+                if ( params.cellrangerarc_reference ){
+                    cellrangerarc_reference = params.cellrangerarc_reference
+                }
+
+                CELLRANGERARC_MKREF( fasta, filtered_gtf, motifs, cellrangerarc_config, cellrangerarc_reference )
+            }
             ch_versions = ch_versions.mix(CELLRANGERARC_MKREF.out.versions)
             cellranger_index = CELLRANGERARC_MKREF.out.reference
         }

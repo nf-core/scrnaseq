@@ -243,6 +243,14 @@
                 "motifs": {
                     "type": "string",
                     "description": "Specify a motif file to create a cellranger-arc index. Can be taken, e.g., from the JASPAR database."
+                },
+                "cellrangerarc_config": {
+                    "type": "string",
+                    "description": "Specify a config file to create the cellranger-arc index."
+                },
+                "cellrangerarc_reference": {
+                    "type": "string",
+                    "description": "Specify the genome reference name in the config file to create a cellranger-arc index."
                 }
             }
         },

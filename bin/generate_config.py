@@ -25,7 +25,7 @@ if __name__ == "__main__":
     config.write('\tinput_fasta: ["{}"]\n'.format(args["fasta"]))
     config.write('\tinput_gtf: ["{}"]\n'.format(args["gtf"]))
     config.write('\tinput_motifs: "{}"\n'.format(args["motifs"]))
-    if args["add"] != "none":
+    if args["add"] != None:
         config.write(args["add"] + "\n")
     config.write("}")
     config.close()

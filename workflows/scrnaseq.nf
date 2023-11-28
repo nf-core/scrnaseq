@@ -78,6 +78,7 @@ ch_genome_fasta = Channel.value(params.fasta ? file(params.fasta) : [])
 ch_gtf = params.gtf ? file(params.gtf) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
 ch_motifs = params.motifs ? file(params.motifs) : []
+ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = Channel.empty()
 ch_multiqc_star = Channel.empty()
@@ -222,7 +223,8 @@ workflow SCRNASEQ {
             ch_filter_gtf,
             ch_motifs,
             ch_cellranger_index,
-            ch_fastq
+            ch_fastq,
+            ch_cellrangerarc_config
         )
         ch_versions = ch_versions.mix(CELLRANGERARC_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)

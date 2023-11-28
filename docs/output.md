@@ -17,7 +17,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [STARsolo](#starsolo)
   - [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
   - [Cellranger](#cellranger)
-  - [Cellranger ARC](#cellrangerarc)
+  - [Cellranger ARC](#cellranger-arc)
   - [UniverSC](#universc)
   - [Other output data](#other-output-data)
   - [MultiQC](#multiqc)

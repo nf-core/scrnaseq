@@ -131,7 +131,7 @@ test_scARC,path/test_scARC_gex_S1_L002_R1_001.fastq.gz,path/test_scARC_gex_S1_L0
 #### Config file and index
 
 Cellranger-arc needs a reference index directory that you can provide with `--cellranger_index`. Be aware, you can use 
-for cellranger-arc the same index you use for cellranger ((see](https://kb.10xgenomics.com/hc/en-us/articles/4408281606797-Are-the-references-interchangeable-between-pipelines)).
+for cellranger-arc the same index you use for cellranger ([see](https://kb.10xgenomics.com/hc/en-us/articles/4408281606797-Are-the-references-interchangeable-between-pipelines)).
 Yet, a cellranger-arc index might include additional data (e.g., TF binding motifs). Therefore, please first check if 
 you have to create a new cellranger-arc index ([see here](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/advanced/references) for 
 more information)

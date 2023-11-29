@@ -97,6 +97,55 @@ UniverSC automatically updates the barcode whitelist and chemistry parameters. U
 
 Currently only 3\' scRNA-Seq parameters are supported in nextflow, although chemistry parameters for 5\' scRNA-Seq and full-length scRNA-Seq libraries are supported by teh container.
 
+### If using cellranger-arc
+
+#### Automatic file name detection
+
+This pipeline currently **does not** automatically renames input FASTQ files to follow the
+[naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
+
+```
+[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz
+```
+
+For more details, see
+
+- [this issue](https://github.com/nf-core/scrnaseq/issues/241), discussing various mechanisms to deal with non-conformant filenames
+- [the README of the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/README.md) which demonstrates that renaming files does not affect the results.
+- [the code for renaming files in the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/templates/cellranger_count.py)
+- [the code for renaming files in UniverSC](https://github.com/minoda-lab/universc/blob/99a20652430c1dc9f962536a2793536f643810b7/launch_universc.sh#L1411-L1609)
+
+#### Sample sheet definition
+
+If you are using cellranger-arc you have to add the column *sample_type* (atac for scATAC or gex for scRNA) and *fastq_barcode* (part of the scATAC data) to your samplesheet as an input. 
+
+**Beware of the following points:**
+ - It is important that you give your scRNA and scATAC different [Sample Name]s.
+ - Check first which file is your barcode fastq file for your scATAC data [see](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/using/using/fastq-input). 
+ - If you have more than one sequencing run then you have to give them another suffix (e.g., rep*) to your [Sample Name] [see](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/using/fastq-input#atac_quick_start).
+
+An example samplesheet for a dataset called test_scARC that has two sequencing runs for the scATAC and one seqeuncing run
+from two lanes for the scRNA could look like this:
+
+sample,fastq_1,fastq_2,fastq_barcode,sample_type
+test_scARC,path/test_scARC_atac_rep1_S1_L001_R1_001.fastq.gz,path/test_scARC_atac_rep1_S1_L001_R2_001.fastq.gz,path/test_scARC_atac_rep1_S1_L001_I2_001.fastq.gz,atac
+test_scARC,path/test_scARC_atac_rep2_S2_L001_R1_001.fastq.gz,path/test_scARC_atac_rep2_S2_L001_R2_001.fastq.gz,path/test_scARC_atac_rep2_S2_L001_I2_001.fastq.gz,atac
+test_scARC,path/test_scARC_gex_S1_L001_R1_001.fastq.gz,path/test_scARC_gex_S1_L001_R2_001.fastq.gz,,gex
+test_scARC,path/test_scARC_gex_S1_L002_R1_001.fastq.gz,path/test_scARC_gex_S1_L002_R2_001.fastq.gz,,gex
+
+#### Config file and index
+
+Cellranger-arc needs a reference index directory that you can provide with `--cellranger_index`. Be aware, you can use 
+for cellranger-arc the same index you use for cellranger [see](https://kb.10xgenomics.com/hc/en-us/articles/4408281606797-Are-the-references-interchangeable-between-pipelines).
+Yet, a cellranger-arc index might include additional data (e.g., TF binding motifs). Therefore, please check first if 
+you have to create a new cellranger-arc index ([see here](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/advanced/references) for 
+more information)
+
+If you decide to create a cellranger-arc index, then you need to create a config file to generate the index. The pipeline
+can do this autmatically for you if you provide a `--fasta`, `--gtf`, and an optional `--motif` file. However, you can
+also decide to provide your own config file with `--cellrangerarc_config`, then you also have to specify with `--cellrangerarc_reference` 
+the reference genome name that you have used and stated as genome: [""] in your config file.
+
 ## Running the pipeline
 
 The minimum typical command for running the pipeline is as follows:

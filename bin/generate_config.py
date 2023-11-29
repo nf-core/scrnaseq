@@ -24,7 +24,7 @@ if __name__ == "__main__":
     config.write('\tgenome: ["cellrangerarc_reference"]\n')
     config.write('\tinput_fasta: ["{}"]\n'.format(args["fasta"]))
     config.write('\tinput_gtf: ["{}"]\n'.format(args["gtf"]))
-    if args["motifs"] != '[]':
+    if args["motifs"] != "[]":
         config.write('\tinput_motifs: "{}"\n'.format(args["motifs"]))
     if args["add"] != None:
         config.write(args["add"] + "\n")

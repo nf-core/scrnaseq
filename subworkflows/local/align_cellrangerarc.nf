@@ -19,8 +19,8 @@ workflow CELLRANGERARC_ALIGN {
     main:
         ch_versions = Channel.empty()
 
-        assert cellranger_index || (fasta && gtf && motifs):
-            "Must provide either a cellranger index or a bundle of a fasta file ('--fasta') + gtf file ('--gtf') + motif file (--motifs)."
+        assert cellranger_index || (fasta && gtf):
+            "Must provide either a cellranger index or a bundle of a fasta file ('--fasta') + gtf file ('--gtf')."
 
         if (!cellranger_index) {
             // Filter GTF based on gene biotypes passed in params.modules
@@ -29,18 +29,16 @@ workflow CELLRANGERARC_ALIGN {
             ch_versions = ch_versions.mix(CELLRANGERARC_MKGTF.out.versions)
 
             // Make reference genome
-            if ( ( params.cellrangerarc_reference && !cellrangerarc_config ) || 
-                 ( !params.cellrangerarc_reference && cellrangerarc_config ) ) {
-                exit 1, "ERROR: If you provide a config file you also have to specific the reference name and vice versa."
-            } else {
+            assert ( ( !params.cellrangerarc_reference && !cellrangerarc_config ) || 
+                     ( params.cellrangerarc_reference && cellrangerarc_config ) ) :
+                "If you provide a config file you also have to specific the reference name and vice versa."
 
-                cellrangerarc_reference = 'cellrangerarc_reference'
-                if ( params.cellrangerarc_reference ){
-                    cellrangerarc_reference = params.cellrangerarc_reference
-                }
-
-                CELLRANGERARC_MKREF( fasta, filtered_gtf, motifs, cellrangerarc_config, cellrangerarc_reference )
+            cellrangerarc_reference = 'cellrangerarc_reference'
+            if ( params.cellrangerarc_reference ){
+                cellrangerarc_reference = params.cellrangerarc_reference
             }
+
+            CELLRANGERARC_MKREF( fasta, filtered_gtf, motifs, cellrangerarc_config, cellrangerarc_reference )
             ch_versions = ch_versions.mix(CELLRANGERARC_MKREF.out.versions)
             cellranger_index = CELLRANGERARC_MKREF.out.reference
         }

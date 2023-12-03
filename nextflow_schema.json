@@ -250,7 +250,7 @@
                 },
                 "cellrangerarc_reference": {
                     "type": "string",
-                    "description": "Specify the genome reference name in the config file to create a cellranger-arc index."
+                    "description": "Specify the genome reference name used in the config file to create a cellranger-arc index."
                 }
             }
         },

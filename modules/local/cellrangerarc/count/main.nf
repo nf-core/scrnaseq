@@ -24,18 +24,37 @@ process CELLRANGERARC_COUNT {
     script:
     def args = task.ext.args ?: ''
     def reference_name = reference.name
-
-    //def multi_meta_info = multi_meta.collate(2).transpose()
     def sample_types = sample_type.join(",")
     def sample_names = sub_sample.join(",")
     def lib_csv = meta.id + "_lib.csv"
 
     """
-    generate_lib_csv.py \\
-        --sample_types $sample_types \\
-        --sample_names $sample_names \\
-        --fastq_folder \$(readlink -f fastqs)\\
-        --out $lib_csv
+    fastq_folder=\$(readlink -f fastqs)
+
+    python3 <<CODE
+
+    sample_types = "${sample_types}".split(",")
+    sample_names = "${sample_names}".split(",")
+    unique_samples_names = set(sample_names)
+
+    lib_csv = open("${lib_csv}", "w")
+    lib_csv.write("fastqs,sample,library_type")
+
+    for i in range(0, len(sample_types)):
+        if sample_names[i] in unique_samples_names:
+            unique_samples_names.remove(
+                sample_names[i]
+            )  # this has to be done to account for different Lane files (e.g., L002)
+            if sample_types[i] == "gex":
+                lib_csv.write("\\n{},{},{}".format("\${fastq_folder}", sample_names[i], "Gene Expression"))
+            else:
+                lib_csv.write("\\n{},{},{}".format("\${fastq_folder}", sample_names[i], "Chromatin Accessibility"))
+
+    lib_csv.close()
+
+    print("Wrote lib.csv file to {}".format("${lib_csv}"))
+
+    CODE
 
     cellranger-arc \\
         count \\

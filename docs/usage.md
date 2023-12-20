@@ -123,11 +123,13 @@ If you are using cellranger-arc you have to add the column _sample_type_ (atac f
 An example samplesheet for a dataset called test_scARC that has two sequencing runs for the scATAC and one seqeuncing run
 from two lanes for the scRNA could look like this:
 
+```csv
 sample,fastq_1,fastq_2,fastq_barcode,sample_type
 test_scARC,path/test_scARC_atac_rep1_S1_L001_R1_001.fastq.gz,path/test_scARC_atac_rep1_S1_L001_R2_001.fastq.gz,path/test_scARC_atac_rep1_S1_L001_I2_001.fastq.gz,atac
 test_scARC,path/test_scARC_atac_rep2_S2_L001_R1_001.fastq.gz,path/test_scARC_atac_rep2_S2_L001_R2_001.fastq.gz,path/test_scARC_atac_rep2_S2_L001_I2_001.fastq.gz,atac
 test_scARC,path/test_scARC_gex_S1_L001_R1_001.fastq.gz,path/test_scARC_gex_S1_L001_R2_001.fastq.gz,,gex
 test_scARC,path/test_scARC_gex_S1_L002_R1_001.fastq.gz,path/test_scARC_gex_S1_L002_R2_001.fastq.gz,,gex
+```
 
 #### Config file and index
 

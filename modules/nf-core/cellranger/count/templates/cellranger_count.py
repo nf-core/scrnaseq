@@ -40,7 +40,7 @@ Old file name matching from NF-core
 # filename_pattern = r"([^a-zA-Z0-9])R1([^a-zA-Z0-9])"
 """
 # FIXME: This is working locally but not on AWS Batch
-filename_pattern = r"(.+)_1"
+# filename_pattern = r"(.+)_1"
 # print(filename_pattern)
 
 for i, (r1, r2) in enumerate(chunk_iter(fastqs, 2)):
@@ -49,10 +49,6 @@ for i, (r1, r2) in enumerate(chunk_iter(fastqs, 2)):
     # if re.sub(filename_pattern, r"\\1R2\\2", r1.name) != r2.name:
     # FIXME: This is working locally but not on AWS Batch
     # if re.sub(filename_pattern, r"\1_2", r1.name) != r2.name:
-    print(r1.name)
-    print(r2.name)
-    print(re.sub(filename_pattern, r"\1_2", r1.name))
-    print(r1.name.replace("_1", "_2"))
     if r1.name.replace("_1", "_2") != r2.name:
         raise AssertionError(
             dedent(

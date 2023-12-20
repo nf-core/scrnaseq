@@ -36,17 +36,39 @@ process CELLRANGERARC_MKREF {
     }
 
     """
-    if [ $reference_config == [] ]; then
-        generate_config.py \\
-            --fasta $fast_name \\
-            --gtf $gtf_name \\
-            --motifs $motifs_name \\
-            $args
-    else
-        if [ ! -f config ]; then
-            mv -i $reference_config config
-        fi
-    fi
+
+    python3 <<CODE
+
+    from os.path import exists
+    import shutil
+    
+    fasta = "${fast_name}"
+    gtf = "${gtf_name}"
+    motifs = "${motifs_name}"
+    add = "${args}"
+    reference_config = "${reference_config}"
+
+    if ( reference_config == "[]" ):
+
+        config = open("config", "w")
+        config.write("{\\n")
+        config.write('\\torganism: "{}"\\n'.format(fasta.split(".")[0]))
+        config.write('\\tgenome: ["cellrangerarc_reference"]\\n')
+        config.write('\\tinput_fasta: ["{}"]\\n'.format(fasta))
+        config.write('\\tinput_gtf: ["{}"]\\n'.format(gtf))
+        if motifs != "[]":
+            config.write('\tinput_motifs: "{}"\\n'.format(motifs))
+        if add != None:
+            config.write(add + "\\n")
+        config.write("}")
+        config.close()
+
+        print("Wrote config file")
+    else:
+        if ( not exists("config") ):
+            shutil.move(reference_config, "config")
+
+    CODE
 
     cellranger-arc \\
         mkref \\
@@ -59,3 +81,4 @@ process CELLRANGERARC_MKREF {
     END_VERSIONS
     """
 }
+

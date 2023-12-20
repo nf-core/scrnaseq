@@ -46,6 +46,7 @@ for i, (r1, r2) in enumerate(chunk_iter(fastqs, 2)):
     # double escapes are required because nextflow processes this python 'template'
     # FIXME: Generalize this pattern switching function once we standardize the filename pattern
     # if re.sub(filename_pattern, r"\\1R2\\2", r1.name) != r2.name:
+    print(r1.name)
     print(re.sub(filename_pattern, r"\1_2", r1.name))
     if re.sub(filename_pattern, r"\1_2", r1.name) != r2.name:
         raise AssertionError(

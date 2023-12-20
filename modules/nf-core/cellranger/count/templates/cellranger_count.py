@@ -31,14 +31,21 @@ assert len(fastqs) % 2 == 0
 fastq_all = Path("./fastq_all")
 fastq_all.mkdir(exist_ok=True)
 
+# FIXME: Generalize this filename pattern once we better understand it
+"""
+Old file name matching from NF-core
 # Match R1 in the filename, but only if it is followed by a non-digit or non-character
 # match "file_R1.fastq.gz", "file.R1_000.fastq.gz", etc. but
 # do not match "SRR12345", "file_INFIXR12", etc
-filename_pattern = r"([^a-zA-Z0-9])R1([^a-zA-Z0-9])"
+# filename_pattern = r"([^a-zA-Z0-9])R1([^a-zA-Z0-9])"
+"""
+filename_pattern = r"(.+)_1"
 
 for i, (r1, r2) in enumerate(chunk_iter(fastqs, 2)):
     # double escapes are required because nextflow processes this python 'template'
-    if re.sub(filename_pattern, r"\\1R2\\2", r1.name) != r2.name:
+    # FIXME: Generalize this pattern switching function once we standardize the filename pattern
+    # if re.sub(filename_pattern, r"\\1R2\\2", r1.name) != r2.name:
+    if re.sub(filename_pattern, r"\1_2", r1.name) != r2.name:
         raise AssertionError(
             dedent(
                 f"""\

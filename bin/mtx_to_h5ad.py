@@ -1,8 +1,13 @@
 #!/usr/bin/env python
+
+# Set numba chache dir to current working directory (which is a writable mount also in containers)
+import os
+
+os.environ["NUMBA_CACHE_DIR"] = "."
+
 import scanpy as sc
 import pandas as pd
 import argparse
-import os
 from scipy import io
 from anndata import AnnData
 

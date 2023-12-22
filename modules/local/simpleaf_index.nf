@@ -27,6 +27,7 @@ process SIMPLEAF_INDEX {
     """
     # export required var
     export ALEVIN_FRY_HOME=.
+    export NUMBA_CACHE_DIR=.
 
     # prep simpleaf
     simpleaf set-paths

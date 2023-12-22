@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+- Better support for custom protocols ([#273](https://github.com/nf-core/scrnaseq/pull/273)).
+  - The universc protocol is now specified via the `--protocol` flag
+  - Any protocol specified is now passed to the respective aligner
+  - Added a section to the documentation
+
 ## v2.4.1 - 2023-09-28
 
 - Fix whitelist logic for dropseq ([#267](https://github.com/nf-core/scrnaseq/pull/267))

@@ -17,6 +17,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [STARsolo](#starsolo)
   - [Salmon Alevin & AlevinQC](#salmon-alevin--alevinqc)
   - [Cellranger](#cellranger)
+  - [Cellranger ARC](#cellranger-arc)
   - [UniverSC](#universc)
   - [Other output data](#other-output-data)
   - [MultiQC](#multiqc)
@@ -102,6 +103,14 @@ Cell Ranger is a set of analysis scripts that processes 10X Chromium single cell
 **Output directory: `results/cellranger`**
 
 - Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger
+
+## Cellranger ARC
+
+Cell Ranger ARC is a set of analysis pipelines that process Chromium Single Cell Multiome ATAC + Gene Expression sequencing data to generate a variety of analyses pertaining to gene expression (GEX), chromatin accessibility, and their linkage. Furthermore, since the ATAC and GEX measurements are on the very same cell, we are able to perform analyses that link chromatin accessibility and GEX. See [Cellranger ARC](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/what-is-cell-ranger-arc) for more information on Cellranger.
+
+**Output directory: `results/cellrangerarc`**
+
+- Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger ARC
 
 ## UniverSC
 

@@ -53,6 +53,7 @@ process SIMPLEAF_QUANT {
     """
     # export required var
     export ALEVIN_FRY_HOME=.
+    export NUMBA_CACHE_DIR=.
 
     # prep simpleaf
     simpleaf set-paths

@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Update template to v2.11.1 ([#279](https://github.com/nf-core/scrnaseq/pull/279))
+- Add support for paired GEX+ATAC sequencing using cellranger-arc ([#274](https://github.com/nf-core/scrnaseq/pull/274))
+- Increase default runtime limits for `medium` and `high` processes ([#281])(https://github.com/nf-core/scrnaseq/pull/281)
 - Better support for custom protocols ([#273](https://github.com/nf-core/scrnaseq/pull/273)).
   - The universc protocol is now specified via the `--protocol` flag
   - Any protocol specified is now passed to the respective aligner

@@ -96,7 +96,7 @@ We thank the following people and teams for their extensive assistance in the de
 - @KevinMenden
 - @FloWuenne
 - @rob-p
-- (GHGA)[https://www.ghga.de/]
+- [GHGA](https://www.ghga.de/)
 
 ## Contributions and Support
 

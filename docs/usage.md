@@ -14,7 +14,7 @@ You will need to create a samplesheet with information about the samples you wou
 
 The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
 
-```console
+```csv title="samplesheet.csv"
 sample,fastq_1,fastq_2
 CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
 CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
@@ -24,19 +24,6 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 ### Full samplesheet
 
 There is a strict requirement for the first 3 columns to match those defined in the table below.
-
-A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
-
-```console
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
-```
 
 | Column           | Description                                                                                                                                                                                                                                                                                                               |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -54,9 +41,9 @@ This parameter is currently supported by
 
 - [Salmon Alevin](https://salmon.readthedocs.io/en/latest/alevin.html#expectcells)
 - [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md)
+- [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger)
 
-In the future, support for this paramter will be added to cellranger and UniverSC. Note that since cellranger v7,
-it is not recommended anymore to supply the `--expected-cells` parameter.
+Note that since cellranger v7, it is **not recommended** anymore to supply the `--expected-cells` parameter.
 
 ## Aligning options
 
@@ -71,7 +58,7 @@ Other aligner options for running the pipeline are:
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
   - `--aligner cellranger`
 - [UniverSC](https://github.com/minoda-lab/universc) to run an open-source version of Cell Ranger on any technology
-  - '--aligner universc'
+  - '--aligner universc`
 
 ### If using cellranger or universc
 
@@ -91,11 +78,85 @@ For more details, see
 
 As a sanity check, we verify that filenames of a pair of FASTQ files only differ by `R1`/`R2`.
 
-#### UniverSC technology configuration
+### Support for different scRNA-seq protocols
 
-UniverSC automatically updates the barcode whitelist and chemistry parameters. Use "universc_technology" to set the 'technology' parameter to configure the run.
+The single-cell protocol used in the experiment can be specified using the `--protocol` flag.
+For cellranger, it is recommended to stick with the default value `'auto'` for automatic detection of the protocol.
+For all other aligner, you need to specify the protocol manually.
+
+The three 10x Genomics protocols 3' v1 (`10XV1`), 3' v2 (`10XV2`) and 3' v3 (`10XV3`) are universally supported
+by all aligners in the pipeline and mapped to the correct options automatically. If the protocol is unknown to the
+nf-core pipeline, the value specified to `--protocol` is passed to the aligner _in verbatim_ to support additional protocols.
+
+Here are some hints on running the various aligners with different protocols
+
+#### Kallisto/bustools
+
+The command `kb --list` shows all supported, preconfigured protocols. Additionally, a custom technology string such as
+`0,0,16:0,16,26:1,0,0` can be speficied:
+
+> Additionally kallisto bus will accept a string specifying a new technology in the format of bc:umi:seq where each of bc,umi and seq are a triplet of integers separated by a comma, denoting the file index, start and stop of the sequence used. For example to specify the 10xV2 technology we would use 0,0,16:0,16,26:1,0,0
+
+For more details, please refer to the [Kallisto/bustools documentation](https://pachterlab.github.io/kallisto/manual#bus).
+
+#### Alevin/fry
+
+Alevin/fry also supports custom chemistries in a slighly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
+
+For more details, see the [simpleaf documentation](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag)
+
+#### UniverSC
+
+See the [UniverSC GitHub page](https://github.com/minoda-lab/universc#pre-set-configurations) for all supported protocols.
 
 Currently only 3\' scRNA-Seq parameters are supported in nextflow, although chemistry parameters for 5\' scRNA-Seq and full-length scRNA-Seq libraries are supported by teh container.
+
+### If using cellranger-arc
+
+#### Automatic file name detection
+
+This pipeline currently **does not** automatically renames input FASTQ files to follow the
+[naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
+
+```
+[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz
+```
+
+Thus please make sure your files follow this naming convention.
+
+#### Sample sheet definition
+
+If you are using cellranger-arc you have to add the column _sample_type_ (atac for scATAC or gex for scRNA) and _fastq_barcode_ (part of the scATAC data) to your samplesheet as an input.
+
+**Beware of the following points:**
+
+- It is important that you give your scRNA and scATAC different [Sample Name]s.
+- Check first which file is your barcode fastq file for your scATAC data ([see](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/using/using/fastq-input)).
+- If you have more than one sequencing run then you have to give them another suffix (e.g., rep\*) to your [Sample Name] ([see](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/using/fastq-input#atac_quick_start)).
+
+An example samplesheet for a dataset called test_scARC that has two sequencing runs for the scATAC and one seqeuncing run
+from two lanes for the scRNA could look like this:
+
+```csv
+sample,fastq_1,fastq_2,fastq_barcode,sample_type
+test_scARC,path/test_scARC_atac_rep1_S1_L001_R1_001.fastq.gz,path/test_scARC_atac_rep1_S1_L001_R2_001.fastq.gz,path/test_scARC_atac_rep1_S1_L001_I2_001.fastq.gz,atac
+test_scARC,path/test_scARC_atac_rep2_S2_L001_R1_001.fastq.gz,path/test_scARC_atac_rep2_S2_L001_R2_001.fastq.gz,path/test_scARC_atac_rep2_S2_L001_I2_001.fastq.gz,atac
+test_scARC,path/test_scARC_gex_S1_L001_R1_001.fastq.gz,path/test_scARC_gex_S1_L001_R2_001.fastq.gz,,gex
+test_scARC,path/test_scARC_gex_S1_L002_R1_001.fastq.gz,path/test_scARC_gex_S1_L002_R2_001.fastq.gz,,gex
+```
+
+#### Config file and index
+
+Cellranger-arc needs a reference index directory that you can provide with `--cellranger_index`. Be aware, you can use
+for cellranger-arc the same index you use for cellranger ([see](https://kb.10xgenomics.com/hc/en-us/articles/4408281606797-Are-the-references-interchangeable-between-pipelines)).
+Yet, a cellranger-arc index might include additional data (e.g., TF binding motifs). Therefore, please first check if
+you have to create a new cellranger-arc index ([see here](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/advanced/references) for
+more information)
+
+If you decide to create a cellranger-arc index, then you need to create a config file to generate the index. The pipeline
+can do this autmatically for you if you provide a `--fasta`, `--gtf`, and an optional `--motif` file. However, you can
+also decide to provide your own config file with `--cellrangerarc_config`, then you also have to specify with `--cellrangerarc_reference`
+the reference genome name that you have used and stated as _genome:_ in your config file.
 
 ## Running the pipeline
 

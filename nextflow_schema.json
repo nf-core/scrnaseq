@@ -58,14 +58,14 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
-                    "enum": ["kallisto", "star", "alevin", "cellranger", "universc"]
+                    "enum": ["kallisto", "star", "alevin", "cellranger", "cellrangerarc", "universc"]
                 },
                 "protocol": {
                     "type": "string",
-                    "description": "The protocol that was used to generate the single cell data, e.g. 10XV2 (default).",
-                    "default": "10XV2",
-                    "fa_icon": "fas fa-cogs",
-                    "enum": ["10XV3", "10XV2", "10XV1", "dropseq"]
+                    "description": "The protocol that was used to generate the single cell data, e.g. 10x Genomics v2 Chemistry.\n\n Can be 'auto' (cellranger only), '10XV1', '10XV2', '10XV3', or any other protocol string that will get directly passed the respective aligner.",
+                    "help_text": "The default is to auto-detect the protocol when running cellranger. For all other aligners the protocol MUST be manually specified. \n\n The following protocols are recognized by the pipeline and mapped to the corresponding protocol name of the respective aligner: '10XV1', '10XV2', '10XV3'. \n\nAny other protocol value is passed to the aligner in verbatim to support other sequencing platforms. See the [kallisto](https://pachterlab.github.io/kallisto/manual#bus), [simpleaf](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag), [starsolo](https://gensoft.pasteur.fr/docs/STAR/2.7.9a/STARsolo.html), and [universc](https://github.com/minoda-lab/universc#pre-set-configurations) documentations for more details.",
+                    "default": "auto",
+                    "fa_icon": "fas fa-cogs"
                 }
             },
             "fa_icon": "fas fa-terminal"
@@ -234,6 +234,26 @@
                 }
             }
         },
+        "cellrangerarc_options": {
+            "title": "Cellranger ARC Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "motifs": {
+                    "type": "string",
+                    "description": "Specify a motif file to create a cellranger-arc index. Can be taken, e.g., from the JASPAR database."
+                },
+                "cellrangerarc_config": {
+                    "type": "string",
+                    "description": "Specify a config file to create the cellranger-arc index."
+                },
+                "cellrangerarc_reference": {
+                    "type": "string",
+                    "description": "Specify the genome reference name used in the config file to create a cellranger-arc index."
+                }
+            }
+        },
         "universc_options": {
             "title": "UniverSC Options",
             "type": "object",
@@ -243,11 +263,6 @@
                 "universc_index": {
                     "type": "string",
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website."
-                },
-                "universc_technology": {
-                    "type": "string",
-                    "description": "Specify a single-cell technology, vendor, or platform. See the UniverSC documentation or GitHub repository for more details.",
-                    "default": "10x"
                 }
             }
         },
@@ -470,6 +485,9 @@
         },
         {
             "$ref": "#/definitions/cellranger_options"
+        },
+        {
+            "$ref": "#/definitions/cellrangerarc_options"
         },
         {
             "$ref": "#/definitions/universc_options"

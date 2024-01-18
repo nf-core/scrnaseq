@@ -31,8 +31,8 @@ jobs:
             "test,docker --aligner alevin",
             "test,docker --aligner kallisto",
             "test,docker --aligner star",
-            "test,docker --aligner cellranger -stub",
-            "test,docker --aligner universc -stub",
+            "test,docker --aligner cellranger",
+            "test,docker --aligner universc",
           ]
     steps:
       - name: Free some space

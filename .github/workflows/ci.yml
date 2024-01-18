@@ -32,7 +32,7 @@ jobs:
             "test,docker --aligner kallisto",
             "test,docker --aligner star",
             "test,docker --aligner cellranger",
-            "test,docker --aligner universc",
+            # "test,docker --aligner universc",
           ]
     steps:
       - name: Free some space

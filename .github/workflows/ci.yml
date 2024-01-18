@@ -32,8 +32,8 @@ jobs:
             "test,docker --aligner kallisto",
             "test,docker --aligner star",
             "test,docker --aligner cellranger",
-            # "test,docker --aligner cellrangerarc", // this currently lacks a suitable test profile, see issue #
-            # "test,docker --aligner universc", // this is broken, see issue #
+            # "test,docker --aligner cellrangerarc", // this currently lacks a suitable test profile, see issue https://github.com/nf-core/scrnaseq/issues/290
+            # "test,docker --aligner universc", // this is broken, see issue https://github.com/nf-core/scrnaseq/issues/289
           ]
     steps:
       - name: Free some space

@@ -26,8 +26,7 @@ jobs:
         NXF_VER:
           - "23.04.0"
           - "latest-everything"
-        profile:
-          [
+        profile: [
             "test,docker --aligner alevin",
             "test,docker --aligner kallisto",
             "test,docker --aligner star",

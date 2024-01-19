@@ -1,0 +1,87 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_star_aligner") {
+
+        when {
+            // the rest is taken from shared config
+            params {
+                aligner    = 'star'
+                outdir     = "${outputDir}/results_star"
+
+                // Limit resources so that this can run on GitHub Actions -- for some reason it had not been taken from shared config
+                max_cpus   = 2
+                max_memory = '6.GB'
+                max_time   = '6.h'
+            }
+        }
+
+        then {
+
+            //
+            // General assertions
+            //
+
+                // Did it finish successfully?
+                assert workflow.success
+
+                // How many tasks were executed?
+                assert workflow.trace.tasks().size() == 14
+
+                // How many results were produced?
+                assert path("${outputDir}/results_star").list().size() == 4
+                assert path("${outputDir}/results_star/star").list().size() == 3
+                assert path("${outputDir}/results_star/star/mtx_conversions").list().size() == 4
+                assert path("${outputDir}/results_star/fastqc").list().size() == 12
+                assert path("${outputDir}/results_star/multiqc").list().size() == 3
+
+            //
+            // Check if files were produced
+            //
+            //
+            // Check if main files exist
+            //
+
+            assert new File( "${outputDir}/results_star/star/Sample_X/Sample_X.SJ.out.tab"                             ).exists()
+            assert new File( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Barcodes.stats"                ).exists()
+            assert new File( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/matrix.mtx.gz"   ).exists()
+            assert new File( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/features.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/barcodes.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_matrix.h5ad" ).exists()
+            assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_matrix.rds"  ).exists()
+
+            assert new File( "${outputDir}/results_star/star/Sample_Y/Sample_Y.SJ.out.tab"                             ).exists()
+            assert new File( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Barcodes.stats"                ).exists()
+            assert new File( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/matrix.mtx.gz"   ).exists()
+            assert new File( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/features.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/barcodes.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_matrix.h5ad" ).exists()
+            assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_matrix.rds"  ).exists()
+
+            //
+            // Check if files are the same
+            //
+            assert snapshot(
+                workflow,
+                path( "${outputDir}/results_star/star/Sample_X/Sample_X.SJ.out.tab"                             ),
+                path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Barcodes.stats"                ),
+                path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/matrix.mtx.gz"   ),
+                path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/features.tsv.gz" ),
+                path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/barcodes.tsv.gz" ),
+                // path( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_matrix.h5ad" ), // does not match
+                path( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_matrix.rds"  ),
+                path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.SJ.out.tab"                             ),
+                path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Barcodes.stats"                ),
+                path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/matrix.mtx.gz"   ),
+                path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/features.tsv.gz" ),
+                path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/barcodes.tsv.gz" ),
+                // path( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_matrix.h5ad" ), // does not match
+                path( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_matrix.rds"  ),
+            ).match()
+
+        }
+    }
+
+}

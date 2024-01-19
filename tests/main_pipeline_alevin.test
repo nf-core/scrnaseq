@@ -1,0 +1,68 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_alevin_aligner") {
+
+        when {
+            // the rest is taken from shared config
+            params {
+                aligner    = 'alevin'
+                outdir     = "${outputDir}/results_alevin"
+
+                // Limit resources so that this can run on GitHub Actions -- for some reason it had not been taken from shared config
+                max_cpus   = 2
+                max_memory = '6.GB'
+                max_time   = '6.h'
+            }
+        }
+
+        then {
+
+            //
+            // General assertions
+            //
+
+                // Did it finish successfully?
+                assert workflow.success
+
+                // How many tasks were executed?
+                assert workflow.trace.tasks().size() == 16
+
+                // How many results were produced?
+                assert path("${outputDir}/results_alevin").list().size() == 5
+                assert path("${outputDir}/results_alevin/alevin").list().size() == 4
+                assert path("${outputDir}/results_alevin/alevin/mtx_conversions").list().size() == 4
+                assert path("${outputDir}/results_alevin/alevinqc").list().size() == 2
+                assert path("${outputDir}/results_alevin/fastqc").list().size() == 12
+                assert path("${outputDir}/results_alevin/multiqc").list().size() == 3
+
+            //
+            // Check if files were produced
+            //
+            assert new File( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat_cols.txt" ).exists()
+            assert new File( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat.mtx" ).exists()
+            assert new File( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat_rows.txt" ).exists()
+
+            assert new File( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat_cols.txt" ).exists()
+            assert new File( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat.mtx" ).exists()
+            assert new File( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat_rows.txt" ).exists()
+
+            //
+            // Check if files are the same
+            //
+            assert snapshot(
+                workflow,
+                path( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat_cols.txt" ),
+                path( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat.mtx" ),
+                path( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat_rows.txt" ),
+                path( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat_cols.txt" ),
+                path( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat.mtx" ),
+                path( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat_rows.txt" )
+            ).match()
+
+        }
+    }
+
+}

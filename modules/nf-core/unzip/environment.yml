@@ -1,7 +1,7 @@
-name: multiqc
+name: unzip
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - bioconda::multiqc=1.19
+  - conda-forge::p7zip=16.02

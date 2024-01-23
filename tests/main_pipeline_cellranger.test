@@ -1,0 +1,84 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_cellranger_aligner") {
+
+        when {
+            // the rest is taken from shared config
+            params {
+                aligner    = 'cellranger'
+                outdir     = "${outputDir}/results_cellranger"
+
+                // Limit resources so that this can run on GitHub Actions -- for some reason it had not been taken from shared config
+                max_cpus   = 2
+                max_memory = '6.GB'
+                max_time   = '6.h'
+            }
+        }
+
+        then {
+
+            //
+            // General assertions
+            //
+
+                // Did it finish successfully?
+                assert workflow.success
+
+                // How many tasks were executed?
+                assert workflow.trace.tasks().size() == 15
+
+                // How many results were produced?
+                assert path("${outputDir}/results_cellranger").list().size() == 4
+                assert path("${outputDir}/results_cellranger/cellranger").list().size() == 4
+                assert path("${outputDir}/results_cellranger/cellranger/mtx_conversions").list().size() == 4
+                assert path("${outputDir}/results_cellranger/cellranger/count").list().size() == 3
+                assert path("${outputDir}/results_cellranger/fastqc").list().size() == 12
+                assert path("${outputDir}/results_cellranger/multiqc").list().size() == 3
+
+            //
+            // Check if files were produced
+            //
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/features.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/matrix.mtx.gz"   ).exists()
+
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/features.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/matrix.mtx.gz"   ).exists()
+
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/barcodes.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/features.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/matrix.mtx.gz"   ).exists()
+
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/barcodes.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/features.tsv.gz" ).exists()
+            assert new File( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/matrix.mtx.gz"   ).exists()
+
+            //
+            // Check if files are the same
+            //
+            assert snapshot(
+                workflow,
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/features.tsv.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/matrix.mtx.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/features.tsv.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/matrix.mtx.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/barcodes.tsv.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/features.tsv.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/matrix.mtx.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/barcodes.tsv.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/features.tsv.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/matrix.mtx.gz" ),
+                path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_matrix.rds" ),
+                path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_matrix.rds" )
+            ).match()
+
+        }
+    }
+
+}

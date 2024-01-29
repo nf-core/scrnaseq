@@ -41,7 +41,7 @@ process KALLISTOBUSTOOLS_COUNT {
         $args \\
         -o ${prefix}.count \\
         -m ${memory}G \\
-        ${reads.join( " " )} 
+        ${reads.join( " " )}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

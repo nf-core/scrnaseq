@@ -27,7 +27,7 @@ process KALLISTOBUSTOOLS_COUNT {
     def args    = task.ext.args ?: ''
     def prefix  = task.ext.prefix ?: "${meta.id}"
     def cdna    = t1c ? "-c1 $t1c" : ''
-    def introns = t2c ? "-c2 $t2c" : ''
+    def unprocessed = t2c ? "-c2 $t2c" : ''
     def memory  = task.memory.toGiga() - 1
     """
     kb \\
@@ -36,7 +36,7 @@ process KALLISTOBUSTOOLS_COUNT {
         -i $index \\
         -g $t2g \\
         $cdna \\
-        $introns \\
+        $unprocessed \\
         -x $technology \\
         $args \\
         -o ${prefix}.count \\

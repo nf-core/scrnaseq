@@ -7,7 +7,7 @@ process CONCAT_H5AD {
         'biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
 
     input:
-    path h5ad
+    tuple val(input_type), path(h5ad)
     path samplesheet
 
     output:
@@ -20,7 +20,7 @@ process CONCAT_H5AD {
     """
     concat_h5ad.py \\
         --input $samplesheet \\
-        --out combined_matrix.h5ad \\
+        --out combined_${input_type}_matrix.h5ad \\
         --suffix "_matrix.h5ad"
     """
 

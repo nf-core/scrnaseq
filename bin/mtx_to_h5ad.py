@@ -57,22 +57,36 @@ def input_to_adata(
     if verbose and (txp2gene or star_index):
         print("Reading in {}".format(input_data))
 
-    if aligner == "cellranger":
+    #
+    # open main data
+    #
+    if aligner == "cellranger" and input_data.lower().endswith('.h5'):
         adata = _10x_h5_to_adata(input_data, sample)
     else:
         adata = _mtx_to_adata(input_data, barcode_file, feature_file, sample, aligner)
 
+    #
+    # open gene information
+    #
     if verbose and (txp2gene or star_index):
         print("Reading in {}".format(txp2gene))
 
-    if txp2gene:
-        t2g = pd.read_table(txp2gene, header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2])
-    elif star_index:
-        t2g = pd.read_table(
-            f"{star_index}/geneInfo.tab", header=None, skiprows=1, names=["gene_id", "gene_symbol"], usecols=[0, 1]
-        )
+    if aligner == "cellranger" and not input_data.lower().endswith('.h5'):
+        #
+        # for cellranger workflow, we do not have a txp2gene file, so, when using this normal/manual function for empty drops
+        # we need to provide this information coming directly from the features.tsv file
+        # by not using the .h5 file for conversion, we loose the two col information: feature_types and genome
+        #
+        t2g = pd.read_table(feature_file, header=None, names=["gene_id", "gene_symbol", "feature_types"], usecols=[0, 1, 2])
+    else:
+        if txp2gene:
+            t2g = pd.read_table(txp2gene, header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2])
+        elif star_index:
+            t2g = pd.read_table(
+                f"{star_index}/geneInfo.tab", header=None, skiprows=1, names=["gene_id", "gene_symbol"], usecols=[0, 1]
+            )
 
-    if txp2gene or star_index:
+    if txp2gene or star_index or (aligner == "cellranger" and not input_data.lower().endswith('.h5')):
         t2g = t2g.drop_duplicates(subset="gene_id").set_index("gene_id")
         adata.var["gene_symbol"] = t2g["gene_symbol"]
 

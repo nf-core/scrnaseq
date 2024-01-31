@@ -37,16 +37,17 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { FASTQC_CHECK      } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
-include { STARSOLO          } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
-include { CELLRANGERARC_ALIGN  } from "../subworkflows/local/align_cellrangerarc"
-include { UNIVERSC_ALIGN    } from "../subworkflows/local/align_universc"
-include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
-include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
+include { INPUT_CHECK             } from '../subworkflows/local/input_check'
+include { FASTQC_CHECK            } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS       } from '../subworkflows/local/kallisto_bustools'
+include { SCRNASEQ_ALEVIN         } from '../subworkflows/local/alevin'
+include { STARSOLO                } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN        } from "../subworkflows/local/align_cellranger"
+include { CELLRANGERARC_ALIGN     } from "../subworkflows/local/align_cellrangerarc"
+include { UNIVERSC_ALIGN          } from "../subworkflows/local/align_universc"
+include { MTX_CONVERSION          } from "../subworkflows/local/mtx_conversion"
+include { GTF_GENE_FILTER         } from '../modules/local/gtf_gene_filter'
+include { EMPTYDROPS_CELL_CALLING } from '../modules/local/emptydrops'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,7 +150,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.counts)
+        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.raw_counts, KALLISTO_BUSTOOLS.out.filtered_counts)
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
@@ -230,6 +231,26 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(CELLRANGERARC_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)
+    }
+
+    // Run emptydrops calling module
+    if ( !params.skip_emptydrops ) {
+        // emptydrops should only run on the raw matrices thus, filter-out the filtered results
+        // of the aligners that can produce it
+        if ( params.aligner == "cellranger" ) {
+            ch_mtx_matrices_for_emptydrops =
+                ch_mtx_matrices.map { meta, mtx_files ->
+                    [ meta, mtx_files.findAll { it.toString().contains("raw_feature_bc_matrix") } ]
+                }
+                .filter { meta, mtx_files -> mtx_files }
+        } else if (params.aligner == 'kallisto') {
+            ch_mtx_matrices_for_emptydrops =
+                ch_mtx_matrices.filter { meta, mtx_files -> mtx_files.toUriString().contains("counts_unfiltered") }
+        } else {
+            ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
+        }
+        EMPTYDROPS_CELL_CALLING( ch_mtx_matrices_for_emptydrops )
+        ch_mtx_matrices = ch_mtx_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
     }
 
     // Run mtx to h5ad conversion subworkflow

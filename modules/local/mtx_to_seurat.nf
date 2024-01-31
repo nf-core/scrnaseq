@@ -19,23 +19,49 @@ process MTX_TO_SEURAT {
 
     script:
     def aligner = params.aligner
+
+    // check input type of inputs
+    def input_type = (inputs.toUriString().contains('unfiltered') || inputs.toUriString().contains('raw')) ? 'raw' : 'filtered'
+    if (inputs.toUriString().contains('emptydrops')) { input_type = 'emptydrops' }
+    def is_emptydrops = (input_type == 'emptydrops') ? '--is_emptydrops' : '0'
+
+    // def file paths for aligners. Cellranger is normally converted with the .h5 files
+    // However, the emptydrops call, always generate .mtx files, thus, cellranger 'emptydrops' required a parsing
     if (params.aligner in [ 'cellranger', 'cellrangerarc' ]) {
-        matrix   = "matrix.mtx.gz"
-        barcodes = "barcodes.tsv.gz"
-        features = "features.tsv.gz"
-    } else if (params.aligner == "kallisto") {
-        matrix   = "*count/counts_unfiltered/*.mtx"
-        barcodes = "*count/counts_unfiltered/*.barcodes.txt"
-        features = "*count/counts_unfiltered/*.genes.txt"
+
+        mtx_dir  = (input_type == 'emptydrops') ? 'emptydrops_filtered' : "${input_type}_feature_bc_matrix"
+        matrix   = "${mtx_dir}/matrix.mtx*"
+        barcodes = "${mtx_dir}/barcodes.tsv*"
+        features = "${mtx_dir}/features.tsv*"
+
+    } else if (params.aligner == 'kallisto') {
+
+        kb_pattern = (input_type == 'raw') ? 'un' : ''
+        mtx_dir    = (input_type == 'emptydrops') ? 'emptydrops_filtered' : "counts_${kb_pattern}filtered"
+        matrix     = "${mtx_dir}/*.mtx"
+        barcodes   = "${mtx_dir}/*.barcodes.txt"
+        features   = "${mtx_dir}/*.genes.txt"
+
     } else if (params.aligner == "alevin") {
-        matrix   = "*_alevin_results/af_quant/alevin/quants_mat.mtx"
-        barcodes = "*_alevin_results/af_quant/alevin/quants_mat_rows.txt"
-        features = "*_alevin_results/af_quant/alevin/quants_mat_cols.txt"
+
+        mtx_dir  = (input_type == 'emptydrops') ? 'emptydrops_filtered' : '*_alevin_results/af_quant/alevin'
+        matrix   = "${mtx_dir}/quants_mat.mtx"
+        barcodes = "${mtx_dir}/quants_mat_rows.txt"
+        features = "${mtx_dir}/quants_mat_cols.txt"
+
     } else if (params.aligner == 'star') {
-        matrix   = "*.Solo.out/Gene*/filtered/matrix.mtx.gz"
-        barcodes = "*.Solo.out/Gene*/filtered/barcodes.tsv.gz"
-        features = "*.Solo.out/Gene*/filtered/features.tsv.gz"
+
+        mtx_dir  = (input_type == 'emptydrops') ? 'emptydrops_filtered' : "*.Solo.out/Gene*/${input_type}"
+        suffix   = (input_type == 'emptydrops') ? '' : '.gz'
+        matrix   = "${mtx_dir}/matrix.mtx${suffix}"
+        barcodes = "${mtx_dir}/barcodes.tsv${suffix}"
+        features = "${mtx_dir}/features.tsv${suffix}"
+
     }
+
+    //
+    // run script
+    //
     """
     mkdir ${meta.id}
     """
@@ -49,7 +75,8 @@ process MTX_TO_SEURAT {
             *count/counts_unfiltered/\${input_type}.barcodes.txt \\
             *count/counts_unfiltered/\${input_type}.genes.txt \\
             ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
-            ${aligner}
+            ${aligner} \\
+            ${is_emptydrops}
     done
     """
 
@@ -59,8 +86,9 @@ process MTX_TO_SEURAT {
         $matrix \\
         $barcodes \\
         $features \\
-        ${meta.id}/${meta.id}_matrix.rds \\
-        ${aligner}
+        ${meta.id}/${meta.id}_${input_type}_matrix.rds \\
+        ${aligner} \\
+        ${is_emptydrops}
     """
 
     stub:

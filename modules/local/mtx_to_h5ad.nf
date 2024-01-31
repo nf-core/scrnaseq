@@ -15,33 +15,58 @@ process MTX_TO_H5AD {
     path star_index
 
     output:
-    path "${meta.id}/*h5ad", emit: h5ad
-    path "${meta.id}/*", emit: counts
-    path  "versions.yml", emit: versions
+    tuple val(input_type), path("${meta.id}/*h5ad") , emit: h5ad
+    path  "versions.yml"                            , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    // def file paths for aligners (except cellranger)
-    if (params.aligner == 'kallisto') {
-        mtx_matrix   = "*count/counts_unfiltered/*.mtx"
-        barcodes_tsv = "*count/counts_unfiltered/*.barcodes.txt"
-        features_tsv = "*count/counts_unfiltered/*.genes.txt"
+    // check input type of inputs
+    input_type = (inputs.toUriString().contains('unfiltered') || inputs.toUriString().contains('raw')) ? 'raw' : 'filtered'
+    if (inputs.toUriString().contains('emptydrops')) { input_type = 'emptydrops' }
+
+    // def file paths for aligners. Cellranger is normally converted with the .h5 files
+    // However, the emptydrops call, always generate .mtx files, thus, cellranger 'emptydrops' required a parsing
+    if (params.aligner in [ 'cellranger', 'cellrangerarc' ] && input_type == 'emptydrops') {
+
+        aligner      = 'cellranger'
+        txp2gene     = ''
+        star_index   = ''
+        mtx_matrix   = "emptydrops_filtered/matrix.mtx"
+        barcodes_tsv = "emptydrops_filtered/barcodes.tsv"
+        features_tsv = "emptydrops_filtered/features.tsv"
+
+    } else if (params.aligner == 'kallisto') {
+
+        kb_pattern   = (input_type == 'raw') ? 'un' : ''
+        mtx_dir      = (input_type == 'emptydrops') ? 'emptydrops_filtered' : "counts_${kb_pattern}filtered"
+        mtx_matrix   = "${mtx_dir}/*.mtx"
+        barcodes_tsv = "${mtx_dir}/*.barcodes.txt"
+        features_tsv = "${mtx_dir}/*.genes.txt"
+
     } else if (params.aligner == 'alevin') {
-        mtx_matrix   = "*_alevin_results/af_quant/alevin/quants_mat.mtx"
-        barcodes_tsv = "*_alevin_results/af_quant/alevin/quants_mat_rows.txt"
-        features_tsv = "*_alevin_results/af_quant/alevin/quants_mat_cols.txt"
+
+        // alevin does not have filtered/unfiltered results
+        mtx_dir      = (input_type == 'emptydrops') ? 'emptydrops_filtered' : '*_alevin_results/af_quant/alevin'
+        mtx_matrix   = "${mtx_dir}/quants_mat.mtx"
+        barcodes_tsv = "${mtx_dir}/quants_mat_rows.txt"
+        features_tsv = "${mtx_dir}/quants_mat_cols.txt"
+
     } else if (params.aligner == 'star') {
-        mtx_matrix   = "*.Solo.out/Gene*/filtered/matrix.mtx.gz"
-        barcodes_tsv = "*.Solo.out/Gene*/filtered/barcodes.tsv.gz"
-        features_tsv = "*.Solo.out/Gene*/filtered/features.tsv.gz"
+
+        mtx_dir      = (input_type == 'emptydrops') ? 'emptydrops_filtered' : "*.Solo.out/Gene*/${input_type}"
+        suffix       = (input_type == 'emptydrops') ? '' : '.gz'
+        mtx_matrix   = "${mtx_dir}/matrix.mtx${suffix}"
+        barcodes_tsv = "${mtx_dir}/barcodes.tsv${suffix}"
+        features_tsv = "${mtx_dir}/features.tsv${suffix}"
+
     }
 
     //
     // run script
     //
-    if (params.aligner in [ 'cellranger', 'cellrangerarc' ])
+    if (params.aligner in [ 'cellranger', 'cellrangerarc' ] && input_type != 'emptydrops')
     """
     # convert file types
     mtx_to_h5ad.py \\
@@ -79,7 +104,7 @@ process MTX_TO_H5AD {
         --feature $features_tsv \\
         --txp2gene ${txp2gene} \\
         --star_index ${star_index} \\
-        --out ${meta.id}/${meta.id}_matrix.h5ad
+        --out ${meta.id}/${meta.id}_${input_type}_matrix.h5ad
     """
 
     stub:

@@ -35,7 +35,7 @@ workflow MTX_CONVERSION {
         // Concat sample-specific h5ad in one
         //
         CONCAT_H5AD (
-            MTX_TO_H5AD.out.h5ad.collect(), // gather all sample-specific files
+            MTX_TO_H5AD.out.h5ad.groupTuple(), // gather all sample-specific files / per type
             samplesheet
         )
 
@@ -51,6 +51,6 @@ workflow MTX_CONVERSION {
 
     emit:
     ch_versions
-    counts = MTX_TO_H5AD.out.counts
+    // counts = MTX_TO_H5AD.out.counts  was this ever used?
 
 }

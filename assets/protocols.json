@@ -30,6 +30,11 @@
             "protocol": "SC3Pv3"
         }
     },
+    "cellrangerarc": {
+        "auto": {
+            "protocol": "auto"
+        }
+    },
     "star": {
         "10XV1": {
             "protocol": "CB_UMI_Simple",

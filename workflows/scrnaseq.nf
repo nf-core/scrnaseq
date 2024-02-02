@@ -184,7 +184,7 @@ workflow SCRNASEQ {
             protocol_config.get('extra_args', ""),
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.star_counts)
+        ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.raw_counts, STARSOLO.out.filtered_counts)
         ch_star_index = STARSOLO.out.star_index
         ch_multiqc_star = STARSOLO.out.for_multiqc
     }
@@ -235,17 +235,17 @@ workflow SCRNASEQ {
 
     // Run emptydrops calling module
     if ( !params.skip_emptydrops ) {
-        // emptydrops should only run on the raw matrices thus, filter-out the filtered results
-        // of the aligners that can produce it
-        if ( params.aligner == "cellranger" ) {
+
+        //
+        // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
+        //
+        if ( params.aligner in [ 'cellranger', 'cellrangerarc', 'kallisto', 'star' ] ) {
             ch_mtx_matrices_for_emptydrops =
-                ch_mtx_matrices.map { meta, mtx_files ->
-                    [ meta, mtx_files.findAll { it.toString().contains("raw_feature_bc_matrix") } ]
-                }
-                .filter { meta, mtx_files -> mtx_files }
-        } else if (params.aligner == 'kallisto') {
-            ch_mtx_matrices_for_emptydrops =
-                ch_mtx_matrices.filter { meta, mtx_files -> mtx_files.toUriString().contains("counts_unfiltered") }
+                ch_mtx_matrices.filter { meta, mtx_files ->
+                mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
+                mtx_files.toUriString().contains("counts_unfiltered")  || // kallisto
+                mtx_files.toUriString().contains("raw")                   // star
+            }
         } else {
             ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
         }

@@ -56,7 +56,7 @@ process MTX_TO_H5AD {
 
     } else if (params.aligner == 'star') {
 
-        mtx_dir      = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "*.Solo.out/Gene*/${input_type}"
+        mtx_dir      = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "${input_type}"
         suffix       = (input_type == 'custom_emptydrops_filter') ? '' : '.gz'
         mtx_matrix   = "${mtx_dir}/matrix.mtx${suffix}"
         barcodes_tsv = "${mtx_dir}/barcodes.tsv${suffix}"

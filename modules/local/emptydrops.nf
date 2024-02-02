@@ -39,9 +39,9 @@ process EMPTYDROPS_CELL_CALLING {
 
     } else if (params.aligner == 'star') {
 
-        matrix   = "*.Solo.out/Gene*/raw/matrix.mtx.gz"
-        barcodes = "*.Solo.out/Gene*/raw/barcodes.tsv.gz"
-        features = "*.Solo.out/Gene*/raw/features.tsv.gz"
+        matrix   = "raw/matrix.mtx.gz"
+        barcodes = "raw/barcodes.tsv.gz"
+        features = "raw/features.tsv.gz"
 
     }
 

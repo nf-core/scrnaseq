@@ -22,10 +22,13 @@ process MTX_TO_H5AD {
     task.ext.when == null || task.ext.when
 
     script:
+    // Get a file to check input type. Some aligners bring arrays instead of a single file.
+    def input_to_check = (inputs instanceof String) ? inputs : inputs[0]
+
     // check input type of inputs
-    input_type = (inputs.toUriString().contains('unfiltered') || inputs.toUriString().contains('raw')) ? 'raw' : 'filtered'
+    input_type = (input_to_check.toUriString().contains('unfiltered') || input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
     if ( params.aligner == 'alevin' ) { input_type = 'raw' } // alevin has its own filtering methods and mostly output a single mtx, raw here means, the base tool output
-    if (inputs.toUriString().contains('emptydrops')) { input_type = 'custom_emptydrops_filter' }
+    if (input_to_check.toUriString().contains('emptydrops')) { input_type = 'custom_emptydrops_filter' }
 
     // def file paths for aligners. Cellranger is normally converted with the .h5 files
     // However, the emptydrops call, always generate .mtx files, thus, cellranger 'emptydrops' required a parsing
@@ -72,9 +75,9 @@ process MTX_TO_H5AD {
     # convert file types
     mtx_to_h5ad.py \\
         --aligner cellranger \\
-        --input filtered_feature_bc_matrix.h5 \\
+        --input ${input_type}_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
-        --out ${meta.id}/${meta.id}_matrix.h5ad
+        --out ${meta.id}/${meta.id}_${input_type}_matrix.h5ad
     """
 
     else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')

@@ -32,9 +32,13 @@ def _mtx_to_adata(
     aligner: str,
 ):
     adata = sc.read_mtx(mtx_file)
-    if (
-        aligner == "star"
-    ):  # for some reason star matrix comes transposed and doesn't fit when values are appended directly
+    # for some reason star matrix comes transposed and doesn't fit when values are appended directly
+    # also true for cellranger files ( this is only used when running with the custom emptydrops_filtered files )
+    # otherwise, it uses the cellranger .h5 files
+    if aligner in [
+        "cellranger",
+        "star",
+    ]:
         adata = adata.transpose()
 
     adata.obs_names = pd.read_csv(barcode_file, header=None, sep="\t")[0].values

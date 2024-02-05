@@ -21,9 +21,9 @@ process EMPTYDROPS_CELL_CALLING {
     script:
     if (params.aligner == "cellranger") {
 
-        matrix   = "raw_feature_bc_matrix/matrix.mtx.gz"
-        barcodes = "raw_feature_bc_matrix/barcodes.tsv.gz"
-        features = "raw_feature_bc_matrix/features.tsv.gz"
+        matrix   = "matrix.mtx.gz"
+        barcodes = "barcodes.tsv.gz"
+        features = "features.tsv.gz"
 
     } else if (params.aligner == "kallisto") {
 

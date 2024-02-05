@@ -20,11 +20,15 @@ process MTX_TO_SEURAT {
     script:
     def aligner = params.aligner
 
+
+    // Get a file to check input type. Some aligners bring arrays instead of a single file.
+    def input_to_check = (inputs instanceof String) ? inputs : inputs[0]
+
     // check input type of inputs
     def is_emptydrops = '0'
-    input_type = (inputs.toUriString().contains('unfiltered') || inputs.toUriString().contains('raw')) ? 'raw' : 'filtered'
+    input_type = (input_to_check.toUriString().contains('unfiltered') || input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
     if ( params.aligner == 'alevin' ) { input_type = 'raw' } // alevin has its own filtering methods and mostly output a single mtx, raw here means, the base tool output
-    if (inputs.toUriString().contains('emptydrops')) {
+    if (input_to_check.toUriString().contains('emptydrops')) {
         input_type = 'custom_emptydrops_filter'
         is_emptydrops = '--is_emptydrops'
     }
@@ -33,10 +37,10 @@ process MTX_TO_SEURAT {
     // However, the emptydrops call, always generate .mtx files, thus, cellranger 'emptydrops' required a parsing
     if (params.aligner in [ 'cellranger', 'cellrangerarc' ]) {
 
-        mtx_dir  = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "${input_type}_feature_bc_matrix"
-        matrix   = "${mtx_dir}/matrix.mtx*"
-        barcodes = "${mtx_dir}/barcodes.tsv*"
-        features = "${mtx_dir}/features.tsv*"
+        mtx_dir  = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered/' : ''
+        matrix   = "${mtx_dir}matrix.mtx*"
+        barcodes = "${mtx_dir}barcodes.tsv*"
+        features = "${mtx_dir}features.tsv*"
 
     } else if (params.aligner == 'kallisto') {
 

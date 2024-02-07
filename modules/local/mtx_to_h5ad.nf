@@ -80,16 +80,16 @@ process MTX_TO_H5AD {
         --out ${meta.id}/${meta.id}_${input_type}_matrix.h5ad
     """
 
-    else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
+    else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard' && input_type != 'custom_emptydrops_filter')
     """
     # convert file types
     for input_type in spliced unspliced ; do
         mtx_to_h5ad.py \\
             --aligner ${params.aligner} \\
             --sample ${meta.id} \\
-            --input *count/counts_unfiltered/\${input_type}.mtx \\
-            --barcode *count/counts_unfiltered/\${input_type}.barcodes.txt \\
-            --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
+            --input ${mtx_dir}/\${input_type}.mtx \\
+            --barcode ${mtx_dir}/\${input_type}.barcodes.txt \\
+            --feature ${mtx_dir}/\${input_type}.genes.txt \\
             --txp2gene ${txp2gene} \\
             --star_index ${star_index} \\
             --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;

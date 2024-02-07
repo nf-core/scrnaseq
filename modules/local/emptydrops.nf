@@ -54,9 +54,9 @@ process EMPTYDROPS_CELL_CALLING {
     # convert file types
     for splice_type in spliced unspliced ; do
         emptydrops_cell_calling.R \\
-            *count/counts_unfiltered/\${splice_type}.mtx \\
-            *count/counts_unfiltered/\${splice_type}.barcodes.txt \\
-            *count/counts_unfiltered/\${splice_type}.genes.txt \\
+            counts_unfiltered/\${splice_type}.mtx \\
+            counts_unfiltered/\${splice_type}.barcodes.txt \\
+            counts_unfiltered/\${splice_type}.genes.txt \\
             emptydrops_filtered \\
             ${params.aligner} \\
             0

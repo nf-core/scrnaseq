@@ -74,14 +74,14 @@ process MTX_TO_SEURAT {
     mkdir ${meta.id}
     """
 
-    if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
+    if (params.aligner == 'kallisto' && params.kb_workflow != 'standard' && input_type != 'custom_emptydrops_filter')
     """
     # convert file types
     for input_type in spliced unspliced ; do
         mtx_to_seurat.R \\
-            *count/counts_unfiltered/\${input_type}.mtx \\
-            *count/counts_unfiltered/\${input_type}.barcodes.txt \\
-            *count/counts_unfiltered/\${input_type}.genes.txt \\
+            ${mtx_dir}/\${input_type}.mtx \\
+            ${mtx_dir}/\${input_type}.barcodes.txt \\
+            ${mtx_dir}/\${input_type}.genes.txt \\
             ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
             ${aligner} \\
             ${is_emptydrops}

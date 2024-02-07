@@ -26,8 +26,15 @@ workflow MTX_CONVERSION {
         //
         // Concat sample-specific h5ad in one
         //
+        ch_concat_h5ad_input = MTX_TO_H5AD.out.h5ad.groupTuple() // gather all sample-specific files / per type
+        if (params.aligner == 'kallisto' && params.kb_workflow != 'standard') {
+            // when having spliced / unspliced matrices, the collected tuple has two levels ( [[mtx_1, mtx_2]] )
+            // which nextflow break because it is not a valid 'path' thus, we have to remove one level
+            // making it as [ mtx_1, mtx_2 ]
+            ch_concat_h5ad_input = ch_concat_h5ad_input.map{ type, matrices -> [ type, matrices.flatten().toList() ] }
+        }
         CONCAT_H5AD (
-            MTX_TO_H5AD.out.h5ad.groupTuple(), // gather all sample-specific files / per type
+            ch_concat_h5ad_input,
             samplesheet
         )
 

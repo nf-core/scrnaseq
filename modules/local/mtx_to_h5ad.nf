@@ -80,7 +80,7 @@ process MTX_TO_H5AD {
         --out ${meta.id}/${meta.id}_${input_type}_matrix.h5ad
     """
 
-    else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard' && input_type != 'custom_emptydrops_filter')
+    else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
     for input_type in spliced unspliced ; do

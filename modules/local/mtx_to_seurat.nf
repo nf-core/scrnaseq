@@ -74,7 +74,7 @@ process MTX_TO_SEURAT {
     mkdir ${meta.id}
     """
 
-    if (params.aligner == 'kallisto' && params.kb_workflow != 'standard' && input_type != 'custom_emptydrops_filter')
+    if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
     for input_type in spliced unspliced ; do

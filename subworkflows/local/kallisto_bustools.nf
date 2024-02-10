@@ -34,7 +34,7 @@ workflow KALLISTO_BUSTOOLS {
     if (!txp2gene && kallisto_index) {
         GENE_MAP( gtf )
         txp2gene = GENE_MAP.out.gene_map
-        ch_versions = ch_versions.mix(GENE_MAP.out.versions)
+        /* --    ch_versions = ch_versions.mix(GENE_MAP.out.versions)    -- */
     }
 
     /*

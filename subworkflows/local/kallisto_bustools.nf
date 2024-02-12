@@ -13,6 +13,8 @@ workflow KALLISTO_BUSTOOLS {
     gtf
     kallisto_index
     txp2gene
+    t1c
+    t2c
     protocol
     kb_workflow
     ch_fastq

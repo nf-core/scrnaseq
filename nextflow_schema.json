@@ -213,6 +213,16 @@
                     "description": "Specify a path to the precomputed Kallisto index.",
                     "fa_icon": "fas fa-fish"
                 },
+                "kb_t1c": {
+                    "type": "string",
+                    "description": "Specify a path to the cDNA transcripts-to-capture.",
+                    "fa_icon": "fas fa-fish"
+                },
+                "kb_t2c": {
+                    "type": "string",
+                    "description": "Specify a path to the intron transcripts-to-capture.",
+                    "fa_icon": "fas fa-fish"
+                },
                 "kb_workflow": {
                     "type": "string",
                     "default": "standard",

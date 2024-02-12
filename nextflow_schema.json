@@ -201,7 +201,7 @@
             "type": "object",
             "description": "Params related to Kallisto/BUS tool",
             "default": "",
-            "fa_icon": "fas fa-fish",
+            "fa_icon": "fas fa-rainbow",
             "properties": {
                 "kallisto_index": {
                     "type": "string",

@@ -1,5 +1,4 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { GENE_MAP }                          from '../../modules/local/gene_map'
 include {KALLISTOBUSTOOLS_COUNT }             from '../../modules/nf-core/kallistobustools/count/main'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
@@ -21,26 +20,13 @@ workflow KALLISTO_BUSTOOLS {
     main:
     ch_versions = Channel.empty()
 
-    assert kallisto_index || (genome_fasta && gtf):
+    assert (txp2gene && kallisto_index) || (genome_fasta && gtf):
         "Must provide a genome fasta file ('--fasta') and a gtf file ('--gtf') if no index is given!"
 
-    assert txp2gene || gtf:
-        "Must provide either a GTF file ('--gtf') or kallisto gene map ('--kallisto_gene_map') to align with kallisto bustools!"
-
     /*
-    * Generate Kallisto Gene Map if not supplied and index is given
-    * If no index is given, the gene map will be generated in the 'kb ref' step
+    * Generate kallisto index and t2g if not already present
     */
-    if (!txp2gene && kallisto_index) {
-        GENE_MAP( gtf )
-        txp2gene = GENE_MAP.out.gene_map
-        /* --    ch_versions = ch_versions.mix(GENE_MAP.out.versions)    -- */
-    }
-
-    /*
-    * Generate kallisto index
-    */
-    if (!kallisto_index) {
+    if (!(txp2gene && kallisto_index)) {
         KALLISTOBUSTOOLS_REF( genome_fasta, gtf, kb_workflow )
         txp2gene = KALLISTOBUSTOOLS_REF.out.t2g.collect()
         kallisto_index = KALLISTOBUSTOOLS_REF.out.index.collect()

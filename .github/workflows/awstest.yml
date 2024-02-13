@@ -28,12 +28,8 @@ jobs:
               "aligner": "${{ matrix.aligner }}"
             }
           profiles: test
-<<<<<<< HEAD
 
       - uses: actions/upload-artifact@v4
-=======
-      - uses: actions/upload-artifact@v3
->>>>>>> dev
         with:
           name: Tower debug log file
           path: |

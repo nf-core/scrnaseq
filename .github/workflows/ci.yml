@@ -68,7 +68,7 @@ jobs:
 
       - name: Run nf-test
         run: |
-          "nf-test test tests/main_pipeline_${{ matrix.profile }}.test --junitxml=test.xml"
+          nf-test test tests/main_pipeline_${{ matrix.profile }}.test --junitxml=test.xml
 
       - name: Output log on failure
         if: failure()

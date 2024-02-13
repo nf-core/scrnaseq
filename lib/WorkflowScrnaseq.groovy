@@ -4,6 +4,8 @@
 
 import nextflow.Nextflow
 import groovy.text.SimpleTemplateEngine
+import groovy.json.JsonSlurper
+
 
 class WorkflowScrnaseq {
 
@@ -11,9 +13,11 @@ class WorkflowScrnaseq {
     // Check and validate parameters
     //
     public static void initialise(params, log) {
+        genomeExists(params, log)
 
-        genomeExistsError(params, log)
-
+        if (!params.input) {
+            Nextflow.error "Please provide an input samplesheet with --input"
+        }
 
         if (!params.fasta) {
             Nextflow.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
@@ -33,16 +37,16 @@ class WorkflowScrnaseq {
                 for (param in group_params.keySet()) {
                     summary_section += "        <dt>$param</dt><dd><samp>${group_params.get(param) ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>\n"
                 }
-                summary_section += "    </dl>\n"
+                summary_section += '    </dl>\n'
             }
         }
 
-        String yaml_file_text  = "id: '${workflow.manifest.name.replace('/','-')}-summary'\n"
+        String yaml_file_text  = "id: '${workflow.manifest.name.replace('/', '-')}-summary'\n"
         yaml_file_text        += "description: ' - this information is collected when the pipeline is started.'\n"
         yaml_file_text        += "section_name: '${workflow.manifest.name} Workflow Summary'\n"
         yaml_file_text        += "section_href: 'https://github.com/${workflow.manifest.name}'\n"
         yaml_file_text        += "plot_type: 'html'\n"
-        yaml_file_text        += "data: |\n"
+        yaml_file_text        += 'data: |\n'
         yaml_file_text        += "${summary_section}"
         return yaml_file_text
     }
@@ -53,7 +57,7 @@ class WorkflowScrnaseq {
 
     public static String toolCitationText(params) {
 
-        // TODO nf-core: Optionally add in-text citation tools to this list.
+        // TODO: Optionally add in-text citation tools to this list.
         // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "Tool (Foo et al. 2023)" : "",
         // Uncomment function in methodsDescriptionText to render in MultiQC report
         def citation_text = [
@@ -108,8 +112,7 @@ class WorkflowScrnaseq {
 
     //
     // Exit pipeline if incorrect --genome key provided
-    //
-    private static void genomeExistsError(params, log) {
+    static void genomeExists(params, log) {
         if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
             def error_string = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" +
                 "  Genome '${params.genome}' not found in any config files provided to the pipeline.\n" +
@@ -119,4 +122,22 @@ class WorkflowScrnaseq {
             Nextflow.error(error_string)
         }
     }
+
+    //
+    // Retrieve the aligner-specific protocol based on the specified protocol.
+    // Returns a map ["protocol": protocol, "extra_args": <extra args>, "whitelist": <path to whitelist>]
+    // extra_args and whitelist are optional.
+    public static Map getProtocol(workflow, log, aligner, protocol) {
+        def jsonSlurper = new JsonSlurper()
+        def json = new File("${workflow.projectDir}/assets/protocols.json").text
+        def protocols = jsonSlurper.parseText(json)
+        def aligner_map = protocols[aligner]
+        if(aligner_map.containsKey(protocol)) {
+            return aligner_map[protocol]
+        } else {
+            log.warn("Protocol '${protocol}' not recognized by the pipeline. Passing on the protocol to the aligner unmodified.")
+            return ["protocol": protocol]
+        }
+    }
+
 }

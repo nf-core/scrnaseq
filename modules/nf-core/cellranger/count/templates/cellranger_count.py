@@ -66,11 +66,13 @@ for i, (r1, r2) in enumerate(chunk_iter(fastqs, 2)):
     r1.rename(fastq_all / f"{sample_id}_S1_L{i:03d}_R1_001.fastq.gz")
     r2.rename(fastq_all / f"{sample_id}_S1_L{i:03d}_R2_001.fastq.gz")
 
+# FIXME: Add toggle for introns based on sc vs snRNA
 run(
     # fmt: off
     [
         "cellranger", "count",
         "--id", "${prefix}",
+        '--include-introns', 'false',
         "--fastqs", str(fastq_all),
         "--transcriptome", "${reference.name}",
         "--localcores", "${task.cpus}",

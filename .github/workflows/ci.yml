@@ -25,7 +25,7 @@ concurrency:
 jobs:
   test:
     name: ${{ matrix.profile }} NF ${{ matrix.NXF_VER }}
-    needs: [changes, define_nxf_versions]
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/scrnaseq') }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

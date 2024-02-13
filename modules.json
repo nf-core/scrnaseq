@@ -7,12 +7,12 @@
                 "nf-core": {
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
@@ -22,12 +22,12 @@
                     },
                     "cellrangerarc/count": {
                         "branch": "master",
-                        "git_sha": "4196b1b2e7ce265892f3979eabf7a9ddc030702f",
+                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
                         "installed_by": ["modules"]
                     },
                     "cellrangerarc/mkgtf": {
                         "branch": "master",
-                        "git_sha": "4196b1b2e7ce265892f3979eabf7a9ddc030702f",
+                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
                         "installed_by": ["modules"]
                     },
                     "cellrangerarc/mkref": {
@@ -42,12 +42,12 @@
                     },
                     "fastqc": {
                         "branch": "master",
-                        "git_sha": "617777a807a1770f73deb38c80004bac06807eef",
+                        "git_sha": "f4ae1d942bd50c5c0b9bd2de1393ce38315ba57c",
                         "installed_by": ["modules"]
                     },
                     "gffread": {
                         "branch": "master",
-                        "git_sha": "b8858b10356b87db4325341872816f9672541b7b",
+                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
                         "installed_by": ["modules"]
                     },
                     "gunzip": {
@@ -67,12 +67,12 @@
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "8ec825f465b9c17f9d83000022995b4f7de6fe93",
+                        "git_sha": "9e71d8519dfbfc328c078bba14d4bd4c99e39a94",
                         "installed_by": ["modules"]
                     },
                     "star/genomegenerate": {
                         "branch": "master",
-                        "git_sha": "d87a6e2156c2099c09280fa70776eaf0a824817a",
+                        "git_sha": "a21faa6a3481af92a343a10926f59c189a2c16c9",
                         "installed_by": ["modules"]
                     },
                     "universc": {

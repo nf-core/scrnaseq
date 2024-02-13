@@ -138,7 +138,12 @@
                     "default": "s3://ngi-igenomes/igenomes",
                     "fa_icon": "fas fa-cloud-download-alt",
                     "hidden": true
-                }
+                },
+                "txp2gene": {
+                    "type": "string",
+                    "description": "Kallisto or Alevin gene mapping file.",
+                    "fa_icon": "fas map-marked-alt"
+                },
             }
         },
         "alevin_options": {
@@ -151,12 +156,6 @@
                     "type": "string",
                     "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
                     "fa_icon": "fas fa-fish"
-                },
-                "txp2gene": {
-                    "type": "string",
-                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
-                    "help_text": "> This is the same as the `kallisto_gene_map` parameter below.",
-                    "fa_icon": "fas fa-map-marked-alt"
                 },
                 "simpleaf_rlen": {
                     "type": "integer",
@@ -206,11 +205,6 @@
                 "kallisto_index": {
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",
-                    "fa_icon": "fas fa-rainbow"
-                },
-                "txp2gene": {
-                    "type": "string",
-                    "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
                     "fa_icon": "fas fa-rainbow"
                 },
                 "kb_t1c": {

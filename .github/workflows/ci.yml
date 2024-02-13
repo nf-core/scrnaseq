@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   test:
-    name: ${{ matrix.profile }} NF ${{ matrix.NXF_VER }}
+    name: "aligner: ${{ matrix.profile }} ; NF: ${{ matrix.NXF_VER }}"
     if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/scrnaseq') }}"
     runs-on: ubuntu-latest
     strategy:
@@ -33,13 +33,7 @@ jobs:
         NXF_VER:
           - "23.04.0"
           - "latest-everything"
-        profile:
-          [
-            "tests/main_pipeline_alevin.test",
-            "tests/main_pipeline_cellranger.test",
-            "tests/main_pipeline_kallisto.test",
-            "tests/main_pipeline_star.test",
-          ]
+        profile: ["alevin", "cellranger", "kallisto", "star"]
 
     steps:
       - name: Free some space
@@ -74,7 +68,7 @@ jobs:
 
       - name: Run nf-test
         run: |
-          nf-test test "${{ matrix.profile }}" --junitxml=test.xml
+          nf-test test tests/main_pipeline_"${{ matrix.profile }}".test --junitxml=test.xml
 
       - name: Output log on failure
         if: failure()

@@ -24,30 +24,25 @@ nextflow_pipeline {
             // General assertions
             //
 
-                // Did it finish successfully?
-                assert workflow.success
+            // Did it finish successfully?
+            assert workflow.success
 
-                // How many tasks were executed?
-                assert workflow.trace.tasks().size() == 16
+            // How many tasks were executed?
+            assert workflow.trace.tasks().size() == 16
 
-                // How many results were produced?
-                assert path("${outputDir}/results_alevin").list().size() == 5
-                assert path("${outputDir}/results_alevin/alevin").list().size() == 4
-                assert path("${outputDir}/results_alevin/alevin/mtx_conversions").list().size() == 4
-                assert path("${outputDir}/results_alevin/alevinqc").list().size() == 2
-                assert path("${outputDir}/results_alevin/fastqc").list().size() == 12
-                assert path("${outputDir}/results_alevin/multiqc").list().size() == 3
+            // How many results were produced?
+            assert path("${outputDir}/results_alevin").list().size() == 5
+            assert path("${outputDir}/results_alevin/alevin").list().size() == 4
+            assert path("${outputDir}/results_alevin/alevin/mtx_conversions").list().size() == 4
+            assert path("${outputDir}/results_alevin/alevinqc").list().size() == 2
+            assert path("${outputDir}/results_alevin/fastqc").list().size() == 12
+            assert path("${outputDir}/results_alevin/multiqc").list().size() == 3
 
             //
             // Check if files were produced
             //
-            assert new File( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat_cols.txt" ).exists()
-            assert new File( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat.mtx" ).exists()
-            assert new File( "${outputDir}/results_alevin/alevin/Sample_X_alevin_results/af_quant/alevin/quants_mat_rows.txt" ).exists()
-
-            assert new File( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat_cols.txt" ).exists()
-            assert new File( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat.mtx" ).exists()
-            assert new File( "${outputDir}/results_alevin/alevin/Sample_Y_alevin_results/af_quant/alevin/quants_mat_rows.txt" ).exists()
+            assert new File( "${outputDir}/results_alevin/alevin/mtx_conversions/Sample_X/Sample_X_matrix.h5ad" ).exists()
+            assert new File( "${outputDir}/results_alevin/alevin/mtx_conversions/Sample_Y/Sample_Y_matrix.h5ad" ).exists()
 
             //
             // Check if files are the same

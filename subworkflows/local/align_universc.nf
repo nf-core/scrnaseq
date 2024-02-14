@@ -34,11 +34,13 @@ workflow UNIVERSC_ALIGN {
 
         // Obtain read counts
         UNIVERSC (
-            ch_fastq.map{ meta, reads -> [
-                // defaults
-                ["samples": [meta.id], "technology": universc_technology, "chemistry": "auto", "single_end": false, "strandedness": "forward"] + meta, // + meta overrides defaults with information already in meta
-                 reads
-            ] },
+            ch_fastq.map{
+                meta, reads -> [
+                    // defaults
+                    ["samples": [meta.id], "technology": universc_technology, "chemistry": "auto", "single_end": false, "strandedness": "forward"] + meta, // + meta overrides defaults with information already in meta
+                    reads
+                ]
+            },
             universc_index
         )
         ch_versions = ch_versions.mix(UNIVERSC.out.versions)

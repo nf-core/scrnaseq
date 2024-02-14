@@ -26,9 +26,13 @@
             "cells_x_genes.barcodes.txt:md5,488437e1f5477243697efb93366e5676",
             "cells_x_genes.genes.txt:md5,acd9d00120f52031974b2add3e7521b6",
             "cells_x_genes.mtx:md5,af90e05b404490f6cb133ab7f62949f8",
-            "Sample_X_matrix.rds:md5,f0e43f69403f4b2e7704065421592ad0",
-            "Sample_Y_matrix.rds:md5,61809156e64dbdaf254cbc1c3456588e"
+            "Sample_X_raw_matrix.rds:md5,f0e43f69403f4b2e7704065421592ad0",
+            "Sample_Y_raw_matrix.rds:md5,61809156e64dbdaf254cbc1c3456588e"
         ],
-        "timestamp": "2024-01-23T12:19:47.921508953"
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.10.1"
+        },
+        "timestamp": "2024-02-14T16:04:36.951736171"
     }
 }

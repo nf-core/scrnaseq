@@ -44,8 +44,8 @@ nextflow_pipeline {
                 //
                 // Check if files were produced
                 //
-                {assert new File( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_matrix.h5ad" ).exists()},
-                {assert new File( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.h5ad" ).exists()},
 
                 //
                 // Check if files are the same
@@ -58,8 +58,8 @@ nextflow_pipeline {
                     path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.barcodes.txt" ),
                     path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.genes.txt" ),
                     path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.mtx" ),
-                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_matrix.rds" ),
-                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_matrix.rds" )
+                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_raw_matrix.rds" ),
+                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.rds" )
                 ).match()}
 
             ) // end of assertAll()

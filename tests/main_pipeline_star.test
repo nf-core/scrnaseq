@@ -30,20 +30,22 @@ nextflow_pipeline {
                 {assert workflow.success},
 
                 // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 14},
+                {assert workflow.trace.tasks().size() == 19},
 
                 // How many results were produced?
                 {assert path("${outputDir}/results_star").list().size() == 4},
                 {assert path("${outputDir}/results_star/star").list().size() == 3},
-                {assert path("${outputDir}/results_star/star/mtx_conversions").list().size() == 4},
+                {assert path("${outputDir}/results_star/star/mtx_conversions").list().size() == 5},
                 {assert path("${outputDir}/results_star/fastqc").list().size() == 12},
                 {assert path("${outputDir}/results_star/multiqc").list().size() == 3},
 
                 //
                 // Check if files were produced
                 //
-                {assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_matrix.h5ad" ).exists()},
-                {assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.h5ad" ).exists()},
 
                 //
                 // Check if files are the same
@@ -55,15 +57,15 @@ nextflow_pipeline {
                     path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/matrix.mtx.gz"   ),
                     path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/features.tsv.gz" ),
                     path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/barcodes.tsv.gz" ),
-                    // path( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_matrix.h5ad" ), // does not match
-                    path( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_matrix.rds"  ),
                     path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.SJ.out.tab"                             ),
                     path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Barcodes.stats"                ),
                     path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/matrix.mtx.gz"   ),
                     path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/features.tsv.gz" ),
                     path( "${outputDir}/results_star/star/Sample_Y/Sample_Y.Solo.out/Gene/filtered/barcodes.tsv.gz" ),
-                    // path( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_matrix.h5ad" ), // does not match
-                    path( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_matrix.rds"  ),
+                    path( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_raw_matrix.rds"  ),
+                    path( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.rds"  ),
+                    path( "${outputDir}/results_star/star/mtx_conversions/Sample_X/Sample_X_filtered_matrix.rds"  ),
+                    path( "${outputDir}/results_star/star/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.rds"  ),
                 ).match()}
 
             ) // end of assertAll()

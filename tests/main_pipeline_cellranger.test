@@ -30,12 +30,12 @@ nextflow_pipeline {
                 {assert workflow.success},
 
                 // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 15},
+                {assert workflow.trace.tasks().size() == 20},
 
                 // How many results were produced?
                 {assert path("${outputDir}/results_cellranger").list().size() == 4},
                 {assert path("${outputDir}/results_cellranger/cellranger").list().size() == 4},
-                {assert path("${outputDir}/results_cellranger/cellranger/mtx_conversions").list().size() == 4},
+                {assert path("${outputDir}/results_cellranger/cellranger/mtx_conversions").list().size() == 5},
                 {assert path("${outputDir}/results_cellranger/cellranger/count").list().size() == 3},
                 {assert path("${outputDir}/results_cellranger/fastqc").list().size() == 12},
                 {assert path("${outputDir}/results_cellranger/multiqc").list().size() == 3},
@@ -43,8 +43,10 @@ nextflow_pipeline {
                 //
                 // Check if files were produced
                 //
-                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_matrix.h5ad" ).exists()},
-                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.h5ad" ).exists()},
 
                 //
                 // Check if files are the same
@@ -63,8 +65,10 @@ nextflow_pipeline {
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/barcodes.tsv.gz" ),
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/features.tsv.gz" ),
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/matrix.mtx.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_matrix.rds" ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_matrix.rds" )
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_raw_matrix.rds" ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.rds" ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_filtered_matrix.rds" ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.rds" )
                 ).match()}
 
             ) // end of assertAll()

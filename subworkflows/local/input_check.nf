@@ -24,11 +24,11 @@ workflow INPUT_CHECK {
 
     if (params.aligner == 'cellrangerarc' ) {
         grouped_ch
-        .map { meta, sample_type, sub_sample, reads -> [ meta, sample_type.flatten(), sub_sample.flatten(), reads.flatten() ] } 
+        .map { meta, sample_type, sub_sample, reads -> [ meta, sample_type.flatten(), sub_sample.flatten(), reads.flatten() ] }
         .set { reads }
     } else {
         grouped_ch
-        .map { meta, reads -> [ meta, reads.flatten() ] } 
+        .map { meta, reads -> [ meta, reads.flatten() ] }
         .set { reads }
     }
 

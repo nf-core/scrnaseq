@@ -43,9 +43,11 @@ include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN   } from '../subworkflows/local/alevin'
 include { STARSOLO          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN  } from "../subworkflows/local/align_cellranger"
+include { CELLRANGERARC_ALIGN  } from "../subworkflows/local/align_cellrangerarc"
 include { UNIVERSC_ALIGN    } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION    } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER   } from '../modules/local/gtf_gene_filter'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -68,21 +70,26 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 // TODO: Are this channels still necessary?
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
-(protocol, chemistry, other_parameters) = WorkflowScrnaseq.formatProtocol(params.protocol, params.aligner)
+protocol_config = WorkflowScrnaseq.getProtocol(workflow, log, params.aligner, params.protocol)
+if (protocol_config['protocol'] == 'auto' && params.aligner != "cellranger") {
+    error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
+}
 
 // general input and params
 ch_input = file(params.input)
 ch_genome_fasta = Channel.value(params.fasta ? file(params.fasta) : [])
 ch_gtf = params.gtf ? file(params.gtf) : []
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
+ch_motifs = params.motifs ? file(params.motifs) : []
+ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = Channel.empty()
 ch_multiqc_star = Channel.empty()
 ch_multiqc_cellranger = Channel.empty()
 if (params.barcode_whitelist) {
     ch_barcode_whitelist = file(params.barcode_whitelist)
-} else if (params.protocol.contains("10X")) {
-    ch_barcode_whitelist = file("$baseDir/assets/whitelist/10x_${chemistry}_barcode_whitelist.txt.gz", checkIfExists: true)
+} else if (protocol_config.containsKey("whitelist")) {
+    ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}")
 } else {
     ch_barcode_whitelist = []
 }
@@ -137,8 +144,7 @@ workflow SCRNASEQ {
             ch_filter_gtf,
             ch_kallisto_index,
             ch_txp2gene,
-            protocol,
-            chemistry,
+            protocol_config['protocol'],
             kb_workflow,
             ch_fastq
         )
@@ -156,8 +162,7 @@ workflow SCRNASEQ {
             ch_salmon_index,
             ch_txp2gene,
             ch_barcode_whitelist,
-            protocol,
-            chemistry,
+            protocol_config['protocol'],
             ch_fastq
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
@@ -171,11 +176,11 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_star_index,
-            protocol,
+            protocol_config['protocol'],
             ch_barcode_whitelist,
             ch_fastq,
             star_feature,
-            other_parameters
+            protocol_config.get('extra_args', ""),
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.star_counts)
@@ -189,7 +194,8 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_cellranger_index,
-            ch_fastq
+            ch_fastq,
+            protocol_config['protocol']
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
@@ -205,11 +211,25 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_universc_index,
-            params.universc_technology,
+            protocol_config['protocol'],
             ch_fastq
         )
         ch_versions = ch_versions.mix(UNIVERSC_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
+    }
+
+    // Run cellranger pipeline
+    if (params.aligner == "cellrangerarc") {
+        CELLRANGERARC_ALIGN(
+            ch_genome_fasta,
+            ch_filter_gtf,
+            ch_motifs,
+            ch_cellranger_index,
+            ch_fastq,
+            ch_cellrangerarc_config
+        )
+        ch_versions = ch_versions.mix(CELLRANGERARC_ALIGN.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)
     }
 
     // Run mtx to h5ad conversion subworkflow

@@ -53,6 +53,7 @@ process SIMPLEAF_QUANT {
     """
     # export required var
     export ALEVIN_FRY_HOME=.
+    export NUMBA_CACHE_DIR=.
 
     # prep simpleaf
     simpleaf set-paths
@@ -66,7 +67,7 @@ process SIMPLEAF_QUANT {
         -o ${prefix}_alevin_results \\
         -m $txp2gene \\
         -t $task.cpus \\
-        -c $protocol \\
+        -c "$protocol" \\
         $expect_cells \\
         $unfiltered_command \\
         $args

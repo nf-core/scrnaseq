@@ -3,6 +3,21 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.5.1
+
+- Fix that cellranger workflow couldn't be run and enable CI for this workflow ([#288](https://github.com/nf-core/scrnaseq/pull/288)).
+- Update modules ([#288]()https://github.com/nf-core/scrnaseq/pull/288).
+
+## v2.5.0 - 2024-01-02
+
+- Update template to v2.11.1 ([#279](https://github.com/nf-core/scrnaseq/pull/279))
+- Add support for paired GEX+ATAC sequencing using cellranger-arc ([#274](https://github.com/nf-core/scrnaseq/pull/274))
+- Increase default runtime limits for some processes ([#281](https://github.com/nf-core/scrnaseq/pull/281), [#284](https://github.com/nf-core/scrnaseq/pull/284))
+- Better support for custom protocols ([#273](https://github.com/nf-core/scrnaseq/pull/273)).
+  - The universc protocol is now specified via the `--protocol` flag
+  - Any protocol specified is now passed to the respective aligner
+  - Added a section to the documentation
+
 ## v2.4.1 - 2023-09-28
 
 - Fix whitelist logic for dropseq ([#267](https://github.com/nf-core/scrnaseq/pull/267))

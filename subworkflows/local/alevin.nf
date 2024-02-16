@@ -20,7 +20,6 @@ workflow SCRNASEQ_ALEVIN {
     txp2gene
     barcode_whitelist
     protocol
-    chemistry
     ch_fastq
 
 

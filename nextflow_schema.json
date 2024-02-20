@@ -1,10 +1,10 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/scrnaseq/master/nextflow_schema.json",
     "title": "nf-core/scrnaseq pipeline parameters",
     "description": "Pipeline for processing 10x Genomics single cell rnaseq data",
     "type": "object",
-    "definitions": {
+    "defs": {
         "input_output_options": {
             "title": "Input/output options",
             "type": "object",
@@ -464,43 +464,43 @@
     },
     "allOf": [
         {
-            "$ref": "#/definitions/input_output_options"
+            "$ref": "#/defs/input_output_options"
         },
         {
-            "$ref": "#/definitions/mandatory_arguments"
+            "$ref": "#/defs/mandatory_arguments"
         },
         {
-            "$ref": "#/definitions/skip_tools"
+            "$ref": "#/defs/skip_tools"
         },
         {
-            "$ref": "#/definitions/reference_genome_options"
+            "$ref": "#/defs/reference_genome_options"
         },
         {
-            "$ref": "#/definitions/alevin_options"
+            "$ref": "#/defs/alevin_options"
         },
         {
-            "$ref": "#/definitions/starsolo_options"
+            "$ref": "#/defs/starsolo_options"
         },
         {
-            "$ref": "#/definitions/kallisto_bus_options"
+            "$ref": "#/defs/kallisto_bus_options"
         },
         {
-            "$ref": "#/definitions/cellranger_options"
+            "$ref": "#/defs/cellranger_options"
         },
         {
-            "$ref": "#/definitions/cellrangerarc_options"
+            "$ref": "#/defs/cellrangerarc_options"
         },
         {
-            "$ref": "#/definitions/universc_options"
+            "$ref": "#/defs/universc_options"
         },
         {
-            "$ref": "#/definitions/institutional_config_options"
+            "$ref": "#/defs/institutional_config_options"
         },
         {
-            "$ref": "#/definitions/max_job_request_options"
+            "$ref": "#/defs/max_job_request_options"
         },
         {
-            "$ref": "#/definitions/generic_options"
+            "$ref": "#/defs/generic_options"
         }
     ]
 }

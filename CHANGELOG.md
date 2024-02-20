@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v2.6.0dev - [date]
 
 - [[#91](https://github.com/nf-core/scrnaseq/issues/91)] - Change from pytests to nf-test
+- [[](https://github.com/nf-core/scrnaseq/pull/306)] - Merged in nf-core template 2.13
 
 ## v2.5.1
 

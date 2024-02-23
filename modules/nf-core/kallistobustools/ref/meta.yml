@@ -45,19 +45,19 @@ output:
       type: file
       description: cDNA fasta file
       pattern: "*cdna.{fa}"
-  - unprocessed:
+  - intron:
       type: file
-      description: Unprocessed fasta file
-      pattern: "*unprocessed.{fa}"
+      description: Intron fasta file
+      pattern: "*intron.{fa}"
   - cdna_t2c:
       type: file
       description: cDNA transcript to capture file
       pattern: "*cdna_t2c.{txt}"
-  - unprocessed_t2c:
+  - intron_t2c:
       type: file
-      description: Unprocessed transcript to capture file
-      pattern: "*unprocessed_t2c.{txt}"
+      description: Intron transcript to capture file
+      pattern: "*intron_t2c.{txt}"
 authors:
-  - "@flowuenne" 
+  - "@flowuenne"
 maintainers:
   - "@flowuenne"

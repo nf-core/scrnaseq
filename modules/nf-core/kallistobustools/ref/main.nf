@@ -17,9 +17,9 @@ process KALLISTOBUSTOOLS_REF {
     path "kb_ref_out.idx" , emit: index
     path "t2g.txt"        , emit: t2g
     path "cdna.fa"        , emit: cdna
-    path "unprocessed.fa"      , optional:true, emit: unprocessed
+    path "intron.fa"      , optional:true, emit: intron
     path "cdna_t2c.txt"   , optional:true, emit: cdna_t2c
-    path "unprocessed_t2c.txt" , optional:true, emit: unprocessed_t2c
+    path "intron_t2c.txt" , optional:true, emit: intron_t2c
 
     when:
     task.ext.when == null || task.ext.when
@@ -49,9 +49,9 @@ process KALLISTOBUSTOOLS_REF {
             -i kb_ref_out.idx \\
             -g t2g.txt \\
             -f1 cdna.fa \\
-            -f2 unprocessed.fa \\
+            -f2 intron.fa \\
             -c1 cdna_t2c.txt \\
-            -c2 unprocessed_t2c.txt \\
+            -c2 intron_t2c.txt \\
             --workflow $workflow_mode \\
             $fasta \\
             $gtf

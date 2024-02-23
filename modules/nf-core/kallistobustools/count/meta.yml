@@ -38,8 +38,8 @@ input:
       pattern: "*.{cdna_t2c.txt}"
   - t2c:
       type: file
-      description: kb ref's c2 unprocessed_t2c file
-      pattern: "*.{unprocessed_t2c.txt}"
+      description: kb ref's c2 intron_t2c file
+      pattern: "*.{intron_t2c.txt}"
   - workflow_mode:
       type: string
       description: String value defining workflow to use, can be one of "standard", "nac", "lamanno" (obsolete)

@@ -35,7 +35,7 @@
                     },
                     "cellranger/multi": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "a03357ba56317686b6f65102415211616cd38672",
                         "installed_by": [
                             "modules"
                         ]

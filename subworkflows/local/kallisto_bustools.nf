@@ -34,7 +34,7 @@ workflow KALLISTO_BUSTOOLS {
         kallisto_index = KALLISTOBUSTOOLS_REF.out.index.collect()
         ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_REF.out.versions)
         t1c = KALLISTOBUSTOOLS_REF.out.cdna_t2c.ifEmpty{ [] }
-        t2c = KALLISTOBUSTOOLS_REF.out.unprocessed_t2c.ifEmpty{ [] }
+        t2c = KALLISTOBUSTOOLS_REF.out.intron_t2c.ifEmpty{ [] }
     }
 
     /*

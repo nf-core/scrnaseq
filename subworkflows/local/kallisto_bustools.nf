@@ -46,7 +46,8 @@ workflow KALLISTO_BUSTOOLS {
         txp2gene,
         t1c,
         t2c,
-        protocol
+        protocol,
+        kb_workflow
     )
 
     ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions)

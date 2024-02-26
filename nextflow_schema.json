@@ -503,6 +503,9 @@
         }
     ],
     "properties": {
+        "skip_cellranger_renaming": {
+            "type": "boolean"
+        },
         "cellranger_gex_index": {
             "type": "string",
             "default": null
@@ -532,6 +535,10 @@
             "default": null
         },
         "beam_antigen_csv": {
+            "type": "string",
+            "default": null
+        },
+        "beam_control_csv": {
             "type": "string",
             "default": null
         },

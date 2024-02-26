@@ -87,8 +87,9 @@ def check_samplesheet(file_in, file_out):
         ## Check header
         MIN_COLS = 2
         MIN_HEADER = ["sample", "fastq_1", "fastq_2"]
-        OPT_HEADER = ["expected_cells", "seq_center", "fastq_barcode", "sample_type"]
-        SAMPLE_TYPES = ["gex", "atac"]
+        OPT_HEADER = ["expected_cells", "seq_center", "fastq_barcode", "sample_type", "protocol", "feature_type"]
+        SAMPLE_TYPES  = ["gex", "atac"]
+        FEATURE_TYPES = ["gex", "cmo", "beam", "vdj", "ab", "crispr"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
 
         unknown_header = 0
@@ -140,6 +141,11 @@ def check_samplesheet(file_in, file_out):
                 if not is_integer(expected_cells):
                     print_error("Expected cells must be an integer", "Line", line)
 
+            ## Checkif protocol is given
+            protocol = ""
+            if "protocol" in header:
+                protocol = lspl[colmap["protocol"]]
+
             ## If present, replace spaces with _ in sequencing center name
             seq_center = ""
             if "seq_center" in header:
@@ -166,6 +172,18 @@ def check_samplesheet(file_in, file_out):
                         line,
                     )
 
+            feature_type = ""
+            if "feature_type" in header:
+                feature_type = lspl[colmap["feature_type"]]
+                if feature_type not in FEATURE_TYPES:
+                    print_error(
+                        "Feature type {} is not supported! Please specify either {}".format(
+                            feature_type, " or ".join(FEATURE_TYPES)
+                        ),
+                        "Line",
+                        line,
+                    )
+
             for fastq in fastq_list:
                 if fastq:
                     if fastq.find(" ") != -1:
@@ -180,9 +198,9 @@ def check_samplesheet(file_in, file_out):
             ## Auto-detect paired-end/single-end
             sample_info = []  ## [single_end, fastq_1, fastq_2]
             if sample and fastq_1 and fastq_2:  ## Paired-end short reads
-                sample_info = ["0", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode, sample_type]
+                sample_info = ["0", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode, sample_type, feature_type, protocol]
             elif sample and fastq_1 and not fastq_2:  ## Single-end short reads
-                sample_info = ["1", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode, sample_type]
+                sample_info = ["1", fastq_1, fastq_2, expected_cells, seq_center, fastq_barcode, sample_type, feature_type, protocol]
             else:
                 print_error("Invalid combination of columns provided!", "Line", line)
 
@@ -210,6 +228,8 @@ def check_samplesheet(file_in, file_out):
                         "seq_center",
                         "fastq_barcode",
                         "sample_type",
+                        "feature_type",
+                        "protocol"
                     ]
                 )
                 + "\n"

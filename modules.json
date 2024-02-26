@@ -91,14 +91,14 @@
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "de204d3c950f091336539ad74f0e47ddffe69ed4",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
                         "installed_by": [
                             "modules"
                         ]
                     },
                     "kallistobustools/ref": {
                         "branch": "master",
-                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
                         "installed_by": [
                             "modules"
                         ]
@@ -112,7 +112,7 @@
                     },
                     "star/genomegenerate": {
                         "branch": "master",
-                        "git_sha": "cc08a888069f67cab8120259bddab8032d4c0fe3",
+                        "git_sha": "a21faa6a3481af92a343a10926f59c189a2c16c9",
                         "installed_by": [
                             "modules"
                         ]

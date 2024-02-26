@@ -43,6 +43,7 @@ include { KALLISTO_BUSTOOLS      } from '../subworkflows/local/kallisto_bustools
 include { SCRNASEQ_ALEVIN        } from '../subworkflows/local/alevin'
 include { STARSOLO               } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN       } from "../subworkflows/local/align_cellranger"
+include { CELLRANGERARC_ALIGN    } from "../subworkflows/local/align_cellrangerarc"
 include { CELLRANGER_MULTI_ALIGN } from "../subworkflows/local/align_cellrangermulti"
 include { UNIVERSC_ALIGN         } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION         } from "../subworkflows/local/mtx_conversion"
@@ -81,6 +82,8 @@ ch_input = file(params.input)
 // if (!params.fasta) { ch_genome_fasta = [] }
 // if (!params.gtf) { ch_gtf = [] }
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
+ch_motifs = params.motifs ? file(params.motifs) : []
+ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
 ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
 ch_multiqc_alevin = Channel.empty()
 ch_multiqc_star = Channel.empty()
@@ -244,6 +247,20 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
     }
 
+    // Run cellrangerarc pipeline
+    if (params.aligner == "cellrangerarc") {
+        CELLRANGERARC_ALIGN(
+            ch_genome_fasta,
+            ch_filter_gtf,
+            ch_motifs,
+            ch_cellranger_index,
+            ch_fastq,
+            ch_cellrangerarc_config
+        )
+        ch_versions = ch_versions.mix(CELLRANGERARC_ALIGN.out.ch_versions)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)
+    }
+
     // Run cellrangermulti pipeline
     if (params.aligner == 'cellrangermulti') {
 
@@ -362,6 +379,13 @@ workflow.onComplete {
     NfcoreTemplate.summary(workflow, params, log)
     if (params.hook_url) {
         NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
+    }
+}
+
+workflow.onError {
+    if (workflow.errorReport.contains("Process requirement exceeds available memory")) {
+        println("🛑 Default resources exceed availability 🛑 ")
+        println("💡 See here on how to configure pipeline: https://nf-co.re/docs/usage/configuration#tuning-workflow-resources 💡")
     }
 }
 

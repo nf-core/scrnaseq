@@ -9,4 +9,4 @@ testing*
 log/
 reports/
 testme.sh
-.nf-test*
+.nf-test/

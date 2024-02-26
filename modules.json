@@ -40,6 +40,21 @@
                             "modules"
                         ]
                     },
+                    "cellrangerarc/count": {
+                        "branch": "master",
+                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
+                        "installed_by": ["modules"]
+                    },
+                    "cellrangerarc/mkgtf": {
+                        "branch": "master",
+                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
+                        "installed_by": ["modules"]
+                    },
+                    "cellrangerarc/mkref": {
+                        "branch": "master",
+                        "git_sha": "4196b1b2e7ce265892f3979eabf7a9ddc030702f",
+                        "installed_by": ["modules"]
+                    },
                     "custom/dumpsoftwareversions": {
                         "branch": "master",
                         "git_sha": "05c280924b6c768d484c7c443dad5e605c4ff4b4",

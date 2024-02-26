@@ -58,7 +58,7 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
-                    "enum": ["kallisto", "star", "alevin", "cellranger", "universc", "cellrangermulti"]
+                    "enum": ["kallisto", "star", "alevin", "cellranger", "universc", "cellrangerarc", "cellrangermulti"]
                 },
                 "protocol": {
                     "type": "string",
@@ -135,7 +135,7 @@
                     "type": "string",
                     "format": "directory-path",
                     "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
+                    "default": "s3://ngi-igenomes/igenomes/",
                     "fa_icon": "fas fa-cloud-download-alt",
                     "hidden": true
                 }
@@ -231,6 +231,26 @@
                 "cellranger_index": {
                     "type": "string",
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                }
+            }
+        },
+        "cellrangerarc_options": {
+            "title": "Cellranger ARC Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "motifs": {
+                    "type": "string",
+                    "description": "Specify a motif file to create a cellranger-arc index. Can be taken, e.g., from the JASPAR database."
+                },
+                "cellrangerarc_config": {
+                    "type": "string",
+                    "description": "Specify a config file to create the cellranger-arc index."
+                },
+                "cellrangerarc_reference": {
+                    "type": "string",
+                    "description": "Specify the genome reference name used in the config file to create a cellranger-arc index."
                 }
             }
         },
@@ -465,6 +485,9 @@
         },
         {
             "$ref": "#/definitions/cellranger_options"
+        },
+        {
+            "$ref": "#/definitions/cellrangerarc_options"
         },
         {
             "$ref": "#/definitions/universc_options"

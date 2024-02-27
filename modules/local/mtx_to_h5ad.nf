@@ -27,7 +27,7 @@ process MTX_TO_H5AD {
     if (params.aligner == 'kallisto') {
         mtx_matrix   = "*count/counts_unfiltered/*.mtx"
         barcodes_tsv = "*count/counts_unfiltered/*.barcodes.txt"
-        features_tsv = "*count/counts_unfiltered/*.genes.txt"
+        features_tsv = "*count/counts_unfiltered/*.genes.names.txt"
     } else if (params.aligner == 'alevin') {
         mtx_matrix   = "*_alevin_results/af_quant/alevin/quants_mat.mtx"
         barcodes_tsv = "*_alevin_results/af_quant/alevin/quants_mat_rows.txt"
@@ -54,13 +54,13 @@ process MTX_TO_H5AD {
     else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
-    for input_type in spliced unspliced ; do
+    for input_type in nascent ambiguous mature ; do
         mtx_to_h5ad.py \\
             --aligner ${params.aligner} \\
             --sample ${meta.id} \\
-            --input *count/counts_unfiltered/\${input_type}.mtx \\
-            --barcode *count/counts_unfiltered/\${input_type}.barcodes.txt \\
-            --feature *count/counts_unfiltered/\${input_type}.genes.txt \\
+            --input *count/counts_unfiltered/cells_x_genes.\${input_type}.mtx \\
+            --barcode *count/counts_unfiltered/cells_x_genes.\${input_type}.barcodes.txt \\
+            --feature *count/counts_unfiltered/cells_x_genes.\${input_type}.genes.names.txt \\
             --txp2gene ${txp2gene} \\
             --star_index ${star_index} \\
             --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;

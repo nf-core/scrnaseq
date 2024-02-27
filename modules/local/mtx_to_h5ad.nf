@@ -60,7 +60,7 @@ process MTX_TO_H5AD {
             --sample ${meta.id} \\
             --input *count/counts_unfiltered/cells_x_genes.\${input_type}.mtx \\
             --barcode $barcodes_tsv \\
-            --feature *count/counts_unfiltered/cells_x_genes.\${input_type}.genes.names.txt \\
+            --feature $features_tsv \\
             --txp2gene ${txp2gene} \\
             --star_index ${star_index} \\
             --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;

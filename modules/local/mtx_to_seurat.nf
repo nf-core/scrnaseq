@@ -47,7 +47,7 @@ process MTX_TO_SEURAT {
         mtx_to_seurat.R \\
             *count/counts_unfiltered/cells_x_genes.\${input_type}.mtx \\
             $barcodes \\
-            *count/counts_unfiltered/cells_x_genes.\${input_type}.genes.names.txt \\
+            $features \\
             ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
             ${aligner}
     done

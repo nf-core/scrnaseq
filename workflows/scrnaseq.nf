@@ -79,8 +79,8 @@ if (protocol_config['protocol'] == 'auto' && params.aligner != "cellranger" && p
 
 // general input and params
 ch_input = file(params.input)
-// if (!params.fasta) { ch_genome_fasta = [] }
-// if (!params.gtf) { ch_gtf = [] }
+if (!params.fasta) { ch_genome_fasta = [] }
+if (!params.gtf) { ch_gtf = [] }
 ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
 ch_motifs = params.motifs ? file(params.motifs) : []
 ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
@@ -146,21 +146,25 @@ workflow SCRNASEQ {
     //
     // Uncompress genome fasta file if required
     //
-    if (params.fasta.endsWith('.gz')) {
-        ch_genome_fasta    = GUNZIP_FASTA ( [ [:], file(params.fasta) ] ).gunzip.map { it[1] }
-        ch_versions        = ch_versions.mix(GUNZIP_FASTA.out.versions)
-    } else {
-        ch_genome_fasta = Channel.value( file(params.fasta) )
+    if (params.fasta) {
+        if (params.fasta.endsWith('.gz')) {
+            ch_genome_fasta    = GUNZIP_FASTA ( [ [:], file(params.fasta) ] ).gunzip.map { it[1] }
+            ch_versions        = ch_versions.mix(GUNZIP_FASTA.out.versions)
+        } else {
+            ch_genome_fasta = Channel.value( file(params.fasta) )
+        }
     }
 
     //
     // Uncompress GTF annotation file or create from GFF3 if required
     //
-    if (params.gtf.endsWith('.gz')) {
-        ch_gtf      = GUNZIP_GTF ( [ [:], file(params.gtf) ] ).gunzip.map { it[1] }
-        ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
-    } else {
-        ch_gtf = Channel.value( file(params.gtf) )
+    if (params.gtf) {
+        if (params.gtf.endsWith('.gz')) {
+            ch_gtf      = GUNZIP_GTF ( [ [:], file(params.gtf) ] ).gunzip.map { it[1] }
+            ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
+        } else {
+            ch_gtf = Channel.value( file(params.gtf) )
+        }
     }
 
     // filter gtf

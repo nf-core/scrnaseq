@@ -231,6 +231,10 @@
                 "cellranger_index": {
                     "type": "string",
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                },
+                "skip_cellranger_renaming": {
+                    "type": "boolean",
+                    "description": "Should it skip the automatic renaming included in cellranger-related modules?"
                 }
             }
         },
@@ -263,6 +267,62 @@
                 "universc_index": {
                     "type": "string",
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website."
+                }
+            }
+        },
+        "cellranger_multi_options": {
+            "title": "Cellranger Multi options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "cellranger_gex_index": {
+                    "type": "string",
+                    "description": "Specify a pre-built cellranger index for GEX analysis"
+                },
+                "cellranger_vdj_index": {
+                    "type": "string",
+                    "description": "Specify a pre-built cellranger index for VDJ analysis"
+                },
+                "gex_frna_probe_set": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "gex_target_panel": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "gex_cmo_set": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "fb_reference": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "vdj_inner_enrichment_primers": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "beam_antigen_csv": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "beam_control_csv": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "frna_sample_csv": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "gex_barcode_sample_assignment": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "cmo_barcode_csv": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
                 }
             }
         },
@@ -493,6 +553,9 @@
             "$ref": "#/definitions/universc_options"
         },
         {
+            "$ref": "#/definitions/cellranger_multi_options"
+        },
+        {
             "$ref": "#/definitions/institutional_config_options"
         },
         {
@@ -501,58 +564,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "skip_cellranger_renaming": {
-            "type": "boolean"
-        },
-        "cellranger_gex_index": {
-            "type": "string",
-            "default": null
-        },
-        "cellranger_vdj_index": {
-            "type": "string",
-            "default": null
-        },
-        "gex_frna_probe_set": {
-            "type": "string",
-            "default": null
-        },
-        "gex_target_panel": {
-            "type": "string",
-            "default": null
-        },
-        "gex_cmo_set": {
-            "type": "string",
-            "default": null
-        },
-        "fb_reference": {
-            "type": "string",
-            "default": null
-        },
-        "vdj_inner_enrichment_primers": {
-            "type": "string",
-            "default": null
-        },
-        "beam_antigen_csv": {
-            "type": "string",
-            "default": null
-        },
-        "beam_control_csv": {
-            "type": "string",
-            "default": null
-        },
-        "frna_sample_csv": {
-            "type": "string",
-            "default": null
-        },
-        "gex_barcode_sample_assignment": {
-            "type": "string",
-            "default": null
-        },
-        "cmo_barcode_csv": {
-            "type": "string",
-            "default": null
-        }
-    }
+    ]
 }

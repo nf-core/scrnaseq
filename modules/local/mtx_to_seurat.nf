@@ -46,7 +46,7 @@ process MTX_TO_SEURAT {
     for input_type in nascent ambiguous mature ; do
         mtx_to_seurat.R \\
             *count/counts_unfiltered/cells_x_genes.\${input_type}.mtx \\
-            $barcodes_tsv \\
+            $barcodes \\
             *count/counts_unfiltered/cells_x_genes.\${input_type}.genes.names.txt \\
             ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
             ${aligner}

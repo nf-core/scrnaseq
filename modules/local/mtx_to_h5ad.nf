@@ -59,7 +59,7 @@ process MTX_TO_H5AD {
             --aligner ${params.aligner} \\
             --sample ${meta.id} \\
             --input *count/counts_unfiltered/cells_x_genes.\${input_type}.mtx \\
-            --barcode *count/counts_unfiltered/cells_x_genes.\${input_type}.barcodes.txt \\
+            --barcode $barcodes_tsv \\
             --feature *count/counts_unfiltered/cells_x_genes.\${input_type}.genes.names.txt \\
             --txp2gene ${txp2gene} \\
             --star_index ${star_index} \\

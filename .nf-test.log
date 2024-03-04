@@ -1,0 +1,17 @@
+Feb-27 21:54:16.881 [main] INFO  com.askimed.nf.test.App - nf-test 0.8.4
+Feb-27 21:54:16.895 [main] INFO  com.askimed.nf.test.App - Arguments: [test, tests/main_pipeline_kallisto.test, --update-snapshot]
+Feb-27 21:54:17.590 [main] INFO  com.askimed.nf.test.App - Nextflow Version: 23.10.1
+Feb-27 21:54:17.592 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Load config from file /home/ec2-user/scrnaseq/nf-test.config...
+Feb-27 21:54:17.887 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Detected 1 test files.
+Feb-27 21:54:18.162 [main] INFO  com.askimed.nf.test.config.FileStaging - Copy directory '/home/ec2-user/scrnaseq/bin' to '/home/ec2-user/scrnaseq/.nf-test/tests/72e0d0f6b834ab79755c0f97ef8c4ca8/meta/bin'
+Feb-27 21:54:18.164 [main] INFO  com.askimed.nf.test.config.FileStaging - Copy directory '/home/ec2-user/scrnaseq/lib' to '/home/ec2-user/scrnaseq/.nf-test/tests/72e0d0f6b834ab79755c0f97ef8c4ca8/meta/lib'
+Feb-27 21:54:18.164 [main] INFO  com.askimed.nf.test.config.FileStaging - Copy directory '/home/ec2-user/scrnaseq/assets' to '/home/ec2-user/scrnaseq/.nf-test/tests/72e0d0f6b834ab79755c0f97ef8c4ca8/meta/assets'
+Feb-27 21:54:18.171 [main] DEBUG com.askimed.nf.test.core.AbstractTest - Stage 0 user provided files...
+Feb-27 21:54:18.174 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Started test plan
+Feb-27 21:54:18.174 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Running testsuite 'Test Workflow main.nf' from file '/home/ec2-user/scrnaseq/tests/main_pipeline_kallisto.test'.
+Feb-27 21:54:18.174 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Run test '72e0d0f6: test-dataset_kallisto_aligner'. type: com.askimed.nf.test.lang.pipeline.PipelineTest
+Feb-27 21:55:36.281 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Load snapshots from file '/home/ec2-user/scrnaseq/tests/main_pipeline_kallisto.test.snap'
+Feb-27 21:55:36.305 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshots 'test-dataset_kallisto_aligner' match.
+Feb-27 21:55:36.306 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Test '72e0d0f6: test-dataset_kallisto_aligner' finished. status: PASSED
+Feb-27 21:55:36.308 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Testsuite 'Test Workflow main.nf' finished. snapshot file: true, skipped tests: false, failed tests: false
+Feb-27 21:55:36.308 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Executed 1 tests. 0 tests failed. Done!

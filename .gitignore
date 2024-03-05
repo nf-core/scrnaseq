@@ -6,3 +6,7 @@ results/
 testing/
 testing*
 *.pyc
+log/
+reports/
+testme.sh
+.nf-test/

@@ -22,7 +22,7 @@ workflow SCRNASEQ {
 
     main:
 
-    protocol_config = WorkflowScrnaseq.getProtocol(workflow, log, params.aligner, params.protocol)
+    protocol_config = Utils.getProtocol(workflow, log, params.aligner, params.protocol)
     if (protocol_config['protocol'] == 'auto' && params.aligner != "cellranger") {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }

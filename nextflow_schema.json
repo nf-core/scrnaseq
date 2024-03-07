@@ -237,7 +237,6 @@
                     "type": "string",
                     "description": "Specify a path to the intron transcripts-to-capture.",
                     "fa_icon": "fas fa-rainbow"
-                    "fa_icon": "fas fa-fish",
                     "format": "file-path",
                     "exists": true
                 },

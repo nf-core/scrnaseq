@@ -32,17 +32,24 @@
             "expected_cells": {
                 "type": "integer",
                 "errorMessage": "Expected cells must be an Integer",
-                "meta": "expected_cells"
+                "meta": [
+                    "expected_cells"
+                ]
             },
             "seq_center": {
                 "type": "string",
-                "meta": "seq_center"
+                "meta": [
+                    "seq_center"
+                ]
             },
             "sample_type": {
                 "type": "string",
                 "enum": [
                     "atac",
                     "gex"
+                ],
+                "meta": [
+                    "sample_type"
                 ]
             }
         },

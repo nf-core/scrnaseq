@@ -5,3 +5,5 @@ lint:
     - .github/ISSUE_TEMPLATE/bug_report.yml
   files_exist:
     - lib/Utils.groovy
+  schema_params:
+    - monochromeLogs

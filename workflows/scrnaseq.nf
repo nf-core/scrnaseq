@@ -43,6 +43,12 @@ workflow SCRNASEQ {
         ch_barcode_whitelist = []
     }
 
+    //kallisto params
+    ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
+    kb_workflow = params.kb_workflow
+    kb_t1c = params.kb_t1c ? file(params.kb_t1c) : []
+    kb_t2c = params.kb_t2c ? file(params.kb_t2c) : []
+
     // samplesheet - this is passed to the MTX conversion functions to add metadata to the
     // AnnData objects.
     ch_input = file(params.input)
@@ -83,6 +89,8 @@ workflow SCRNASEQ {
             ch_filter_gtf,
             ch_kallisto_index,
             ch_txp2gene,
+            kb_t1c,
+            kb_t2c,
             protocol_config['protocol'],
             kb_workflow,
             ch_fastq

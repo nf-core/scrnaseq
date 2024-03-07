@@ -43,6 +43,10 @@ workflow SCRNASEQ {
         ch_barcode_whitelist = []
     }
 
+    // samplesheet - this is passed to the MTX conversion functions to add metadata to the
+    // AnnData objects.
+    ch_input = file(params.input)
+
     //kallisto params
     ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
     kb_workflow = params.kb_workflow
@@ -167,17 +171,17 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)
     }
 
-    // TODO
-    // // Run mtx to h5ad conversion subworkflow
-    // MTX_CONVERSION (
-    //     ch_mtx_matrices,
-    //     ch_input,
-    //     ch_txp2gene,
-    //     ch_star_index
-    // )
+    TODO
+    // Run mtx to h5ad conversion subworkflow
+    MTX_CONVERSION (
+        ch_mtx_matrices,
+        ch_input,
+        ch_txp2gene,
+        ch_star_index
+    )
 
-    // //Add Versions from MTX Conversion workflow too
-    // ch_versions.mix(MTX_CONVERSION.out.ch_versions)
+    //Add Versions from MTX Conversion workflow too
+    ch_versions.mix(MTX_CONVERSION.out.ch_versions)
 
     //
     // MODULE: MultiQC

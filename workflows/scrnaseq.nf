@@ -18,10 +18,9 @@ include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
 workflow SCRNASEQ {
 
     take:
-    ch_input // channel: samplesheet read in from --input
+    ch_fastq
 
     main:
-    ch_fastq = Channel.empty()
 
     protocol_config = WorkflowScrnaseq.getProtocol(workflow, log, params.aligner, params.protocol)
     if (protocol_config['protocol'] == 'auto' && params.aligner != "cellranger") {

@@ -224,7 +224,9 @@
                 "kallisto_index": {
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",
-                    "fa_icon": "fas fa-rainbow"
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "kb_t1c": {
                     "type": "string",
@@ -236,7 +238,7 @@
                 "kb_t2c": {
                     "type": "string",
                     "description": "Specify a path to the intron transcripts-to-capture.",
-                    "fa_icon": "fas fa-rainbow"
+                    "fa_icon": "fas fa-rainbow",
                     "format": "file-path",
                     "exists": true
                 },

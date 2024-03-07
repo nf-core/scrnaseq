@@ -7,7 +7,7 @@
                 "nf-core": {
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
+                        "git_sha": "a2dfd9a0b2e192243695711c723d652959de39fc",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
@@ -33,11 +33,6 @@
                     "cellrangerarc/mkref": {
                         "branch": "master",
                         "git_sha": "4196b1b2e7ce265892f3979eabf7a9ddc030702f",
-                        "installed_by": ["modules"]
-                    },
-                    "custom/dumpsoftwareversions": {
-                        "branch": "master",
-                        "git_sha": "8ec825f465b9c17f9d83000022995b4f7de6fe93",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {
@@ -67,7 +62,7 @@
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "9e71d8519dfbfc328c078bba14d4bd4c99e39a94",
+                        "git_sha": "b7ebe95761cd389603f9cc0e0dc384c0f663815a",
                         "installed_by": ["modules"]
                     },
                     "star/genomegenerate": {
@@ -84,6 +79,25 @@
                         "branch": "master",
                         "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
                         "installed_by": ["modules"]
+                    }
+                }
+            },
+            "subworkflows": {
+                "nf-core": {
+                    "utils_nextflow_pipeline": {
+                        "branch": "master",
+                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "utils_nfcore_pipeline": {
+                        "branch": "master",
+                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "utils_nfvalidation_plugin": {
+                        "branch": "master",
+                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "installed_by": ["subworkflows"]
                     }
                 }
             }

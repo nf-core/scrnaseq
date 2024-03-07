@@ -30,7 +30,7 @@ nextflow_pipeline {
                 {assert workflow.success},
 
                 // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 20},
+                {assert workflow.trace.tasks().size() == 18},
 
                 // How many results were produced?
                 {assert path("${outputDir}/results_cellranger").list().size() == 4},

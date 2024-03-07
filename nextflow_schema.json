@@ -16,6 +16,7 @@
                     "type": "string",
                     "format": "file-path",
                     "exists": true,
+                    "schema": "assets/schema_input.json",
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
@@ -50,7 +51,9 @@
                 "barcode_whitelist": {
                     "type": "string",
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
-                    "fa_icon": "fas fa-barcode"
+                    "fa_icon": "fas fa-barcode",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "aligner": {
                     "type": "string",
@@ -123,12 +126,16 @@
                 "transcript_fasta": {
                     "type": "string",
                     "description": "A cDNA FASTA file",
-                    "fa_icon": "fas fa-dna"
+                    "fa_icon": "fas fa-dna",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "gtf": {
                     "type": "string",
                     "description": "Reference GTF annotation file",
-                    "fa_icon": "fas fa-code-branch"
+                    "fa_icon": "fas fa-code-branch",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "save_reference": {
                     "type": "boolean",
@@ -154,13 +161,17 @@
                 "salmon_index": {
                     "type": "string",
                     "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-fish",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "txp2gene": {
                     "type": "string",
                     "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
                     "help_text": "> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.",
-                    "fa_icon": "fas fa-map-marked-alt"
+                    "fa_icon": "fas fa-map-marked-alt",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "simpleaf_rlen": {
                     "type": "integer",
@@ -180,7 +191,9 @@
                     "type": "string",
                     "description": "Specify a path to the precomputed STAR index.",
                     "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
-                    "fa_icon": "fas fa-asterisk"
+                    "fa_icon": "fas fa-asterisk",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "star_ignore_sjdbgtf": {
                     "type": "string",
@@ -215,7 +228,9 @@
                 "kallisto_index": {
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-fish",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "kb_workflow": {
                     "type": "string",
@@ -239,7 +254,9 @@
             "properties": {
                 "cellranger_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. ",
+                    "format": "file-path",
+                    "exists": true
                 }
             }
         },
@@ -271,7 +288,9 @@
             "properties": {
                 "universc_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website."
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website.",
+                    "format": "file-path",
+                    "exists": true
                 }
             }
         },
@@ -425,6 +444,7 @@
                     "type": "string",
                     "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
+                    "exists": true,
                     "fa_icon": "fas fa-cog",
                     "hidden": true
                 },

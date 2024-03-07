@@ -71,7 +71,7 @@ workflow SCRNASEQ {
     if (!params.skip_fastqc) {
         FASTQC_CHECK ( ch_fastq )
         ch_versions       = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_zip)
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_zip.map{ meta, it -> it })
     }
 
     ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
@@ -171,7 +171,6 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)
     }
 
-    TODO
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (
         ch_mtx_matrices,

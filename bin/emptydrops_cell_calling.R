@@ -17,7 +17,7 @@ mtx      <- readMM(fn_mtx)
 
 get_name <- function(file) {
     name <- as.character(basename(file))
-    name <- gsub('\\.gz', '', name)
+    name <- gsub('\\.gz$', '', name)
     return(name)
 }
 

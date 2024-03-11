@@ -20,19 +20,15 @@
                 "name": "workflow",
                 "success": true
             },
-            "cells_x_genes.barcodes.txt:md5,18be561873e435d4587f6b3f95a0e301",
+            "cells_x_genes.barcodes.txt:md5,72d78bb1c1ee7cb174520b30f695aa48",
             "cells_x_genes.genes.txt:md5,acd9d00120f52031974b2add3e7521b6",
-            "cells_x_genes.mtx:md5,37d2cd8c712f9c70463e87485bf6cd36",
-            "cells_x_genes.barcodes.txt:md5,488437e1f5477243697efb93366e5676",
+            "cells_x_genes.mtx:md5,894d60da192e3788de11fa8fc1fa711d",
+            "cells_x_genes.barcodes.txt:md5,a8cf7ea4b2d075296a94bf066a64b7a4",
             "cells_x_genes.genes.txt:md5,acd9d00120f52031974b2add3e7521b6",
-            "cells_x_genes.mtx:md5,af90e05b404490f6cb133ab7f62949f8",
-            "Sample_X_raw_matrix.rds:md5,f0e43f69403f4b2e7704065421592ad0",
-            "Sample_Y_raw_matrix.rds:md5,61809156e64dbdaf254cbc1c3456588e"
+            "cells_x_genes.mtx:md5,abd83de117204d0a77df3c92d00cc025",
+            "Sample_X_matrix.rds:md5,0938f4189b7a7fd1030abfcee798741c",
+            "Sample_Y_matrix.rds:md5,93c12abe283ab37c5f37e5cd3cb25302"
         ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "23.10.1"
-        },
-        "timestamp": "2024-02-14T16:04:36.951736171"
+        "timestamp": "2024-02-27T12:19:47.921508953"
     }
 }

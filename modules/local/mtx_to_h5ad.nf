@@ -47,7 +47,7 @@ process MTX_TO_H5AD {
         mtx_dir      = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "counts_${kb_pattern}filtered"
         mtx_matrix   = "${mtx_dir}/*.mtx"
         barcodes_tsv = "${mtx_dir}/*.barcodes.txt"
-        features_tsv = "${mtx_dir}/*.genes.txt"
+        features_tsv = "${mtx_dir}/*.genes.names.txt"
 
     } else if (params.aligner == 'alevin') {
 
@@ -83,13 +83,13 @@ process MTX_TO_H5AD {
     else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
-    for input_type in spliced unspliced ; do
+    for input_type in nascent ambiguous mature ; do
         mtx_to_h5ad.py \\
             --aligner ${params.aligner} \\
             --sample ${meta.id} \\
             --input ${mtx_dir}/\${input_type}.mtx \\
             --barcode ${mtx_dir}/\${input_type}.barcodes.txt \\
-            --feature ${mtx_dir}/\${input_type}.genes.txt \\
+            --feature ${mtx_dir}/\${input_type}.genes.names.txt \\
             --txp2gene ${txp2gene} \\
             --star_index ${star_index} \\
             --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;

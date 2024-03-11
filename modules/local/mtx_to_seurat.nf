@@ -48,7 +48,7 @@ process MTX_TO_SEURAT {
         mtx_dir    = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "counts_${kb_pattern}filtered"
         matrix     = "${mtx_dir}/*.mtx"
         barcodes   = "${mtx_dir}/*.barcodes.txt"
-        features   = "${mtx_dir}/*.genes.txt"
+        features   = "${mtx_dir}/*.genes.names.txt"
 
     } else if (params.aligner == "alevin") {
 
@@ -77,11 +77,11 @@ process MTX_TO_SEURAT {
     if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
-    for input_type in spliced unspliced ; do
+    for input_type in nascent ambiguous mature ; do
         mtx_to_seurat.R \\
             ${mtx_dir}/\${input_type}.mtx \\
             ${mtx_dir}/\${input_type}.barcodes.txt \\
-            ${mtx_dir}/\${input_type}.genes.txt \\
+            ${mtx_dir}/\${input_type}.genes.names.txt \\
             ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
             ${aligner} \\
             ${is_emptydrops}

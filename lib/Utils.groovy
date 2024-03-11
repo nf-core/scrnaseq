@@ -1,47 +1,22 @@
-//
-// This file holds several Groovy functions that could be useful for any Nextflow pipeline
-//
+import groovy.json.JsonSlurper
 
-import org.yaml.snakeyaml.Yaml
 
-class Utils {
-
-    //
-    // When running with -profile conda, warn if channels have not been set-up appropriately
-    //
-    public static void checkCondaChannels(log) {
-        Yaml parser = new Yaml()
-        def channels = []
-        try {
-            def config = parser.load('conda config --show channels'.execute().text)
-            channels = config.channels
-        } catch (NullPointerException | IOException e) {
-            log.warn 'Could not verify conda channel configuration.'
-            return
-        }
-
-        // Check that all channels are present
-        // This channel list is ordered by required channel priority.
-        def required_channels_in_order = ['conda-forge', 'bioconda', 'defaults']
-        def channels_missing = ((required_channels_in_order as Set) - (channels as Set)) as Boolean
-
-        // Check that they are in the right order
-        def channel_priority_violation = false
-        def n = required_channels_in_order.size()
-        for (int i = 0; i < n - 1; i++) {
-            channel_priority_violation |= !(channels.indexOf(required_channels_in_order[i]) < channels.indexOf(required_channels_in_order[i+1]))
-        }
-
-        if (channels_missing | channel_priority_violation) {
-            log.warn "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" +
-                "  There is a problem with your Conda configuration!\n\n" +
-                "  You will need to set-up the conda-forge and bioconda channels correctly.\n" +
-                "  Please refer to https://bioconda.github.io/\n" +
-                "  The observed channel order is \n" +
-                "  ${channels}\n" +
-                "  but the following channel order is required:\n" +
-                "  ${required_channels_in_order}\n" +
-                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+class WorkflowScrnaseq {
+    // Retrieve the aligner-specific protocol based on the specified protocol.
+    // Returns a map ["protocol": protocol, "extra_args": <extra args>, "whitelist": <path to whitelist>]
+    // extra_args and whitelist are optional.
+    public static Map getProtocol(workflow, log, aligner, protocol) {
+        def jsonSlurper = new JsonSlurper()
+        def json = new File("${workflow.projectDir}/assets/protocols.json").text
+        def protocols = jsonSlurper.parseText(json)
+        aligner = (aligner == 'cellrangermulti') ? 'cellranger' : aligner
+        def aligner_map = protocols[aligner]
+        if(aligner_map.containsKey(protocol)) {
+            return aligner_map[protocol]
+        } else {
+            log.warn("Protocol '${protocol}' not recognized by the pipeline. Passing on the protocol to the aligner unmodified.")
+            return ["protocol": protocol]
         }
     }
+
 }

@@ -3,19 +3,19 @@
         "content": [
             {
                 "stderr": [
-                    
+
                 ],
                 "errorReport": "",
                 "exitStatus": 0,
                 "failed": false,
                 "stdout": [
-                    
+
                 ],
                 "errorMessage": "",
                 "trace": {
                     "tasksFailed": 0,
-                    "tasksCount": 16,
-                    "tasksSucceeded": 16
+                    "tasksCount": 14,
+                    "tasksSucceeded": 14
                 },
                 "name": "workflow",
                 "success": true

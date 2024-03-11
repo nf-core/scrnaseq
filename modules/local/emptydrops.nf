@@ -77,6 +77,7 @@ process EMPTYDROPS_CELL_CALLING {
 
     stub:
     """
-    touch emptydrops_filtered/*
+    mkdir emptydrops_filtered
+    touch emptydrops_filtered/empty_file
     """
 }

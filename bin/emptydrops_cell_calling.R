@@ -21,13 +21,15 @@ get_name <- function(file) {
     return(name)
 }
 
-# Check if barcodes are in columns, if not, transpose mtx
-is_transposed<-FALSE
-if (dim(barcodes)[1]!=dim(mtx)[2]){
-    mtx<-t(mtx)
-    is_transposed<-TRUE
-    print('Matrix was tranposed.')
+# transpose matrices when required
+# based on code of 'mtx_to_seurat.R', only the data from kallisto and alevin would require transposition
+print("Only kallisto and alevin have transposed matrices.")
+if (aligner %in% c( "kallisto", "alevin" ))  {
+    is_transposed <- TRUE
+} else {
+    is_transposed <- FALSE
 }
+
 
 # Call empty drops
 e.out <- emptyDrops(mtx)

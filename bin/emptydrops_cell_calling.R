@@ -26,6 +26,7 @@ get_name <- function(file) {
 print("Only kallisto and alevin have transposed matrices.")
 if (aligner %in% c( "kallisto", "alevin" ))  {
     is_transposed <- TRUE
+    mtx<-t(mtx)
 } else {
     is_transposed <- FALSE
 }

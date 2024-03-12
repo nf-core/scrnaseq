@@ -1,18 +1,17 @@
-include { MULTIQC } from '../modules/nf-core/multiqc/main'
-include { FASTQC_CHECK } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_ALEVIN } from '../subworkflows/local/alevin'
-include { STARSOLO } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN } from "../subworkflows/local/align_cellranger"
-include { CELLRANGERARC_ALIGN } from "../subworkflows/local/align_cellrangerarc"
-include { UNIVERSC_ALIGN } from "../subworkflows/local/align_universc"
-include { MTX_CONVERSION } from "../subworkflows/local/mtx_conversion"
-include { GTF_GENE_FILTER } from '../modules/local/gtf_gene_filter'
-include { EMPTYDROPS_CELL_CALLING } from '../modules/local/emptydrops'
-
-include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { MULTIQC                            } from '../modules/nf-core/multiqc/main'
+include { FASTQC_CHECK                       } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS                  } from '../subworkflows/local/kallisto_bustools'
+include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevin'
+include { STARSOLO                           } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN                   } from "../subworkflows/local/align_cellranger"
+include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align_cellrangerarc"
+include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align_universc"
+include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
+include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
+include { EMPTYDROPS_CELL_CALLING            } from '../modules/local/emptydrops'
+include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
 
 
@@ -20,6 +19,8 @@ workflow SCRNASEQ {
 
     take:
     ch_fastq
+    ch_genome_fasta
+    ch_gtf
 
     main:
 
@@ -28,9 +29,11 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
+    // overwrite fasta and gtf if user provide a custom one
+    ch_genome_fasta = Channel.value(params.fasta ? file(params.fasta) : ch_genome_fasta)
+    ch_gtf = Channel.value(params.gtf ? file(params.gtf) : ch_gtf)
+
     // general input and params
-    ch_genome_fasta = Channel.value(params.fasta ? file(params.fasta) : [])
-    ch_gtf = params.gtf ? file(params.gtf) : []
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
     ch_motifs = params.motifs ? file(params.motifs) : []
     ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []

@@ -29,7 +29,7 @@ process EMPTYDROPS_CELL_CALLING {
 
         matrix     = "counts_unfiltered/*.mtx"
         barcodes   = "counts_unfiltered/*.barcodes.txt"
-        features   = "counts_unfiltered/*.genes.txt"
+        features   = "counts_unfiltered/*.genes.names.txt"
 
     } else if (params.aligner == "alevin") {
 

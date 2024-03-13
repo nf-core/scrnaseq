@@ -26,7 +26,7 @@ process MTX_TO_SEURAT {
     } else if (params.aligner == "kallisto") {
         matrix   = "*count/counts_unfiltered/*.mtx"
         barcodes = "*count/counts_unfiltered/*.barcodes.txt"
-        features = "*count/counts_unfiltered/*.genes.txt"
+        features = "*count/counts_unfiltered/*.genes.names.txt"
     } else if (params.aligner == "alevin") {
         matrix   = "*_alevin_results/af_quant/alevin/quants_mat.mtx"
         barcodes = "*_alevin_results/af_quant/alevin/quants_mat_rows.txt"
@@ -43,11 +43,11 @@ process MTX_TO_SEURAT {
     if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
-    for input_type in spliced unspliced ; do
+    for input_type in nascent ambiguous mature ; do
         mtx_to_seurat.R \\
-            *count/counts_unfiltered/\${input_type}.mtx \\
-            *count/counts_unfiltered/\${input_type}.barcodes.txt \\
-            *count/counts_unfiltered/\${input_type}.genes.txt \\
+            *count/counts_unfiltered/cells_x_genes.\${input_type}.mtx \\
+            $barcodes \\
+            $features \\
             ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
             ${aligner}
     done

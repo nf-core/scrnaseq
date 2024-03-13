@@ -214,26 +214,35 @@
             "type": "object",
             "description": "Params related to Kallisto/BUS tool",
             "default": "",
-            "fa_icon": "fas fa-fish",
+            "fa_icon": "fas fa-rainbow",
             "properties": {
-                "kallisto_gene_map": {
-                    "type": "string",
-                    "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
-                    "fa_icon": "fas fa-fish"
-                },
                 "kallisto_index": {
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",
-                    "fa_icon": "fas fa-fish",
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "kb_t1c": {
+                    "type": "string",
+                    "description": "Specify a path to the cDNA transcripts-to-capture.",
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "kb_t2c": {
+                    "type": "string",
+                    "description": "Specify a path to the intron transcripts-to-capture.",
+                    "fa_icon": "fas fa-rainbow",
                     "format": "file-path",
                     "exists": true
                 },
                 "kb_workflow": {
                     "type": "string",
                     "default": "standard",
-                    "description": "Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite: 10xFB` for 10x Genomics Feature Barcoding technology. (default: standard)",
-                    "fa_icon": "fas fa-fish",
-                    "enum": ["standard", "lamanno", "nucleus", "kite", "kite: 10xFB"]
+                    "description": "Type of workflow. Use `nac` for an index type that can quantify nascent and mature RNA. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. (default: standard)",
+                    "fa_icon": "fas fa-rainbow",
+                    "enum": ["standard", "lamanno", "nac"]
                 }
             }
         },

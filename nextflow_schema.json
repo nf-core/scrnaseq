@@ -168,7 +168,7 @@
                 "txp2gene": {
                     "type": "string",
                     "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
-                    "help_text": "> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.",
+                    "help_text": "> This is only used by the Salmon Alevin workflow.",
                     "fa_icon": "fas fa-map-marked-alt",
                     "format": "file-path",
                     "exists": true

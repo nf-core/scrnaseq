@@ -49,6 +49,24 @@ process MTX_TO_H5AD {
         barcodes_tsv = "${mtx_dir}/*.barcodes.txt"
         features_tsv = "${mtx_dir}/*.genes.names.txt"
 
+        // kallisto allows the following workflows: ["standard", "lamanno", "nac"]
+        // lamanno creates "spliced" and "unspliced"
+        // nac creates "nascent", "ambiguous" "mature"
+        // also, lamanno produces a barcodes and genes file for both spliced and unspliced
+        // while nac keep only one for all the different .mtx files produced
+        kb_non_standard_files = ""
+        if (params.kb_workflow == "lamanno") {
+            kb_non_standard_files = "spliced unspliced"
+            matrix       = "${mtx_dir}/\${input_type}.mtx"
+            barcodes_tsv = "${mtx_dir}/\${input_type}.barcodes.txt"
+            features_tsv = "${mtx_dir}/\${input_type}.genes.txt"
+        }
+        if (params.kb_workflow == "nac") {
+            kb_non_standard_files = "nascent ambiguous mature"
+            matrix       = "${mtx_dir}/*\${input_type}.mtx"
+            features_tsv = "${mtx_dir}/*.genes.txt"
+        } // barcodes tsv has same pattern as standard workflow
+
     } else if (params.aligner == 'alevin') {
 
         // alevin does not have filtered/unfiltered results
@@ -83,13 +101,13 @@ process MTX_TO_H5AD {
     else if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
-    for input_type in nascent ambiguous mature ; do
+    for input_type in ${kb_non_standard_files} ; do
         mtx_to_h5ad.py \\
             --aligner ${params.aligner} \\
             --sample ${meta.id} \\
-            --input ${mtx_dir}/\${input_type}.mtx \\
-            --barcode ${mtx_dir}/\${input_type}.barcodes.txt \\
-            --feature ${mtx_dir}/\${input_type}.genes.names.txt \\
+            --input ${matrix} \\
+            --barcode ${barcodes_tsv} \\
+            --feature ${features_tsv} \\
             --txp2gene ${txp2gene} \\
             --star_index ${star_index} \\
             --out ${meta.id}/${meta.id}_\${input_type}_matrix.h5ad ;

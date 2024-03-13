@@ -31,6 +31,24 @@ process EMPTYDROPS_CELL_CALLING {
         barcodes   = "counts_unfiltered/*.barcodes.txt"
         features   = "counts_unfiltered/*.genes.names.txt"
 
+        // kallisto allows the following workflows: ["standard", "lamanno", "nac"]
+        // lamanno creates "spliced" and "unspliced"
+        // nac creates "nascent", "ambiguous" "mature"
+        // also, lamanno produces a barcodes and genes file for both spliced and unspliced
+        // while nac keep only one for all the different .mtx files produced
+        kb_non_standard_files = ""
+        if (params.kb_workflow == "lamanno") {
+            kb_non_standard_files = "spliced unspliced"
+            matrix   = "counts_unfiltered/\${input_type}.mtx"
+            barcodes = "counts_unfiltered/\${input_type}.barcodes.txt"
+            features = "counts_unfiltered/\${input_type}.genes.txt"
+        }
+        if (params.kb_workflow == "nac") {
+            kb_non_standard_files = "nascent ambiguous mature"
+            matrix   = "counts_unfiltered/*\${input_type}.mtx"
+            features = "counts_unfiltered/*.genes.txt"
+        } // barcodes tsv has same pattern as standard workflow
+
     } else if (params.aligner == "alevin") {
 
         matrix   = "*_alevin_results/af_quant/alevin/quants_mat.mtx"
@@ -52,11 +70,11 @@ process EMPTYDROPS_CELL_CALLING {
     """
     mkdir emptydrops_filtered/
     # convert file types
-    for splice_type in spliced unspliced ; do
+    for input_type in ${kb_non_standard_files} ; do
         emptydrops_cell_calling.R \\
-            counts_unfiltered/\${splice_type}.mtx \\
-            counts_unfiltered/\${splice_type}.barcodes.txt \\
-            counts_unfiltered/\${splice_type}.genes.txt \\
+            ${matrix} \\
+            ${barcodes} \\
+            ${features} \\
             emptydrops_filtered \\
             ${params.aligner} \\
             0

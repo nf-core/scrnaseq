@@ -50,6 +50,24 @@ process MTX_TO_SEURAT {
         barcodes   = "${mtx_dir}/*.barcodes.txt"
         features   = "${mtx_dir}/*.genes.names.txt"
 
+        // kallisto allows the following workflows: ["standard", "lamanno", "nac"]
+        // lamanno creates "spliced" and "unspliced"
+        // nac creates "nascent", "ambiguous" "mature"
+        // also, lamanno produces a barcodes and genes file for both spliced and unspliced
+        // while nac keep only one for all the different .mtx files produced
+        kb_non_standard_files = ""
+        if (params.kb_workflow == "lamanno") {
+            kb_non_standard_files = "spliced unspliced"
+            matrix   = "${mtx_dir}/\${input_type}.mtx"
+            barcodes = "${mtx_dir}/\${input_type}.barcodes.txt"
+            features = "${mtx_dir}/\${input_type}.genes.txt"
+        }
+        if (params.kb_workflow == "nac") {
+            kb_non_standard_files = "nascent ambiguous mature"
+            matrix   = "${mtx_dir}/*\${input_type}.mtx"
+            features = "${mtx_dir}/*.genes.txt"
+        } // barcodes tsv has same pattern as standard workflow
+
     } else if (params.aligner == "alevin") {
 
         mtx_dir  = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : '*_alevin_results/af_quant/alevin'
@@ -77,11 +95,11 @@ process MTX_TO_SEURAT {
     if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
-    for input_type in nascent ambiguous mature ; do
+    for input_type in ${kb_non_standard_files} ; do
         mtx_to_seurat.R \\
-            ${mtx_dir}/\${input_type}.mtx \\
-            ${mtx_dir}/\${input_type}.barcodes.txt \\
-            ${mtx_dir}/\${input_type}.genes.names.txt \\
+            ${matrix} \\
+            ${barcodes} \\
+            ${features} \\
             ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
             ${aligner} \\
             ${is_emptydrops}

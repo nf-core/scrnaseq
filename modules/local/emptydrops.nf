@@ -68,14 +68,14 @@ process EMPTYDROPS_CELL_CALLING {
     //
     if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
-    mkdir emptydrops_filtered/
     # convert file types
     for input_type in ${kb_non_standard_files} ; do
+        mkdir -p emptydrops_filtered/\${input_type}
         emptydrops_cell_calling.R \\
             ${matrix} \\
             ${barcodes} \\
             ${features} \\
-            emptydrops_filtered \\
+            emptydrops_filtered/\${input_type} \\
             ${params.aligner} \\
             0
     done

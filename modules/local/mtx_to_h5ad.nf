@@ -45,6 +45,7 @@ process MTX_TO_H5AD {
 
         kb_pattern   = (input_type == 'raw') ? 'un' : ''
         mtx_dir      = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "counts_${kb_pattern}filtered"
+        if ((input_type == 'custom_emptydrops_filter') && (params.kb_workflow != 'standard')) { mtx_dir = 'emptydrops_filtered/\${input_type}' } // dir has subdirs for non-standard workflows
         mtx_matrix   = "${mtx_dir}/*.mtx"
         barcodes_tsv = "${mtx_dir}/*.barcodes.txt"
         features_tsv = "${mtx_dir}/*.genes.names.txt"

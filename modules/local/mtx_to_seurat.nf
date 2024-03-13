@@ -46,6 +46,7 @@ process MTX_TO_SEURAT {
 
         kb_pattern = (input_type == 'raw') ? 'un' : ''
         mtx_dir    = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "counts_${kb_pattern}filtered"
+        if ((input_type == 'custom_emptydrops_filter') && (params.kb_workflow != 'standard')) { mtx_dir = 'emptydrops_filtered/\${input_type}' } // dir has subdirs for non-standard workflows
         matrix     = "${mtx_dir}/*.mtx"
         barcodes   = "${mtx_dir}/*.barcodes.txt"
         features   = "${mtx_dir}/*.genes.names.txt"

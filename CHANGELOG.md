@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change from pytests to nf-test ([#291](https://github.com/nf-core/scrnaseq/pull/291))
 - Update template to v2.13.1 ([#309](https://github.com/nf-core/scrnaseq/pull/309))
 - Update to kallisto|bustools v0.28.2 ([#294](https://github.com/nf-core/scrnaseq/pull/294))
+- Fix cellrangerarc matrix conversions and protocol selection ([#300](https://github.com/nf-core/scrnaseq/pull/300))
 
 ## v2.5.1
 

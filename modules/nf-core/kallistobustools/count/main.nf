@@ -18,8 +18,8 @@ process KALLISTOBUSTOOLS_COUNT {
 
     output:
     tuple val(meta), path ("*.count")                  , emit: count
-    tuple val(meta), path ("*.count/counts_unfiltered"), emit: raw_counts                       // TODO: Add to nf-coew/modules before merging PR
-    tuple val(meta), path ("*.count/counts_filtered")  , emit: filtered_counts, optional: true  // TODO: Add to nf-coew/modules before merging PR
+    tuple val(meta), path ("*.count/counts_unfiltered"), emit: raw_counts
+    tuple val(meta), path ("*.count/counts_filtered")  , emit: filtered_counts, optional: true
     path "versions.yml"                                , emit: versions
     path "*.count/*/*.mtx"                             , emit: matrix //Ensure that kallisto finished and produced outputs
 

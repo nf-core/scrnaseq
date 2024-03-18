@@ -7,7 +7,7 @@
                 "nf-core": {
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "a2dfd9a0b2e192243695711c723d652959de39fc",
+                        "git_sha": "92ca535c5a8c0fe89eb71e649ee536bd355ce4fc",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
@@ -52,7 +52,7 @@
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "de8215983defba48cd81961d620a9e844f11c7e7",
+                        "git_sha": "9d3e489286eead7dfe1010fd324904d8b698eca7",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/ref": {

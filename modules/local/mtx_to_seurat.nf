@@ -19,23 +19,76 @@ process MTX_TO_SEURAT {
 
     script:
     def aligner = params.aligner
-    if (params.aligner in [ 'cellranger', 'cellrangerarc' ]) {
-        matrix   = "matrix.mtx.gz"
-        barcodes = "barcodes.tsv.gz"
-        features = "features.tsv.gz"
-    } else if (params.aligner == "kallisto") {
-        matrix   = "*count/counts_unfiltered/*.mtx"
-        barcodes = "*count/counts_unfiltered/*.barcodes.txt"
-        features = "*count/counts_unfiltered/*.genes.names.txt"
-    } else if (params.aligner == "alevin") {
-        matrix   = "*_alevin_results/af_quant/alevin/quants_mat.mtx"
-        barcodes = "*_alevin_results/af_quant/alevin/quants_mat_rows.txt"
-        features = "*_alevin_results/af_quant/alevin/quants_mat_cols.txt"
-    } else if (params.aligner == 'star') {
-        matrix   = "*.Solo.out/Gene*/filtered/matrix.mtx.gz"
-        barcodes = "*.Solo.out/Gene*/filtered/barcodes.tsv.gz"
-        features = "*.Solo.out/Gene*/filtered/features.tsv.gz"
+
+
+    // Get a file to check input type. Some aligners bring arrays instead of a single file.
+    def input_to_check = (inputs instanceof String) ? inputs : inputs[0]
+
+    // check input type of inputs
+    def is_emptydrops = '0'
+    input_type = (input_to_check.toUriString().contains('unfiltered') || input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
+    if ( params.aligner == 'alevin' ) { input_type = 'raw' } // alevin has its own filtering methods and mostly output a single mtx, raw here means, the base tool output
+    if (input_to_check.toUriString().contains('emptydrops')) {
+        input_type = 'custom_emptydrops_filter'
+        is_emptydrops = '--is_emptydrops'
     }
+
+    // def file paths for aligners. Cellranger is normally converted with the .h5 files
+    // However, the emptydrops call, always generate .mtx files, thus, cellranger 'emptydrops' required a parsing
+    if (params.aligner in [ 'cellranger', 'cellrangerarc' ]) {
+
+        mtx_dir  = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered/' : ''
+        matrix   = "${mtx_dir}matrix.mtx*"
+        barcodes = "${mtx_dir}barcodes.tsv*"
+        features = "${mtx_dir}features.tsv*"
+
+    } else if (params.aligner == 'kallisto') {
+
+        kb_pattern = (input_type == 'raw') ? 'un' : ''
+        mtx_dir    = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "counts_${kb_pattern}filtered"
+        if ((input_type == 'custom_emptydrops_filter') && (params.kb_workflow != 'standard')) { mtx_dir = 'emptydrops_filtered/\${input_type}' } // dir has subdirs for non-standard workflows
+        matrix     = "${mtx_dir}/*.mtx"
+        barcodes   = "${mtx_dir}/*.barcodes.txt"
+        features   = "${mtx_dir}/*.genes.names.txt"
+
+        // kallisto allows the following workflows: ["standard", "lamanno", "nac"]
+        // lamanno creates "spliced" and "unspliced"
+        // nac creates "nascent", "ambiguous" "mature"
+        // also, lamanno produces a barcodes and genes file for both spliced and unspliced
+        // while nac keep only one for all the different .mtx files produced
+        kb_non_standard_files = ""
+        if (params.kb_workflow == "lamanno") {
+            kb_non_standard_files = "spliced unspliced"
+            matrix   = "${mtx_dir}/\${input_type}.mtx"
+            barcodes = "${mtx_dir}/\${input_type}.barcodes.txt"
+            features = "${mtx_dir}/\${input_type}.genes.txt"
+        }
+        if (params.kb_workflow == "nac") {
+            kb_non_standard_files = "nascent ambiguous mature"
+            matrix   = "${mtx_dir}/*\${input_type}.mtx"
+            features = "${mtx_dir}/*.genes.txt"
+        } // barcodes tsv has same pattern as standard workflow
+
+    } else if (params.aligner == "alevin") {
+
+        mtx_dir  = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : '*_alevin_results/af_quant/alevin'
+        matrix   = "${mtx_dir}/quants_mat.mtx"
+        barcodes = "${mtx_dir}/quants_mat_rows.txt"
+        features = "${mtx_dir}/quants_mat_cols.txt"
+
+    } else if (params.aligner == 'star') {
+
+        mtx_dir  = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered' : "${input_type}"
+        suffix   = (input_type == 'custom_emptydrops_filter') ? '' : '.gz'
+        matrix   = "${mtx_dir}/matrix.mtx${suffix}"
+        barcodes = "${mtx_dir}/barcodes.tsv${suffix}"
+        features = "${mtx_dir}/features.tsv${suffix}"
+
+    }
+
+    //
+    // run script
+    //
     """
     mkdir ${meta.id}
     """
@@ -43,13 +96,14 @@ process MTX_TO_SEURAT {
     if (params.aligner == 'kallisto' && params.kb_workflow != 'standard')
     """
     # convert file types
-    for input_type in nascent ambiguous mature ; do
+    for input_type in ${kb_non_standard_files} ; do
         mtx_to_seurat.R \\
-            *count/counts_unfiltered/cells_x_genes.\${input_type}.mtx \\
-            $barcodes \\
-            $features \\
+            ${matrix} \\
+            ${barcodes} \\
+            ${features} \\
             ${meta.id}/${meta.id}_\${input_type}_matrix.rds \\
-            ${aligner}
+            ${aligner} \\
+            ${is_emptydrops}
     done
     """
 
@@ -59,8 +113,9 @@ process MTX_TO_SEURAT {
         $matrix \\
         $barcodes \\
         $features \\
-        ${meta.id}/${meta.id}_matrix.rds \\
-        ${aligner}
+        ${meta.id}/${meta.id}_${input_type}_matrix.rds \\
+        ${aligner} \\
+        ${is_emptydrops}
     """
 
     stub:

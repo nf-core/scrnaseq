@@ -134,9 +134,7 @@ workflow CELLRANGER_MULTI_ALIGN {
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI.out.versions)
 
-
-
     emit:
         ch_versions
-        cellrangermulti_out  = CELLRANGER_MULTI.out.outs
+        cellrangermulti_out = CELLRANGER_MULTI.out.outs
 }

@@ -1,20 +1,18 @@
-include { MULTIQC } from '../modules/nf-core/multiqc/main'
-include { FASTQC_CHECK } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_ALEVIN } from '../subworkflows/local/alevin'
-include { STARSOLO } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN } from "../subworkflows/local/align_cellranger"
-include { CELLRANGERARC_ALIGN } from "../subworkflows/local/align_cellrangerarc"
-include { CELLRANGER_MULTI_ALIGN } from "../subworkflows/local/align_cellrangermulti"
-include { UNIVERSC_ALIGN } from "../subworkflows/local/align_universc"
-include { MTX_CONVERSION } from "../subworkflows/local/mtx_conversion"
-include { GTF_GENE_FILTER } from '../modules/local/gtf_gene_filter'
-include { GUNZIP as GUNZIP_FASTA      } from '../modules/nf-core/gunzip/main'
-include { GUNZIP as GUNZIP_GTF        } from '../modules/nf-core/gunzip/main'
-
-include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { MULTIQC                            } from '../modules/nf-core/multiqc/main'
+include { FASTQC_CHECK                       } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS                  } from '../subworkflows/local/kallisto_bustools'
+include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevin'
+include { STARSOLO                           } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN                   } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_MULTI_ALIGN             } from "../subworkflows/local/align_cellrangermulti"
+include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align_cellrangerarc"
+include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align_universc"
+include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
+include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
+include { EMPTYDROPS_CELL_CALLING            } from '../modules/local/emptydrops'
+include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
 
 
@@ -22,6 +20,8 @@ workflow SCRNASEQ {
 
     take:
     ch_fastq
+    ch_genome_fasta
+    ch_gtf
 
     main:
 
@@ -30,9 +30,11 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
+    // overwrite fasta and gtf if user provide a custom one
+    ch_genome_fasta = Channel.value(params.fasta ? file(params.fasta) : ch_genome_fasta)
+    ch_gtf = Channel.value(params.gtf ? file(params.gtf) : ch_gtf)
+
     // general input and params
-    if (!params.fasta) { ch_genome_fasta = [] }
-    if (!params.gtf) { ch_gtf = [] }
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
     ch_motifs = params.motifs ? file(params.motifs) : []
     ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
@@ -129,7 +131,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.counts)
+        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.raw_counts, KALLISTO_BUSTOOLS.out.filtered_counts)
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
@@ -163,7 +165,7 @@ workflow SCRNASEQ {
             protocol_config.get('extra_args', ""),
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.star_counts)
+        ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.raw_counts, STARSOLO.out.filtered_counts)
         ch_star_index = STARSOLO.out.star_index
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
     }
@@ -178,7 +180,7 @@ workflow SCRNASEQ {
             protocol_config['protocol']
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_out)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_matrices)
         ch_star_index = CELLRANGER_ALIGN.out.star_index
         ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map{
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
@@ -266,6 +268,26 @@ workflow SCRNASEQ {
         }
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out)
 
+    }
+
+    // Run emptydrops calling module
+    if ( !params.skip_emptydrops ) {
+
+        //
+        // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
+        //
+        if ( params.aligner in [ 'cellranger', 'cellrangerarc', 'kallisto', 'star' ] ) {
+            ch_mtx_matrices_for_emptydrops =
+                ch_mtx_matrices.filter { meta, mtx_files ->
+                    mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
+                    mtx_files.toString().contains("counts_unfiltered")  || // kallisto
+                    mtx_files.toString().contains("raw")                   // star
+            }
+        } else {
+            ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
+        }
+        EMPTYDROPS_CELL_CALLING( ch_mtx_matrices_for_emptydrops )
+        ch_mtx_matrices = ch_mtx_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
     }
 
     // Run mtx to h5ad conversion subworkflow

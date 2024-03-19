@@ -14,20 +14,6 @@ workflow MTX_CONVERSION {
     main:
         ch_versions = Channel.empty()
 
-        // Cellranger module output contains too many files which cause path collisions, we filter to the ones we need.
-        if (params.aligner in [ 'cellranger', 'cellrangerarc' ]) {
-            mtx_matrices = mtx_matrices.map { meta, mtx_files ->
-                    [ meta, mtx_files.findAll { it.toString().contains("filtered_feature_bc_matrix") } ]
-                }
-                .filter { meta, mtx_files -> mtx_files } // Remove any that are missing the relevant files
-        }
-        if ( params.aligner == "cellrangermulti" ) { // only produces raw_feature_bc_matrix
-            mtx_matrices = mtx_matrices.map { meta, mtx_files ->
-                    [ meta, mtx_files.findAll { it.toString().contains("raw_feature_bc_matrix") } ]
-                }
-                .filter { meta, mtx_files -> mtx_files } // Remove any that are missing the relevant files
-        }
-
         //
         // Convert matrix to h5ad
         //
@@ -40,8 +26,15 @@ workflow MTX_CONVERSION {
         //
         // Concat sample-specific h5ad in one
         //
+        ch_concat_h5ad_input = MTX_TO_H5AD.out.h5ad.groupTuple() // gather all sample-specific files / per type
+        if (params.aligner == 'kallisto' && params.kb_workflow != 'standard') {
+            // when having spliced / unspliced matrices, the collected tuple has two levels ( [[mtx_1, mtx_2]] )
+            // which nextflow break because it is not a valid 'path' thus, we have to remove one level
+            // making it as [ mtx_1, mtx_2 ]
+            ch_concat_h5ad_input = ch_concat_h5ad_input.map{ type, matrices -> [ type, matrices.flatten().toList() ] }
+        }
         CONCAT_H5AD (
-            MTX_TO_H5AD.out.h5ad.collect(), // gather all sample-specific files
+            ch_concat_h5ad_input,
             samplesheet
         )
 
@@ -57,6 +50,6 @@ workflow MTX_CONVERSION {
 
     emit:
     ch_versions
-    // counts = MTX_TO_H5AD.out.counts
+    // counts = MTX_TO_H5AD.out.counts  was this ever used?
 
 }

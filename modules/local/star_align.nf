@@ -21,12 +21,14 @@ process STAR_ALIGN {
     val other_10x_parameters
 
     output:
-    tuple val(meta), path('*d.out.bam')       , emit: bam
-    tuple val(meta), path('*.Solo.out')       , emit: counts
-    tuple val(meta), path('*Log.final.out')   , emit: log_final
-    tuple val(meta), path('*Log.out')         , emit: log_out
-    tuple val(meta), path('*Log.progress.out'), emit: log_progress
-    path  "versions.yml"                      , emit: versions
+    tuple val(meta), path('*d.out.bam')                , emit: bam
+    tuple val(meta), path('*.Solo.out')                , emit: counts
+    tuple val(meta), path ("*.Solo.out/Gene*/raw")     , emit: raw_counts
+    tuple val(meta), path ("*.Solo.out/Gene*/filtered"), emit: filtered_counts
+    tuple val(meta), path('*Log.final.out')            , emit: log_final
+    tuple val(meta), path('*Log.out')                  , emit: log_out
+    tuple val(meta), path('*Log.progress.out')         , emit: log_progress
+    path  "versions.yml"                               , emit: versions
 
     tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
     tuple val(meta), path('*toTranscriptome.out.bam'), optional:true, emit: bam_transcript

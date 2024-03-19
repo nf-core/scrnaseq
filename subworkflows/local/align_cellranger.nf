@@ -42,6 +42,7 @@ workflow CELLRANGER_ALIGN {
 
     emit:
         ch_versions
-        cellranger_out  = CELLRANGER_COUNT.out.outs
-        star_index = cellranger_index
+        cellranger_out      = CELLRANGER_COUNT.out.outs
+        cellranger_matrices = CELLRANGER_COUNT.out.filtered.mix( CELLRANGER_COUNT.out.raw )
+        star_index          = cellranger_index
 }

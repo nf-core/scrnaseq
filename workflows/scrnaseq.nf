@@ -223,7 +223,6 @@ workflow SCRNASEQ {
         // the metadata and data for each data-type of every sample.
         // then, inside the subworkflow, it can be parsed to manage inputs to the module
         ch_fastq
-        .view()
         .map { meta, fastqs ->
             def parsed_meta = meta.clone() + [ "${meta.feature_type.toString()}": fastqs ]
             [ parsed_meta.id , parsed_meta ]

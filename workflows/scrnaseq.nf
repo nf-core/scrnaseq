@@ -10,6 +10,8 @@ include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align
 include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
 include { EMPTYDROPS_CELL_CALLING            } from '../modules/local/emptydrops'
+include { GUNZIP as GUNZIP_FASTA             } from '../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_GTF               } from '../modules/nf-core/gunzip/main'
 include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
@@ -220,7 +222,8 @@ workflow SCRNASEQ {
         // parse the input data to generate a collected channel per sample, which will have
         // the metadata and data for each data-type of every sample.
         // then, inside the subworkflow, it can be parsed to manage inputs to the module
-        INPUT_CHECK.out.reads
+        ch_fastq
+        .view()
         .map { meta, fastqs ->
             def parsed_meta = meta.clone() + [ "${meta.feature_type.toString()}": fastqs ]
             [ parsed_meta.id , parsed_meta ]
@@ -276,12 +279,12 @@ workflow SCRNASEQ {
         //
         // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
         //
-        if ( params.aligner in [ 'cellranger', 'cellrangerarc', 'kallisto', 'star' ] ) {
+        if ( params.aligner in [ 'cellranger', 'cellrangerarc', 'cellrangermulti', 'kallisto', 'star' ] ) {
             ch_mtx_matrices_for_emptydrops =
                 ch_mtx_matrices.filter { meta, mtx_files ->
                     mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
-                    mtx_files.toString().contains("counts_unfiltered")  || // kallisto
-                    mtx_files.toString().contains("raw")                   // star
+                    mtx_files.toString().contains("counts_unfiltered")     || // kallisto
+                    mtx_files.toString().contains("raw")                      // star
             }
         } else {
             ch_mtx_matrices_for_emptydrops = ch_mtx_matrices

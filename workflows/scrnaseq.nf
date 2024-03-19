@@ -273,23 +273,31 @@ workflow SCRNASEQ {
     }
 
     // Run emptydrops calling module
-    if ( !params.skip_emptydrops ) {
+    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
 
         //
         // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
         //
-        if ( params.aligner in [ 'cellranger', 'cellrangerarc', 'cellrangermulti', 'kallisto', 'star' ] ) {
+        if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
             ch_mtx_matrices_for_emptydrops =
-                ch_mtx_matrices.filter { meta, mtx_files ->
-                    mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
-                    mtx_files.toString().contains("counts_unfiltered")     || // kallisto
-                    mtx_files.toString().contains("raw")                      // star
+                ch_mtx_matrices.map { meta, mtx_files ->
+                    def desired_files = []
+                    mtx_files.each{
+                        if (
+                            it.toString().contains("raw_feature_bc_matrix") || // cellranger
+                            it.toString().contains("counts_unfiltered")     || // kallisto
+                            it.toString().contains("raw")                      // star
+                        ) { desired_files.add( it ) }
+                    }
+                    [ meta, desired_files ]
             }
         } else {
             ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
         }
+
         EMPTYDROPS_CELL_CALLING( ch_mtx_matrices_for_emptydrops )
         ch_mtx_matrices = ch_mtx_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
+
     }
 
     // Run mtx to h5ad conversion subworkflow

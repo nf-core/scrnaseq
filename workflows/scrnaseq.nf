@@ -268,7 +268,7 @@ workflow SCRNASEQ {
         ch_multiqc_files = CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out.map{
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
         }
-        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx)
 
     }
 
@@ -280,17 +280,11 @@ workflow SCRNASEQ {
         //
         if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
             ch_mtx_matrices_for_emptydrops =
-                ch_mtx_matrices.map { meta, mtx_files ->
-                    def desired_files = []
-                    mtx_files.each{
-                        if (
-                            it.toString().contains("raw_feature_bc_matrix") || // cellranger
-                            it.toString().contains("counts_unfiltered")     || // kallisto
-                            it.toString().contains("raw")                      // star
-                        ) { desired_files.add( it ) }
-                    }
-                    [ meta, desired_files ]
-            }
+                ch_mtx_matrices.filter { meta, mtx_files ->
+                    mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
+                    mtx_files.toString().contains("counts_unfiltered")     || // kallisto
+                    mtx_files.toString().contains("raw")                      // star
+                }
         } else {
             ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
         }

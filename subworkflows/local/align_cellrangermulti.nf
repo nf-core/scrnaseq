@@ -134,7 +134,29 @@ workflow CELLRANGER_MULTI_ALIGN {
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI.out.versions)
 
+        //
+        // Split channels of raw and filtered to avoid file collision problems when loading the inputs in conversion modules.
+        //
+        ch_matrices_raw =
+        CELLRANGER_MULTI.out.outs.map { meta, mtx_files ->
+            def desired_files = []
+            mtx_files.each{
+                if ( it.toString().contains("raw_feature_bc_matrix") ) { desired_files.add( it ) }
+            }
+            [ meta, desired_files ]
+        }
+
+        ch_matrices_filtered =
+        CELLRANGER_MULTI.out.outs.map { meta, mtx_files ->
+            def desired_files = []
+            mtx_files.each{
+                if ( it.toString().contains("filtered_feature_bc_matrix") ) { desired_files.add( it ) }
+            }
+            [ meta, desired_files ]
+        }
+
     emit:
         ch_versions
         cellrangermulti_out = CELLRANGER_MULTI.out.outs
+        cellrangermulti_mtx = ch_matrices_raw.mix( ch_matrices_filtered )
 }

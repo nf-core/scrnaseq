@@ -45,10 +45,6 @@
                 "type": "string",
                 "enum": ["gex", "vdj", "ab", "beam", "crispr", "cmo"],
                 "meta": ["feature_type"]
-            },
-            "protocol": {
-                "type": "string",
-                "meta": ["protocol"]
             }
         },
         "required": ["sample", "fastq_1", "fastq_2"]

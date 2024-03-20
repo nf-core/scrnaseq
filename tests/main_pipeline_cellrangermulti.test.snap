@@ -1,0 +1,54 @@
+{
+    "test-dataset_cellrangermulti_aligner": {
+        "content": [
+            {
+                "stderr": [
+                    
+                ],
+                "errorReport": "",
+                "exitStatus": 0,
+                "failed": false,
+                "stdout": [
+                    
+                ],
+                "errorMessage": "",
+                "trace": {
+                    "tasksFailed": 0,
+                    "tasksCount": 27,
+                    "tasksSucceeded": 27
+                },
+                "name": "workflow",
+                "success": true
+            },
+            "barcodes.tsv.gz:md5,9a272c14cfbfe6670fc8814cef9d1181",
+            "features.tsv.gz:md5,5b2aef51e60667d6f9ccbb3a7d30839b",
+            "matrix.mtx.gz:md5,e65fa3c0cbd373bcbbf234f739a58072",
+            "barcodes.tsv.gz:md5,6b00a878bf2047eac5ef5c7c68ad941c",
+            "features.tsv.gz:md5,5b2aef51e60667d6f9ccbb3a7d30839b",
+            "matrix.mtx.gz:md5,2a223c40cfe05fb87366ab3b31dd9332",
+            "barcodes.tsv.gz:md5,0b06eaaf4c4717de7a5ca25b45ce54b4",
+            "features.tsv.gz:md5,5b2aef51e60667d6f9ccbb3a7d30839b",
+            "matrix.mtx.gz:md5,55a54e9c1c92ee07db1a27e5207f200f",
+            "barcodes.tsv.gz:md5,0abf0bbfb5ed8e78e86f00a16d12e9da",
+            "features.tsv.gz:md5,5b2aef51e60667d6f9ccbb3a7d30839b",
+            "matrix.mtx.gz:md5,e3e4a53a95bf6c5b56701abc733675ff",
+            "barcodes.tsv.gz:md5,d014e325977ea1c79aa1524f9981d842",
+            "features.tsv.gz:md5,5b2aef51e60667d6f9ccbb3a7d30839b",
+            "matrix.mtx.gz:md5,857430b9e56ef34bb68e3a1c49238f86",
+            "barcodes.tsv.gz:md5,bd852b88b665974d475061cef7e45326",
+            "features.tsv.gz:md5,5b2aef51e60667d6f9ccbb3a7d30839b",
+            "matrix.mtx.gz:md5,01399e373a1b0ab32a1d43e8d9188805",
+            "PBMC_10K_CMO_raw_matrix.rds:md5,a32e7e27da46acce3bf0746f13a6bf79",
+            "PBMC_10K_CMV_raw_matrix.rds:md5,46650e78b00a0a1c27e17c7c7380bcad",
+            "PBMC_10K_raw_matrix.rds:md5,ff33e21707d3af018a0e086ef1629062",
+            "PBMC_10K_CMO_filtered_matrix.rds:md5,bbd9df3c7d57ad4aa1474ef9c47915af",
+            "PBMC_10K_CMV_filtered_matrix.rds:md5,04aebe08d8dde95376d79c5696cab23b",
+            "PBMC_10K_filtered_matrix.rds:md5,64dcf7bdccc4a571d960d817f2e17b7b"
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.10.1"
+        },
+        "timestamp": "2024-03-20T13:08:43.931681467"
+    }
+}

@@ -32,7 +32,7 @@ process MTX_TO_H5AD {
 
     // def file paths for aligners. Cellranger is normally converted with the .h5 files
     // However, the emptydrops call, always generate .mtx files, thus, cellranger 'emptydrops' required a parsing
-    if (params.aligner in [ 'cellranger', 'cellrangerarc' ] && input_type == 'custom_emptydrops_filter') {
+    if (params.aligner in [ 'cellranger', 'cellrangerarc', 'cellrangermulti' ] && input_type == 'custom_emptydrops_filter') {
 
         aligner      = 'cellranger'
         txp2gene     = ''
@@ -94,7 +94,7 @@ process MTX_TO_H5AD {
     # convert file types
     mtx_to_h5ad.py \\
         --aligner cellranger \\
-        --input ${input_type}_feature_bc_matrix.h5 \\
+        --input *${input_type}_feature_bc_matrix.h5 \\
         --sample ${meta.id} \\
         --out ${meta.id}/${meta.id}_${input_type}_matrix.h5ad
     """

@@ -61,7 +61,7 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
-                    "enum": ["kallisto", "star", "alevin", "cellranger", "cellrangerarc", "universc"]
+                    "enum": ["kallisto", "star", "alevin", "cellranger", "universc", "cellrangerarc", "cellrangermulti"]
                 },
                 "protocol": {
                     "type": "string",
@@ -266,6 +266,10 @@
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. ",
                     "format": "file-path",
                     "exists": true
+                },
+                "skip_cellranger_renaming": {
+                    "type": "boolean",
+                    "description": "Should it skip the automatic renaming included in cellranger-related modules?"
                 }
             }
         },
@@ -300,6 +304,62 @@
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website.",
                     "format": "file-path",
                     "exists": true
+                }
+            }
+        },
+        "cellranger_multi_options": {
+            "title": "Cellranger Multi options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "cellranger_gex_index": {
+                    "type": "string",
+                    "description": "Specify a pre-built cellranger index for GEX analysis"
+                },
+                "cellranger_vdj_index": {
+                    "type": "string",
+                    "description": "Specify a pre-built cellranger index for VDJ analysis"
+                },
+                "gex_frna_probe_set": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "gex_target_panel": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "gex_cmo_set": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "fb_reference": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "vdj_inner_enrichment_primers": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "beam_antigen_csv": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "beam_control_csv": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "frna_sample_csv": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "gex_barcode_sample_assignment": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
+                },
+                "cmo_barcode_csv": {
+                    "type": "string",
+                    "description": "TODO: Need help in defining a description for param."
                 }
             }
         },
@@ -529,6 +589,9 @@
         },
         {
             "$ref": "#/definitions/universc_options"
+        },
+        {
+            "$ref": "#/definitions/cellranger_multi_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

@@ -33,7 +33,7 @@ jobs:
         NXF_VER:
           - "23.04.0"
           - "latest-everything"
-        profile: ["alevin", "cellranger", "kallisto", "star"]
+        profile: ["alevin", "cellranger", "cellrangermulti", "kallisto", "star"]
 
     steps:
       - name: Disk space cleanup

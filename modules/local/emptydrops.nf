@@ -19,7 +19,7 @@ process EMPTYDROPS_CELL_CALLING {
     task.ext.when == null || task.ext.when
 
     script:
-    if (params.aligner == "cellranger") {
+    if (params.aligner in ["cellranger", "cellrangermulti"]) {
 
         matrix   = "matrix.mtx.gz"
         barcodes = "barcodes.tsv.gz"

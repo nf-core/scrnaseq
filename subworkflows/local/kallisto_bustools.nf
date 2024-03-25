@@ -52,11 +52,23 @@ workflow KALLISTO_BUSTOOLS {
 
     ch_versions = ch_versions.mix(KALLISTOBUSTOOLS_COUNT.out.versions)
 
+    // get raw/filtered counts
+    ch_raw_counts = KALLISTOBUSTOOLS_COUNT.out.count.map{ meta, kb_dir ->
+        if (file("${kb_dir.toUriString()}/counts_unfiltered").exists()) {
+            [meta, file("${kb_dir.toUriString()}/counts_unfiltered")]
+        }
+    }
+    ch_filtered_counts = KALLISTOBUSTOOLS_COUNT.out.count.map{ meta, kb_dir ->
+        if (file("${kb_dir.toUriString()}/counts_filtered").exists()) {
+            [meta, file("${kb_dir.toUriString()}/counts_filtered")]
+        }
+    }
+
     emit:
     ch_versions
-    counts = KALLISTOBUSTOOLS_COUNT.out.count
-    raw_counts = KALLISTOBUSTOOLS_COUNT.out.raw_counts
-    filtered_counts = KALLISTOBUSTOOLS_COUNT.out.filtered_counts
-    txp2gene = txp2gene.collect()
+    counts          = KALLISTOBUSTOOLS_COUNT.out.count
+    raw_counts      = ch_raw_counts
+    filtered_counts = ch_filtered_counts
+    txp2gene        = txp2gene.collect()
 
 }

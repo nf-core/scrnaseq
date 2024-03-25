@@ -27,7 +27,7 @@ process MTX_TO_H5AD {
 
     // check input type of inputs
     input_type = (input_to_check.toUriString().contains('unfiltered') || input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
-    if ( params.aligner == 'alevin' ) { input_type = 'raw' } // alevin has its own filtering methods and mostly output a single mtx, raw here means, the base tool output
+    if ( params.aligner == 'alevin' ) { input_type = 'raw' } // alevin has its own filtering methods and mostly output a single mtx, 'raw' here means, the base tool output
     if (input_to_check.toUriString().contains('emptydrops')) { input_type = 'custom_emptydrops_filter' }
 
     // def file paths for aligners. Cellranger is normally converted with the .h5 files

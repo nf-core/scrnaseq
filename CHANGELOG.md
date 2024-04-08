@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update to kallisto|bustools v0.28.2 ([#294](https://github.com/nf-core/scrnaseq/pull/294))
 - Fix cellrangerarc matrix conversions and protocol selection ([#300](https://github.com/nf-core/scrnaseq/pull/300))
 - Add new emptydrops calling module ([#301](https://github.com/nf-core/scrnaseq/pull/301))
+- Add cellranger multi subworkflow ([#247](https://github.com/nf-core/scrnaseq/issues/247))
 
 ## v2.5.1
 
@@ -26,7 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The universc protocol is now specified via the `--protocol` flag
   - Any protocol specified is now passed to the respective aligner
   - Added a section to the documentation
-- Add cellranger multi subworkflow ([#247](https://github.com/nf-core/scrnaseq/issues/247))
 
 ## v2.4.1 - 2023-09-28
 

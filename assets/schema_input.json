@@ -43,7 +43,7 @@
             },
             "feature_type": {
                 "type": "string",
-                "enum": ["gex", "vdj", "ab", "beam", "crispr", "cmo"],
+                "enum": ["gex", "vdj", "ab", "crispr", "cmo"],
                 "meta": ["feature_type"]
             }
         },

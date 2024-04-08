@@ -246,7 +246,7 @@ workflow SCRNASEQ {
             if (!collected_map_clone.any{ it.feature_type == 'gex' })    { collected_map_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
             if (!collected_map_clone.any{ it.feature_type == 'vdj' })    { collected_map_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
             if (!collected_map_clone.any{ it.feature_type == 'ab' })     { collected_map_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
-            if (!collected_map_clone.any{ it.feature_type == 'beam' })   { collected_map_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) }
+            if (!collected_map_clone.any{ it.feature_type == 'beam' })   { collected_map_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
             if (!collected_map_clone.any{ it.feature_type == 'crispr' }) { collected_map_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
             if (!collected_map_clone.any{ it.feature_type == 'cmo' })    { collected_map_clone.add( [id: sample_id, feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
 

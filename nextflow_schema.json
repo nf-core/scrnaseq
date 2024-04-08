@@ -341,23 +341,11 @@
                     "type": "string",
                     "description": "TODO: Need help in defining a description for param."
                 },
-                "beam_antigen_csv": {
-                    "type": "string",
-                    "description": "TODO: Need help in defining a description for param."
-                },
-                "beam_control_csv": {
-                    "type": "string",
-                    "description": "TODO: Need help in defining a description for param."
-                },
-                "frna_sample_csv": {
-                    "type": "string",
-                    "description": "TODO: Need help in defining a description for param."
-                },
                 "gex_barcode_sample_assignment": {
                     "type": "string",
                     "description": "TODO: Need help in defining a description for param."
                 },
-                "cmo_barcode_csv": {
+                "cellranger_multi_barcodes": {
                     "type": "string",
                     "description": "TODO: Need help in defining a description for param."
                 }

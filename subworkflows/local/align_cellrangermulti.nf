@@ -109,9 +109,9 @@ workflow CELLRANGER_MULTI_ALIGN {
                 if (meta) {
                     lines = [ 'sample,probe_barcode_ids,description' ]
                     meta[0].each{ lines = lines + [ "$it.sample,$it.probe_barcode_ids,$it.description" ] } // groupTuple adds one level nest on array, thus, meta[0] takes the real array with all maps.
-                    cmos = file( "${sample}_cmo_samplesheet.csv" )
-                    cmos.text = lines.join("\n").trim().toString()
-                    cmos
+                    frna = file( "${sample}_frna_samplesheet.csv" )
+                    frna.text = lines.join("\n").trim().toString()
+                    frna
                 } else { empty_file }
             }
 

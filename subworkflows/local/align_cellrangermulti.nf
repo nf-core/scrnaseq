@@ -94,8 +94,8 @@ workflow CELLRANGER_MULTI_ALIGN {
             .map{ sample, meta ->
                 // groupTuple adds one level nest on array, thus, meta[0] takes the real array with all maps.
                 if (meta && meta[0][0].containsKey('cmo_ids')) {
-                    lines = [ 'sample,cmo_ids,description' ]
-                    meta[0].each{ lines = lines + [ "$it.sample,$it.cmo_ids,$it.description" ] }
+                    lines = [ 'sample_id,cmo_ids,description' ]
+                    meta[0].each{ lines = lines + [ "$it.multiplexed_sample_id,$it.cmo_ids,$it.description" ] }
                     cmos = file( "${sample}_cmo_samplesheet.csv" )
                     cmos.text = lines.join("\n").trim().toString()
                     cmos
@@ -109,8 +109,8 @@ workflow CELLRANGER_MULTI_ALIGN {
             .map{ sample, meta ->
                 // groupTuple adds one level nest on array, thus, meta[0] takes the real array with all maps.
                 if (meta && meta[0][0].containsKey('probe_barcode_ids')) {
-                    lines = [ 'sample,probe_barcode_ids,description' ]
-                    meta[0].each{ lines = lines + [ "$it.sample,$it.probe_barcode_ids,$it.description" ] }
+                    lines = [ 'sample_id,probe_barcode_ids,description' ]
+                    meta[0].each{ lines = lines + [ "$it.multiplexed_sample_id,$it.probe_barcode_ids,$it.description" ] }
                     frna = file( "${sample}_frna_samplesheet.csv" )
                     frna.text = lines.join("\n").trim().toString()
                     frna

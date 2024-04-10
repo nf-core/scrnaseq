@@ -97,7 +97,12 @@ workflow CELLRANGER_MULTI_ALIGN {
                     lines = [ 'sample_id,cmo_ids,description' ]
                     meta[0].each{ lines = lines + [ "$it.multiplexed_sample_id,$it.cmo_ids,$it.description" ] }
                     cmos = file( "${workflow.workDir}/${sample}_cmo_samplesheet.csv" )
-                    cmos.text = lines.join("\n").trim().toString()
+                    if (
+                        cmos.exists() &&
+                        cmos.text == lines.join("\n").trim().toString()
+                    ) {} else {
+                        cmos.text = lines.join("\n").trim().toString()
+                    }
                     cmos
                 } else { empty_file }
             }
@@ -112,7 +117,12 @@ workflow CELLRANGER_MULTI_ALIGN {
                     lines = [ 'sample_id,probe_barcode_ids,description' ]
                     meta[0].each{ lines = lines + [ "$it.multiplexed_sample_id,$it.probe_barcode_ids,$it.description" ] }
                     frna = file( "${workflow.workDir}/${sample}_frna_samplesheet.csv" )
-                    frna.text = lines.join("\n").trim().toString()
+                    if (
+                        frna.exists() &&
+                        frna.text == lines.join("\n").trim().toString()
+                    ) {} else {
+                        frna.text = lines.join("\n").trim().toString()
+                    }
                     frna
                 } else { empty_file }
             }

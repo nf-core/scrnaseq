@@ -90,11 +90,12 @@ workflow CELLRANGER_MULTI_ALIGN {
             // CMOs
             ch_cmo_barcode_csv =
             ch_grouped_fastq.gex.map{ it[0].id }
-            .join( ch_cellrangermulti_barcodes.cmo.collect().map{ [ it[0].sample, it ] }.groupTuple(by:0), remainder: true )
+            .join( ch_cellrangermulti_barcodes.cmo.collect().map{ [ it[0].sample, it ] }.groupTuple(by:0).ifEmpty{ [ [], [] ] }, remainder: true ).filter{ it[0] != [] } // .ifEmpty{} is there to allow join when data is not available and the rest do not fail, and the . filter{} is there to remove the generated [[],[]] when empty so it does not break the expected channel size.
             .map{ sample, meta ->
-                if (meta) {
+                // groupTuple adds one level nest on array, thus, meta[0] takes the real array with all maps.
+                if (meta && meta[0][0].containsKey('cmo_ids')) {
                     lines = [ 'sample,cmo_ids,description' ]
-                    meta[0].each{ lines = lines + [ "$it.sample,$it.cmo_ids,$it.description" ] } // groupTuple adds one level nest on array, thus, meta[0] takes the real array with all maps.
+                    meta[0].each{ lines = lines + [ "$it.sample,$it.cmo_ids,$it.description" ] }
                     cmos = file( "${sample}_cmo_samplesheet.csv" )
                     cmos.text = lines.join("\n").trim().toString()
                     cmos
@@ -104,11 +105,12 @@ workflow CELLRANGER_MULTI_ALIGN {
             // FRNAs
             ch_frna_sample_csv =
             ch_grouped_fastq.gex.map{ it[0].id }
-            .join( ch_cellrangermulti_barcodes.frna.collect().map{ [ it[0].sample, it ] }.groupTuple(by:0), remainder: true )
+            .join( ch_cellrangermulti_barcodes.frna.collect().map{ [ it[0].sample, it ] }.groupTuple(by:0).ifEmpty{ [ [], [] ] }, remainder: true ).filter{ it[0] != [] } // .ifEmpty{} is there to allow join when data is not available and the rest do not fail, and the . filter{} is there to remove the generated [[],[]] when empty so it does not break the expected channel size.
             .map{ sample, meta ->
-                if (meta) {
+                // groupTuple adds one level nest on array, thus, meta[0] takes the real array with all maps.
+                if (meta && meta[0][0].containsKey('probe_barcode_ids')) {
                     lines = [ 'sample,probe_barcode_ids,description' ]
-                    meta[0].each{ lines = lines + [ "$it.sample,$it.probe_barcode_ids,$it.description" ] } // groupTuple adds one level nest on array, thus, meta[0] takes the real array with all maps.
+                    meta[0].each{ lines = lines + [ "$it.sample,$it.probe_barcode_ids,$it.description" ] }
                     frna = file( "${sample}_frna_samplesheet.csv" )
                     frna.text = lines.join("\n").trim().toString()
                     frna

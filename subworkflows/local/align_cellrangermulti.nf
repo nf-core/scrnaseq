@@ -69,38 +69,33 @@ workflow CELLRANGER_MULTI_ALIGN {
             // and also split it to have one fnra/cmo .csv for each sample.
             //
             // The selection of the GEX fastqs is because samples are always expected to have at least GEX data.
-            // Then, using "joined" map, which means, the "additional barcode information" of each sample, we then,
+            // Then, using "combined" map, which means, the "additional barcode information" of each sample, we then,
             // parse it to generate the cmo / frna samplesheets to be used by each sample.
             //
-            // Here, because of the .join() we take advantage of the "FIFO"-rule and are sure that the data used in the
-            // module is from the same sample from the "normal" samplesheet.
+            // Here, to guarantee it and take advantage of the "FIFO"-rule and are sure that the data used in the
+            // module is from the same sample from the "normal" samplesheet. We have to use the .concat().groupTuple()
+            // pipe instead of .join() because .join() outputs first the arrays that could be joined and afterwards
+            // the ones with "remainders", thus, we would not ensure "FIFO" and the same order.
+            //
+            // To guarantee this, we can define two nf-tests, one having only one sample with CMO and another with two
+            // samples using CMOs, even if wrongly/repeated, but just to guarantee FIFO is working.
             //
 
             PARSE_CELLRANGERMULTI_SAMPLESHEET( ch_multi_samplesheet )
 
-            //
-            // when module output channel is not empty, it generates an array [ sample, file ]. Where file cna be a real file or a (null) due the .join() remainder.
-            // and, when the module output channel, the resulting channel is not an array, but just a string with sample name.
-            //
-            // this is taken into account in the .map{} that comes after the .join()
-            //
+            ch_grouped_fastq.gex
+            .map{ [it[0].id] }
+            .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.flatten().map { [ "${it.baseName}" - "_cmo", it ] } )
+            .groupTuple()
+            .map { if ( it.size() == 2 ) { it[1] } else { empty_file } } // a correct tuple from snippet will have: [ sample, cmo.csv ]
+            .set { ch_cmo_barcode_csv }
 
-            ch_cmo_barcode_csv =
-                ch_grouped_fastq.gex.map{ it[0].id }
-                .join(
-                    PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.map { [ "${it.baseName}" - "_cmo", it ] },
-                    remainder: true
-                )
-
-                .map { if ((it instanceof ArrayList) && it[1] != null) { it[1] } else { empty_file } }
-
-            ch_frna_sample_csv =
-                ch_grouped_fastq.gex.map{ it[0].id }
-                .join(
-                    PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.map { [ "${it.baseName}" - "_frna", it ] },
-                    remainder: true
-                )
-                .map { if ((it instanceof ArrayList) && it[1] != null) { it[1] } else { empty_file } }
+            ch_grouped_fastq.gex
+            .map{ [it[0].id] }
+            .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.flatten().map { [ "${it.baseName}" - "_frna", it ] } )
+            .groupTuple()
+            .map { if ( it.size() == 2 ) { it[1] } else { empty_file } } // a correct tuple from snippet will have: [ sample, frna.csv ]
+            .set { ch_frna_sample_csv }
 
         } else {
             ch_cmo_barcode_csv = empty_file

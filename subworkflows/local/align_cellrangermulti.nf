@@ -16,6 +16,7 @@ workflow CELLRANGER_MULTI_ALIGN {
         cellranger_gex_index
         cellranger_vdj_index
         empty_file
+        ch_multi_samplesheet
 
     main:
         ch_versions    = Channel.empty()
@@ -60,11 +61,47 @@ workflow CELLRANGER_MULTI_ALIGN {
         ch_beam_control_panel_csv = empty_file // currently not implemented
 
         // parse frna and barcode information
-        if (params.cellranger_multi_barcodes) {
-            ch_multi_samplesheet = file( params.cellranger_multi_barcodes, checkIfExists: true )
+        if (ch_multi_samplesheet) {
+
+            //
+            // Here, we parse the received cellranger multi barcodes samplesheet.
+            // We first use the get the PARSE_CELLRANGERMULTI_SAMPLESHEET module to check it and guarantee structure
+            // and also split it to have one fnra/cmo .csv for each sample.
+            //
+            // The selection of the GEX fastqs is because samples are always expected to have at least GEX data.
+            // Then, using "joined" map, which means, the "additional barcode information" of each sample, we then,
+            // parse it to generate the cmo / frna samplesheets to be used by each sample.
+            //
+            // Here, because of the .join() we take advantage of the "FIFO"-rule and are sure that the data used in the
+            // module is from the same sample from the "normal" samplesheet.
+            //
+
             PARSE_CELLRANGERMULTI_SAMPLESHEET( ch_multi_samplesheet )
-            ch_cmo_barcode_csv = PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.view()
-            ch_frna_sample_csv = PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna
+
+            //
+            // when module output channel is not empty, it generates an array [ sample, file ]. Where file cna be a real file or a (null) due the .join() remainder.
+            // and, when the module output channel, the resulting channel is not an array, but just a string with sample name.
+            //
+            // this is taken into account in the .map{} that comes after the .join()
+            //
+
+            ch_cmo_barcode_csv =
+                ch_grouped_fastq.gex.map{ it[0].id }
+                .join(
+                    PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.map { [ "${it.baseName}" - "_cmo", it ] },
+                    remainder: true
+                )
+
+                .map { if ((it instanceof ArrayList) && it[1] != null) { it[1] } else { empty_file } }
+
+            ch_frna_sample_csv =
+                ch_grouped_fastq.gex.map{ it[0].id }
+                .join(
+                    PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.map { [ "${it.baseName}" - "_frna", it ] },
+                    remainder: true
+                )
+                .map { if ((it instanceof ArrayList) && it[1] != null) { it[1] } else { empty_file } }
+
         } else {
             ch_cmo_barcode_csv = empty_file
             ch_frna_sample_csv = empty_file

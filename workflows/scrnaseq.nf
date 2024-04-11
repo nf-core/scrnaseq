@@ -78,8 +78,9 @@ workflow SCRNASEQ {
     ch_universc_index = params.universc_index ? file(params.universc_index) : []
 
     //cellrangermulti params
-    cellranger_gex_index              = params.cellranger_gex_index ? file(params.cellranger_gex_index) : []
-    cellranger_vdj_index              = params.cellranger_vdj_index ? file(params.cellranger_vdj_index) : []
+    cellranger_gex_index              = params.cellranger_gex_index      ? file(params.cellranger_gex_index, checkIfExists: true)      : []
+    cellranger_vdj_index              = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
+    ch_multi_samplesheet              = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
     empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
 
     ch_versions     = Channel.empty()
@@ -262,7 +263,8 @@ workflow SCRNASEQ {
             ch_cellrangermulti_collected_channel,
             cellranger_gex_index,
             cellranger_vdj_index,
-            empty_file
+            empty_file,
+            ch_multi_samplesheet
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN.out.ch_versions)
         ch_multiqc_files = CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out.map{

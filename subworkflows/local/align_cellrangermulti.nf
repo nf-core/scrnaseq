@@ -88,6 +88,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.flatten().map { [ "${it.baseName}" - "_cmo", it ] } )
             .groupTuple()
             .map { if ( it.size() == 2 ) { it[1] } else { empty_file } } // a correct tuple from snippet will have: [ sample, cmo.csv ]
+            .flatten()
             .set { ch_cmo_barcode_csv }
 
             ch_grouped_fastq.gex
@@ -95,6 +96,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.flatten().map { [ "${it.baseName}" - "_frna", it ] } )
             .groupTuple()
             .map { if ( it.size() == 2 ) { it[1] } else { empty_file } } // a correct tuple from snippet will have: [ sample, frna.csv ]
+            .flatten()
             .set { ch_frna_sample_csv }
 
         } else {

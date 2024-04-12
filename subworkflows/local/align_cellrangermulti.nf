@@ -179,10 +179,38 @@ workflow CELLRANGER_MULTI_ALIGN {
         ch_versions = ch_versions.mix(CELLRANGER_MULTI.out.versions)
 
         //
+        // Cellranger multi splits the results from each sample. So, a module execution will have: (1) a raw counts dir for all;
+        // (2) a filtered counts dir PER sample.
+        //
+        // Thus, cellranger multi outputs data from all identified samples in a single channel, which will cause file collision.
+        //
+        // For the conversion, we should convert the resulting files of each sample, thus, now, we must parse the names
+        // of the filtered 'per_sample_outs' of cellranger/multi and then, split the channels as such.
+        //
+        CELLRANGER_MULTI.out.outs
+        .map{ meta, mtx_files ->
+            def desired_files = []
+            mtx_files.each{
+                if ( it.toString().contains("per_sample_outs") ) {
+                    def demuxed_sample_name = it.toString().split('per_sample_outs/')[1].split('/')[0]
+                    def meta_clone    = meta.clone()
+                    meta_clone.bkp_id = meta_clone.id
+                    meta_clone.id     = demuxed_sample_name
+                    desired_files.add( [ meta_clone, it ] )
+                }
+            }
+            desired_files
+        }
+        .flatten()
+        .buffer( size: 2 )   // gets: [ meta_clone, single_file ]
+        .groupTuple( by: 0 ) // gets: [ meta_clone, all_files   ]
+        .set { ch_parsed_per_sample_matrices }
+
+        //
         // Split channels of raw and filtered to avoid file collision problems when loading the inputs in conversion modules.
         //
         ch_matrices_raw =
-        CELLRANGER_MULTI.out.outs.map { meta, mtx_files ->
+        CELLRANGER_MULTI.out.outs.map { meta, mtx_files -> // Use the unparsed matrix channel because raw results will be outside the 'per_sample_outs'
             def desired_files = []
             mtx_files.each{
                 if ( it.toString().contains("raw_feature_bc_matrix") ) { desired_files.add( it ) }
@@ -191,7 +219,7 @@ workflow CELLRANGER_MULTI_ALIGN {
         }
 
         ch_matrices_filtered =
-        CELLRANGER_MULTI.out.outs.map { meta, mtx_files ->
+        ch_parsed_per_sample_matrices.map { meta, mtx_files -> // Use the parsed matrix channel
             def desired_files = []
             mtx_files.each{
                 if ( it.toString().contains("filtered_feature_bc_matrix") ) { desired_files.add( it ) }

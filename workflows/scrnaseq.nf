@@ -275,12 +275,12 @@ workflow SCRNASEQ {
     }
 
     // Run emptydrops calling module
-    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
+    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc', 'cellrangermulti']) ) { // TODO: Can it run with 'cellrangermulti'?
 
         //
         // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
         //
-        if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
+        if ( params.aligner in [ 'cellranger', 'kallisto', 'star' ] ) {
             ch_mtx_matrices_for_emptydrops =
                 ch_mtx_matrices.filter { meta, mtx_files ->
                     mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger

@@ -11,12 +11,12 @@ process CELLRANGER_MULTI {
 
     input:
     val meta
-    tuple val(meta_gex)        , path (gex_fastqs   , stageAs: "fastqs/???/gex/*")
-    tuple val(meta_vdj)        , path (vdj_fastqs   , stageAs: "fastqs/???/vdj/*")
-    tuple val(meta_ab)         , path (ab_fastqs    , stageAs: "fastqs/???/ab/*")
-    tuple val(meta_beam)       , path (beam_fastqs  , stageAs: "fastqs/???/beam/*")
-    tuple val(meta_cmo)        , path (cmo_fastqs   , stageAs: "fastqs/???/cmo/*")
-    tuple val(meta_crispr)     , path (crispr_fastqs, stageAs: "fastqs/???/crispr/*")
+    tuple val(meta_gex)        , path (gex_fastqs   , stageAs: "fastqs/gex/fastq_???/*")
+    tuple val(meta_vdj)        , path (vdj_fastqs   , stageAs: "fastqs/vdj/fastq_???/*")
+    tuple val(meta_ab)         , path (ab_fastqs    , stageAs: "fastqs/ab/fastq_???/*")
+    tuple val(meta_beam)       , path (beam_fastqs  , stageAs: "fastqs/beam/fastq_???/*")
+    tuple val(meta_cmo)        , path (cmo_fastqs   , stageAs: "fastqs/cmo/fastq_???/*")
+    tuple val(meta_crispr)     , path (crispr_fastqs, stageAs: "fastqs/crispr/fastq_???/*")
     path gex_reference         , stageAs: "references/gex/*"
     path gex_frna_probeset     , stageAs: "references/gex/probeset/*"
     path gex_targetpanel       , stageAs: "references/gex/targetpanel/*"

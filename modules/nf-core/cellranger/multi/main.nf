@@ -4,14 +4,19 @@ process CELLRANGER_MULTI {
 
     container "nf-core/cellranger:7.1.0"
 
+    //
+    //TODO: Work in progress
+    // Once code works with internal real data, all fixes should be migrated to nf-core/module
+    //
+
     input:
     val meta
-    tuple val(meta_gex)        , path (gex_fastqs   , stageAs: "fastqs/gex/*")
-    tuple val(meta_vdj)        , path (vdj_fastqs   , stageAs: "fastqs/vdj/*")
-    tuple val(meta_ab)         , path (ab_fastqs    , stageAs: "fastqs/ab/*")
-    tuple val(meta_beam)       , path (beam_fastqs  , stageAs: "fastqs/beam/*")
-    tuple val(meta_cmo)        , path (cmo_fastqs   , stageAs: "fastqs/cmo/*")
-    tuple val(meta_crispr)     , path (crispr_fastqs, stageAs: "fastqs/crispr/*")
+    tuple val(meta_gex)        , path (gex_fastqs   , stageAs: "fastqs/???/gex/*")
+    tuple val(meta_vdj)        , path (vdj_fastqs   , stageAs: "fastqs/???/vdj/*")
+    tuple val(meta_ab)         , path (ab_fastqs    , stageAs: "fastqs/???/ab/*")
+    tuple val(meta_beam)       , path (beam_fastqs  , stageAs: "fastqs/???/beam/*")
+    tuple val(meta_cmo)        , path (cmo_fastqs   , stageAs: "fastqs/???/cmo/*")
+    tuple val(meta_crispr)     , path (crispr_fastqs, stageAs: "fastqs/???/crispr/*")
     path gex_reference         , stageAs: "references/gex/*"
     path gex_frna_probeset     , stageAs: "references/gex/probeset/*"
     path gex_targetpanel       , stageAs: "references/gex/targetpanel/*"
@@ -71,13 +76,13 @@ process CELLRANGER_MULTI {
     target_panel = gex_targetpanel_name != '' ? "target-panel,./$gex_targetpanel_name" : ''
 
     // fixed RNA reference (not sample info!) also goes under GEX section
-    frna_probeset = include_frna && gex_frna_probeset_name != '' ? "probe-set,./references/gex/probeset/$gex_frna_probeset_name" : ''
+    frna_probeset = include_frna && gex_frna_probeset_name != '' ? "probe-set,./$gex_frna_probeset_name" : ''
 
     // VDJ inner primer set
     primer_index = vdj_primer_index.getBaseName() != 'EMPTY' ? "inner-enrichment-primers,./references/primers/${vdj_primer_index.getName()}" : ''
 
     // BEAM antigen list, remember that this is a Feature Barcode file
-    beam_antigen_csv = include_beam && beam_antigen_panel_name != '' ? "reference,\$PWD/$beam_antigen_panel_name" : ''
+    beam_antigen_csv = include_beam && beam_antigen_panel_name != '' ? "reference,./$beam_antigen_panel_name" : ''
 
     // pull CSV text from these reference panels
     // these references get appended directly to config file

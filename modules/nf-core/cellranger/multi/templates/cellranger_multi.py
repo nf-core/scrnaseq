@@ -25,7 +25,7 @@ sample_id = "${prefix}"
 #   - ...
 # Since we require fastq files in the input channel to be ordered such that a R1/R2 pair
 # of files follows each other, ordering will get us a sequence of [R1, R2, R1, R2, ...]
-fastqs = sorted(Path(".").glob("fastqs/*/[!EMPTY]*"))
+fastqs = sorted(Path(".").glob("fastqs/*/*/[!EMPTY]*"))
 assert len(fastqs) % 2 == 0
 
 # target directory in which the renamed fastqs will be placed
@@ -71,8 +71,8 @@ for i, (r1, r2) in enumerate(chunk_iter(fastqs, 2), start=1):
         resolved_name_r2 = f"{sample_id}_S1_L{i:03d}_R2_001.fastq.gz"
 
     # rename or just move
-    r1.rename(fastq_all / subdir / resolved_name_r1 )
-    r2.rename(fastq_all / subdir / resolved_name_r2 )
+    r1.rename( fastq_all / subdir / resolved_name_r1 )
+    r2.rename( fastq_all / subdir / resolved_name_r2 )
 
 #
 # fix relative paths from main.nf
@@ -140,7 +140,7 @@ fastq_id,fastqs,lanes,feature_types
 # check the extra data that is included
 #
 if len("${include_cmo}") > 0:
-    with open("${cmo_barcodes}", 'r') as input_conf:
+    with open("${beam_csv_text}", 'r') as input_conf:
         config_txt = config_txt + "\\n${include_cmo}\\n" + input_conf.read() + "\\n"
 
 if len("${include_beam}") > 0:

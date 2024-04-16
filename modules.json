@@ -7,17 +7,17 @@
                 "nf-core": {
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "92ca535c5a8c0fe89eb71e649ee536bd355ce4fc",
+                        "git_sha": "e66183d2ab6a5c2f3fd66b2bee942287cf65536c",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
-                        "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
+                        "git_sha": "e66183d2ab6a5c2f3fd66b2bee942287cf65536c",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "e66183d2ab6a5c2f3fd66b2bee942287cf65536c",
                         "installed_by": ["modules"]
                     },
                     "cellrangerarc/count": {

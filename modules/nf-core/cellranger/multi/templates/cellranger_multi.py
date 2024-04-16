@@ -140,7 +140,7 @@ fastq_id,fastqs,lanes,feature_types
 # check the extra data that is included
 #
 if len("${include_cmo}") > 0:
-    with open("${beam_csv_text}", "r") as input_conf:
+    with open("${cmo_csv_text}", "r") as input_conf:
         config_txt = config_txt + "\\n${include_cmo}\\n" + input_conf.read() + "\\n"
 
 if len("${include_beam}") > 0:

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update to kallisto|bustools v0.28.2 ([#294](https://github.com/nf-core/scrnaseq/pull/294))
 - Fix cellrangerarc matrix conversions and protocol selection ([#300](https://github.com/nf-core/scrnaseq/pull/300))
 - Add new emptydrops calling module ([#301](https://github.com/nf-core/scrnaseq/pull/301))
+- Update cellranger modules to latest version ([[#316](https://github.com/nf-core/scrnaseq/issues/316)])
 
 ## v2.5.1
 

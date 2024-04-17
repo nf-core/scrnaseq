@@ -61,12 +61,12 @@ process CELLRANGER_MULTI {
     cmo_sample_assignment   = cmo_barcode_assignment.getName() != 'EMPTY' ? cmo_barcode_assignment.getName() : ''
     beam_antigen_panel_name = beam_antigen_panel.getName() != 'EMPTY' ? beam_antigen_panel.getName() : ''
 
-    include_gex  = gex_fastqs.first().getName() != 'fastqs' && gex_reference ? '[gene-expression]'     : ''
-    include_vdj  = vdj_fastqs.first().getName() != 'fastqs' && vdj_reference ? '[vdj]'                 : ''
-    include_beam = beam_fastqs.first().getName() != 'fastqs' && beam_control_panel ? '[antigen-specificity]' : ''
-    include_cmo  = cmo_fastqs.first().getName() != 'fastqs' && cmo_barcodes  ? '[samples]'             : ''
-    include_fb   = fb_reference.first().getName() != 'references'            ? '[feature]'             : ''
-    include_frna = gex_frna_probeset_name && frna_sampleinfo                 ? '[samples]'             : ''
+    include_gex  = gex_fastqs.first().getName() != 'fastqs' && gex_reference           ? '[gene-expression]'     : ''
+    include_vdj  = vdj_fastqs.first().getName() != 'fastqs' && vdj_reference           ? '[vdj]'                 : ''
+    include_beam = beam_fastqs.first().getName() != 'fastqs' && beam_control_panel     ? '[antigen-specificity]' : ''
+    include_cmo  = cmo_fastqs.first().getName() != 'fastqs' && cmo_barcodes            ? '[samples]'             : ''
+    include_fb   = fb_reference.first().getName() != 'references'                      ? '[feature]'             : ''
+    include_frna = gex_frna_probeset_name && frna_sampleinfo.getBaseName() != 'EMPTY'  ? '[samples]'             : ''
 
     gex_reference_path = include_gex ? "reference,./${gex_reference_name}" : ''
     fb_reference_path  = include_fb  ? "reference,./${fb_reference_name}"  : ''

@@ -213,7 +213,11 @@ workflow CELLRANGER_MULTI_ALIGN {
         CELLRANGER_MULTI.out.outs.map { meta, mtx_files -> // Use the unparsed matrix channel because raw results will be outside the 'per_sample_outs'
             def desired_files = []
             mtx_files.each{
-                if ( it.toString().contains("raw_feature_bc_matrix") ) { desired_files.add( it ) }
+                if (
+                        it.toString().contains("raw_feature_bc_matrix") &&
+                        // frna analysis also produces raw data per sample. For standardization, let's keep raw conversions always from the 'unmultiplexed' results.
+                        !(it.toString().contains("sample_raw_feature_bc_matrix")) // TODO: Define if this is enough or if one still wants the raw conversion per samples when frna.
+                    ) { desired_files.add( it ) }
             }
             [ meta, desired_files ]
         }

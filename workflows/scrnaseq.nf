@@ -226,6 +226,12 @@ workflow SCRNASEQ {
         ch_fastq
         .map { meta, fastqs ->
             def parsed_meta = meta.clone() + [ "${meta.feature_type.toString()}": fastqs ]
+            parsed_meta.options = [:]
+
+            // add cellranger options that are currently handled by pipeline, coming from samplesheet
+            if (meta.expected_cells)                   { parsed_meta.options['expected-cells'] = meta.expected_cells }
+            if (meta.feature_type.toString() == 'gex') { parsed_meta.options['create-bam']     = true                } // force bam creation -- param required by cellranger multi
+
             [ parsed_meta.id , parsed_meta ]
         }
         .groupTuple( by: 0 )

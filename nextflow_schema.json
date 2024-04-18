@@ -324,7 +324,7 @@
                 "skip_cellrangermulti_vdjref": {
                     "type": "boolean",
                     "description": "Skip mkvdjref if not using VDJ data with cellranger/multi"
-                }
+                },
                 "gex_frna_probe_set": {
                     "type": "string",
                     "description": "TODO: Need help in defining a description for param."

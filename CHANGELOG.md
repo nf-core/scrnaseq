@@ -3,16 +3,21 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.6.0dev - [date]
+## v2.7.0dev
 
+- Add cellranger multi subworkflow ([#247](https://github.com/nf-core/scrnaseq/issues/247))
+
+## v2.6.0 - 2024-04-16
+
+- Update cellranger to v8.0.0 ([#317](https://github.com/nf-core/scrnaseq/pull/317))
 - Change from pytests to nf-test ([#291](https://github.com/nf-core/scrnaseq/pull/291))
 - Update template to v2.13.1 ([#309](https://github.com/nf-core/scrnaseq/pull/309))
 - Update to kallisto|bustools v0.28.2 ([#294](https://github.com/nf-core/scrnaseq/pull/294))
 - Fix cellrangerarc matrix conversions and protocol selection ([#300](https://github.com/nf-core/scrnaseq/pull/300))
 - Add new emptydrops calling module ([#301](https://github.com/nf-core/scrnaseq/pull/301))
-- Add cellranger multi subworkflow ([#247](https://github.com/nf-core/scrnaseq/issues/247))
+- Update cellranger modules to latest version ([[#316](https://github.com/nf-core/scrnaseq/issues/316)])
 
-## v2.5.1
+## v2.5.1 - 2024-01-23
 
 - Template update to v2.12 ([#298](https://github.com/nf-core/scrnaseq/pull/298)).
 - Fix that cellranger workflow couldn't be run and enable CI for this workflow ([#288](https://github.com/nf-core/scrnaseq/pull/288)).

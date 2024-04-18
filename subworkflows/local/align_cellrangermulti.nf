@@ -138,15 +138,19 @@ workflow CELLRANGER_MULTI_ALIGN {
         //
         if ( !cellranger_vdj_index ) {
 
-            // Make reference genome
-            CELLRANGER_MKVDJREF(
-                ch_fasta,
-                CELLRANGER_MKGTF.out.gtf,
-                [], // currently ignoring the 'seqs' option
-                "vdj_reference"
-            )
-            ch_versions = ch_versions.mix(CELLRANGER_MKVDJREF.out.versions)
-            ch_cellranger_vdj_index = CELLRANGER_MKVDJREF.out.reference.ifEmpty { empty_file }
+            if ( !params.skip_cellrangermulti_vdjref  ) { // if user uses cellranger multi but does not have VDJ data
+                // Make reference genome
+                CELLRANGER_MKVDJREF(
+                    ch_fasta,
+                    CELLRANGER_MKGTF.out.gtf,
+                    [], // currently ignoring the 'seqs' option
+                    "vdj_reference"
+                )
+                ch_versions = ch_versions.mix(CELLRANGER_MKVDJREF.out.versions)
+                ch_cellranger_vdj_index = CELLRANGER_MKVDJREF.out.reference.ifEmpty { empty_file }
+            } else {
+                ch_cellranger_vdj_index = []
+            }
 
         } else {
             ch_cellranger_vdj_index = cellranger_vdj_index

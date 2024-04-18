@@ -141,7 +141,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             // Make reference genome
             CELLRANGER_MKVDJREF(
                 ch_fasta,
-                CELLRANGER_MKGTF.out.gtf,,
+                CELLRANGER_MKGTF.out.gtf,
                 [], // currently ignoring the 'seqs' option
                 "vdj_reference"
             )

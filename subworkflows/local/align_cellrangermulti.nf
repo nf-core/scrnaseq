@@ -21,6 +21,10 @@ workflow CELLRANGER_MULTI_ALIGN {
     main:
         ch_versions    = Channel.empty()
 
+        //
+        // TODO: Include checkers for cellranger multi parameter combinations. For example, when VDJ data is given, require VDJ ref. If FFPE, require frna probe sets, etc.
+        //
+
         // since we merged all data as a meta, now we have a channel per sample, which
         // every item is a meta map for each data-type
         // now we can split it back for passing as input to the module

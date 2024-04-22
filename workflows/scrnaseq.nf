@@ -228,6 +228,9 @@ workflow SCRNASEQ {
             def parsed_meta = meta.clone() + [ "${meta.feature_type.toString()}": fastqs ]
             parsed_meta.options = [:]
 
+            // add an universal key to differentiate from empty channels so that the "&& meta_gex?.options" lines in the module main.nf can work properly
+            parsed_meta.options['data-available'] = true
+
             // add cellranger options that are currently handled by pipeline, coming from samplesheet
             // the module parses them from the 'gex' options
             if (meta.feature_type.toString() == 'gex') {

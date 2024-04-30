@@ -16,14 +16,14 @@ include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/uti
 include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
+include { getGenomeAttribute                 } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+
 
 
 workflow SCRNASEQ {
 
     take:
     ch_fastq
-    ch_genome_fasta
-    ch_gtf
 
     main:
 
@@ -32,9 +32,8 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    // overwrite fasta and gtf if user provide a custom one
-    ch_genome_fasta = Channel.value(params.fasta ? file(params.fasta) : ch_genome_fasta)
-    ch_gtf = Channel.value(params.gtf ? file(params.gtf) : ch_gtf)
+    ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('fasta'), checkIfExists: true ) : [] )
+    ch_gtf          = params.gtf ? file(params.gtf, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('gtf'), checkIfExists: true   ) : [] )
 
     // general input and params
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
@@ -118,7 +117,7 @@ workflow SCRNASEQ {
     }
 
     // filter gtf
-    ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
+    ch_filter_gtf = ch_gtf ? GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf : []
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {

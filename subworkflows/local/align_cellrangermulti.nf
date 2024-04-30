@@ -111,7 +111,7 @@ workflow CELLRANGER_MULTI_ALIGN {
         //
         // Prepare GTF
         //
-        if (!cellranger_gex_index || !cellranger_vdj_index) {
+        if ( !cellranger_gex_index || (!cellranger_vdj_index && !params.skip_cellrangermulti_vdjref) ) {
 
             // Filter GTF based on gene biotypes passed in params.modules
             CELLRANGER_MKGTF ( ch_gtf )

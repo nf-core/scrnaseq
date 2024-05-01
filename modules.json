@@ -8,121 +8,87 @@
                     "cellranger/count": {
                         "branch": "master",
                         "git_sha": "e66183d2ab6a5c2f3fd66b2bee942287cf65536c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
                         "git_sha": "e66183d2ab6a5c2f3fd66b2bee942287cf65536c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
                         "branch": "master",
                         "git_sha": "e66183d2ab6a5c2f3fd66b2bee942287cf65536c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "cellranger/mkvdjref": {
                         "branch": "master",
                         "git_sha": "e66183d2ab6a5c2f3fd66b2bee942287cf65536c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "cellranger/multi": {
                         "branch": "master",
                         "git_sha": "64250e477e29160edd67b7de8e6dd1e935cd9d43",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "cellrangerarc/count": {
                         "branch": "master",
                         "git_sha": "18e53e27cfeca5dbbfbeee675c05438dec68245f",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "cellrangerarc/mkgtf": {
                         "branch": "master",
                         "git_sha": "575e1bc54b083fb15e7dd8b5fcc40bea60e8ce83",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "cellrangerarc/mkref": {
                         "branch": "master",
                         "git_sha": "4196b1b2e7ce265892f3979eabf7a9ddc030702f",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "f4ae1d942bd50c5c0b9bd2de1393ce38315ba57c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "gffread": {
                         "branch": "master",
                         "git_sha": "b1b959609bda44341120aed1766329909f54b8d0",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "gunzip": {
                         "branch": "master",
                         "git_sha": "3a5fef109d113b4997c9822198664ca5f2716208",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "kallistobustools/count": {
                         "branch": "master",
                         "git_sha": "53c2b466994f07def210b7f4cc866bb5a8a2cb92",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "kallistobustools/ref": {
                         "branch": "master",
                         "git_sha": "de8215983defba48cd81961d620a9e844f11c7e7",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "b7ebe95761cd389603f9cc0e0dc384c0f663815a",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "star/genomegenerate": {
                         "branch": "master",
                         "git_sha": "a21faa6a3481af92a343a10926f59c189a2c16c9",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "universc": {
                         "branch": "master",
                         "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "unzip": {
                         "branch": "master",
                         "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     }
                 }
             },
@@ -131,23 +97,17 @@
                     "utils_nextflow_pipeline": {
                         "branch": "master",
                         "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "utils_nfcore_pipeline": {
                         "branch": "master",
                         "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "utils_nfvalidation_plugin": {
                         "branch": "master",
                         "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     }
                 }
             }

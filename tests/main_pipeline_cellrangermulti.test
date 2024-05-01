@@ -20,8 +20,8 @@ nextflow_pipeline {
                 protocol                  = 'auto'
 
                 // Limit resources so that this can run on GitHub Actions -- for some reason it had not been taken from shared config
-                max_cpus   = 4
-                max_memory = '14.GB'
+                max_cpus   = 2
+                max_memory = '8.GB'
                 max_time   = '6.h'
             }
         }

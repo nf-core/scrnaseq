@@ -249,8 +249,9 @@ workflow SCRNASEQ {
             //
             // data.types: gex, vdj, ab, beam, crispr, cmo
 
-            // clone to avoid mutating the input
-            def collected_map_clone = collected_map.clone()
+            // clone ArrayBag (received from .groupTuple()) to avoid mutating the input
+            def collected_map_clone = []
+            collected_map_clone.addAll(collected_map)
 
             // generate the expected EMPTY tuple when a data type is not used
             // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,

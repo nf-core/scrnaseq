@@ -276,7 +276,6 @@ workflow SCRNASEQ {
             ch_cellrangermulti_collected_channel,
             cellranger_gex_index,
             cellranger_vdj_index,
-            empty_file,
             ch_multi_samplesheet
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN.out.ch_versions)

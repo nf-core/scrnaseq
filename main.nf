@@ -20,7 +20,6 @@ nextflow.enable.dsl = 2
 include { SCRNASEQ                } from './workflows/scrnaseq'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,8 +27,6 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrn
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 // we cannot modify params. here, we must load the files
-ch_genome_fasta = params.genome ? file( getGenomeAttribute('fasta'), checkIfExists: true ) : []
-ch_gtf          = params.genome ? file( getGenomeAttribute('gtf'), checkIfExists: true   ) : []
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,8 +41,6 @@ workflow NFCORE_SCRNASEQ {
 
     take:
     samplesheet // channel: samplesheet read in from --input
-    ch_genome_fasta
-    ch_gtf
 
     main:
 
@@ -54,8 +49,6 @@ workflow NFCORE_SCRNASEQ {
     //
     SCRNASEQ (
         samplesheet,
-        ch_genome_fasta,
-        ch_gtf
     )
 
     emit:
@@ -90,8 +83,6 @@ workflow {
     //
     NFCORE_SCRNASEQ (
         PIPELINE_INITIALISATION.out.samplesheet,
-        ch_genome_fasta,
-        ch_gtf
     )
 
     //

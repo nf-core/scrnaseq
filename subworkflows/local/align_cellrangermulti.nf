@@ -15,7 +15,6 @@ workflow CELLRANGER_MULTI_ALIGN {
         ch_fastq
         cellranger_gex_index
         cellranger_vdj_index
-        empty_file
         ch_multi_samplesheet
 
     main:
@@ -55,14 +54,14 @@ workflow CELLRANGER_MULTI_ALIGN {
         .set { ch_grouped_fastq }
 
         // Assign other cellranger reference files
-        ch_gex_frna_probeset      = params.gex_frna_probe_set ? file(params.gex_frna_probe_set) : empty_file
-        ch_gex_target_panel       = params.gex_target_panel   ? file(params.gex_target_panel)   : empty_file
-        ch_gex_cmo_set            = params.gex_cmo_set        ? file(params.gex_cmo_set)        : empty_file
-        ch_gex_barcodes           = params.gex_barcode_sample_assignment ? file(params.gex_barcode_sample_assignment) : empty_file
-        ch_fb_reference           = params.fb_reference       ? file(params.fb_reference)       : empty_file
-        ch_vdj_primer_index       = params.vdj_inner_enrichment_primers ? file(params.vdj_inner_enrichment_primers) : empty_file
-        ch_beam_antigen_panel_csv = empty_file // currently not implemented
-        ch_beam_control_panel_csv = empty_file // currently not implemented
+        ch_gex_frna_probeset      = params.gex_frna_probe_set            ? file(params.gex_frna_probe_set)            : []
+        ch_gex_target_panel       = params.gex_target_panel              ? file(params.gex_target_panel)              : []
+        ch_gex_cmo_set            = params.gex_cmo_set                   ? file(params.gex_cmo_set)                   : []
+        ch_gex_barcodes           = params.gex_barcode_sample_assignment ? file(params.gex_barcode_sample_assignment) : []
+        ch_fb_reference           = params.fb_reference                  ? file(params.fb_reference)                  : []
+        ch_vdj_primer_index       = params.vdj_inner_enrichment_primers  ? file(params.vdj_inner_enrichment_primers)  : []
+        ch_beam_antigen_panel_csv = [] // currently not implemented
+        ch_beam_control_panel_csv = [] // currently not implemented
 
         // parse frna and barcode information
         if (ch_multi_samplesheet) {
@@ -91,21 +90,19 @@ workflow CELLRANGER_MULTI_ALIGN {
             .map{ [it[0].id] }
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.flatten().map { [ "${it.baseName}" - "_cmo", it ] } )
             .groupTuple()
-            .map { if ( it.size() == 2 ) { it[1] } else { empty_file } } // a correct tuple from snippet will have: [ sample, cmo.csv ]
-            .flatten()
+            .map { if ( it.size() == 2 ) { it[1] } else { [] } } // a correct tuple from snippet will have: [ sample, cmo.csv ]
             .set { ch_cmo_barcode_csv }
 
             ch_grouped_fastq.gex
             .map{ [it[0].id] }
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.flatten().map { [ "${it.baseName}" - "_frna", it ] } )
             .groupTuple()
-            .map { if ( it.size() == 2 ) { it[1] } else { empty_file } } // a correct tuple from snippet will have: [ sample, frna.csv ]
-            .flatten()
+            .map { if ( it.size() == 2 ) { it[1] } else { [] } } // a correct tuple from snippet will have: [ sample, frna.csv ]
             .set { ch_frna_sample_csv }
 
         } else {
-            ch_cmo_barcode_csv = empty_file
-            ch_frna_sample_csv = empty_file
+            ch_cmo_barcode_csv = []
+            ch_frna_sample_csv = []
         }
 
         //
@@ -131,7 +128,7 @@ workflow CELLRANGER_MULTI_ALIGN {
                 "gex_reference"
             )
             ch_versions = ch_versions.mix(CELLRANGER_MKREF.out.versions)
-            ch_cellranger_gex_index = CELLRANGER_MKREF.out.reference.ifEmpty { empty_file }
+            ch_cellranger_gex_index = CELLRANGER_MKREF.out.reference.ifEmpty { [] }
 
         } else {
             ch_cellranger_gex_index = cellranger_gex_index
@@ -151,7 +148,7 @@ workflow CELLRANGER_MULTI_ALIGN {
                     "vdj_reference"
                 )
                 ch_versions = ch_versions.mix(CELLRANGER_MKVDJREF.out.versions)
-                ch_cellranger_vdj_index = CELLRANGER_MKVDJREF.out.reference.ifEmpty { empty_file }
+                ch_cellranger_vdj_index = CELLRANGER_MKVDJREF.out.reference.ifEmpty { [] }
             } else {
                 ch_cellranger_vdj_index = []
             }

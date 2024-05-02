@@ -240,7 +240,7 @@ workflow SCRNASEQ {
             [ parsed_meta.id , parsed_meta ]
         }
         .groupTuple( by: 0 )
-        .map{ sample_id, collected_map ->
+        .map{ sample_id, map_collection ->
             // Now we must check if every data possibility taken into account in the .branch() operation
             // performed inside the CELLRANGER_MULTI_ALIGN subworkflow are initialized, even with empty files
             // This to ensure that the sizes of each data channel is the same, and the the order and the data types
@@ -248,22 +248,23 @@ workflow SCRNASEQ {
             //
             // data.types: gex, vdj, ab, beam, crispr, cmo
 
-            // clone to avoid mutating the input
-            def collected_map_clone = collected_map
+            // clone ArrayBag (received from .groupTuple()) to avoid mutating the input
+            def map_collection_clone = []
+            map_collection_clone.addAll(map_collection)
 
             // generate the expected EMPTY tuple when a data type is not used
             // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,
             // allowing to have multiple samples in the sheet, having all the data-type tuples initialized,
             // either empty or populated. It will be branched inside the subworkflow.
-            if (!collected_map_clone.any{ it.feature_type == 'gex' })    { collected_map_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
-            if (!collected_map_clone.any{ it.feature_type == 'vdj' })    { collected_map_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
-            if (!collected_map_clone.any{ it.feature_type == 'ab' })     { collected_map_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
-            if (!collected_map_clone.any{ it.feature_type == 'beam' })   { collected_map_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
-            if (!collected_map_clone.any{ it.feature_type == 'crispr' }) { collected_map_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
-            if (!collected_map_clone.any{ it.feature_type == 'cmo' })    { collected_map_clone.add( [id: sample_id, feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'gex' })    { map_collection_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'vdj' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'ab' })     { map_collection_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'beam' })   { map_collection_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
+            if (!map_collection_clone.any{ it.feature_type == 'crispr' }) { map_collection_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'cmo' })    { map_collection_clone.add( [id: sample_id, feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
 
             // return final map
-            collected_map_clone
+            map_collection_clone
         }
         .set{ ch_cellrangermulti_collected_channel }
 
@@ -274,7 +275,6 @@ workflow SCRNASEQ {
             ch_cellrangermulti_collected_channel,
             cellranger_gex_index,
             cellranger_vdj_index,
-            empty_file,
             ch_multi_samplesheet
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN.out.ch_versions)

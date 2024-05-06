@@ -89,7 +89,7 @@ workflow SCRNASEQ {
     if (!params.skip_fastqc) {
         FASTQC_CHECK ( ch_fastq )
         ch_versions       = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_zip.map{ meta, it -> it })
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.zip.map{ meta, it -> it })
     }
 
     //

@@ -186,59 +186,41 @@ workflow CELLRANGER_MULTI_ALIGN {
 
         //
         // Cellranger multi splits the results from each sample. So, a module execution will have: (1) a raw counts dir for all;
-        // (2) a filtered counts dir PER sample.
+        // (2) a filtered counts dir PER sample; (3) a raw counts dir PER sample
         //
         // Thus, cellranger multi outputs data from all identified samples in a single channel, which will cause file collision.
         //
         // For the conversion, we should convert the resulting files of each sample, thus, now, we must parse the names
-        // of the filtered 'per_sample_outs' of cellranger/multi and then, split the channels as such.
+        // of the filtered 'per_sample_outs' of cellranger/multi on the split the channels raw / filtered.
         //
-        CELLRANGER_MULTI.out.outs
-        .map{ meta, mtx_files ->
-            def desired_files = []
-            mtx_files.each{
-                if ( it.toString().contains("per_sample_outs") ) {
-                    def demuxed_sample_name = it.toString().split('per_sample_outs/')[1].split('/')[0]
-                    def meta_clone    = meta.clone()
-                    meta_clone.bkp_id = meta_clone.id
-                    meta_clone.id     = demuxed_sample_name
-                    desired_files.add( [ meta_clone, it ] )
-                }
-            }
-            desired_files
-        }
-        .flatten()
-        .buffer( size: 2 )   // gets: [ meta_clone, single_file ]
-        .groupTuple( by: 0 ) // gets: [ meta_clone, all_files   ]
-        .set { ch_parsed_per_sample_matrices }
 
-        //
         // Split channels of raw and filtered to avoid file collision problems when loading the inputs in conversion modules.
-        //
-        ch_matrices_raw =
-        CELLRANGER_MULTI.out.outs.map { meta, mtx_files -> // Use the unparsed matrix channel because raw results will be outside the 'per_sample_outs'
-            def desired_files = []
-            mtx_files.each{
-                if (
-                        it.toString().contains("raw_feature_bc_matrix") &&
-                        // frna analysis also produces raw data per sample. For standardization, let's keep raw conversions always from the 'unmultiplexed' results.
-                        !(it.toString().contains("sample_raw_feature_bc_matrix")) // TODO: Define if this is enough or if one still wants the raw conversion per samples when frna.
-                    ) { desired_files.add( it ) }
-            }
-            [ meta, desired_files ]
-        }
-
-        ch_matrices_filtered =
-        ch_parsed_per_sample_matrices.map { meta, mtx_files -> // Use the parsed matrix channel
-            def desired_files = []
-            mtx_files.each{
-                if ( it.toString().contains("filtered_feature_bc_matrix") ) { desired_files.add( it ) }
-            }
-            [ meta, desired_files ]
-        }
+        ch_matrices_filtered = parse_demultiplexed_output_channels( CELLRANGER_MULTI.out.outs, "filtered_feature_bc_matrix" )
+        ch_matrices_raw      = parse_demultiplexed_output_channels( CELLRANGER_MULTI.out.outs, "raw_feature_bc_matrix"      )
 
     emit:
         ch_versions
         cellrangermulti_out = CELLRANGER_MULTI.out.outs
         cellrangermulti_mtx = ch_matrices_raw.mix( ch_matrices_filtered )
+}
+
+def parse_demultiplexed_output_channels(in_ch, pattern) {
+    out_ch =
+    in_ch.map { meta, mtx_files ->
+        def desired_files = []
+        mtx_files.each{ if ( it.toString().contains("${pattern}") ) { desired_files.add( it ) } }
+        [ meta, desired_files ]
+    }                    // separate only desired files
+    .transpose()         // transpose for handling one meta/file pair at a time
+    .map { meta, mtx_files ->
+        def meta_clone = meta.clone()
+        if ( mtx_files.toString().contains("per_sample_outs") ) {
+            def demultiplexed_sample_id = mtx_files.toString().split('/per_sample_outs/')[1].split('/')[0]
+            meta_clone.id = demultiplexed_sample_id.toString()
+        }
+        [ meta_clone, mtx_files ]
+    }                    // check if output is from demultiplexed sample, if yes, correct meta.id for proper conversion naming
+    .groupTuple( by: 0 ) // group it back as one file collection per sample
+
+    return out_ch
 }

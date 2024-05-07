@@ -16,6 +16,7 @@
                     "type": "string",
                     "format": "file-path",
                     "exists": true,
+                    "schema": "assets/schema_input.json",
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
@@ -50,7 +51,9 @@
                 "barcode_whitelist": {
                     "type": "string",
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
-                    "fa_icon": "fas fa-barcode"
+                    "fa_icon": "fas fa-barcode",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "aligner": {
                     "type": "string",
@@ -84,6 +87,10 @@
                 "skip_fastqc": {
                     "type": "boolean",
                     "description": "Skip FastQC"
+                },
+                "skip_emptydrops": {
+                    "type": "boolean",
+                    "description": "Skip custom empty drops filter module"
                 }
             }
         },
@@ -119,12 +126,16 @@
                 "transcript_fasta": {
                     "type": "string",
                     "description": "A cDNA FASTA file",
-                    "fa_icon": "fas fa-dna"
+                    "fa_icon": "fas fa-dna",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "gtf": {
                     "type": "string",
                     "description": "Reference GTF annotation file",
-                    "fa_icon": "fas fa-code-branch"
+                    "fa_icon": "fas fa-code-branch",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "save_reference": {
                     "type": "boolean",
@@ -135,7 +146,7 @@
                     "type": "string",
                     "format": "directory-path",
                     "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
+                    "default": "s3://ngi-igenomes/igenomes/",
                     "fa_icon": "fas fa-cloud-download-alt",
                     "hidden": true
                 }
@@ -150,13 +161,17 @@
                 "salmon_index": {
                     "type": "string",
                     "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-fish",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "txp2gene": {
                     "type": "string",
                     "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
-                    "help_text": "> This is not the same as the `kallisto_gene_map` parameter down below and is only used by the Salmon Alevin workflow.",
-                    "fa_icon": "fas fa-map-marked-alt"
+                    "help_text": "> This is only used by the Salmon Alevin workflow.",
+                    "fa_icon": "fas fa-map-marked-alt",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "simpleaf_rlen": {
                     "type": "integer",
@@ -176,7 +191,9 @@
                     "type": "string",
                     "description": "Specify a path to the precomputed STAR index.",
                     "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
-                    "fa_icon": "fas fa-asterisk"
+                    "fa_icon": "fas fa-asterisk",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "star_ignore_sjdbgtf": {
                     "type": "string",
@@ -201,24 +218,40 @@
             "type": "object",
             "description": "Params related to Kallisto/BUS tool",
             "default": "",
-            "fa_icon": "fas fa-fish",
+            "fa_icon": "fas fa-rainbow",
             "properties": {
-                "kallisto_gene_map": {
-                    "type": "string",
-                    "description": "Specify a Kallisto gene mapping file here. If you don't, this will be automatically created in the Kallisto workflow when specifying a valid `--gtf` file.",
-                    "fa_icon": "fas fa-fish"
-                },
                 "kallisto_index": {
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",
-                    "fa_icon": "fas fa-fish"
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "kb_t1c": {
+                    "type": "string",
+                    "description": "Specify a path to the cDNA transcripts-to-capture.",
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "kb_t2c": {
+                    "type": "string",
+                    "description": "Specify a path to the intron transcripts-to-capture.",
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "file-path",
+                    "exists": true
                 },
                 "kb_workflow": {
                     "type": "string",
                     "default": "standard",
-                    "description": "Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite: 10xFB` for 10x Genomics Feature Barcoding technology. (default: standard)",
+                    "description": "Type of workflow. Use `nac` for an index type that can quantify nascent and mature RNA. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. (default: standard)",
+                    "fa_icon": "fas fa-rainbow",
+                    "enum": ["standard", "lamanno", "nac"]
+                },
+                "kb_filter": {
+                    "type": "boolean",
                     "fa_icon": "fas fa-fish",
-                    "enum": ["standard", "lamanno", "nucleus", "kite", "kite: 10xFB"]
+                    "description": "Activate Kallisto/BUStools filtering algorithm"
                 }
             }
         },
@@ -230,7 +263,9 @@
             "properties": {
                 "cellranger_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. "
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. ",
+                    "format": "file-path",
+                    "exists": true
                 }
             }
         },
@@ -262,7 +297,9 @@
             "properties": {
                 "universc_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website."
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website.",
+                    "format": "file-path",
+                    "exists": true
                 }
             }
         },
@@ -416,6 +453,7 @@
                     "type": "string",
                     "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
+                    "exists": true,
                     "fa_icon": "fas fa-cog",
                     "hidden": true
                 },

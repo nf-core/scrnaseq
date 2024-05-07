@@ -57,8 +57,10 @@ workflow STARSOLO {
     emit:
     ch_versions
     // get rid of meta for star index
-    star_index  = star_index.map{ meta, index -> index}
+    star_index  = star_index.map{ meta, index -> index }
     star_result = STAR_ALIGN.out.tab
     star_counts = STAR_ALIGN.out.counts
-    for_multiqc = STAR_ALIGN.out.log_final
+    raw_counts = STAR_ALIGN.out.raw_counts
+    filtered_counts = STAR_ALIGN.out.filtered_counts
+    for_multiqc = STAR_ALIGN.out.log_final.map{ meta, it -> it }
 }

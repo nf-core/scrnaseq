@@ -29,8 +29,8 @@ workflow CELLRANGERARC_ALIGN {
             ch_versions = ch_versions.mix(CELLRANGERARC_MKGTF.out.versions)
 
             // Make reference genome
-            assert ( ( !params.cellrangerarc_reference && !cellrangerarc_config ) || 
-                     ( params.cellrangerarc_reference && cellrangerarc_config ) ) :
+            assert (( !params.cellrangerarc_reference && !cellrangerarc_config ) ||
+                    ( params.cellrangerarc_reference && cellrangerarc_config ) ) :
                 "If you provide a config file you also have to specific the reference name and vice versa."
 
             cellrangerarc_reference = 'cellrangerarc_reference'

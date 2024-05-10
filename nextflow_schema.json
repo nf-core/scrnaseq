@@ -313,10 +313,6 @@
             "description": "",
             "default": "",
             "properties": {
-                "cellranger_gex_index": {
-                    "type": "string",
-                    "description": "Specify a pre-built cellranger index for GEX analysis"
-                },
                 "cellranger_vdj_index": {
                     "type": "string",
                     "description": "Specify a pre-built cellranger index for VDJ analysis"

@@ -260,16 +260,20 @@ PBMC_10K_CMV,https://raw.githubusercontent.com/nf-core/test-datasets/modules/dat
 
 #### Additional supporting files
 
-Cellranger-arc needs a reference index directory that you can provide with `--cellranger_index`. Be aware, you can use
-for cellranger-arc the same index you use for cellranger ([see](https://kb.10xgenomics.com/hc/en-us/articles/4408281606797-Are-the-references-interchangeable-between-pipelines)).
-Yet, a cellranger-arc index might include additional data (e.g., TF binding motifs). Therefore, please first check if
-you have to create a new cellranger-arc index ([see here](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/advanced/references) for
-more information)
+Cellranger multi needs a reference for GEX and VDJ analysis. They are calculated on the fly given the reference files (`--fasta` and `--gtf`) provided, but users can also provide their own with: `--cellranger_index` and `--cellranger_vdj_index`, for GEX and VDJ, respectively.
 
-If you decide to create a cellranger-arc index, then you need to create a config file to generate the index. The pipeline
-can do this autmatically for you if you provide a `--fasta`, `--gtf`, and an optional `--motif` file. However, you can
-also decide to provide your own config file with `--cellrangerarc_config`, then you also have to specify with `--cellrangerarc_reference`
-the reference genome name that you have used and stated as _genome:_ in your config file.
+> When running cellranger multi, without any VDJ data, users can also skip VDJ automated ref building with: `--skip_cellrangermulti_vdjref`.
+
+Cellranger multi also requires some additional data/information when utilizing some specific Feature Barcode Technologies:
+
+TODO: talk about these:
+gex_frna_probe_set = null
+gex_target_panel = null
+gex_cmo_set = null
+fb_reference = null
+vdj_inner_enrichment_primers = null
+gex_barcode_sample_assignment = null
+cellranger_multi_barcodes = null
 
 ## Running the pipeline
 

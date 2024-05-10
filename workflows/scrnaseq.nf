@@ -77,7 +77,6 @@ workflow SCRNASEQ {
     ch_universc_index = params.universc_index ? file(params.universc_index) : []
 
     //cellrangermulti params
-    cellranger_gex_index              = params.cellranger_gex_index      ? file(params.cellranger_gex_index, checkIfExists: true)      : []
     cellranger_vdj_index              = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
     ch_multi_samplesheet              = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
     empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
@@ -273,7 +272,7 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_cellrangermulti_collected_channel,
-            cellranger_gex_index,
+            ch_cellranger_index,
             cellranger_vdj_index,
             ch_multi_samplesheet
         )

@@ -266,14 +266,62 @@ Cellranger multi needs a reference for GEX and VDJ analysis. They are calculated
 
 Cellranger multi also requires some additional data/information when utilizing some specific Feature Barcode Technologies:
 
-TODO: talk about these:
-gex_frna_probe_set = null
+**FFPE and CMO barcodes**
+You must provide those via a CSV with the `--cellranger_multi_barcodes` parameter. The file should look like this:
+
+```csv
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,description
+PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_1,,CMO301,PBMCs_human_1
+PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_2,,CMO302,PBMCs_human_2
+4PLEX_HUMAN,Liver_BC1,BC001,,Healthy liver dissociated using the Miltenyi FFPE Tissue Dissociation Kit
+4PLEX_HUMAN,Ovarian_BC2,BC002,,Ovarian cancer dissociated using the Miltenyi FFPE Dissociation Kit
+4PLEX_HUMAN,Colorectal_BC3,BC003,,Colorectal cancer dissociated using the Miltenyi FFPE Dissociation Kit
+4PLEX_HUMAN,Pancreas_BC4,BC004,,Healthy pancreas dissociated using the Miltenyi FFPE Tissue Dissociation Kit
+```
+
+TODO: Complete the ones below. Do not have a real understanding.
+
+The set of CMO reference sequences with `--gex_cmo_set`.
+
+The frna probe reference sequences with `--gex_frna_probe_set`. Example:
+
+```csv
+#probe_set_file_format=2.0
+#panel_name=Chromium Human Transcriptome Probe Set v1.0.1
+#panel_type=predesigned
+#reference_genome=gex_reference
+#reference_version=2020-A
+gene_id,probe_seq,probe_id,included,region
+ENSG00000000003,GGTGACACCACAACAATGCAACGTATTTTGGATCTTGTCTACTGCATGGC,ENSG00000000003|TSPAN6|8eab823,TRUE,spliced
+ENSG00000000003,TCTGCATCTCTCTGTGGAGTACAATCTTCAAGTTTACAGCAACTCTTAGG,ENSG00000000003|TSPAN6|9d7fe51,TRUE,unspliced
+ENSG00000000003,AAAGCTGTTCTTAATCTCATGTCTGAAAACAAATCCTACGATGGCAGCGA,ENSG00000000003|TSPAN6|d2b5833,TRUE,spliced
+[...]
+```
+
+**Feature barcode reference for antibody capture**
+
+File containing feature barcodes used for AB analysis (`--fb_reference`). Example:
+
+```csv
+id,name,read,pattern,sequence,feature_type
+CD3,CD3,R2,^NNNNNNNNNN(BC)NNNNNNNNN,CTCATTGTAACTCCT,Antibody Capture
+CD4,CD4,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TGTTCCCGCTCAACT,Antibody Capture
+CD8,CD8,R2,^NNNNNNNNNN(BC)NNNNNNNNN,GCGCAACTTGATGAT,Antibody Capture
+CD11c,CD11c,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TACGCCTATAACTTG,Antibody Capture
+CD14,CD14,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TCTCAGACCTCCGTA,Antibody Capture
+CD16,CD16,R2,^NNNNNNNNNN(BC)NNNNNNNNN,AAGTTCACTCTTTGC,Antibody Capture
+CD19,CD19,R2,^NNNNNNNNNN(BC)NNNNNNNNN,CTGGGCAATTACTCG,Antibody Capture
+CD56,CD56,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TCCTTTCCTGATAGG,Antibody Capture
+CD45,CD45,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TCCCTTGCGATTTAC,Antibody Capture
+IgG1,IgG1_control_TotalSeqC,R2,^NNNNNNNNNN(BC)NNNNNNNNN,GCCGGACGACATTAA,Antibody Capture
+A0201_NLVPMVATV_CMV_TCR-1,NLVPMVATV_CMV_TCR-1,R2,^NNNNNNNNNN(BC)NNNNNNNNN,GGCCTCGGTCCTAGG,Antibody Capture
+```
+
 gex_target_panel = null
-gex_cmo_set = null
-fb_reference = null
 vdj_inner_enrichment_primers = null
 gex_barcode_sample_assignment = null
-cellranger_multi_barcodes = null
+
+TODO: ends here
 
 ## Running the pipeline
 

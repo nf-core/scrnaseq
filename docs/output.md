@@ -113,6 +113,10 @@ Cell Ranger ARC is a set of analysis pipelines that process Chromium Single Cell
 
 - Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger ARC
 
+## Cellranger multi
+
+TODO: Complete. I think it is similar to the 'Cellranger' one.
+
 ## UniverSC
 
 UniverSC is a wrapper that calls an open-source implementation of Cell Ranger v3.0.2 and adjusts run parameters for compatibility with a wide ranger of technologies.

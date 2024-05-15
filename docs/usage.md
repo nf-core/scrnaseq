@@ -220,18 +220,14 @@ If your data already follows the expected naming convention, you can deactivate 
 
 If you are using cellranger-multi you have to add the column _feature_type_ to indicate which of the Feature Barcode Technology your data corresponds to:
 
-- gex
-  - gene expression
-- vdj
-  - VDJ profiling
-- ab
-  - antibody capture
-- crispr
-  - crispr capture
-- cmo
-  - cmo tags
-- beam
-  - currently not supported
+| feature_type | description                            |
+| ------------ | -------------------------------------- |
+| `gex`        | Gene expression                        |
+| `vdj`        | TCR/BCR profiling                      |
+| `ab`         | Antibody profiling (feature barcoding) |
+| `crispr`     | CRISPR capture                         |
+| `cmo`        | Cell multiplexing oligos (CMO) tags    |
+| `beam`       | _Currently not supported_              |
 
 > More information on the Feature Barcode Technologies can be found here: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi
 
@@ -239,6 +235,7 @@ If you are using cellranger-multi you have to add the column _feature_type_ to i
 
 - It is important that you give the same sample name for the different feature barcode technologies data that correspond to the same and should be analysed together.
 - The pipeline will **automatically** generate the cellranger multi config file based on the given data.
+- When working with multiplexed data (FFPE or CMO), you'll need a **second samplesheet** relating the multiplexed samples to the corresponding "physical" sample (details below). The `sample` column in the main samplesheet refers to the "physical" sample that may contain multiple multiplexed samples.
 
 An example samplesheet could look like this:
 
@@ -258,15 +255,8 @@ PBMC_10K_CMV,https://raw.githubusercontent.com/nf-core/test-datasets/modules/dat
 4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L004_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L004_R2_001.subsampled.fastq.gz,gex,
 ```
 
-#### Additional supporting files
+#### Additional samplesheet for multiplexed samples
 
-Cellranger multi needs a reference for GEX and VDJ analysis. They are calculated on the fly given the reference files (`--fasta` and `--gtf`) provided, but users can also provide their own with: `--cellranger_index` and `--cellranger_vdj_index`, for GEX and VDJ, respectively.
-
-> When running cellranger multi, without any VDJ data, users can also skip VDJ automated ref building with: `--skip_cellrangermulti_vdjref`.
-
-Cellranger multi also requires some additional data/information when utilizing some specific Feature Barcode Technologies:
-
-**FFPE and CMO barcodes**
 You must provide those via a CSV with the `--cellranger_multi_barcodes` parameter. The file should look like this:
 
 ```csv
@@ -279,49 +269,25 @@ PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_2,,CMO302,PBMCs_human_2
 4PLEX_HUMAN,Pancreas_BC4,BC004,,Healthy pancreas dissociated using the Miltenyi FFPE Tissue Dissociation Kit
 ```
 
-TODO: Complete the ones below. Do not have a real understanding.
+The `sample` column must match the corresponding entry in the main samplesheet.
 
-The set of CMO reference sequences with `--gex_cmo_set`.
+#### Additional reference data
 
-The frna probe reference sequences with `--gex_frna_probe_set`. Example:
+- Cellranger multi needs a reference for **GEX and VDJ analysis**. They are calculated on the fly given the reference
+  files (`--fasta` and `--gtf`) provided, but users can also provide their own with: `--cellranger_index`
+  and `--cellranger_vdj_index`, for GEX and VDJ, respectively.
 
-```csv
-#probe_set_file_format=2.0
-#panel_name=Chromium Human Transcriptome Probe Set v1.0.1
-#panel_type=predesigned
-#reference_genome=gex_reference
-#reference_version=2020-A
-gene_id,probe_seq,probe_id,included,region
-ENSG00000000003,GGTGACACCACAACAATGCAACGTATTTTGGATCTTGTCTACTGCATGGC,ENSG00000000003|TSPAN6|8eab823,TRUE,spliced
-ENSG00000000003,TCTGCATCTCTCTGTGGAGTACAATCTTCAAGTTTACAGCAACTCTTAGG,ENSG00000000003|TSPAN6|9d7fe51,TRUE,unspliced
-ENSG00000000003,AAAGCTGTTCTTAATCTCATGTCTGAAAACAAATCCTACGATGGCAGCGA,ENSG00000000003|TSPAN6|d2b5833,TRUE,spliced
-[...]
-```
+  > When running cellranger multi, without any VDJ data, users can also skip VDJ automated ref building with: `--skip_cellrangermulti_vdjref`.
 
-**Feature barcode reference for antibody capture**
+- When working with **FFPE data**, a prob set needs to be specified via `--gex_frna_probe_set`. This file is typically
+  [provided by 10x](https://www.10xgenomics.com/support/software/cell-ranger/downloads#probe-set-downloads).
 
-File containing feature barcodes used for AB analysis (`--fb_reference`). Example:
+- When working with **Cell Multiplexing Oligos (CMOs)**, a reference file needs to be provided via `--gex_cmo_set`. The
+  default reference file, as well as a description how to write a custom one, are [available from the 10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#cmo-ref)
 
-```csv
-id,name,read,pattern,sequence,feature_type
-CD3,CD3,R2,^NNNNNNNNNN(BC)NNNNNNNNN,CTCATTGTAACTCCT,Antibody Capture
-CD4,CD4,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TGTTCCCGCTCAACT,Antibody Capture
-CD8,CD8,R2,^NNNNNNNNNN(BC)NNNNNNNNN,GCGCAACTTGATGAT,Antibody Capture
-CD11c,CD11c,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TACGCCTATAACTTG,Antibody Capture
-CD14,CD14,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TCTCAGACCTCCGTA,Antibody Capture
-CD16,CD16,R2,^NNNNNNNNNN(BC)NNNNNNNNN,AAGTTCACTCTTTGC,Antibody Capture
-CD19,CD19,R2,^NNNNNNNNNN(BC)NNNNNNNNN,CTGGGCAATTACTCG,Antibody Capture
-CD56,CD56,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TCCTTTCCTGATAGG,Antibody Capture
-CD45,CD45,R2,^NNNNNNNNNN(BC)NNNNNNNNN,TCCCTTGCGATTTAC,Antibody Capture
-IgG1,IgG1_control_TotalSeqC,R2,^NNNNNNNNNN(BC)NNNNNNNNN,GCCGGACGACATTAA,Antibody Capture
-A0201_NLVPMVATV_CMV_TCR-1,NLVPMVATV_CMV_TCR-1,R2,^NNNNNNNNNN(BC)NNNNNNNNN,GGCCTCGGTCCTAGG,Antibody Capture
-```
-
-gex_target_panel = null
-vdj_inner_enrichment_primers = null
-gex_barcode_sample_assignment = null
-
-TODO: ends here
+- When working with **Feature barcoding (antibody capture)**, a reference file needs to be provided via `--fb_reference`.
+  It relates each "feature" to the corresponding barcode sequence. The structure of this file is described in
+  the [cellranger documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-feature-bc-analysis#feature-ref)
 
 ## Running the pipeline
 

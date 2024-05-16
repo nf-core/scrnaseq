@@ -353,10 +353,6 @@
                     "format": "file-path",
                     "exists": true
                 },
-                "gex_barcode_sample_assignment": {
-                    "type": "string",
-                    "description": "TODO: Need help in defining a description for param."
-                },
                 "cellranger_multi_barcodes": {
                     "type": "string",
                     "format": "file-path",

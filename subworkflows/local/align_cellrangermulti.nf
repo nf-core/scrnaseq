@@ -178,11 +178,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             ch_beam_control_panel_csv,
             ch_gex_cmo_set,
             ch_cmo_barcode_csv,
-<<<<<<< HEAD
-            [], // currently not supported
-=======
-            ch_gex_barcodes,
->>>>>>> parent of 03a38cd (remove gex_barcode_sample_assignment parameter)
+            [],
             ch_frna_sample_csv,
             params.skip_cellranger_renaming
         )

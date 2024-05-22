@@ -1,2 +1,11 @@
 repository_type: pipeline
 nf_core_version: "2.14.1"
+lint:
+  template_strings: False
+  files_unchanged:
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+  files_exist:
+    - lib/Utils.groovy
+  # TODO This is because of an issue with the monochromeLogs parameter
+  # See nextflow.config for details
+  schema_params: False

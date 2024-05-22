@@ -17,10 +17,9 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { SCRNASEQ  } from './workflows/scrnaseq'
+include { SCRNASEQ                } from './workflows/scrnaseq'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-
 include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 
 /*
@@ -28,11 +27,9 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrn
     GENOME PARAMETER VALUES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
-params.fasta = getGenomeAttribute('fasta')
+// we cannot modify params. here, we must load the files
+ch_genome_fasta = params.genome ? file( getGenomeAttribute('fasta'), checkIfExists: true ) : []
+ch_gtf          = params.genome ? file( getGenomeAttribute('gtf'), checkIfExists: true   ) : []
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -47,6 +44,8 @@ workflow NFCORE_SCRNASEQ {
 
     take:
     samplesheet // channel: samplesheet read in from --input
+    ch_genome_fasta
+    ch_gtf
 
     main:
 
@@ -54,7 +53,9 @@ workflow NFCORE_SCRNASEQ {
     // WORKFLOW: Run pipeline
     //
     SCRNASEQ (
-        samplesheet
+        samplesheet,
+        ch_genome_fasta,
+        ch_gtf
     )
 
     emit:
@@ -88,7 +89,9 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     NFCORE_SCRNASEQ (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.samplesheet,
+        ch_genome_fasta,
+        ch_gtf
     )
 
     //

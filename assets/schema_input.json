@@ -26,8 +26,22 @@
                 "exists": true,
                 "pattern": "^\\S+\\.f(ast)?q\\.gz$",
                 "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+            },
+            "expected_cells": {
+                "type": "integer",
+                "errorMessage": "Expected cells must be an Integer",
+                "meta": ["expected_cells"]
+            },
+            "seq_center": {
+                "type": "string",
+                "meta": ["seq_center"]
+            },
+            "sample_type": {
+                "type": "string",
+                "enum": ["atac", "gex"],
+                "meta": ["sample_type"]
             }
         },
-        "required": ["sample", "fastq_1"]
+        "required": ["sample", "fastq_1", "fastq_2"]
     }
 }

@@ -1,0 +1,38 @@
+{
+    "test-dataset_alevin_aligner": {
+        "content": [
+            {
+                "stderr": [
+
+                ],
+                "errorReport": "",
+                "exitStatus": 0,
+                "failed": false,
+                "stdout": [
+
+                ],
+                "errorMessage": "",
+                "trace": {
+                    "tasksFailed": 0,
+                    "tasksCount": 14,
+                    "tasksSucceeded": 14
+                },
+                "name": "workflow",
+                "success": true
+            },
+            "quants_mat_cols.txt:md5,e9868982c17a330392e38c2a5933cf97",
+            "quants_mat.mtx:md5,b8aa7b3c488fd8923de50a3621d4991f",
+            "quants_mat_rows.txt:md5,6227df5a13127b71c71fb18cd8574857",
+            "quants_mat_cols.txt:md5,e9868982c17a330392e38c2a5933cf97",
+            "quants_mat.mtx:md5,54cd12666016adce94c025b2e07f4b02",
+            "quants_mat_rows.txt:md5,6b458a7777260ba90eccbe7919df934b",
+            "Sample_X_raw_matrix.rds:md5,ad35ee66bf2fc3d5d4656c19a7e64e2b",
+            "Sample_Y_raw_matrix.rds:md5,baf584142205b1d42bb6fdab1f22a06a"
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.10.1"
+        },
+        "timestamp": "2024-02-14T14:49:46.831540515"
+    }
+}

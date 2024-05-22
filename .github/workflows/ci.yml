@@ -1,5 +1,5 @@
-name: nf-core CI
 # This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
+name: nf-core CI
 on:
   push:
     branches:
@@ -7,9 +7,16 @@ on:
   pull_request:
   release:
     types: [published]
+  merge_group:
+    types:
+      - checks_requested
+    branches:
+      - master
+      - dev
 
 env:
   NXF_ANSI_LOG: false
+  NFTEST_VER: "0.8.1"
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
@@ -17,16 +24,21 @@ concurrency:
 
 jobs:
   test:
-    name: Run pipeline with test data
-    # Only run on push if this is the nf-core dev branch (merged PRs)
+    name: "aligner: ${{ matrix.profile }} ; NF: ${{ matrix.NXF_VER }}"
     if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/scrnaseq') }}"
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         NXF_VER:
           - "23.04.0"
           - "latest-everything"
+        profile: ["alevin", "cellranger", "kallisto", "star"]
+
     steps:
+      - name: Disk space cleanup
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+
       - name: Check out pipeline code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
 
@@ -35,12 +47,33 @@ jobs:
         with:
           version: "${{ matrix.NXF_VER }}"
 
-      - name: Disk space cleanup
-        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+      - name: Cache nf-test installation
+        id: cache-software
+        uses: actions/cache@v3
+        with:
+          path: |
+            /usr/local/bin/nf-test
+            /home/runner/.nf-test/nf-test.jar
+          key: ${{ runner.os }}-${{ env.NFTEST_VER }}-nftest
 
-      - name: Run pipeline with test data
-        # TODO nf-core: You can customise CI pipeline run tests as required
-        # For example: adding multiple test runs with different parameters
-        # Remember that you can parallelise this by using strategy.matrix
+      - name: Install nf-test
+        if: steps.cache-software.outputs.cache-hit != 'true'
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results
+          wget -qO- https://code.askimed.com/install/nf-test | bash
+          sudo mv nf-test /usr/local/bin/
+
+      - name: Run nf-test
+        run: |
+          nf-test test tests/main_pipeline_${{ matrix.profile }}.test --junitxml=test.xml
+
+      - name: Output log on failure
+        if: failure()
+        run: |
+          sudo apt install bat > /dev/null
+          batcat --decorations=always --color=always ${{ github.workspace }}/.nf-test/tests/*/meta/nextflow.log
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always() # always run even if the previous step fails
+        with:
+          report_paths: test.xml

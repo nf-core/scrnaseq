@@ -40,6 +40,11 @@
                 "type": "string",
                 "enum": ["atac", "gex"],
                 "meta": ["sample_type"]
+            },
+            "feature_type": {
+                "type": "string",
+                "enum": ["gex", "vdj", "ab", "crispr", "cmo"],
+                "meta": ["feature_type"]
             }
         },
         "required": ["sample", "fastq_1", "fastq_2"]

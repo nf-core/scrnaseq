@@ -99,7 +99,7 @@ For details on how to load these into R and perform further downstream analysis,
 
 ## Cellranger
 
-Cell Ranger is a set of analysis scripts that processes 10X Chromium single cell data to align reads, generate feature-barcode matrices, perform clustering and other secondary analysis. See [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) for more information on Cellranger.
+Cell Ranger is a set of analysis scripts that processes 10x Chromium single cell data to align reads, generate feature-barcode matrices, perform clustering and other secondary analysis. See [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) for more information on Cellranger.
 
 **Output directory: `results/cellranger`**
 
@@ -112,6 +112,16 @@ Cell Ranger ARC is a set of analysis pipelines that process Chromium Single Cell
 **Output directory: `results/cellrangerarc`**
 
 - Contains the mapped BAM files, filtered and unfiltered HDF5 matrices and output metrics created by Cellranger ARC
+
+## Cellranger multi
+
+Cell Ranger Multi is the 10x analysis pipeline for *multi*omics and *multi*plexed experiments. See [Cell Ranger Multi]()
+for the corresponding documentation.
+
+**Output directory: `results/cellrangermulti`**
+
+- Overall same output structure as cellranger. In case of multiplexed samples there will be one ouput folder for
+  each demultiplexed sample, and one containing all (non-demultiplexed) cells.
 
 ## UniverSC
 

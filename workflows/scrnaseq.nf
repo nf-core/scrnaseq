@@ -4,34 +4,36 @@ include { KALLISTO_BUSTOOLS                  } from '../subworkflows/local/kalli
 include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevin'
 include { STARSOLO                           } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN                   } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_MULTI_ALIGN             } from "../subworkflows/local/align_cellrangermulti"
 include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align_cellrangerarc"
 include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
 include { EMPTYDROPS_CELL_CALLING            } from '../modules/local/emptydrops'
+include { GUNZIP as GUNZIP_FASTA             } from '../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_GTF               } from '../modules/nf-core/gunzip/main'
 include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
+include { getGenomeAttribute                 } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+
 
 
 workflow SCRNASEQ {
 
     take:
     ch_fastq
-    ch_genome_fasta
-    ch_gtf
 
     main:
 
     protocol_config = Utils.getProtocol(workflow, log, params.aligner, params.protocol)
-    if (protocol_config['protocol'] == 'auto' && params.aligner != "cellranger") {
+    if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangermulti"]) {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    // overwrite fasta and gtf if user provide a custom one
-    ch_genome_fasta = Channel.value(params.fasta ? file(params.fasta) : ch_genome_fasta)
-    ch_gtf = Channel.value(params.gtf ? file(params.gtf) : ch_gtf)
+    ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('fasta'), checkIfExists: true ) : [] )
+    ch_gtf          = params.gtf ? file(params.gtf, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('gtf'), checkIfExists: true   ) : [] )
 
     // general input and params
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
@@ -74,17 +76,47 @@ workflow SCRNASEQ {
     //universc params
     ch_universc_index = params.universc_index ? file(params.universc_index) : []
 
+    //cellrangermulti params
+    cellranger_vdj_index              = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
+    ch_multi_samplesheet              = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
+    empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
+
     ch_versions     = Channel.empty()
     ch_mtx_matrices = Channel.empty()
 
     // Run FastQC
     if (!params.skip_fastqc) {
         FASTQC_CHECK ( ch_fastq )
-        ch_versions       = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_zip.map{ meta, it -> it })
+        ch_versions      = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_multiqc.flatten())
     }
 
-    ch_filter_gtf = GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf
+    //
+    // Uncompress genome fasta file if required
+    //
+    if (params.fasta) {
+        if (params.fasta.endsWith('.gz')) {
+            ch_genome_fasta    = GUNZIP_FASTA ( [ [:], file(params.fasta) ] ).gunzip.map { it[1] }
+            ch_versions        = ch_versions.mix(GUNZIP_FASTA.out.versions)
+        } else {
+            ch_genome_fasta = Channel.value( file(params.fasta) )
+        }
+    }
+
+    //
+    // Uncompress GTF annotation file or create from GFF3 if required
+    //
+    if (params.gtf) {
+        if (params.gtf.endsWith('.gz')) {
+            ch_gtf      = GUNZIP_GTF ( [ [:], file(params.gtf) ] ).gunzip.map { it[1] }
+            ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
+        } else {
+            ch_gtf = Channel.value( file(params.gtf) )
+        }
+    }
+
+    // filter gtf
+    ch_filter_gtf = ch_gtf ? GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf : []
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
@@ -169,7 +201,7 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
     }
 
-    // Run cellranger pipeline
+    // Run cellrangerarc pipeline
     if (params.aligner == "cellrangerarc") {
         CELLRANGERARC_ALIGN(
             ch_genome_fasta,
@@ -183,24 +215,95 @@ workflow SCRNASEQ {
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)
     }
 
+    // Run cellrangermulti pipeline
+    if (params.aligner == 'cellrangermulti') {
+
+        // parse the input data to generate a collected channel per sample, which will have
+        // the metadata and data for each data-type of every sample.
+        // then, inside the subworkflow, it can be parsed to manage inputs to the module
+        ch_fastq
+        .map { meta, fastqs ->
+            def parsed_meta = meta.clone() + [ "${meta.feature_type.toString()}": fastqs ]
+            parsed_meta.options = [:]
+
+            // add an universal key to differentiate from empty channels so that the "&& meta_gex?.options" lines in the module main.nf can work properly
+            parsed_meta.options['data-available'] = true
+
+            // add cellranger options that are currently handled by pipeline, coming from samplesheet
+            // the module parses them from the 'gex' options
+            if (meta.feature_type.toString() == 'gex') {
+                parsed_meta.options['create-bam'] = true  // force bam creation -- param required by cellranger multi
+                if (meta.expected_cells) { parsed_meta.options['expected-cells'] = meta.expected_cells }
+            }
+
+            [ parsed_meta.id , parsed_meta ]
+        }
+        .groupTuple( by: 0 )
+        .map{ sample_id, map_collection ->
+            // Now we must check if every data possibility taken into account in the .branch() operation
+            // performed inside the CELLRANGER_MULTI_ALIGN subworkflow are initialized, even with empty files
+            // This to ensure that the sizes of each data channel is the same, and the the order and the data types
+            // are used together with its rightful pairs
+            //
+            // data.types: gex, vdj, ab, beam, crispr, cmo
+
+            // clone ArrayBag (received from .groupTuple()) to avoid mutating the input
+            def map_collection_clone = []
+            map_collection_clone.addAll(map_collection)
+
+            // generate the expected EMPTY tuple when a data type is not used
+            // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,
+            // allowing to have multiple samples in the sheet, having all the data-type tuples initialized,
+            // either empty or populated. It will be branched inside the subworkflow.
+            if (!map_collection_clone.any{ it.feature_type == 'gex' })    { map_collection_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'vdj' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'ab' })     { map_collection_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'beam' })   { map_collection_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
+            if (!map_collection_clone.any{ it.feature_type == 'crispr' }) { map_collection_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'cmo' })    { map_collection_clone.add( [id: sample_id, feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
+
+            // return final map
+            map_collection_clone
+        }
+        .set{ ch_cellrangermulti_collected_channel }
+
+        // Run cellranger multi
+        CELLRANGER_MULTI_ALIGN(
+            ch_genome_fasta,
+            ch_filter_gtf,
+            ch_cellrangermulti_collected_channel,
+            ch_cellranger_index,
+            cellranger_vdj_index,
+            ch_multi_samplesheet
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN.out.ch_versions)
+        ch_multiqc_files = ch_multiqc_files.mix( CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out.map{
+            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
+        })
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx)
+
+    }
+
     // Run emptydrops calling module
-    if ( !params.skip_emptydrops ) {
+    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
 
         //
         // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
         //
-        if ( params.aligner in [ 'cellranger', 'cellrangerarc', 'kallisto', 'star' ] ) {
+        if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
             ch_mtx_matrices_for_emptydrops =
                 ch_mtx_matrices.filter { meta, mtx_files ->
                     mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
-                    mtx_files.toString().contains("counts_unfiltered")  || // kallisto
-                    mtx_files.toString().contains("raw")                   // star
-            }
+                    mtx_files.toString().contains("counts_unfiltered")     || // kallisto
+                    mtx_files.toString().contains("raw")                      // star
+                }
         } else {
             ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
         }
+
         EMPTYDROPS_CELL_CALLING( ch_mtx_matrices_for_emptydrops )
         ch_mtx_matrices = ch_mtx_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
+
     }
 
     // Run mtx to h5ad conversion subworkflow
@@ -213,6 +316,17 @@ workflow SCRNASEQ {
 
     //Add Versions from MTX Conversion workflow too
     ch_versions.mix(MTX_CONVERSION.out.ch_versions)
+
+    //
+    // Collate and save software versions
+    //
+    softwareVersionsToYAML(ch_versions)
+        .collectFile(
+            storeDir: "${params.outdir}/pipeline_info",
+            name: 'nf_core_pipeline_software_mqc_versions.yml',
+            sort: true,
+            newLine: true
+        ).set { ch_collated_versions }
 
     //
     // MODULE: MultiQC

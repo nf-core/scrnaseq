@@ -23,7 +23,7 @@ if (aligner %in% c( "kallisto", "alevin" ))  {
         mtx = mtx_file, features = feature_file, cells = barcode_file, feature.column = 1, mtx.transpose = TRUE
     )
 } else {
-    if (aligner %in% c( "cellranger", "star" ) && is_emptydrops) {
+    if (aligner %in% c( "cellranger", "cellrangermulti", "star" ) && is_emptydrops) {
         print("2")
         expression.matrix <- ReadMtx(
             mtx = mtx_file, features = feature_file, cells = barcode_file, feature.column = 1

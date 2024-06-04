@@ -28,12 +28,12 @@ workflow SCRNASEQ {
     main:
 
     protocol_config = Utils.getProtocol(workflow, log, params.aligner, params.protocol)
-    if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangermulti"]) {
+    if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangerarc", "cellrangermulti"]) {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
     ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('fasta'), checkIfExists: true ) : [] )
-    ch_gtf          = params.gtf ? file(params.gtf, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('gtf'), checkIfExists: true   ) : [] )
+    ch_gtf          = params.gtf   ? file(params.gtf  , checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('gtf')  , checkIfExists: true ) : [] )
 
     // general input and params
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []

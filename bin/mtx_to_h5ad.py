@@ -37,6 +37,7 @@ def _mtx_to_adata(
     # otherwise, it uses the cellranger .h5 files
     if aligner in [
         "cellranger",
+        "cellrangermulti",
         "star",
     ]:
         adata = adata.transpose()

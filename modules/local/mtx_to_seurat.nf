@@ -35,7 +35,7 @@ process MTX_TO_SEURAT {
 
     // def file paths for aligners. Cellranger is normally converted with the .h5 files
     // However, the emptydrops call, always generate .mtx files, thus, cellranger 'emptydrops' required a parsing
-    if (params.aligner in [ 'cellranger', 'cellrangerarc' ]) {
+    if (params.aligner in [ "cellranger", "cellrangerarc", "cellrangermulti" ]) {
 
         mtx_dir  = (input_type == 'custom_emptydrops_filter') ? 'emptydrops_filtered/' : ''
         matrix   = "${mtx_dir}matrix.mtx*"

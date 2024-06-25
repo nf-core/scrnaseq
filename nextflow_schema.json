@@ -61,7 +61,7 @@
                     "default": "alevin",
                     "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
-                    "enum": ["kallisto", "star", "alevin", "cellranger", "cellrangerarc", "universc"]
+                    "enum": ["kallisto", "star", "alevin", "cellranger", "universc", "cellrangerarc", "cellrangermulti"]
                 },
                 "protocol": {
                     "type": "string",
@@ -162,7 +162,7 @@
                     "type": "string",
                     "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
                     "fa_icon": "fas fa-fish",
-                    "format": "file-path",
+                    "format": "path",
                     "exists": true
                 },
                 "txp2gene": {
@@ -192,7 +192,7 @@
                     "description": "Specify a path to the precomputed STAR index.",
                     "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
                     "fa_icon": "fas fa-asterisk",
-                    "format": "file-path",
+                    "format": "path",
                     "exists": true
                 },
                 "star_ignore_sjdbgtf": {
@@ -224,7 +224,7 @@
                     "type": "string",
                     "description": "Specify a path to the precomputed Kallisto index.",
                     "fa_icon": "fas fa-rainbow",
-                    "format": "file-path",
+                    "format": "path",
                     "exists": true
                 },
                 "kb_t1c": {
@@ -264,8 +264,12 @@
                 "cellranger_index": {
                     "type": "string",
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. ",
-                    "format": "file-path",
+                    "format": "path",
                     "exists": true
+                },
+                "skip_cellranger_renaming": {
+                    "type": "boolean",
+                    "description": "Should it skip the automatic renaming included in cellranger-related modules?"
                 }
             }
         },
@@ -298,8 +302,70 @@
                 "universc_index": {
                     "type": "string",
                     "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website.",
+                    "format": "path",
+                    "exists": true
+                }
+            }
+        },
+        "cellranger_multi_options": {
+            "title": "Cellranger Multi options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "cellranger_vdj_index": {
+                    "type": "string",
+                    "format": "path",
+                    "exists": true,
+                    "description": "Specify a pre-built Cell Ranger index for VDJ analysis."
+                },
+                "skip_cellrangermulti_vdjref": {
+                    "type": "boolean",
+                    "description": "Skip mkvdjref if not using VDJ data with cellranger/multi"
+                },
+                "gex_frna_probe_set": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "Provide a probe set for fixed RNA-seq profiling (used with FFPE samples). Please refer to the [10x documentation about probesets](https://www.10xgenomics.com/support/single-cell-gene-expression-flex/documentation/steps/probe-sets/chromium-frp-probe-set-files) for more details."
+                },
+                "gex_target_panel": {
+                    "type": "string",
+                    "description": "Provide a panel description for targeted sequencing.",
+                    "format": "file-path",
+                    "exists": "true"
+                },
+                "gex_cmo_set": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": "true",
+                    "description": "Provide a Cell Multiplexing Oligo (CMO) description file when working with multiplexed samples. This is only necessary if you with to override Cell Ranger's default CMO-set. Please refer to the [10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#cmo-ref) about CMO references for more details."
+                },
+                "fb_reference": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "Provide a reference file for feature barcoding (e.g. antibody measurements). Please refer to the [Cell Ranger Feature Reference documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv) for more details."
+                },
+                "vdj_inner_enrichment_primers": {
+                    "type": "string",
+                    "description": "This argument takes a .txt file containing primer sequences that were used to enrich cDNA for V(D)J sequences. This is only necessary if you with to override Cell Ranger's defaults.",
                     "format": "file-path",
                     "exists": true
+                },
+                "gex_barcode_sample_assignment": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/csv",
+                    "exists": true,
+                    "description": "This is only necessary to override Cell Ranger's default cell calling and tag calling steps. In most cases you need to only use the `cellranger_multi_barcodes` parameter. Please refer to the [10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#barcode-asst) for more information about this file."
+                },
+                "cellranger_multi_barcodes": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/csv",
+                    "description": "Additional samplesheet to provide information about multiplexed samples. See the 'Usage' section for more details."
                 }
             }
         },
@@ -495,6 +561,13 @@
                     "description": "Validation of parameters in lenient more.",
                     "hidden": true,
                     "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
+                },
+                "pipelines_testdata_base_path": {
+                    "type": "string",
+                    "fa_icon": "far fa-check-circle",
+                    "description": "Base URL or local path to location of pipeline test dataset files",
+                    "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
+                    "hidden": true
                 }
             }
         }
@@ -529,6 +602,9 @@
         },
         {
             "$ref": "#/definitions/universc_options"
+        },
+        {
+            "$ref": "#/definitions/cellranger_multi_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

@@ -5,6 +5,7 @@ include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevi
 include { STARSOLO                           } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN                   } from "../subworkflows/local/align_cellranger"
 include { CELLRANGER_MULTI_ALIGN             } from "../subworkflows/local/align_cellrangermulti"
+include { CELLRANGER_MULTI_VDJ_ALIGN         } from "../subworkflows/local/align_cellrangermulti_vdj"
 include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align_cellrangerarc"
 include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
@@ -222,6 +223,75 @@ workflow SCRNASEQ {
 
     // Run cellrangermulti pipeline
     if (params.aligner == 'cellrangermulti') {
+
+        // parse the input data to generate a collected channel per sample, which will have
+        // the metadata and data for each data-type of every sample.
+        // then, inside the subworkflow, it can be parsed to manage inputs to the module
+        ch_fastq
+        .map { meta, fastqs ->
+            def parsed_meta = meta.clone() + [ "${meta.feature_type.toString()}": fastqs ]
+            parsed_meta.options = [:]
+
+            // add an universal key to differentiate from empty channels so that the "&& meta_gex?.options" lines in the module main.nf can work properly
+            parsed_meta.options['data-available'] = true
+
+            // add cellranger options that are currently handled by pipeline, coming from samplesheet
+            // the module parses them from the 'gex' options
+            if (meta.feature_type.toString() == 'gex') {
+                parsed_meta.options['create-bam'] = true  // force bam creation -- param required by cellranger multi
+                if (meta.expected_cells) { parsed_meta.options['expected-cells'] = meta.expected_cells }
+            }
+
+            [ parsed_meta.id , parsed_meta ]
+        }
+        .groupTuple( by: 0 )
+        .map{ sample_id, map_collection ->
+            // Now we must check if every data possibility taken into account in the .branch() operation
+            // performed inside the CELLRANGER_MULTI_ALIGN subworkflow are initialized, even with empty files
+            // This to ensure that the sizes of each data channel is the same, and the the order and the data types
+            // are used together with its rightful pairs
+            //
+            // data.types: gex, vdj, ab, beam, crispr, cmo
+
+            // clone ArrayBag (received from .groupTuple()) to avoid mutating the input
+            def map_collection_clone = []
+            map_collection_clone.addAll(map_collection)
+
+            // generate the expected EMPTY tuple when a data type is not used
+            // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,
+            // allowing to have multiple samples in the sheet, having all the data-type tuples initialized,
+            // either empty or populated. It will be branched inside the subworkflow.
+            if (!map_collection_clone.any{ it.feature_type == 'gex' })    { map_collection_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'vdj' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'ab' })     { map_collection_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'beam' })   { map_collection_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
+            if (!map_collection_clone.any{ it.feature_type == 'crispr' }) { map_collection_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'cmo' })    { map_collection_clone.add( [id: sample_id, feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
+
+            // return final map
+            map_collection_clone
+        }
+        .set{ ch_cellrangermulti_collected_channel }
+
+        // Run cellranger multi
+        CELLRANGER_MULTI_ALIGN(
+            ch_genome_fasta,
+            ch_filter_gtf,
+            ch_cellrangermulti_collected_channel,
+            ch_cellranger_index,
+            cellranger_vdj_index,
+            ch_multi_samplesheet
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN.out.ch_versions)
+        ch_multiqc_files = ch_multiqc_files.mix( CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out.map{
+            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
+        })
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx)
+
+    }
+
+    // Run cellrangermulti with immuneprofiling pipeline
+    if (params.aligner == 'cellrangermulti_vdj') {
 
         // parse the input data to generate a collected channel per sample, which will have
         // the metadata and data for each data-type of every sample.

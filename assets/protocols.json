@@ -28,6 +28,9 @@
         },
         "10XV3": {
             "protocol": "SC3Pv3"
+        },
+        "10XV4": {
+            "protocol": "SC3Pv4"
         }
     },
     "cellrangerarc": {

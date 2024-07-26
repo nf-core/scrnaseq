@@ -85,7 +85,7 @@ The single-cell protocol used in the experiment can be specified using the `--pr
 For cellranger, it is recommended to stick with the default value `'auto'` for automatic detection of the protocol.
 For all other aligner, you need to specify the protocol manually.
 
-The three 10x Genomics protocols 3' v1 (`10XV1`), 3' v2 (`10XV2`) and 3' v3 (`10XV3`) are universally supported
+The three 10x Genomics protocols 3' v1 (`10XV1`), 3' v2 (`10XV2`), 3' v3 (`10XV3`), and 3' v4 (`10XV4`) are universally supported
 by all aligners in the pipeline and mapped to the correct options automatically. If the protocol is unknown to the
 nf-core pipeline, the value specified to `--protocol` is passed to the aligner _in verbatim_ to support additional protocols.
 

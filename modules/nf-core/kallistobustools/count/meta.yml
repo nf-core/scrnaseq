@@ -47,7 +47,7 @@ input:
   - technology:
       type: string
       description: String value defining the sequencing technology used.
-      pattern: "{10XV1,10XV2,10XV3,10XV4,CELSEQ,CELSEQ2,DROPSEQ,INDROPSV1,INDROPSV2,INDROPSV3,SCRUBSEQ,SURECELL,SMARTSEQ}"
+      pattern: "{10XV1,10XV2,10XV3,CELSEQ,CELSEQ2,DROPSEQ,INDROPSV1,INDROPSV2,INDROPSV3,SCRUBSEQ,SURECELL,SMARTSEQ}"
 output:
   - meta:
       type: map

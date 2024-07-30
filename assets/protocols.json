@@ -12,6 +12,10 @@
             "protocol": "10xv3",
             "whitelist": "assets/whitelist/10x_V3_barcode_whitelist.txt.gz"
         },
+        "10XV4": {
+            "protocol": "10xv4",
+            "whitelist": "assets/whitelist/10x_V4_barcode_whitelist.txt.gz"
+        },
         "dropseq": {
             "protocol": "dropseq"
         }
@@ -28,6 +32,9 @@
         },
         "10XV3": {
             "protocol": "SC3Pv3"
+        },
+        "10XV4": {
+            "protocol": "SC3Pv4"
         }
     },
     "cellrangerarc": {
@@ -51,6 +58,11 @@
             "extra_args": "--soloUMIlen 12",
             "whitelist": "assets/whitelist/10x_V3_barcode_whitelist.txt.gz"
         },
+        "10XV4": {
+            "protocol": "CB_UMI_Simple",
+            "extra_args": "--soloUMIlen 12",
+            "whitelist": "assets/whitelist/10x_V4_barcode_whitelist.txt.gz"
+        },
         "dropseq": {
             "protocol": "CB_UMI_Simple"
         },
@@ -67,6 +79,9 @@
         },
         "10XV3": {
             "protocol": "10XV3"
+        },
+        "10XV4": {
+            "protocol": "10XV4"
         },
         "dropseq": {
             "protocol": "DROPSEQ"
@@ -87,6 +102,9 @@
         },
         "10XV3": {
             "protocol": "10x-v3"
+        },
+        "10XV4": {
+            "protocol": "10x-v4"
         },
         "dropseq": {
             "protocol": "dropseq"

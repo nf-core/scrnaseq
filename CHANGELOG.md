@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add support for 10XV4 chemistry ([#348](https://github.com/nf-core/scrnaseq/pull/348))
+
 ## v2.7.0 - 2024-06-03
 
 - Apply `check_max` to AlevinQC time limit ([#335](https://github.com/nf-core/scrnaseq/pull/335))

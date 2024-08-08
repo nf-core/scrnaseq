@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Add support for 10XV4 chemistry ([#348](https://github.com/nf-core/scrnaseq/pull/348))
+- Fix issues with predefined STAR index ([#350](https://github.com/nf-core/scrnaseq/pull/350))
 
 ## v2.7.0 - 2024-06-03
 

@@ -67,13 +67,8 @@ workflow SCRNASEQ {
     ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 
     //star params
-    if (params.star_index) {
-        ch_star_index = Channel.fromPath(params.star_index).map{f -> [[id:f.baseName], f] }
-    } else if (params.genome ) {
-        ch_star_index = Channel.fromPath(params.genomes[params.genome]["star"]).map{ f -> [[id:f.baseName], f] }
-    } else {
-        ch_star_index = []
-    }
+    star_index = params.star ? file(params.star_index, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('star'), checkIfExists: true ) : [] )
+    ch_star_index = [[id: star_index.baseName], star_index]
     star_feature = params.star_feature
 
     //cellranger params

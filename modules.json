@@ -17,7 +17,7 @@
                     },
                     "cellranger/mkref": {
                         "branch": "master",
-                        "git_sha": "90dad5491658049282ceb287a3d7732c1ce39837",
+                        "git_sha": "3549a361ce3401b6afd238a266389d78392a53f6",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkvdjref": {
@@ -42,7 +42,7 @@
                     },
                     "cellrangerarc/mkref": {
                         "branch": "master",
-                        "git_sha": "4196b1b2e7ce265892f3979eabf7a9ddc030702f",
+                        "git_sha": "3549a361ce3401b6afd238a266389d78392a53f6",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {

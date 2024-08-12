@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for 10XV4 chemistry ([#348](https://github.com/nf-core/scrnaseq/pull/348))
 - Update modules ([#351](https://github.com/nf-core/scrnaseq/pull/351))
+- Fix resource specifications for `cellranger mkref`/`cellrangerarc mkref` ([#352](https://github.com/nf-core/scrnaseq/pull/352))
 
 ## v2.7.0 - 2024-06-03
 

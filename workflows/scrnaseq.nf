@@ -32,8 +32,12 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('fasta'), checkIfExists: true ) : [] )
-    ch_gtf          = params.gtf   ? file(params.gtf  , checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('gtf')  , checkIfExists: true ) : [] )
+    params.fasta = getGenomeAttribute('fasta')
+    params.gtf = getGenomeAttribute('gtf')
+    params.star_index = getGenomeAttribute('star')
+
+    ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : []
+    ch_gtf = params.gtf ? file(params.gtf, checkIfExists: true) : []
 
     // general input and params
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
@@ -67,8 +71,8 @@ workflow SCRNASEQ {
     ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 
     //star params
-    star_index = params.star ? file(params.star_index, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('star'), checkIfExists: true ) : [] )
-    ch_star_index = [[id: star_index.baseName], star_index]
+    star_index = params.star_index ? file(params.star_index, checkIfExists: true) : null
+    ch_star_index = star_index ? [[id: star_index.baseName], star_index] : []
     star_feature = params.star_feature
 
     //cellranger params

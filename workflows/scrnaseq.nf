@@ -67,7 +67,8 @@ workflow SCRNASEQ {
     ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 
     //star params
-    ch_star_index = params.star_index ? file(params.star_index) : []
+    star_index = params.star ? file(params.star_index, checkIfExists: true) : ( params.genome ? file( getGenomeAttribute('star'), checkIfExists: true ) : [] )
+    ch_star_index = [[id: star_index.baseName], star_index]
     star_feature = params.star_feature
 
     //cellranger params

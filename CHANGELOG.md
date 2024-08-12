@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Re-enable linting check for nextflow schema ([#354](https://github.com/nf-core/scrnaseq/pull/354))
 - Add support for 10XV4 chemistry ([#348](https://github.com/nf-core/scrnaseq/pull/348))
 - Fix issues with predefined STAR index ([#350](https://github.com/nf-core/scrnaseq/pull/350))
 - Update modules ([#351](https://github.com/nf-core/scrnaseq/pull/351))

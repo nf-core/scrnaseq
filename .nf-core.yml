@@ -6,6 +6,3 @@ lint:
     - .github/ISSUE_TEMPLATE/bug_report.yml
   files_exist:
     - lib/Utils.groovy
-  # TODO This is because of an issue with the monochromeLogs parameter
-  # See nextflow.config for details
-  schema_params: False

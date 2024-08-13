@@ -16,7 +16,10 @@ on:
 
 env:
   NXF_ANSI_LOG: false
-  NFTEST_VER: "0.8.1"
+  NFT_VER: "0.9.0"
+  NFT_WORKDIR: "~"
+  NFT_DIFF: "pdiff"
+  NFT_DIFF_ARGS: "--line-numbers --expand-tabs=2"
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"

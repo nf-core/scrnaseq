@@ -3,8 +3,9 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## v2.7.1 - 2024-08-13
 
+- Re-enable linting check for nextflow schema ([#354](https://github.com/nf-core/scrnaseq/pull/354))
 - Add support for 10XV4 chemistry ([#348](https://github.com/nf-core/scrnaseq/pull/348))
 - Fix issues with predefined STAR index ([#350](https://github.com/nf-core/scrnaseq/pull/350))
 - Update modules ([#351](https://github.com/nf-core/scrnaseq/pull/351))

@@ -16,7 +16,7 @@ workflow SCRNASEQ_ALEVIN {
     genome_fasta
     gtf
     transcript_fasta
-    salmon_index
+    simpleaf_index
     txp2gene
     barcode_whitelist
     protocol
@@ -26,16 +26,16 @@ workflow SCRNASEQ_ALEVIN {
     main:
     ch_versions = Channel.empty()
 
-    assert (genome_fasta && gtf && salmon_index && txp2gene) || (genome_fasta && gtf)  || (genome_fasta && gtf && transcript_fasta && txp2gene):
+    assert (genome_fasta && gtf && simpleaf_index && txp2gene) || (genome_fasta && gtf)  || (genome_fasta && gtf && transcript_fasta && txp2gene):
         """Must provide a genome fasta file ('--fasta') and a gtf file ('--gtf'), or a genome fasta file
         and a transcriptome fasta file ('--transcript_fasta`) if no index and txp2gene is given!""".stripIndent()
 
     /*
     * Build salmon index
     */
-    if (!salmon_index) {
+    if (!simpleaf_index) {
         SIMPLEAF_INDEX( genome_fasta, transcript_fasta, gtf )
-        salmon_index = SIMPLEAF_INDEX.out.index.collect()
+        simpleaf_index = SIMPLEAF_INDEX.out.index.collect()
         transcript_tsv = SIMPLEAF_INDEX.out.transcript_tsv.collect()
         ch_versions = ch_versions.mix(SIMPLEAF_INDEX.out.versions)
 
@@ -51,7 +51,7 @@ workflow SCRNASEQ_ALEVIN {
     */
     SIMPLEAF_QUANT (
         ch_fastq,
-        salmon_index,
+        simpleaf_index,
         txp2gene,
         protocol,
         barcode_whitelist

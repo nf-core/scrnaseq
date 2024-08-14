@@ -92,7 +92,7 @@ For details on how to load these into R and perform further downstream analysis,
 
 **Output directory: `results/reference_genome`**
 
-- `salmon_index`
+- `simpleaf_index`
   - Contains the indexed reference transcriptome for Salmon Alevin
 - `alevin/txp2gene.tsv`
   - The transcriptome to gene mapping TSV file utilized by Salmon Alevin

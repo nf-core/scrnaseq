@@ -68,7 +68,7 @@ workflow SCRNASEQ {
     kb_workflow = params.kb_workflow
 
     //salmon params
-    ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
+    ch_simpleaf_index = params.simpleaf_index ? file(params.simpleaf_index) : []
 
     //star params
     star_index = params.star_index ? file(params.star_index, checkIfExists: true) : null
@@ -147,7 +147,7 @@ workflow SCRNASEQ {
             ch_genome_fasta,
             ch_filter_gtf,
             ch_transcript_fasta,
-            ch_salmon_index,
+            ch_simpleaf_index,
             ch_txp2gene,
             ch_barcode_whitelist,
             protocol_config['protocol'],

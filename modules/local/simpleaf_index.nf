@@ -41,9 +41,7 @@ process SIMPLEAF_INDEX {
         $no_piscem \\
         $args \\
         -o salmon
-    simpleaf index --output simpleaf_index --fasta data/refdata-gex-GRCh38-2020-A/fasta/genome.fa --gtf data/refdata-gex-GRCh38-2020-A/genes/genes.gtf --rlen 91 --threads 16 \
-    \
-    --no-piscem
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         simpleaf: \$(simpleaf -V | tr -d '\\n' | cut -d ' ' -f 2)

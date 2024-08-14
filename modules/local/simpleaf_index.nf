@@ -2,10 +2,10 @@ process SIMPLEAF_INDEX {
     tag "$transcript_gtf"
     label "process_medium"
 
-    conda 'bioconda::simpleaf=0.10.0-1'
+    conda 'bioconda::simpleaf=0.17.2-0'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/simpleaf:0.10.0--h9f5acd7_1' :
-        'biocontainers/simpleaf:0.10.0--h9f5acd7_1' }"
+        'https://depot.galaxyproject.org/singularity/simpleaf:0.17.2--h919a2d8_0' :
+        'biocontainers/simpleaf:0.17.2--h919a2d8_0' }"
 
     input:
     path genome_fasta
@@ -14,7 +14,7 @@ process SIMPLEAF_INDEX {
 
     output:
     path "salmon/index"              , emit: index
-    path "salmon/ref/*_t2g_3col.tsv" , emit: transcript_tsv
+    path "salmon/ref/*t2g_3col.tsv" , emit: transcript_tsv
     path "versions.yml"              , emit: versions
     path "salmon"                    , emit: salmon
 
@@ -23,7 +23,8 @@ process SIMPLEAF_INDEX {
 
     script:
     def args = task.ext.args ?: ''
-    def seq_inputs = (params.transcript_fasta) ? "--refseq $transcript_fasta" : "--gtf $transcript_gtf"
+    def seq_inputs = (params.transcript_fasta) ? "--refseq $transcript_fasta" : "--fasta $genome_fasta --gtf $transcript_gtf"
+    def no_piscem = (params.no_piscem) ? "--no-piscem" : " "
     """
     # export required var
     export ALEVIN_FRY_HOME=.
@@ -36,11 +37,13 @@ process SIMPLEAF_INDEX {
     simpleaf \\
         index \\
         --threads $task.cpus \\
-        --fasta $genome_fasta \\
         $seq_inputs \\
+        $no_piscem \\
         $args \\
         -o salmon
-
+    simpleaf index --output simpleaf_index --fasta data/refdata-gex-GRCh38-2020-A/fasta/genome.fa --gtf data/refdata-gex-GRCh38-2020-A/genes/genes.gtf --rlen 91 --threads 16 \
+    \
+    --no-piscem
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         simpleaf: \$(simpleaf -V | tr -d '\\n' | cut -d ' ' -f 2)

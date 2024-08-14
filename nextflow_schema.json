@@ -182,7 +182,12 @@
                 "no_piscem": {
                     "type": "boolean",
                     "fa_icon": "fas fa-map-marked-alt",
-                    "description": "Use salmon instead of the default piscem indexer and mapper."
+                    "description": "Don't use the default piscem mapper, instead use salmon-alevin"
+                },
+                "use_selective_alignment": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-map-marked-alt",
+                    "description": "Use selective-alignment for mapping instead of pseudoalignment with structural constraints (only if using salmon alevin as the underlying mapper)."
                 }
             }
         },

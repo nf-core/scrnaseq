@@ -24,7 +24,7 @@ process SIMPLEAF_INDEX {
     script:
     def args = task.ext.args ?: ''
     def seq_inputs = (params.transcript_fasta) ? "--refseq $transcript_fasta" : "--fasta $genome_fasta --gtf $transcript_gtf"
-    def no_piscem = (params.no_piscem) ? "--no-piscem" : " "
+    def no_piscem = (params.no_piscem) ? '--no-piscem' : ''
     """
     # export required var
     export ALEVIN_FRY_HOME=.

@@ -29,6 +29,8 @@ process SIMPLEAF_QUANT {
     def args      = task.ext.args ?: ''
     def args_list = args.tokenize()
     def prefix    = task.ext.prefix ?: "${meta.id}"
+    // selective alignment is only available in salmon
+    def use_selective_alignment = (params.no_piscem && params.use_selective_alignment) ? '-s' : ''
 
     //
     // check if users are using one of the mutually excludable parameters:
@@ -70,6 +72,7 @@ process SIMPLEAF_QUANT {
         -c "$protocol" \\
         $expect_cells \\
         $unfiltered_command \\
+        $use_selective_alignment \\
         $args
 
     $save_whitelist

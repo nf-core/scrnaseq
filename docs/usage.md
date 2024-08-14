@@ -39,7 +39,7 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 
 This parameter is currently supported by
 
-- [Salmon Alevin](https://salmon.readthedocs.io/en/latest/alevin.html#expectcells)
+- [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/generate_permit_list.html#:~:text=%2D%2Dexpect%2Dcells%20%3Cncells%3E)
 - [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md)
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger)
 
@@ -47,7 +47,7 @@ Note that since cellranger v7, it is **not recommended** anymore to supply the `
 
 ## Aligning options
 
-By default, the pipeline uses [Salmon Alevin](https://salmon.readthedocs.io/en/latest/alevin.html) (i.e. --aligner alevin) to perform pseudo-alignment of reads to the reference genome and to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
+By default, the pipeline uses [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) (i.e. --aligner alevin) via [Simpleaf](https://simpleaf.readthedocs.io/en/latest/) to perform pseudo-alignment of reads to the reference genome and to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
 
 Other aligner options for running the pipeline are:
 
@@ -100,11 +100,11 @@ The command `kb --list` shows all supported, preconfigured protocols. Additional
 
 For more details, please refer to the [Kallisto/bustools documentation](https://pachterlab.github.io/kallisto/manual#bus).
 
-#### Alevin/fry
+#### Alevin-fry
 
-Alevin/fry also supports custom chemistries in a slighly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
+Alevin-fry also supports custom chemistries in a slightly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
 
-For more details, see the [simpleaf documentation](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag)
+For more details, see the [simpleaf documentation](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag) and the [language specification](https://hackmd.io/@PI7Og0l1ReeBZu_pjQGUQQ/rJMgmvr13).
 
 #### UniverSC
 

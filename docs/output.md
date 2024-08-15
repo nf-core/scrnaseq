@@ -122,6 +122,8 @@ for the corresponding documentation.
 
 - Overall same output structure as cellranger. In case of multiplexed samples there will be one ouput folder for
   each demultiplexed sample, and one containing all (non-demultiplexed) cells.
+- In case sample demultiplexing is to be followed by immune profiling, an extra output is added containing .fastq files
+  converted from the standard .bam file output.
 
 ## UniverSC
 

@@ -1,21 +1,19 @@
 //
 // Include modules
 //
-include { CELLRANGER_MKGTF                  } from "../../modules/nf-core/cellranger/mkgtf/main.nf"
-include { CELLRANGER_MKREF                  } from "../../modules/nf-core/cellranger/mkref/main.nf"
-include { CELLRANGER_MKVDJREF               } from "../../modules/nf-core/cellranger/mkvdjref/main.nf"
-include { CELLRANGER_MULTI                  } from "../../modules/nf-core/cellranger/multi/main.nf"
-include { PARSE_CELLRANGERMULTI_SAMPLESHEET } from "../../modules/local/parse_cellrangermulti_samplesheet.nf"
+include { CELLRANGER_MULTI as CELLRANGER_MULTI_DEMUX    } from "../../modules/nf-core/cellranger/multi/main.nf"
+include { CELLRANGER_MULTI as CELLRANGER_MULTI_IMMUNE   } from "../../modules/nf-core/cellranger/multi/main.nf"
+include { PARSE_CELLRANGERMULTI_SAMPLESHEET             } from "../../modules/local/parse_cellrangermulti_samplesheet.nf"
+include { BAMTOFASTQ10X                                 } from '../../modules/nf-core/bamtofastq10x/main'
 
 // Define workflow to subset and index a genome region fasta file
-workflow CELLRANGER_MULTI_ALIGN {
+workflow CELLRANGER_MULTI_ALIGN_VDJ {
     take:
-        ch_fasta
-        ch_gtf
         ch_fastq
-        cellranger_gex_index
-        cellranger_vdj_index
+        ch_cellranger_gex_index
+        ch_cellranger_vdj_index
         ch_multi_samplesheet
+        empty_file
 
     main:
         ch_versions    = Channel.empty()
@@ -53,6 +51,28 @@ workflow CELLRANGER_MULTI_ALIGN {
         }
         .set { ch_grouped_fastq }
 
+        // Add faux VDJ channel to first run cellranger without immune profiling
+        ch_grouped_fastq.vdj.map { meta, fastqs ->
+            def meta_clone = meta.clone()
+            meta_clone.options = "[:]"
+            [meta_clone, empty_file]
+        }
+        .set { ch_faux_vdj_fastq }
+        // Add faux CMO channel to first run cellranger without sample demultiplexing
+        ch_grouped_fastq.cmo.map { meta, fastqs ->
+            def meta_clone = meta.clone()
+            meta_clone.options = "[:]"
+            [meta_clone, empty_file]
+        }
+        .set { ch_faux_cmo_fastq }
+        // Add faux Ab channel
+        ch_grouped_fastq.ab.map { meta, fastqs ->
+            def meta_clone = meta.clone()
+            meta_clone.options = "[:]"
+            [meta_clone, empty_file]
+        }
+        .set { ch_faux_ab_fastq }
+
         // Assign other cellranger reference files
         ch_gex_frna_probeset      = params.gex_frna_probe_set            ? file(params.gex_frna_probe_set)            : []
         ch_gex_target_panel       = params.gex_target_panel              ? file(params.gex_target_panel)              : []
@@ -88,14 +108,14 @@ workflow CELLRANGER_MULTI_ALIGN {
 
             ch_grouped_fastq.gex
             .map{ [it[0].id] }
-            .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.flatten().map { [ "${it.baseName}" - "_cmo", it ] } )
+            .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.flatten().map { [get_sample_id(it, "_cmo"), it ] } )
             .groupTuple()
             .map { if ( it.size() == 2 ) { it[1] } else { [] } } // a correct tuple from snippet will have: [ sample, cmo.csv ]
             .set { ch_cmo_barcode_csv }
 
             ch_grouped_fastq.gex
             .map{ [it[0].id] }
-            .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.flatten().map { [ "${it.baseName}" - "_frna", it ] } )
+            .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.flatten().map { [get_sample_id(it, "_frna"), it ] } )
             .groupTuple()
             .map { if ( it.size() == 2 ) { it[1] } else { [] } } // a correct tuple from snippet will have: [ sample, frna.csv ]
             .set { ch_frna_sample_csv }
@@ -106,65 +126,13 @@ workflow CELLRANGER_MULTI_ALIGN {
         }
 
         //
-        // Prepare GTF
-        //
-        if ( !cellranger_gex_index || (!cellranger_vdj_index && !params.skip_cellrangermulti_vdjref) ) {
-
-            // Filter GTF based on gene biotypes passed in params.modules
-            CELLRANGER_MKGTF ( ch_gtf )
-            ch_versions = ch_versions.mix(CELLRANGER_MKGTF.out.versions)
-
-        }
-
-        //
-        // Prepare gex reference (Normal Ref)
-        //
-        if ( !cellranger_gex_index ) {
-
-            // Make reference genome
-            CELLRANGER_MKREF(
-                ch_fasta,
-                CELLRANGER_MKGTF.out.gtf,
-                "gex_reference"
-            )
-            ch_versions = ch_versions.mix(CELLRANGER_MKREF.out.versions)
-            ch_cellranger_gex_index = CELLRANGER_MKREF.out.reference.ifEmpty { [] }
-
-        } else {
-            ch_cellranger_gex_index = cellranger_gex_index
-        }
-
-        //
-        // Prepare vdj reference (Special)
-        //
-        if ( !cellranger_vdj_index ) {
-
-            if ( !params.skip_cellrangermulti_vdjref  ) { // if user uses cellranger multi but does not have VDJ data
-                // Make reference genome
-                CELLRANGER_MKVDJREF(
-                    ch_fasta,
-                    CELLRANGER_MKGTF.out.gtf,
-                    [], // currently ignoring the 'seqs' option
-                    "vdj_reference"
-                )
-                ch_versions = ch_versions.mix(CELLRANGER_MKVDJREF.out.versions)
-                ch_cellranger_vdj_index = CELLRANGER_MKVDJREF.out.reference.ifEmpty { [] }
-            } else {
-                ch_cellranger_vdj_index = []
-            }
-
-        } else {
-            ch_cellranger_vdj_index = cellranger_vdj_index
-        }
-
-        //
         // MODULE: cellranger multi
         //
-        CELLRANGER_MULTI(
+        CELLRANGER_MULTI_DEMUX(
             ch_grouped_fastq.gex.map{ it[0] },
             ch_grouped_fastq.gex,
-            ch_grouped_fastq.vdj,
-            ch_grouped_fastq.ab,
+            ch_faux_vdj_fastq,
+            ch_faux_ab_fastq,
             ch_grouped_fastq.beam,
             ch_grouped_fastq.cmo,
             ch_grouped_fastq.crispr,
@@ -182,7 +150,45 @@ workflow CELLRANGER_MULTI_ALIGN {
             ch_frna_sample_csv,
             params.skip_cellranger_renaming
         )
-        ch_versions = ch_versions.mix(CELLRANGER_MULTI.out.versions)
+        ch_versions = ch_versions.mix(CELLRANGER_MULTI_DEMUX.out.versions)
+        ch_bam_files = extract_bam(CELLRANGER_MULTI_DEMUX.out.outs)
+
+        //
+        // MODULE: bam to fastq
+        //
+        BAMTOFASTQ10X(
+            ch_bam_files
+        )
+        ch_versions = ch_versions.mix(BAMTOFASTQ10X.out.versions)
+        BAMTOFASTQ10X.out.fastq.view { "bamtofq10x: $it" }
+        ch_grouped_fastq.gex.view { "gex: $it" }
+        
+        //
+        // MODULE: cellranger multi
+        //
+        CELLRANGER_MULTI_IMMUNE(
+            BAMTOFASTQ10X.out.fastq.map{ it[0] },
+            BAMTOFASTQ10X.out.fastq,
+            ch_grouped_fastq.vdj,
+            ch_grouped_fastq.ab,
+            ch_grouped_fastq.beam,
+            ch_faux_cmo_fastq,
+            ch_grouped_fastq.crispr,
+            ch_cellranger_gex_index,
+            ch_gex_frna_probeset,
+            ch_gex_target_panel,
+            ch_cellranger_vdj_index,
+            ch_vdj_primer_index,
+            ch_fb_reference,
+            ch_beam_antigen_panel_csv,
+            ch_beam_control_panel_csv,
+            [],
+            [],
+            [],
+            ch_frna_sample_csv,
+            params.skip_cellranger_renaming
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_MULTI_IMMUNE.out.versions)
 
         //
         // Cellranger multi splits the results from each sample. So, a module execution will have: (1) a raw counts dir for all;
@@ -195,13 +201,20 @@ workflow CELLRANGER_MULTI_ALIGN {
         //
 
         // Split channels of raw and filtered to avoid file collision problems when loading the inputs in conversion modules.
-        ch_matrices_filtered = parse_demultiplexed_output_channels( CELLRANGER_MULTI.out.outs, "filtered_feature_bc_matrix" )
-        ch_matrices_raw      = parse_demultiplexed_output_channels( CELLRANGER_MULTI.out.outs, "raw_feature_bc_matrix"      )
+        ch_matrices_filtered = parse_demultiplexed_output_channels( CELLRANGER_MULTI_IMMUNE.out.outs, "filtered_feature_bc_matrix" )
+        ch_matrices_raw      = parse_demultiplexed_output_channels( CELLRANGER_MULTI_IMMUNE.out.outs, "raw_feature_bc_matrix"      )
 
     emit:
         ch_versions
-        cellrangermulti_out = CELLRANGER_MULTI.out.outs
+        cellrangermulti_out = CELLRANGER_MULTI_IMMUNE.out.outs
         cellrangermulti_mtx = ch_matrices_raw.mix( ch_matrices_filtered )
+}
+
+def get_sample_id(in_ch, pattern="_cmo") {
+    def bname = in_ch.baseName
+    def idx = bname.lastIndexOf(pattern)
+    def modified_bname = (idx != -1) ? bname[0..<idx] : bname
+    return modified_bname
 }
 
 def parse_demultiplexed_output_channels(in_ch, pattern) {
@@ -223,4 +236,36 @@ def parse_demultiplexed_output_channels(in_ch, pattern) {
     .groupTuple( by: 0 ) // group it back as one file collection per sample
 
     return out_ch
+}
+
+
+def extract_bam(in_ch) {
+    out_ch =
+    in_ch.map { meta, bam_files ->
+        def desired_files = []
+        bam_files.each{ if ( it.toString().endsWith("sample_alignments.bam") ) { desired_files.add( it ) } }
+        [ meta, desired_files ]
+    }
+    .transpose()         // transpose for handling one meta/file pair at a time
+    .map { meta, bam_files ->
+        def meta_clone = meta.clone()
+        if ( bam_files.toString().contains("per_sample_outs") ) {
+            def demux_id = bam_files.toString().split('/per_sample_outs/')[1].split('/')[0]
+            meta_clone.sample_id = meta_clone.id
+            meta_clone.id = demux_id.toString()
+        }
+        [ meta_clone, bam_files ]
+    }                    // check if output is from demultiplexed sample, if yes, correct meta.id for proper conversion naming
+    .groupTuple( by: 0 ) // group it back as one file collection per sample
+
+    return out_ch
+}
+
+def extract_gex_fq(in_ch) {
+    out_ch =
+    in_ch.map { meta, fns ->
+        def desired_files = []
+        fns.each{ if ( it.toString().contains("/demultiplex*_0_1_*/*.fastq.gz") ) { desired_files.add( it ) } }
+    
+    }
 }

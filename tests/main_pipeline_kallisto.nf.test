@@ -1,0 +1,70 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_kallisto_aligner") {
+
+        when {
+            // the rest is taken from shared config
+            params {
+                aligner    = 'kallisto'
+                outdir     = "${outputDir}/results_kallisto"
+
+                // Limit resources so that this can run on GitHub Actions -- for some reason it had not been taken from shared config
+                max_cpus   = 2
+                max_memory = '6.GB'
+                max_time   = '6.h'
+            }
+        }
+
+        then {
+
+            assertAll(
+
+                //
+                // General assertions
+                //
+
+                // Did it finish successfully?
+                {assert workflow.success},
+
+                // How many tasks were executed?
+                {assert workflow.trace.tasks().size() == 12},
+
+                // How many results were produced?
+                {assert path("${outputDir}/results_kallisto").list().size() == 4},
+                {assert path("${outputDir}/results_kallisto/kallisto").list().size() == 4},
+                {assert path("${outputDir}/results_kallisto/kallisto/mtx_conversions").list().size() == 4},
+                {assert path("${outputDir}/results_kallisto/kallisto/Sample_X.count").list().size() == 9},
+                {assert path("${outputDir}/results_kallisto/kallisto/Sample_Y.count").list().size() == 9},
+                {assert path("${outputDir}/results_kallisto/fastqc").list().size() == 12},
+                {assert path("${outputDir}/results_kallisto/multiqc").list().size() == 3},
+
+                //
+                // Check if files were produced
+                //
+                {assert new File( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.h5ad" ).exists()},
+
+                //
+                // Check if files are the same
+                //
+                {assert snapshot(
+                    workflow,
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.barcodes.txt" ),
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.genes.txt" ),
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.mtx" ),
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.barcodes.txt" ),
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.genes.txt" ),
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.mtx" ),
+                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_raw_matrix.rds" ),
+                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.rds" )
+                ).match()}
+
+            ) // end of assertAll()
+
+        }
+    }
+
+}

@@ -3,6 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.7.1 - 2024-08-13
+
+- Fix that tests have not been executed with nf-test v0.9 ([#359](https://github.com/nf-core/scrnaseq/pull/359))
+- Add support for 10XV4 chemistry ([#348](https://github.com/nf-core/scrnaseq/pull/348))
+- Fix issues with predefined STAR index ([#350](https://github.com/nf-core/scrnaseq/pull/350))
+- Update modules ([#351](https://github.com/nf-core/scrnaseq/pull/351))
+- Fix resource specifications for `cellranger mkref`/`cellrangerarc mkref` ([#352](https://github.com/nf-core/scrnaseq/pull/352))
+
 ## v2.7.0 - 2024-06-03
 
 - Apply `check_max` to AlevinQC time limit ([#335](https://github.com/nf-core/scrnaseq/pull/335))

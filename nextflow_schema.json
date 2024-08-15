@@ -158,9 +158,9 @@
             "description": "",
             "default": "",
             "properties": {
-                "salmon_index": {
+                "simpleaf_index": {
                     "type": "string",
-                    "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
+                    "description": "This can be used to specify a precomputed Simpleaf index in the pipeline, in order to skip the generation of required indices by Simpleaf itself.",
                     "fa_icon": "fas fa-fish",
                     "format": "path",
                     "exists": true
@@ -178,6 +178,16 @@
                     "default": 91,
                     "description": "It is the target read length the index will be built for, using simpleaf.",
                     "fa_icon": "fas fa-map-marked-alt"
+                },
+                "no_piscem": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-map-marked-alt",
+                    "description": "Don't use the default piscem mapper, instead use salmon-alevin"
+                },
+                "use_selective_alignment": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-map-marked-alt",
+                    "description": "Use selective-alignment for mapping instead of pseudoalignment with structural constraints (only if using salmon alevin as the underlying mapper)."
                 }
             }
         },

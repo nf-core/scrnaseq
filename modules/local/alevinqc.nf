@@ -3,10 +3,10 @@ process ALEVINQC {
     label 'process_low'
 
     //The alevinqc 1.14.0 container is broken, missing some libraries - thus reverting this to previous 1.12.1 version
-    conda "bioconda::bioconductor-alevinqc=1.12.1"
+    conda "bioconda::bioconductor-alevinqc=1.18.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.12.1--r41h9f5acd7_0' :
-        'biocontainers/bioconductor-alevinqc:1.12.1--r41h9f5acd7_0' }"
+        'https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.18.0--r43hf17093f_0' :
+        'biocontainers/bioconductor-alevinqc:1.18.0--r43hf17093f_0' }"
 
     input:
     tuple val(meta), path(alevin_results)

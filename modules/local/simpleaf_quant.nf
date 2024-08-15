@@ -2,10 +2,10 @@ process SIMPLEAF_QUANT {
     tag "$meta.id"
     label 'process_high'
 
-    conda 'bioconda::simpleaf=0.10.0-1'
+    conda 'bioconda::simpleaf=0.17.2-0'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/simpleaf:0.10.0--h9f5acd7_1' :
-        'biocontainers/simpleaf:0.10.0--h9f5acd7_1' }"
+        'https://depot.galaxyproject.org/singularity/simpleaf:0.17.2--h919a2d8_0' :
+        'biocontainers/simpleaf:0.17.2--h919a2d8_0' }"
 
     input:
     //
@@ -29,6 +29,8 @@ process SIMPLEAF_QUANT {
     def args      = task.ext.args ?: ''
     def args_list = args.tokenize()
     def prefix    = task.ext.prefix ?: "${meta.id}"
+    // selective alignment is only available in salmon
+    def use_selective_alignment = (params.no_piscem && params.use_selective_alignment) ? '-s' : ''
 
     //
     // check if users are using one of the mutually excludable parameters:
@@ -70,6 +72,7 @@ process SIMPLEAF_QUANT {
         -c "$protocol" \\
         $expect_cells \\
         $unfiltered_command \\
+        $use_selective_alignment \\
         $args
 
     $save_whitelist

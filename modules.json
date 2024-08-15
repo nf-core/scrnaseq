@@ -5,6 +5,11 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "bamtofastq10x": {
+                        "branch": "master",
+                        "git_sha": "63d6994f4f85c0628b7f2ac1e7097136c1b4be34",
+                        "installed_by": ["modules"]
+                    },
                     "cellranger/count": {
                         "branch": "master",
                         "git_sha": "90dad5491658049282ceb287a3d7732c1ce39837",

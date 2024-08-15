@@ -86,7 +86,7 @@ For details on how to load these into R and perform further downstream analysis,
 **Output directory: `results/alevin`**
 
 - `alevin`
-  - Contains the created Salmon Alevin pseudo-aligned output
+  - Contains the created alevin-fry pseudo-aligned output
 - `alevinqc`
   - Contains the QC report for the aforementioned Salmon Alevin output data
 

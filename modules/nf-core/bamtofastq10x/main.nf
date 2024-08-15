@@ -11,8 +11,8 @@ process BAMTOFASTQ10X {
     tuple val(meta), path(bam)
 
     output:
-    tuple val(meta), path("*.fastq.gz"), emit: fastq
-    path "versions.yml"                , emit: versions
+    tuple val(meta), path("${meta.id}/**/*.fastq.gz"), emit: fastq
+    path "versions.yml"                              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -24,7 +24,16 @@ process BAMTOFASTQ10X {
     bamtofastq \\
         $args \\
         $bam \\
-        ${prefix}.fastq.gz
+        $prefix
+
+    out_dir=\$(find . -type d -maxdepth 2 -print | grep -m1 '${meta.sample_id}_0_1')
+    echo \${out_dir}
+
+    for file in $prefix/${meta.sample_id}_0_1*/*.fastq.gz; 
+    do
+        echo \$file
+        mv "\$file" "\${file/bamtofastq/$prefix}"; 
+    done
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

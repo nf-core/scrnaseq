@@ -61,6 +61,7 @@ workflow STARSOLO {
         STAR_ALIGN.out.raw_counts.mix( STAR_ALIGN.out.filtered_counts ),
         star_index.map{ meta, index -> index }
     )
+    ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
 
 
     emit:

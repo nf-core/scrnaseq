@@ -68,5 +68,6 @@ workflow STARSOLO {
     // get rid of meta for star index
     star_result = STAR_ALIGN.out.tab
     star_counts = STAR_ALIGN.out.counts
+    star_h5ad   = MTX_TO_H5AD.out.h5ad
     for_multiqc = STAR_ALIGN.out.log_final.map{ meta, it -> it }
 }

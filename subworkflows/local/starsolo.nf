@@ -1,5 +1,6 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { STAR_ALIGN }                  from '../../modules/local/star_align'
+include { STAR_ALIGN }                      from '../../modules/local/star_align'
+include { MTX_TO_H5AD_STAR as MTX_TO_H5AD } from '../../modules/local/mtx_to_h5ad_star'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
@@ -53,14 +54,19 @@ workflow STARSOLO {
     )
     ch_versions = ch_versions.mix(STAR_ALIGN.out.versions)
 
+    /*
+    * Perform h5ad conversion
+    */
+    MTX_TO_H5AD (
+        STAR_ALIGN.out.raw_counts.mix( STAR_ALIGN.out.filtered_counts ),
+        star_index.map{ meta, index -> index }
+    )
+
 
     emit:
     ch_versions
     // get rid of meta for star index
-    star_index  = star_index.map{ meta, index -> index }
     star_result = STAR_ALIGN.out.tab
     star_counts = STAR_ALIGN.out.counts
-    raw_counts = STAR_ALIGN.out.raw_counts
-    filtered_counts = STAR_ALIGN.out.filtered_counts
     for_multiqc = STAR_ALIGN.out.log_final.map{ meta, it -> it }
 }

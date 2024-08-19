@@ -31,7 +31,7 @@ def input_to_adata(
     barcode_file: str,
     feature_file: str,
     sample: str,
-    star_index: str,
+    txp2gene: str,
 ):
     print("Reading in {}".format(input_data))
 
@@ -39,7 +39,6 @@ def input_to_adata(
     adata = _mtx_to_adata(input_data, barcode_file, feature_file, sample)
 
     # open gene information
-    txp2gene = "{}/geneInfo.tab".format(star_index)
     print("Reading in {}".format(txp2gene))
     t2g = pd.read_table("{}".format(txp2gene), header=None, skiprows=1, names=["gene_id", "gene_symbol"], usecols=[0, 1])
     t2g = t2g.drop_duplicates(subset="gene_id").set_index("gene_id")
@@ -67,7 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--sample", dest="sample", help="Sample name")
     parser.add_argument("-o", "--out", dest="out", help="Output path.")
     parser.add_argument("--task_process", dest="task_process", help="Task process name.")
-    parser.add_argument("--star_index", dest="star_index", help="Star index folder containing geneInfo.tab.", nargs="?", const="")
+    parser.add_argument("--txp2gene", dest="txp2gene", help="Star index folder containing geneInfo.tab.", nargs="?", const="")
 
     args = vars(parser.parse_args())
 
@@ -79,7 +78,7 @@ if __name__ == "__main__":
         barcode_file=args["barcode"],
         feature_file=args["feature"],
         sample=args["sample"],
-        star_index=args["star_index"]
+        txp2gene=args["txp2gene"]
     )
 
     adata.write_h5ad(args["out"], compression="gzip")

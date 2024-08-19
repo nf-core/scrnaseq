@@ -29,7 +29,6 @@ process MTX_TO_H5AD_STAR {
     barcodes_tsv = "${input_type}/barcodes.tsv.gz"
     features_tsv = "${input_type}/features.tsv.gz"
 
-
     """
     # convert file types
     mtx_to_h5ad_star.py \\
@@ -38,7 +37,7 @@ process MTX_TO_H5AD_STAR {
         --input $mtx_matrix \\
         --barcode $barcodes_tsv \\
         --feature $features_tsv \\
-        --star_index ${star_index} \\
+        --txp2gene ${star_index}/geneInfo.tab \\
         --out ${meta.id}/${meta.id}_${input_type}_matrix.h5ad
     """
 

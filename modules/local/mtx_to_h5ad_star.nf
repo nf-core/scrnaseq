@@ -25,18 +25,15 @@ process MTX_TO_H5AD_STAR {
     // check input type of inputs
     input_type   = (input_to_check.toUriString().contains('unfiltered') || input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
     meta2        = meta + [input_type: input_type]
-    mtx_matrix   = "${input_type}/matrix.mtx.gz"
-    barcodes_tsv = "${input_type}/barcodes.tsv.gz"
-    features_tsv = "${input_type}/features.tsv.gz"
 
     """
     # convert file types
     mtx_to_h5ad_star.py \\
         --task_process ${task.process} \\
         --sample ${meta.id} \\
-        --input $mtx_matrix \\
-        --barcode $barcodes_tsv \\
-        --feature $features_tsv \\
+        --input ${input_type}/matrix.mtx.gz \\
+        --barcode ${input_type}/barcodes.tsv.gz \\
+        --feature ${input_type}/features.tsv.gz \\
         --txp2gene ${star_index}/geneInfo.tab \\
         --out ${meta.id}/${meta.id}_${input_type}_matrix.h5ad
     """

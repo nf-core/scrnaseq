@@ -290,37 +290,37 @@ workflow SCRNASEQ {
     }
 
     // Run emptydrops calling module
-    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
+    // if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
 
-        //
-        // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
-        //
-        if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
-            ch_mtx_matrices_for_emptydrops =
-                ch_mtx_matrices.filter { meta, mtx_files ->
-                    mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
-                    mtx_files.toString().contains("counts_unfiltered")     || // kallisto
-                    mtx_files.toString().contains("raw")                      // star
-                }
-        } else {
-            ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
-        }
+    //     //
+    //     // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
+    //     //
+    //     if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
+    //         ch_mtx_matrices_for_emptydrops =
+    //             ch_mtx_matrices.filter { meta, mtx_files ->
+    //                 mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
+    //                 mtx_files.toString().contains("counts_unfiltered")     || // kallisto
+    //                 mtx_files.toString().contains("raw")                      // star
+    //             }
+    //     } else {
+    //         ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
+    //     }
 
-        EMPTYDROPS_CELL_CALLING( ch_mtx_matrices_for_emptydrops )
-        ch_mtx_matrices = ch_mtx_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
+    //     EMPTYDROPS_CELL_CALLING( ch_mtx_matrices_for_emptydrops )
+    //     ch_mtx_matrices = ch_mtx_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
 
-    }
+    // }
 
-    // Run mtx to h5ad conversion subworkflow
-    MTX_CONVERSION (
-        ch_mtx_matrices,
-        ch_input,
-        ch_txp2gene,
-        ch_star_index
-    )
+    // // Run mtx to h5ad conversion subworkflow
+    // MTX_CONVERSION (
+    //     ch_mtx_matrices,
+    //     ch_input,
+    //     ch_txp2gene,
+    //     ch_star_index
+    // )
 
-    //Add Versions from MTX Conversion workflow too
-    ch_versions.mix(MTX_CONVERSION.out.ch_versions)
+    // //Add Versions from MTX Conversion workflow too
+    // ch_versions.mix(MTX_CONVERSION.out.ch_versions)
 
     //
     // Collate and save software versions

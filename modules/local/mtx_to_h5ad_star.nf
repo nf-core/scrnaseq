@@ -2,10 +2,8 @@ process MTX_TO_H5AD_STAR {
     tag "$meta.id"
     label 'process_medium'
 
-    conda "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/scanpy:1.7.2--pyhdfd78af_0' :
-        'biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
+    conda "conda-forge::scanpy==1.10.2 conda-forge::python-igraph conda-forge::leidenalg"
+    container "community.wave.seqera.io/library/scanpy:1.10.2--e83da2205b92a538"
 
     input:
     tuple val(meta), path(inputs)

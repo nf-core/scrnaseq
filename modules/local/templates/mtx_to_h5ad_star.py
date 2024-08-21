@@ -63,7 +63,8 @@ def input_to_adata(
     # standard format
     # index are gene IDs and symbols are a column
     adata.var["gene_symbol"] = adata.var.index
-    adata.var[['gene_ids', 'gene_versions']] = adata.var["gene_ids"].apply(lambda x: pd.Series(str(x).split(".")))
+    adata.var['gene_versions'] = adata.var["gene_ids"]
+    adata.var['gene_ids'] = adata.var['gene_versions'].str.split('.').str[0]
     adata.var.index = adata.var["gene_ids"].values
     adata.var = adata.var.drop("gene_ids", axis=1)
 

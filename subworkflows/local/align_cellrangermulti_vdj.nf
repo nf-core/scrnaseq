@@ -160,20 +160,24 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
             ch_bam_files
         )
         ch_versions = ch_versions.mix(BAMTOFASTQ10X.out.versions)
-        BAMTOFASTQ10X.out.fastq.view { "bamtofq10x: $it" }
-        ch_grouped_fastq.gex.view { "gex: $it" }
+        ch_bamtofastq = extract_gex_fq(BAMTOFASTQ10X.out.fastq)
+
+        ch_expanded_vdj = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.vdj, ch_bamtofastq)
+        ch_expanded_ab = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.ab, ch_bamtofastq)
+        ch_expanded_beam = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.beam, ch_bamtofastq)
+        ch_expanded_crispr = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.crispr, ch_bamtofastq)
         
         //
         // MODULE: cellranger multi
         //
         CELLRANGER_MULTI_IMMUNE(
-            BAMTOFASTQ10X.out.fastq.map{ it[0] },
-            BAMTOFASTQ10X.out.fastq,
-            ch_grouped_fastq.vdj,
-            ch_grouped_fastq.ab,
-            ch_grouped_fastq.beam,
+            ch_bamtofastq.map{ it[0] },
+            ch_bamtofastq,
+            ch_expanded_vdj,
+            ch_expanded_ab,
+            ch_expanded_beam,
             ch_faux_cmo_fastq,
-            ch_grouped_fastq.crispr,
+            ch_expanded_crispr,
             ch_cellranger_gex_index,
             ch_gex_frna_probeset,
             ch_gex_target_panel,
@@ -264,8 +268,32 @@ def extract_bam(in_ch) {
 def extract_gex_fq(in_ch) {
     out_ch =
     in_ch.map { meta, fns ->
+        def meta_clone = meta.clone()
+        meta_clone.options['check-library-compatibility'] = false //
         def desired_files = []
-        fns.each{ if ( it.toString().contains("/demultiplex*_0_1_*/*.fastq.gz") ) { desired_files.add( it ) } }
-    
+        fns.each{ if ( it.toString().contains("/${meta.sample_id}_0_1_") ) { desired_files.add( it ) } }
+        [ meta_clone, desired_files ]
     }
+
+    return out_ch
+}
+
+def expand_feature_by_demultiplexed_samples(in_ch, gex_ch) {
+    out_ch = 
+    in_ch
+        .map{ meta, fns ->
+            def meta_clone = meta.clone()
+            meta_clone.sample_id = meta_clone.id
+            [meta_clone, fns]
+        }
+        .cross(gex_ch) { it[0][-1] } // test also it[0]["sample_id"]
+        .map{ftx, gex ->
+            def ftx_meta_clone = ftx[0].clone()
+            def gex_meta_clone = gex[0].clone()
+            assert ftx_meta_clone.sample_id == gex_meta_clone.sample_id
+            ftx_meta_clone.id = gex_meta_clone.id
+            [ftx_meta_clone, ftx[1]]
+        }
+
+    return out_ch
 }

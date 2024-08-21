@@ -26,14 +26,6 @@ process BAMTOFASTQ10X {
         $bam \\
         $prefix
 
-    out_dir=\$(find . -type d -maxdepth 2 -print | grep -m1 '${meta.sample_id}_0_1')
-    echo \${out_dir}
-
-    for file in $prefix/${meta.sample_id}_0_1*/*.fastq.gz; 
-    do
-        echo \$file
-        mv "\$file" "\${file/bamtofastq/$prefix}"; 
-    done
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -1,13 +1,11 @@
 process CONCAT_H5AD {
     label 'process_medium'
 
-    conda "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/scanpy:1.7.2--pyhdfd78af_0' :
-        'biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
+    conda "conda-forge::scanpy==1.10.2 conda-forge::python-igraph conda-forge::leidenalg"
+    container "community.wave.seqera.io/library/scanpy:1.10.2--e83da2205b92a538"
 
     input:
-    tuple val(input_type), path(h5ad)
+    tuple val(meta), path(h5ad)
     path samplesheet
 
     output:
@@ -17,12 +15,7 @@ process CONCAT_H5AD {
     task.ext.when == null || task.ext.when
 
     script:
-    """
-    concat_h5ad.py \\
-        --input $samplesheet \\
-        --out combined_${input_type}_matrix.h5ad \\
-        --suffix "_matrix.h5ad"
-    """
+    template 'concat_h5ad.py'
 
     stub:
     """

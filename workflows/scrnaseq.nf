@@ -301,8 +301,8 @@ workflow SCRNASEQ {
         ch_input
     )
 
-    // //Add Versions from MTX Conversion workflow too
-    // ch_versions.mix(MTX_CONVERSION.out.ch_versions)
+    //Add Versions from MTX Conversion workflow too
+    ch_versions.mix(MTX_CONVERSION.out.ch_versions)
 
     //
     // Collate and save software versions

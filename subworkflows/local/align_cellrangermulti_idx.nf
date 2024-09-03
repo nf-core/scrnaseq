@@ -20,16 +20,6 @@ workflow CELLRANGER_MULTI_REF {
         // TODO: Include checkers for cellranger multi parameter combinations. For example, when VDJ data is given, require VDJ ref. If FFPE, require frna probe sets, etc.
         //
 
-        // Assign other cellranger reference files
-        ch_gex_frna_probeset      = params.gex_frna_probe_set            ? file(params.gex_frna_probe_set)            : []
-        ch_gex_target_panel       = params.gex_target_panel              ? file(params.gex_target_panel)              : []
-        ch_gex_cmo_set            = params.gex_cmo_set                   ? file(params.gex_cmo_set)                   : []
-        ch_gex_barcodes           = params.gex_barcode_sample_assignment ? file(params.gex_barcode_sample_assignment) : []
-        ch_fb_reference           = params.fb_reference                  ? file(params.fb_reference)                  : []
-        ch_vdj_primer_index       = params.vdj_inner_enrichment_primers  ? file(params.vdj_inner_enrichment_primers)  : []
-        ch_beam_antigen_panel_csv = [] // currently not implemented
-        ch_beam_control_panel_csv = [] // currently not implemented
-
         //
         // Prepare GTF
         //

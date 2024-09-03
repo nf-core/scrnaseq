@@ -57,6 +57,7 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
             meta_clone.options = "[:]"
             [meta_clone, empty_file]
         }
+        .first() // convert to value channel to be consumed indefinitely
         .set { ch_faux_vdj_fastq }
         // Add faux CMO channel to first run cellranger without sample demultiplexing
         ch_grouped_fastq.cmo.map { meta, fastqs ->
@@ -64,6 +65,7 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
             meta_clone.options = "[:]"
             [meta_clone, empty_file]
         }
+        .first() // convert to value channel to be consumed indefinitely
         .set { ch_faux_cmo_fastq }
         // Add faux Ab channel
         ch_grouped_fastq.ab.map { meta, fastqs ->
@@ -71,6 +73,7 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
             meta_clone.options = "[:]"
             [meta_clone, empty_file]
         }
+        .first() // convert to value channel to be consumed indefinitely
         .set { ch_faux_ab_fastq }
 
         // Assign other cellranger reference files
@@ -189,7 +192,7 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
             [],
             [],
             [],
-            ch_frna_sample_csv,
+            ch_frna_sample_csv, // currently not implemented nor tested
             params.skip_cellranger_renaming
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI_IMMUNE.out.versions)
@@ -265,14 +268,31 @@ def extract_bam(in_ch) {
     return out_ch
 }
 
+def extractParts(filename) {
+    // convert lane, read, and sequence number to integers to sort files.
+    def matcher = filename =~ /L(\d{3})_R(\d)_(\d{3})/
+    if (matcher.find()) {
+        return [matcher.group(1).toInteger(), matcher.group(2).toInteger(), matcher.group(3).toInteger()]
+    }
+    return [0, 0, 0] // Default value if pattern not found
+}
+
 def extract_gex_fq(in_ch) {
+    // Extract GEX fastq files from bamtofastq output and sort files in read pairs.
     out_ch =
     in_ch.map { meta, fns ->
         def meta_clone = meta.clone()
-        meta_clone.options['check-library-compatibility'] = false //
+        meta_clone.options['check-library-compatibility'] = false // in order for downstream immune profiling not to fail.
         def desired_files = []
+        // GEX fq files are located in the "*_0_1_*" directory as the multi config always starts with GEX files.
         fns.each{ if ( it.toString().contains("/${meta.sample_id}_0_1_") ) { desired_files.add( it ) } }
-        [ meta_clone, desired_files ]
+        // Sort files to pair R1 and R2 from the same lane (L001, L002, etc) and sequence number (001, 002, etc)
+        def sortedFiles = desired_files.sort { a, b ->
+            def partsA = extractParts(a)
+            def partsB = extractParts(b)
+            return partsA[0] <=> partsB[0] ?: partsA[2] <=> partsB[2] ?: partsA[1] <=> partsB[1]
+        }
+        [ meta_clone, sortedFiles ]
     }
 
     return out_ch

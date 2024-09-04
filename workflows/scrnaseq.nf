@@ -4,7 +4,7 @@ include { KALLISTO_BUSTOOLS                  } from '../subworkflows/local/kalli
 include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevin'
 include { STARSOLO                           } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN                   } from "../subworkflows/local/align_cellranger"
-include { CELLRANGER_MULTI_REF               } from "../subworkflows/local/align_cellrangermulti_idx"
+include { CELLRANGER_MULTI_REF               } from "../subworkflows/local/cellrangermulti_ref"
 include { CELLRANGER_MULTI_ALIGN             } from "../subworkflows/local/align_cellrangermulti"
 include { CELLRANGER_MULTI_ALIGN_VDJ         } from "../subworkflows/local/align_cellrangermulti_vdj"
 include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align_cellrangerarc"

@@ -192,7 +192,7 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
             [],
             [],
             [],
-            ch_frna_sample_csv, // currently not implemented nor tested
+            [], // TODO
             params.skip_cellranger_renaming
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI_IMMUNE.out.versions)

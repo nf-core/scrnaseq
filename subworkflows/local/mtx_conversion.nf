@@ -1,7 +1,8 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { MTX_TO_H5AD   }             from '../../modules/local/mtx_to_h5ad.nf'
-include { CONCAT_H5AD   }             from '../../modules/local/concat_h5ad.nf'
-include { MTX_TO_SEURAT }             from '../../modules/local/mtx_to_seurat.nf'
+include { MTX_TO_H5AD           } from '../../modules/local/mtx_to_h5ad.nf'
+include { CONCAT_H5AD           } from '../../modules/local/concat_h5ad.nf'
+include { MTX_TO_SEURAT         } from '../../modules/local/mtx_to_seurat.nf'
+include { EMPTY_DROPLET_REMOVAL } from '../subworkflows/local/emptydrops_removal'
 
 workflow MTX_CONVERSION {
 

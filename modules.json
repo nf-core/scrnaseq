@@ -5,6 +5,11 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "cellbender/removebackground": {
+                        "branch": "master",
+                        "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
+                        "installed_by": ["modules"]
+                    },
                     "cellranger/count": {
                         "branch": "master",
                         "git_sha": "90dad5491658049282ceb287a3d7732c1ce39837",

@@ -9,7 +9,6 @@ include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align
 include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
 include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
-include { EMPTYDROPS_CELL_CALLING            } from '../modules/local/emptydrops'
 include { GUNZIP as GUNZIP_FASTA             } from '../modules/nf-core/gunzip/main'
 include { GUNZIP as GUNZIP_GTF               } from '../modules/nf-core/gunzip/main'
 include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -286,14 +285,6 @@ workflow SCRNASEQ {
         ch_h5ad_matrices = ch_h5ad_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx)
 
     }
-
-    // Run emptydrops calling module
-    // if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
-
-    //     EMPTYDROPS_CELL_CALLING( ch_h5ad_matrices.filter{ it[0].input_type == 'raw' } )
-    //     ch_h5ad_matrices = ch_h5ad_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
-
-    // }
 
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (

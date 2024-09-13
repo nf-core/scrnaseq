@@ -1,4 +1,6 @@
 process CONCAT_H5AD {
+    tag "${meta.id}"
+
     label 'process_medium'
 
     conda "conda-forge::scanpy==1.10.2 conda-forge::python-igraph conda-forge::leidenalg"

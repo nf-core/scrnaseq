@@ -1,4 +1,6 @@
 process ANNDATAR_CONVERT {
+    tag "${meta.id}"
+
     label 'process_medium'
 
     container "fmalmeida/anndatar:dev"

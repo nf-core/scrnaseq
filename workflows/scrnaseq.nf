@@ -3,11 +3,12 @@ include { FASTQC_CHECK                       } from '../subworkflows/local/fastq
 include { KALLISTO_BUSTOOLS                  } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevin'
 include { STARSOLO                           } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN                   } from "../subworkflows/local/align_cellranger"
-include { CELLRANGER_MULTI_ALIGN             } from "../subworkflows/local/align_cellrangermulti"
-include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align_cellrangerarc"
-include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align_universc"
-include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
+include { CELLRANGER_ALIGN                   } from '../subworkflows/local/align_cellranger'
+include { CELLRANGER_MULTI_ALIGN             } from '../subworkflows/local/align_cellrangermulti'
+include { CELLRANGERARC_ALIGN                } from '../subworkflows/local/align_cellrangerarc'
+include { UNIVERSC_ALIGN                     } from '../subworkflows/local/align_universc'
+include { EMPTY_DROPLET_REMOVAL              } from '../subworkflows/local/emptydrops_removal'
+include { MTX_CONVERSION                     } from '../subworkflows/local/mtx_conversion'
 include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
 include { GUNZIP as GUNZIP_FASTA             } from '../modules/nf-core/gunzip/main'
 include { GUNZIP as GUNZIP_GTF               } from '../modules/nf-core/gunzip/main'
@@ -283,6 +284,26 @@ workflow SCRNASEQ {
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
         })
         ch_h5ad_matrices = ch_h5ad_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx)
+
+    }
+
+    // SUBWORKFLOW: Run cellbender emptydrops filter
+    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
+
+        //
+        // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
+        //
+        if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
+            ch_h5ad_matrices_for_emptydrops =
+                ch_h5ad_matrices.filter { meta, mtx_files -> meta.input_type == 'raw' }
+        } else {
+            ch_h5ad_matrices_for_emptydrops = ch_h5ad_matrices
+        }
+
+        EMPTY_DROPLET_REMOVAL (
+            ch_h5ad_matrices_for_emptydrops
+        )
+        // ch_h5ad_matrices = ch_h5ad_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
 
     }
 

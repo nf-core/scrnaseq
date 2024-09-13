@@ -1,7 +1,6 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { CONCAT_H5AD           } from '../../modules/local/concat_h5ad.nf'
 include { ANNDATAR_CONVERT      } from '../../modules/local/anndatar_convert'
-include { EMPTY_DROPLET_REMOVAL } from './emptydrops_removal'
 
 workflow MTX_CONVERSION {
 

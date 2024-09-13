@@ -1,4 +1,5 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
+include { ANNDATAR_CONVERT      } from '../../modules/local/anndatar_convert'
 include { MTX_TO_H5AD           } from '../../modules/local/mtx_to_h5ad.nf'
 include { CONCAT_H5AD           } from '../../modules/local/concat_h5ad.nf'
 include { MTX_TO_SEURAT         } from '../../modules/local/mtx_to_seurat.nf'
@@ -14,6 +15,13 @@ workflow MTX_CONVERSION {
         ch_versions = Channel.empty()
 
         //
+        // MODULE: Standardize h5ad and convert with AnndataR package
+        //
+        ANNDATAR_CONVERT (
+            mtx_matrices
+        )
+
+        //
         // Concat sample-specific h5ad in one
         //
         ch_concat_h5ad_input = mtx_matrices.groupTuple() // gather all sample-specific files / per type
@@ -23,6 +31,7 @@ workflow MTX_CONVERSION {
             // making it as [ mtx_1, mtx_2 ]
             ch_concat_h5ad_input = ch_concat_h5ad_input.map{ type, matrices -> [ type, matrices.flatten().toList() ] }
         }
+
         CONCAT_H5AD (
             ch_concat_h5ad_input,
             samplesheet

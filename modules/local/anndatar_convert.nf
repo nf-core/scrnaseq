@@ -3,13 +3,12 @@ process ANNDATAR_CONVERT {
 
     label 'process_medium'
 
-    container "fmalmeida/anndatar:dev"
+    container "fmalmeida/anndatar:dev" // TODO: Fix
 
     input:
     tuple val(meta), path(h5ad)
 
     output:
-    tuple val(meta), path("${meta.id}_standardized.h5ad"), emit: h5ad
     tuple val(meta), path("${meta.id}_standardized.Rds"), emit: rds
 
     when:
@@ -20,7 +19,6 @@ process ANNDATAR_CONVERT {
 
     stub:
     """
-    touch ${meta.id}_standardized.h5ad
     touch ${meta.id}_standardized.Rds
     """
 }

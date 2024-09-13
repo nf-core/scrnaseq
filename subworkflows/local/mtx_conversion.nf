@@ -24,7 +24,7 @@ workflow MTX_CONVERSION {
         //
         // Concat sample-specific h5ad in one
         //
-        ch_concat_h5ad_input = mtx_matrices.groupTuple() // gather all sample-specific files / per type
+        ch_concat_h5ad_input = ANNDATAR_CONVERT.out.h5ad.groupTuple() // gather all sample-specific files / per type
         if (params.aligner == 'kallisto' && params.kb_workflow != 'standard') {
             // when having spliced / unspliced matrices, the collected tuple has two levels ( [[mtx_1, mtx_2]] )
             // which nextflow break because it is not a valid 'path' thus, we have to remove one level
@@ -36,13 +36,6 @@ workflow MTX_CONVERSION {
             ch_concat_h5ad_input,
             samplesheet
         )
-
-        //
-        // Convert matrix do seurat
-        //
-        // MTX_TO_SEURAT (
-        //     mtx_matrices
-        // )
 
         //TODO CONCAT h5ad and MTX to h5ad should also have versions.yaml output
         // ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions, MTX_TO_SEURAT.out.versions)

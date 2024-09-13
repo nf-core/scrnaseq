@@ -1,8 +1,6 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { ANNDATAR_CONVERT      } from '../../modules/local/anndatar_convert'
-include { MTX_TO_H5AD           } from '../../modules/local/mtx_to_h5ad.nf'
 include { CONCAT_H5AD           } from '../../modules/local/concat_h5ad.nf'
-include { MTX_TO_SEURAT         } from '../../modules/local/mtx_to_seurat.nf'
+include { ANNDATAR_CONVERT      } from '../../modules/local/anndatar_convert'
 include { EMPTY_DROPLET_REMOVAL } from './emptydrops_removal'
 
 workflow MTX_CONVERSION {
@@ -15,7 +13,7 @@ workflow MTX_CONVERSION {
         ch_versions = Channel.empty()
 
         //
-        // MODULE: Standardize h5ad and convert with AnndataR package
+        // MODULE: Convert to Rds with AnndataR package
         //
         ANNDATAR_CONVERT (
             mtx_matrices

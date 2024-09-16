@@ -19,7 +19,7 @@
   > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
 
 - [Simpleaf](https://doi.org/10.1093/bioinformatics/btad614)
-  
+
   > He, D., Patro, R. simpleaf: a simple, flexible, and scalable framework for single-cell data processing using alevin-fry, Bioinformatics 39, 10 (2023).
 
 * [Alevin-fry](https://doi.org/10.1038/s41592-022-01408-3)

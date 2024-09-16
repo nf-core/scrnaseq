@@ -22,7 +22,7 @@ get_name <- function(file) {
 }
 
 # transpose matrices when required
-# based on code of 'mtx_to_seurat.R', only the data from kallisto and alevin-fry would require transposition
+# based on code of 'mtx_to_seurat.R', only the data from kallisto and alevin would require transposition
 print("Only kallisto and alevin have transposed matrices.")
 if (aligner %in% c( "kallisto", "alevin" ))  {
     is_transposed <- TRUE

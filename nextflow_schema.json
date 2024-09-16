@@ -59,7 +59,7 @@
                     "type": "string",
                     "description": "Name of the tool to use for scRNA (pseudo-) alignment.",
                     "default": "alevin",
-                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon + Alevin-fry + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
                     "enum": ["kallisto", "star", "alevin", "cellranger", "universc", "cellrangerarc", "cellrangermulti"]
                 },
@@ -153,7 +153,7 @@
             }
         },
         "alevin_options": {
-            "title": "Alevin Options",
+            "title": "Alevin-fry Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -167,8 +167,7 @@
                 },
                 "txp2gene": {
                     "type": "string",
-                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
-                    "help_text": "> This is only used by the Salmon Alevin workflow.",
+                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Alevin-fry and AlevinQC.",
                     "fa_icon": "fas fa-map-marked-alt",
                     "format": "file-path",
                     "exists": true

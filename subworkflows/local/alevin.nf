@@ -1,11 +1,12 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { GFFREAD_TRANSCRIPTOME }             from '../../modules/local/gffread_transcriptome'
-include { ALEVINQC              }             from '../../modules/local/alevinqc'
-include { SIMPLEAF_INDEX        }             from '../../modules/local/simpleaf_index'
-include { SIMPLEAF_QUANT        }             from '../../modules/local/simpleaf_quant'
+include { GFFREAD_TRANSCRIPTOME } from '../../modules/local/gffread_transcriptome'
+include { ALEVINQC              } from '../../modules/local/alevin/alevinqc'
+include { SIMPLEAF_INDEX        } from '../../modules/local/alevin/simpleaf_index'
+include { SIMPLEAF_QUANT        } from '../../modules/local/alevin/simpleaf_quant'
+include { MTX_TO_H5AD           } from '../../modules/local/alevin/mtx_to_h5ad'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
+include { GUNZIP                      } from '../../modules/nf-core/gunzip/main'
 include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/gffread/main'
 
 def multiqc_report    = []
@@ -44,8 +45,6 @@ workflow SCRNASEQ_ALEVIN {
         }
     }
 
-
-
     /*
     * Perform quantification with salmon alevin
     */
@@ -59,6 +58,15 @@ workflow SCRNASEQ_ALEVIN {
     ch_versions = ch_versions.mix(SIMPLEAF_QUANT.out.versions)
 
     /*
+    * Perform h5ad conversion
+    */
+    MTX_TO_H5AD (
+        SIMPLEAF_QUANT.out.alevin_results,
+        []
+    )
+    ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
+
+    /*
     * Run alevinQC
     */
     ALEVINQC( SIMPLEAF_QUANT.out.alevin_results )
@@ -67,5 +75,6 @@ workflow SCRNASEQ_ALEVIN {
     emit:
     ch_versions
     alevin_results = SIMPLEAF_QUANT.out.alevin_results
-    alevinqc = ALEVINQC.out.report
+    alevin_h5ad    = MTX_TO_H5AD.out.h5ad
+    alevinqc       = ALEVINQC.out.report
 }

@@ -155,7 +155,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_ALEVIN.out.alevin_results.map{ meta, it -> it })
-        ch_h5ad_matrices = ch_h5ad_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_results)
+        ch_h5ad_matrices = ch_h5ad_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_h5ad)
     }
 
     // Run STARSolo pipeline

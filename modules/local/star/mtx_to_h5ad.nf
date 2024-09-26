@@ -1,4 +1,4 @@
-process MTX_TO_H5AD_STAR {
+process MTX_TO_H5AD {
     tag "$meta.id"
     label 'process_medium'
 
@@ -21,10 +21,10 @@ process MTX_TO_H5AD_STAR {
     def input_to_check = (inputs instanceof String) ? inputs : inputs[0]
 
     // check input type of inputs
-    input_type   = (input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
-    meta2        = meta + [input_type: input_type]
+    input_type = (input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
+    meta2      = meta + [input_type: input_type]
 
-    template 'mtx_to_h5ad_star.py'
+    template 'mtx_to_h5ad.py'
 
     stub:
     """

@@ -82,11 +82,11 @@ def input_to_adata(
 #
 
 # create the directory with the sample name
-os.makedirs("${meta.id}", exist_ok=True)
+os.makedirs("${meta2.id}", exist_ok=True)
 
 # input_type comes from NF module
 adata = input_to_adata(
-    input_data="${input_type}",
-    output="${meta.id}/${meta.id}_${input_type}_matrix.h5ad",
-    sample="${meta.id}"
+    input_data="${meta2.input_type}",
+    output="${meta2.id}/${meta2.id}_${meta2.input_type}_matrix.h5ad",
+    sample="${meta2.id}"
 )

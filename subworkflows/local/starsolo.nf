@@ -1,6 +1,6 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { STAR_ALIGN }                      from '../../modules/local/star_align'
-include { MTX_TO_H5AD_STAR as MTX_TO_H5AD } from '../../modules/local/mtx_to_h5ad_star'
+include { STAR_ALIGN  } from '../../modules/local/star/star_align'
+include { MTX_TO_H5AD } from '../../modules/local/star/mtx_to_h5ad'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'

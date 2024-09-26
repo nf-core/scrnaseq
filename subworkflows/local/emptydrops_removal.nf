@@ -11,7 +11,15 @@ workflow EMPTY_DROPLET_REMOVAL {
     CELLBENDER_REMOVEBACKGROUND(ch_unfiltered)
     ch_versions = ch_versions.mix(CELLBENDER_REMOVEBACKGROUND.out.versions)
 
-    ch_combined = ch_unfiltered.join(CELLBENDER_REMOVEBACKGROUND.out.barcodes)
+    ch_combined =
+    ch_unfiltered
+        .join(CELLBENDER_REMOVEBACKGROUND.out.barcodes)
+        .map { meta, h5ad, csv ->
+            def meta_clone = meta.clone()
+            meta_clone.input_type = 'emptydrops_filter'
+
+            [ meta_clone, h5ad, csv ]
+        }
 
     ADATA_BARCODES(ch_combined)
     ch_versions = ch_versions.mix(ADATA_BARCODES.out.versions)

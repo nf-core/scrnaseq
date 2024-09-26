@@ -303,7 +303,7 @@ workflow SCRNASEQ {
         EMPTY_DROPLET_REMOVAL (
             ch_h5ad_matrices_for_emptydrops
         )
-        // ch_h5ad_matrices = ch_h5ad_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
+        ch_h5ad_matrices = ch_h5ad_matrices.mix( EMPTY_DROPLET_REMOVAL.out.h5ad )
 
     }
 

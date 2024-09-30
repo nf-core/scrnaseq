@@ -1,6 +1,6 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { STAR_ALIGN  } from '../../modules/local/star/star_align'
-include { MTX_TO_H5AD } from '../../modules/local/star/mtx_to_h5ad'
+include { STAR_ALIGN  } from '../../modules/local/star_align'
+include { MTX_TO_H5AD } from '../../modules/local/mtx_to_h5ad'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
@@ -58,7 +58,10 @@ workflow STARSOLO {
     * Perform h5ad conversion
     */
     MTX_TO_H5AD (
-        STAR_ALIGN.out.raw_counts.mix( STAR_ALIGN.out.filtered_counts ),
+        STAR_ALIGN.out.raw_counts
+            .map{ meta, files -> [meta + [input_type: 'raw'], files] }
+            .mix( STAR_ALIGN.out.filtered_counts.map{ meta, files -> [meta + [input_type: 'filtered'], files] } ),
+        [],
         star_index.map{ meta, index -> index }
     )
     ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())

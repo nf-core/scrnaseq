@@ -76,5 +76,6 @@ workflow CELLRANGER_ALIGN {
         ch_versions
         cellranger_out      = CELLRANGER_COUNT.out.outs
         cellranger_matrices = ch_matrices_raw.mix( ch_matrices_filtered )
+        cellranger_h5ad     = MTX_TO_H5AD.out.h5ad
         star_index          = cellranger_index
 }

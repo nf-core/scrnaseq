@@ -74,9 +74,6 @@ def input_to_adata(
     adata.var = adata.var.drop("gene_ids", axis=1)
     adata.var_names_make_unique()
 
-    print(adata)
-    print(adata.var)
-
     # write results
     adata.write_h5ad(f"{output}", compression="gzip")
     print(f"Wrote h5ad file to {output}")

@@ -185,7 +185,7 @@ workflow SCRNASEQ {
             protocol_config['protocol']
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
-        ch_star_index = CELLRANGER_ALIGN.out.star_index
+        ch_h5ad_matrices = ch_h5ad_matrices.mix(CELLRANGER_ALIGN.out.cellranger_h5ad)
         ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map{
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
         })

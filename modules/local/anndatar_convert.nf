@@ -3,7 +3,7 @@ process ANNDATAR_CONVERT {
 
     label 'process_medium'
 
-    container "fmalmeida/anndatar:dev" // TODO: Fix
+    container "docker://fmalmeida/anndatar:dev" // TODO: Fix
 
     input:
     tuple val(meta), path(h5ad)

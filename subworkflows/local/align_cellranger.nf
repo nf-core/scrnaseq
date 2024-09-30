@@ -2,9 +2,10 @@
  * Alignment with Cellranger
  */
 
-include {CELLRANGER_MKGTF} from "../../modules/nf-core/cellranger/mkgtf/main.nf"
-include {CELLRANGER_MKREF} from "../../modules/nf-core/cellranger/mkref/main.nf"
-include {CELLRANGER_COUNT} from "../../modules/nf-core/cellranger/count/main.nf"
+include { CELLRANGER_MKGTF } from "../../modules/nf-core/cellranger/mkgtf/main.nf"
+include { CELLRANGER_MKREF } from "../../modules/nf-core/cellranger/mkref/main.nf"
+include { CELLRANGER_COUNT } from "../../modules/nf-core/cellranger/count/main.nf"
+include { MTX_TO_H5AD      } from '../../modules/local/mtx_to_h5ad'
 
 // Define workflow to subset and index a genome region fasta file
 workflow CELLRANGER_ALIGN {
@@ -49,7 +50,7 @@ workflow CELLRANGER_ALIGN {
             mtx_files.each{
                 if ( it.toString().contains("raw_feature_bc_matrix") ) { desired_files.add( it ) }
             }
-            [ meta, desired_files ]
+            [ meta + [input_type: 'raw'], desired_files ]
         }
 
         ch_matrices_filtered =
@@ -58,8 +59,18 @@ workflow CELLRANGER_ALIGN {
             mtx_files.each{
                 if ( it.toString().contains("filtered_feature_bc_matrix") ) { desired_files.add( it ) }
             }
-            [ meta, desired_files ]
+            [ meta + [input_type: 'filtered'], desired_files ]
         }
+
+        /*
+        * Perform h5ad conversion
+        */
+        MTX_TO_H5AD (
+            ch_matrices_raw.mix( ch_matrices_filtered ),
+            [],
+            []
+        )
+        ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
 
     emit:
         ch_versions

@@ -25,8 +25,15 @@ process MTX_TO_H5AD {
     // Get a file to check input type. Some aligners bring arrays instead of a single file.
     def input_to_check = (inputs instanceof String) ? inputs : inputs[0]
 
+    println(inputs)
+    println('##')
+    println(input_to_check.toUriString())
+    println('##')
+
     // check input type of inputs
     input_type = (input_to_check.toUriString().contains('unfiltered') || input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
+    println(input_type)
+
     if ( params.aligner == 'alevin' ) { input_type = 'raw' } // alevin has its own filtering methods and mostly output a single mtx, raw here means, the base tool output
     if (input_to_check.toUriString().contains('emptydrops')) { input_type = 'custom_emptydrops_filter' }
 

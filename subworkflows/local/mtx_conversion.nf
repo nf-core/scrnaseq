@@ -1,27 +1,56 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
+include { MTX_TO_H5AD           } from '../../modules/local/mtx_to_h5ad'
 include { CONCAT_H5AD           } from '../../modules/local/concat_h5ad.nf'
 include { ANNDATAR_CONVERT      } from '../../modules/local/anndatar_convert'
+include { EMPTY_DROPLET_REMOVAL } from '../../subworkflows/local/emptydrops_removal'
 
 workflow MTX_CONVERSION {
 
     take:
     mtx_matrices
+    txp2gene
+    star_index
     samplesheet
 
     main:
         ch_versions = Channel.empty()
+        ch_h5ads    = Channel.empty()
+
+        //
+        // MODULE: Convert matrices to h5ad
+        //
+        MTX_TO_H5AD (
+            mtx_matrices,
+            txp2gene,
+            star_index
+        )
+        ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
+        ch_h5ads    = MTX_TO_H5AD.out.h5ad
+
+        //
+        // SUBWORKFLOW: Run cellbender emptydrops filter
+        //
+        if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
+
+            // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
+            EMPTY_DROPLET_REMOVAL (
+                MTX_TO_H5AD.out.h5ad.filter { meta, mtx_files -> meta.input_type == 'raw' }
+            )
+            ch_h5ads = ch_h5ads.mix( EMPTY_DROPLET_REMOVAL.out.h5ad )
+
+        }
 
         //
         // MODULE: Convert to Rds with AnndataR package
         //
         ANNDATAR_CONVERT (
-            mtx_matrices
+            ch_h5ads
         )
 
         //
         // Concat sample-specific h5ad in one
         //
-        ch_concat_h5ad_input = mtx_matrices.groupTuple() // gather all sample-specific files / per type
+        ch_concat_h5ad_input = ch_h5ads.groupTuple() // gather all sample-specific files / per type
         if (params.aligner == 'kallisto' && params.kb_workflow != 'standard') {
             // when having spliced / unspliced matrices, the collected tuple has two levels ( [[mtx_1, mtx_2]] )
             // which nextflow break because it is not a valid 'path' thus, we have to remove one level

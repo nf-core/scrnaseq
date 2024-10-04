@@ -7,7 +7,6 @@ include { CELLRANGER_ALIGN                   } from '../subworkflows/local/align
 include { CELLRANGER_MULTI_ALIGN             } from '../subworkflows/local/align_cellrangermulti'
 include { CELLRANGERARC_ALIGN                } from '../subworkflows/local/align_cellrangerarc'
 include { UNIVERSC_ALIGN                     } from '../subworkflows/local/align_universc'
-include { EMPTY_DROPLET_REMOVAL              } from '../subworkflows/local/emptydrops_removal'
 include { MTX_CONVERSION                     } from '../subworkflows/local/mtx_conversion'
 include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
 include { GUNZIP as GUNZIP_FASTA             } from '../modules/nf-core/gunzip/main'
@@ -87,7 +86,7 @@ workflow SCRNASEQ {
     empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
 
     ch_versions      = Channel.empty()
-    ch_h5ad_matrices = Channel.empty()
+    ch_mtx_matrices = Channel.empty()
 
     // Run FastQC
     if (!params.skip_fastqc) {
@@ -137,7 +136,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
-        ch_h5ad_matrices = ch_h5ad_matrices.mix(KALLISTO_BUSTOOLS.out.raw_counts, KALLISTO_BUSTOOLS.out.filtered_counts)
+        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.raw_counts, KALLISTO_BUSTOOLS.out.filtered_counts)
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
@@ -155,7 +154,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_ALEVIN.out.alevin_results.map{ meta, it -> it })
-        ch_h5ad_matrices = ch_h5ad_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_h5ad)
+        ch_mtx_matrices = ch_mtx_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_h5ad)
     }
 
     // Run STARSolo pipeline
@@ -172,7 +171,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
-        ch_h5ad_matrices = STARSOLO.out.star_h5ad
+        ch_mtx_matrices = STARSOLO.out.star_h5ad
     }
 
     // Run cellranger pipeline
@@ -185,8 +184,8 @@ workflow SCRNASEQ {
             protocol_config['protocol']
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
-        ch_h5ad_matrices = ch_h5ad_matrices.mix(CELLRANGER_ALIGN.out.cellranger_h5ad)
-        ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map{
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_matrices)
+        ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map {
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
         })
     }
@@ -201,7 +200,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(UNIVERSC_ALIGN.out.ch_versions)
-        ch_h5ad_matrices = ch_h5ad_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
+        ch_mtx_matrices = ch_mtx_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
     }
 
     // Run cellrangerarc pipeline
@@ -215,7 +214,7 @@ workflow SCRNASEQ {
             ch_cellrangerarc_config
         )
         ch_versions = ch_versions.mix(CELLRANGERARC_ALIGN.out.ch_versions)
-        ch_h5ad_matrices = ch_h5ad_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellranger_arc_out)
     }
 
     // Run cellrangermulti pipeline
@@ -283,33 +282,15 @@ workflow SCRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix( CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out.map{
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
         })
-        ch_h5ad_matrices = ch_h5ad_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx)
-
-    }
-
-    // SUBWORKFLOW: Run cellbender emptydrops filter
-    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
-
-        //
-        // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
-        //
-        if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
-            ch_h5ad_matrices_for_emptydrops =
-                ch_h5ad_matrices.filter { meta, mtx_files -> meta.input_type == 'raw' }
-        } else {
-            ch_h5ad_matrices_for_emptydrops = ch_h5ad_matrices
-        }
-
-        EMPTY_DROPLET_REMOVAL (
-            ch_h5ad_matrices_for_emptydrops
-        )
-        ch_h5ad_matrices = ch_h5ad_matrices.mix( EMPTY_DROPLET_REMOVAL.out.h5ad )
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx)
 
     }
 
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (
-        ch_h5ad_matrices,
+        ch_mtx_matrices,
+        ch_txp2gene,
+        ch_star_index,
         ch_input
     )
 

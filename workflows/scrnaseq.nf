@@ -136,7 +136,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.raw_counts, KALLISTO_BUSTOOLS.out.filtered_counts)
+        ch_mtx_matrices = KALLISTO_BUSTOOLS.out.counts
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 

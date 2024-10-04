@@ -7,7 +7,7 @@
                 "nf-core": {
                     "bamtofastq10x": {
                         "branch": "master",
-                        "git_sha": "63d6994f4f85c0628b7f2ac1e7097136c1b4be34",
+                        "git_sha": "2d82007b83328343d0e2a9cec087b628eef7e3d1",
                         "installed_by": ["modules"]
                     },
                     "cellranger/count": {

@@ -76,11 +76,6 @@ def input_to_adata(
     adata.write_h5ad(f"{output}", compression="gzip")
     print(f"Wrote h5ad file to {output}")
 
-    # dump versions
-    dump_versions()
-
-    return adata
-
 #
 # Run main script
 #
@@ -89,8 +84,11 @@ def input_to_adata(
 os.makedirs("${meta.id}", exist_ok=True)
 
 # input_type comes from NF module
-adata = input_to_adata(
+input_to_adata(
     input_data="${meta.id}_alevin_results/af_quant/alevin/",
     output="${meta.id}/${meta.id}_${meta.input_type}_matrix.h5ad",
     sample="${meta.id}"
 )
+
+# dump versions
+dump_versions()

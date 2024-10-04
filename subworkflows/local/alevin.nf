@@ -3,7 +3,6 @@ include { GFFREAD_TRANSCRIPTOME } from '../../modules/local/gffread_transcriptom
 include { ALEVINQC              } from '../../modules/local/alevinqc'
 include { SIMPLEAF_INDEX        } from '../../modules/local/simpleaf_index'
 include { SIMPLEAF_QUANT        } from '../../modules/local/simpleaf_quant'
-include { MTX_TO_H5AD           } from '../../modules/local/mtx_to_h5ad'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { GUNZIP                      } from '../../modules/nf-core/gunzip/main'
@@ -58,16 +57,6 @@ workflow SCRNASEQ_ALEVIN {
     ch_versions = ch_versions.mix(SIMPLEAF_QUANT.out.versions)
 
     /*
-    * Perform h5ad conversion
-    */
-    MTX_TO_H5AD (
-        SIMPLEAF_QUANT.out.alevin_results.map{ meta, files -> [meta + [input_type: 'raw'], files] },
-        [],
-        []
-    )
-    ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
-
-    /*
     * Run alevinQC
     */
     ALEVINQC( SIMPLEAF_QUANT.out.alevin_results )
@@ -75,7 +64,6 @@ workflow SCRNASEQ_ALEVIN {
 
     emit:
     ch_versions
-    alevin_results = SIMPLEAF_QUANT.out.alevin_results
-    alevin_h5ad    = MTX_TO_H5AD.out.h5ad
+    alevin_results = SIMPLEAF_QUANT.out.alevin_results.map{ meta, files -> [meta + [input_type: 'raw'], files] }
     alevinqc       = ALEVINQC.out.report
 }

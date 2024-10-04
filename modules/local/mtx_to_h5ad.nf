@@ -2,6 +2,8 @@ process MTX_TO_H5AD {
     tag "$meta.id"
     label 'process_medium'
 
+    debug true
+
     conda "conda-forge::scanpy conda-forge::python-igraph conda-forge::leidenalg"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/scanpy:1.7.2--pyhdfd78af_0' :

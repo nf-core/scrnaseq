@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Enable sample demultiplexing followed by immune profiling
+- Add bamtofastq10x module
+
 ## v2.7.1 - 2024-08-13
 
 - Fix that tests have not been executed with nf-test v0.9 ([#359](https://github.com/nf-core/scrnaseq/pull/359))

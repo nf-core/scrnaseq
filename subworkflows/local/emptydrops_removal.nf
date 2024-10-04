@@ -16,7 +16,7 @@ workflow EMPTY_DROPLET_REMOVAL {
         .join(CELLBENDER_REMOVEBACKGROUND.out.barcodes)
         .map { meta, h5ad, csv ->
             def meta_clone = meta.clone()
-            meta_clone.input_type = 'emptydrops_filter'
+            meta_clone.input_type = meta['input_type'].toString().replaceAll('raw', 'emptydrops_filter')
 
             [ meta_clone, h5ad, csv ]
         }

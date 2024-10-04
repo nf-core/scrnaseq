@@ -25,7 +25,23 @@ workflow MTX_CONVERSION {
             star_index
         )
         ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
-        ch_h5ads    = MTX_TO_H5AD.out.h5ad
+
+        // fix channel size when kallisto non-standard workflow
+        if (params.aligner == 'kallisto' && !(params.kb_workflow == 'standard')) {
+            ch_h5ads =
+            MTX_TO_H5AD.out.h5ad
+                .transpose()
+                .map { meta, h5ad ->
+                    def meta_clone = meta.clone()
+                    def spc_prefix = h5ad.toString().contains('unspliced') ? 'un' : ''
+
+                    meta_clone["input_type"] = "${meta.input_type}_${spc_prefix}spliced"
+
+                    [ meta_clone, h5ad ]
+                }
+        } else {
+            ch_h5ads = MTX_TO_H5AD.out.h5ad
+        }
 
         //
         // SUBWORKFLOW: Run cellbender emptydrops filter
@@ -34,7 +50,7 @@ workflow MTX_CONVERSION {
 
             // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
             EMPTY_DROPLET_REMOVAL (
-                MTX_TO_H5AD.out.h5ad.filter { meta, mtx_files -> meta.input_type == 'raw' }
+                ch_h5ads.filter { meta, mtx_files -> meta.input_type.contains('raw') }
             )
             ch_h5ads = ch_h5ads.mix( EMPTY_DROPLET_REMOVAL.out.h5ad )
 

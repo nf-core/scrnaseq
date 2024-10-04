@@ -31,6 +31,7 @@ process MTX_TO_H5AD {
     println('##')
     println(input_to_check.toUriString())
     println('##')
+    def foo = input_to_check.toUriString()
 
     // check input type of inputs
     input_type = (input_to_check.toUriString().contains('unfiltered') || input_to_check.toUriString().contains('raw')) ? 'raw' : 'filtered'
@@ -100,6 +101,11 @@ process MTX_TO_H5AD {
     //
     if (params.aligner in [ 'cellranger', 'cellrangerarc' ] && input_type != 'custom_emptydrops_filter')
     """
+    echo $inputs
+    echo $foo
+    echo $input_to_check
+    echo $input_type
+
     # convert file types
     mtx_to_h5ad.py \\
         --aligner cellranger \\

@@ -171,7 +171,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
-        ch_mtx_matrices = STARSOLO.out.star_h5ad
+        ch_mtx_matrices = STARSOLO.out.star_counts
     }
 
     // Run cellranger pipeline

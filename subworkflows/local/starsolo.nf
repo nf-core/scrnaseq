@@ -54,24 +54,16 @@ workflow STARSOLO {
     )
     ch_versions = ch_versions.mix(STAR_ALIGN.out.versions)
 
-    /*
-    * Perform h5ad conversion
-    */
-    MTX_TO_H5AD (
-        STAR_ALIGN.out.raw_counts
-            .map{ meta, files -> [meta + [input_type: 'raw'], files] }
-            .mix( STAR_ALIGN.out.filtered_counts.map{ meta, files -> [meta + [input_type: 'filtered'], files] } ),
-        [],
-        star_index.map{ meta, index -> index }
-    )
-    ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
+    // generate channel of star counts with correct metadata
+    ch_star_counts =
+        STAR_ALIGN.out.raw_counts.map{ meta, files -> [meta + [input_type: 'raw'], files] }
+        .mix( STAR_ALIGN.out.filtered_counts.map{ meta, files -> [meta + [input_type: 'filtered'], files] } )
 
 
     emit:
     ch_versions
     // get rid of meta for star index
     star_result = STAR_ALIGN.out.tab
-    star_counts = STAR_ALIGN.out.counts
-    star_h5ad   = MTX_TO_H5AD.out.h5ad
+    star_counts = ch_star_counts
     for_multiqc = STAR_ALIGN.out.log_final.map{ meta, it -> it }
 }

@@ -1,0 +1,46 @@
+{
+    "test-dataset_cellranger_aligner": {
+        "content": [
+            {
+                "stderr": [
+                    
+                ],
+                "errorReport": "",
+                "exitStatus": 0,
+                "failed": false,
+                "stdout": [
+                    
+                ],
+                "errorMessage": "",
+                "trace": {
+                    "tasksFailed": 0,
+                    "tasksCount": 18,
+                    "tasksSucceeded": 18
+                },
+                "name": "workflow",
+                "success": true
+            },
+            "barcodes.tsv.gz:md5,fe6e51564b4405b37ca8604a844b1f2e",
+            "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
+            "matrix.mtx.gz:md5,1528b9b0fccc78dec95695928e42e710",
+            "barcodes.tsv.gz:md5,77afe9a76631fc7b44236d3962a55aa5",
+            "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
+            "matrix.mtx.gz:md5,49db721ca5d5749cf11597e82a010eb6",
+            "barcodes.tsv.gz:md5,85da6b6e0c78dfe81af8c07c2017ab5e",
+            "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
+            "matrix.mtx.gz:md5,96943587acf3356c5fa5038056c54c96",
+            "barcodes.tsv.gz:md5,081f72b5252ccaf5ffd535ffbd235c4c",
+            "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
+            "matrix.mtx.gz:md5,58182db2706d532ec970526de3d3b70f",
+            "Sample_X_raw_matrix.rds:md5,306a5477ace4d43d851b8389fdfeaf1f",
+            "Sample_Y_raw_matrix.rds:md5,74b31532da4cae5a8197d690021d77fc",
+            "Sample_X_filtered_matrix.rds:md5,f9191ba575a3ab79ada4807715f18573",
+            "Sample_Y_filtered_matrix.rds:md5,7be3f7b29d668dcf7e951b9f4d371a5e"
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.10.1"
+        },
+        "timestamp": "2024-04-16T09:43:45.32298954"
+    }
+}

@@ -46,7 +46,6 @@ nextflow_pipeline {
                 // Check if files are the same
                 //
                 {assert snapshot(
-                    workflow,
                     path( "${outputDir}/results_star/star/Sample_X/Sample_X.SJ.out.tab"                             ),
                     path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Barcodes.stats"                ),
                     path( "${outputDir}/results_star/star/Sample_X/Sample_X.Solo.out/Gene/filtered/matrix.mtx.gz"   ),

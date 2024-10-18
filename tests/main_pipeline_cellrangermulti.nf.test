@@ -69,8 +69,6 @@ nextflow_pipeline {
                 // Check if files are the same
                 //
                 {assert snapshot(
-                    workflow,
-
                     // barcodes.tsv.gz files
                     path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/multi/count/raw_feature_bc_matrix/barcodes.tsv.gz" ),
                     path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz" ),

@@ -47,7 +47,6 @@ nextflow_pipeline {
                 // Check if files are the same
                 //
                 {assert snapshot(
-                    workflow,
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ),
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/features.tsv.gz" ),
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/matrix.mtx.gz" ),

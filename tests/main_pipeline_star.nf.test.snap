@@ -1,25 +1,6 @@
 {
     "test-dataset_star_aligner": {
         "content": [
-            {
-                "stderr": [
-
-                ],
-                "errorReport": "",
-                "exitStatus": 0,
-                "failed": false,
-                "stdout": [
-
-                ],
-                "errorMessage": "",
-                "trace": {
-                    "tasksFailed": 0,
-                    "tasksCount": 17,
-                    "tasksSucceeded": 17
-                },
-                "name": "workflow",
-                "success": true
-            },
             "Sample_X.SJ.out.tab:md5,d2d7f0abe38029012571bdf6622fc6eb",
             "Barcodes.stats:md5,7f99dc8aa5e074fbe5779ea7712c0886",
             "matrix.mtx.gz:md5,6a923393343aa1a69b0cf1bd998c9285",

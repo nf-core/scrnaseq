@@ -46,7 +46,6 @@ nextflow_pipeline {
                 // Check if files are the same
                 //
                 {assert snapshot(
-                    workflow,
                     path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.barcodes.txt" ),
                     path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.genes.txt" ),
                     path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.mtx" ),

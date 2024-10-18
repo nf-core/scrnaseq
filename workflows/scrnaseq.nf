@@ -13,13 +13,12 @@ include { FASTQC_CHECK                       } from '../subworkflows/local/fastq
 include { KALLISTO_BUSTOOLS                  } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevin'
 include { STARSOLO                           } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN                   } from "../subworkflows/local/align_cellranger"
-include { CELLRANGER_MULTI_ALIGN             } from "../subworkflows/local/align_cellrangermulti"
-include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align_cellrangerarc"
-include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align_universc"
-include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
+include { CELLRANGER_ALIGN                   } from '../subworkflows/local/align_cellranger'
+include { CELLRANGER_MULTI_ALIGN             } from '../subworkflows/local/align_cellrangermulti'
+include { CELLRANGERARC_ALIGN                } from '../subworkflows/local/align_cellrangerarc'
+include { UNIVERSC_ALIGN                     } from '../subworkflows/local/align_universc'
+include { MTX_CONVERSION                     } from '../subworkflows/local/mtx_conversion'
 include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
-include { EMPTYDROPS_CELL_CALLING            } from '../modules/local/emptydrops'
 include { GUNZIP as GUNZIP_FASTA             } from '../modules/nf-core/gunzip/main'
 include { GUNZIP as GUNZIP_GTF               } from '../modules/nf-core/gunzip/main'
 
@@ -91,7 +90,7 @@ workflow SCRNASEQ {
     ch_multi_samplesheet              = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
     empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
 
-    ch_versions     = Channel.empty()
+    ch_versions      = Channel.empty()
     ch_mtx_matrices = Channel.empty()
 
     // Run FastQC
@@ -142,7 +141,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.raw_counts, KALLISTO_BUSTOOLS.out.filtered_counts)
+        ch_mtx_matrices = KALLISTO_BUSTOOLS.out.counts
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
@@ -176,9 +175,8 @@ workflow SCRNASEQ {
             protocol_config.get('extra_args', ""),
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.raw_counts, STARSOLO.out.filtered_counts)
-        ch_star_index = STARSOLO.out.star_index
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
+        ch_mtx_matrices = STARSOLO.out.star_counts
     }
 
     // Run cellranger pipeline
@@ -192,8 +190,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_matrices)
-        ch_star_index = CELLRANGER_ALIGN.out.star_index
-        ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map{
+        ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map {
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
         })
     }
@@ -294,34 +291,12 @@ workflow SCRNASEQ {
 
     }
 
-    // Run emptydrops calling module
-    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
-
-        //
-        // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
-        //
-        if ( params.aligner in [ 'cellranger', 'cellrangermulti', 'kallisto', 'star' ] ) {
-            ch_mtx_matrices_for_emptydrops =
-                ch_mtx_matrices.filter { meta, mtx_files ->
-                    mtx_files.toString().contains("raw_feature_bc_matrix") || // cellranger
-                    mtx_files.toString().contains("counts_unfiltered")     || // kallisto
-                    mtx_files.toString().contains("raw")                      // star
-                }
-        } else {
-            ch_mtx_matrices_for_emptydrops = ch_mtx_matrices
-        }
-
-        EMPTYDROPS_CELL_CALLING( ch_mtx_matrices_for_emptydrops )
-        ch_mtx_matrices = ch_mtx_matrices.mix( EMPTYDROPS_CELL_CALLING.out.filtered_matrices )
-
-    }
-
     // Run mtx to h5ad conversion subworkflow
     MTX_CONVERSION (
         ch_mtx_matrices,
-        ch_input,
         ch_txp2gene,
-        ch_star_index
+        ch_star_index,
+        ch_input
     )
 
     //Add Versions from MTX Conversion workflow too

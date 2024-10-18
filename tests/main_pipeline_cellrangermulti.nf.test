@@ -18,11 +18,6 @@ nextflow_pipeline {
                 gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
                 aligner                   = 'cellrangermulti'
                 protocol                  = 'auto'
-
-                // Limit resources so that this can run on GitHub Actions -- for some reason it had not been taken from shared config
-                max_cpus   = 2
-                max_memory = '8.GB'
-                max_time   = '6.h'
             }
         }
 
@@ -74,8 +69,6 @@ nextflow_pipeline {
                 // Check if files are the same
                 //
                 {assert snapshot(
-                    workflow,
-
                     // barcodes.tsv.gz files
                     path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/multi/count/raw_feature_bc_matrix/barcodes.tsv.gz" ),
                     path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz" ),

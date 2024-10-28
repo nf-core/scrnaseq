@@ -55,9 +55,9 @@ process STAR_ALIGN {
     def (forward, reverse) = reads.collate(2).transpose()
     """
     if [[ $whitelist == *.gz ]]; then
-        gzip -cdf $whitelist > whitelist.txt
+        gzip -cdf $whitelist > whitelist.uncompressed.txt
     else
-        cp $whitelist whitelist.txt
+        cp $whitelist whitelist.uncompressed.txt
     fi
 
     STAR \\
@@ -65,7 +65,7 @@ process STAR_ALIGN {
         --readFilesIn ${reverse.join( "," )} ${forward.join( "," )} \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
-        --soloCBwhitelist whitelist.txt \\
+        --soloCBwhitelist whitelist.uncompressed.txt \\
         --soloType $protocol \\
         --soloFeatures $star_feature \\
         $other_10x_parameters \\

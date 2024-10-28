@@ -39,7 +39,11 @@ process SIMPLEAF_QUANT {
     save_whitelist     = ""
     if (!(args_list.any { it in ['-k', '--knee', '-e', '--expect-cells', '-f', '--forced-cells']} || meta.expected_cells)) {
         if (whitelist) {
-            unzip_whitelist = "gzip -dcf $whitelist > whitelist.uncompressed.txt"
+            if (whitelist.name.endsWith('.gz')) {
+                unzip_whitelist = "gzip -dcf $whitelist > whitelist.uncompressed.txt"
+            } else {
+                unzip_whitelist = "cp $whitelist whitelist.uncompressed.txt"
+            }
             unfiltered_command = "-u whitelist.uncompressed.txt"
             save_whitelist     = "mv whitelist.uncompressed.txt ${prefix}_alevin_results/"
         }

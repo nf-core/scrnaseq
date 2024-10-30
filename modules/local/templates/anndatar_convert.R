@@ -13,4 +13,4 @@ obj <- adata\$to_Seurat()
 
 # save files
 dir.create(file.path("$meta.id"), showWarnings = FALSE)
-saveRDS(obj, file = "${meta.id}/${meta.id}_${meta.input_type}_matrix.Rds")
+saveRDS(obj, file = "${meta.id}_${meta.input_type}_matrix.Rds")

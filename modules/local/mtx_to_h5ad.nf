@@ -13,8 +13,8 @@ process MTX_TO_H5AD {
     path star_index
 
     output:
-    tuple val(meta), path("${meta.id}/*h5ad"), emit: h5ad
-    path  "versions.yml"                     , emit: versions
+    tuple val(meta), path("${meta.id}_${meta.input_type}_matrix.h5ad"), emit: h5ad
+    path  "versions.yml"                                              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

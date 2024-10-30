@@ -1,4 +1,9 @@
 process ANNDATAR_CONVERT {
+
+    //
+    // This module uses the anndata R package to convert h5ad files in different formats
+    //
+
     tag "${meta.id}"
 
     label 'process_medium'

@@ -1,4 +1,9 @@
 process GFFREAD_TRANSCRIPTOME {
+
+    //
+    // This module uses gffread to filter input to generate a transcripts fasta
+    //
+
     tag "${genome_fasta}"
     label 'process_low'
 

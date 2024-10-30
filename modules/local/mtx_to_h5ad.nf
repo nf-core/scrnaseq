@@ -1,4 +1,9 @@
 process MTX_TO_H5AD {
+
+    //
+    // This module executes different conversion template scripts (per aligner) for converting output mtx files into h5ad files
+    //
+
     tag "$meta.id"
     label 'process_medium'
 

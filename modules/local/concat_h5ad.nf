@@ -1,4 +1,10 @@
 process CONCAT_H5AD {
+
+    //
+    // This module concatenates all h5ad, per type (raw, filtered, etc.) files generated during pipeline execution
+    //
+
+
     tag "${meta.id}"
 
     label 'process_medium'

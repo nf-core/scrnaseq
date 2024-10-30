@@ -1,4 +1,9 @@
 process SIMPLEAF_QUANT {
+
+    //
+    // This module executes simpleaf to perform quantification with alevin
+    //
+
     tag "$meta.id"
     label 'process_high'
 

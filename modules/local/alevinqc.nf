@@ -1,4 +1,9 @@
 process ALEVINQC {
+
+    //
+    // This module executes alevinfry QC reporting tool on alevin results
+    //
+
     tag "$meta.id"
     label 'process_low'
 

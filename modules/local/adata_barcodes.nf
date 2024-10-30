@@ -1,4 +1,10 @@
 process ADATA_BARCODES {
+
+    //
+    // Module from nf-core/scdownstream.
+    // This module performs the subset of the h5ad file to only contain barcodes that passed emptydrops filter with cellbender
+    //
+
     tag "$meta.id"
     label 'process_single'
 

@@ -57,13 +57,6 @@ workflow MTX_CONVERSION {
         }
 
         //
-        // MODULE: Convert to Rds with AnndataR package
-        //
-        ANNDATAR_CONVERT (
-            ch_h5ads
-        )
-
-        //
         // Concat sample-specific h5ad in one
         //
         ch_concat_h5ad_input = ch_h5ads.groupTuple() // gather all sample-specific files / per type
@@ -77,6 +70,18 @@ workflow MTX_CONVERSION {
         CONCAT_H5AD (
             ch_concat_h5ad_input,
             samplesheet
+        )
+        ch_h5ad_concat = CONCAT_H5AD.out.h5ad.map{ meta, file ->
+            def meta_clone = meta.clone()
+            meta_clone.id = 'combined' // maintain output prefix
+            [ meta_clone, file ]
+        }
+
+        //
+        // MODULE: Convert to Rds with AnndataR package
+        //
+        ANNDATAR_CONVERT (
+            ch_h5ads.mix( ch_h5ad_concat )
         )
 
         //TODO CONCAT h5ad and MTX to h5ad should also have versions.yaml output

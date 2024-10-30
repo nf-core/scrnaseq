@@ -69,7 +69,7 @@ def input_to_adata(
     adata.var = adata.var.drop("gene_ids", axis=1)
 
     # write results
-    adata.write_h5ad(f"{output}", compression="gzip")
+    adata.write_h5ad(f"{output}")
     print(f"Wrote h5ad file to {output}")
 
 #

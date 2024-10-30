@@ -73,7 +73,7 @@ def input_to_adata(
     adata.var_names_make_unique()
 
     # write results
-    adata.write_h5ad(f"{output}", compression="gzip")
+    adata.write_h5ad(f"{output}")
     print(f"Wrote h5ad file to {output}")
 
 #

@@ -204,8 +204,9 @@ workflow CELLRANGER_MULTI_ALIGN {
 
     emit:
         ch_versions
-        cellrangermulti_out = CELLRANGER_MULTI.out.outs
-        cellrangermulti_mtx = ch_matrices_raw.mix( ch_matrices_filtered )
+        cellrangermulti_out          = CELLRANGER_MULTI.out.outs
+        cellrangermulti_mtx_raw      = ch_matrices_raw
+        cellrangermulti_mtx_filtered = ch_matrices_filtered
 }
 
 def parse_demultiplexed_output_channels(in_ch, pattern) {

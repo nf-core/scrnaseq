@@ -27,7 +27,7 @@ def _mtx_to_adata(
 
     txp2gene = pd.read_table(glob.glob(f"{t2g}")[0], header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2])
     txp2gene = txp2gene.drop_duplicates(subset="gene_id").set_index("gene_id")
-    adata.var = pd.merge(adata.var, txp2gene, left_index=True, right_index=True)
+    adata.var = adata.var.join(txp2gene, how="left")
 
     return adata
 

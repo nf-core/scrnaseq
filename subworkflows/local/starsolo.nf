@@ -59,7 +59,7 @@ workflow STARSOLO {
     // get rid of meta for star index
     star_result     = STAR_ALIGN.out.tab
     star_counts     = STAR_ALIGN.out.counts
-    raw_counts      = STAR_ALIGN.out.raw_counts
-    filtered_counts = STAR_ALIGN.out.filtered_counts
+    raw_counts      = STAR_ALIGN.out.raw_counts.map{ meta, files -> [meta + [input_type: 'raw'], files] }
+    filtered_counts = STAR_ALIGN.out.filtered_counts.map{ meta, files -> [meta + [input_type: 'filtered'], files] }
     for_multiqc     = STAR_ALIGN.out.log_final.map{ meta, it -> it }
 }

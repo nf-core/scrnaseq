@@ -34,6 +34,6 @@ if __name__ == "__main__":
 
     # merge with data.frame, on sample information
     adata.obs = adata.obs.join(df_samplesheet, on="sample").astype(str)
-    adata.write_h5ad("combined_${meta.input_type}_matrix.h5ad", compression="gzip")
+    adata.write_h5ad("combined_${meta.input_type}_matrix.h5ad")
 
     print("Wrote h5ad file to {}".format("combined_${meta.input_type}_matrix.h5ad"))

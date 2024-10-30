@@ -135,7 +135,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
-        ch_mtx_matrices = KALLISTO_BUSTOOLS.out.counts_raw.mix( KALLISTO_BUSTOOLS.out.counts_filtered )
+        ch_mtx_matrices = ch_mtx_matrices.mix( KALLISTO_BUSTOOLS.out.counts_raw, KALLISTO_BUSTOOLS.out.counts_filtered )
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
@@ -153,7 +153,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_ALEVIN.out.alevin_results.map{ meta, it -> it })
-        ch_mtx_matrices = ch_mtx_matrices.mix(SCRNASEQ_ALEVIN.out.alevin_results)
+        ch_mtx_matrices = ch_mtx_matrices.mix( SCRNASEQ_ALEVIN.out.alevin_results )
     }
 
     // Run STARSolo pipeline
@@ -170,7 +170,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
-        ch_mtx_matrices = STARSOLO.out.raw_counts.mix( STARSOLO.out.filtered_counts )
+        ch_mtx_matrices = ch_mtx_matrices.mix( STARSOLO.out.raw_counts, STARSOLO.out.filtered_counts )
     }
 
     // Run cellranger pipeline
@@ -183,7 +183,7 @@ workflow SCRNASEQ {
             protocol_config['protocol']
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_matrices)
+        ch_mtx_matrices = ch_mtx_matrices.mix( CELLRANGER_ALIGN.out.cellranger_matrices_raw, CELLRANGER_ALIGN.out.cellranger_matrices_filtered )
         ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map {
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
         })

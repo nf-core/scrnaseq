@@ -97,7 +97,7 @@ if "${params.kb_workflow}" == "standard":
         matrix=glob.glob("${inputs}/*.mtx")[0],
         barcodes=glob.glob("${inputs}/*.barcodes.txt")[0],
         features=glob.glob("${inputs}/*.genes.txt")[0],
-        output="${meta.id}/${meta.id}_${meta.input_type}_matrix.h5ad",
+        output="${meta.id}_${meta.input_type}_matrix.h5ad",
         sample="${meta.id}",
         t2g="${txp2gene}"
     )
@@ -108,7 +108,7 @@ else:
             matrix=glob.glob("${inputs}/" + f"{type}*.mtx")[0],
             barcodes=glob.glob("${inputs}/" + f"{type}*.barcodes.txt")[0],
             features=glob.glob("${inputs}/" + f"{type}*.genes.txt")[0],
-            output="${meta.id}/${meta.id}_${meta.input_type}" + f"_{type}_matrix.h5ad",
+            output="${meta.id}_${meta.input_type}" + f"_{type}_matrix.h5ad",
             sample="${meta.id}",
             t2g="${txp2gene}"
         )

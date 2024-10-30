@@ -80,7 +80,7 @@ os.makedirs("${meta.id}", exist_ok=True)
 # input_type comes from NF module
 input_to_adata(
     input_data="${meta.input_type}",
-    output="${meta.id}/${meta.id}_${meta.input_type}_matrix.h5ad",
+    output="${meta.id}_${meta.input_type}_matrix.h5ad",
     sample="${meta.id}"
 )
 

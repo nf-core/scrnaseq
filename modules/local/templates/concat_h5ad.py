@@ -33,7 +33,7 @@ if __name__ == "__main__":
     adata = ad.concat(dict_of_h5ad, label="sample", merge="unique", index_unique="_")
 
     # merge with data.frame, on sample information
-    adata.obs = adata.obs.join(df_samplesheet, on="sample").astype(str)
+    adata.obs = adata.obs.join(df_samplesheet, on="sample", how="left").astype(str)
     adata.write_h5ad("combined_${meta.input_type}_matrix.h5ad")
 
     print("Wrote h5ad file to {}".format("combined_${meta.input_type}_matrix.h5ad"))

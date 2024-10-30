@@ -135,7 +135,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
-        ch_mtx_matrices = KALLISTO_BUSTOOLS.out.counts
+        ch_mtx_matrices = KALLISTO_BUSTOOLS.out.counts_raw.mix( KALLISTO_BUSTOOLS.out.counts_filtered )
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
@@ -170,9 +170,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
-        ch_mtx_matrices =
-            STARSOLO.out.raw_counts.map{ meta, files -> [meta + [input_type: 'raw'], files] }
-            .mix( STARSOLO.out.filtered_counts.map{ meta, files -> [meta + [input_type: 'filtered'], files] } )
+        ch_mtx_matrices = STARSOLO.out.raw_counts.mix( STARSOLO.out.filtered_counts )
     }
 
     // Run cellranger pipeline

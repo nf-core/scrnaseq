@@ -66,7 +66,9 @@ workflow KALLISTO_BUSTOOLS {
 
     emit:
     ch_versions
-    counts          = ch_raw_counts.mix (ch_filtered_counts)
+    counts          = KALLISTOBUSTOOLS_COUNT.out.count
+    counts_raw      = ch_raw_counts
+    counts_filtered = ch_filtered_counts
     txp2gene        = txp2gene.collect()
 
 }

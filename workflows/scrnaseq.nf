@@ -31,12 +31,11 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    params.fasta = getGenomeAttribute('fasta')
-    params.gtf = getGenomeAttribute('gtf')
-    params.star_index = getGenomeAttribute('star')
-
-    ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : []
-    ch_gtf = params.gtf ? file(params.gtf, checkIfExists: true) : []
+    // search igenomes, but overwrite with user paths
+    // cannot use 'params.<something> = ' in workflow, it does not overwrite parameter
+    def fasta_file = params.fasta      ? params.fasta      : getGenomeAttribute('fasta')
+    def gtf_file   = params.gtf        ? params.gtf        : getGenomeAttribute('gtf')
+    def star_index = params.star_index ? params.star_index : getGenomeAttribute('star')
 
     // general input and params
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
@@ -70,7 +69,7 @@ workflow SCRNASEQ {
     ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
 
     //star params
-    star_index = params.star_index ? file(params.star_index, checkIfExists: true) : null
+    star_index = star_index ? file(star_index, checkIfExists: true) : null
     ch_star_index = star_index ? [[id: star_index.baseName], star_index] : []
     star_feature = params.star_feature
 
@@ -98,24 +97,24 @@ workflow SCRNASEQ {
     //
     // Uncompress genome fasta file if required
     //
-    if (params.fasta) {
-        if (params.fasta.endsWith('.gz')) {
-            ch_genome_fasta    = GUNZIP_FASTA ( [ [:], file(params.fasta) ] ).gunzip.map { it[1] }
+    if (fasta_file) {
+        if (fasta_file.endsWith('.gz')) {
+            ch_genome_fasta    = GUNZIP_FASTA ( [ [:], file(fasta_file) ] ).gunzip.map { it[1] }
             ch_versions        = ch_versions.mix(GUNZIP_FASTA.out.versions)
         } else {
-            ch_genome_fasta = Channel.value( file(params.fasta) )
+            ch_genome_fasta = Channel.value( file(fasta_file) )
         }
     }
 
     //
     // Uncompress GTF annotation file or create from GFF3 if required
     //
-    if (params.gtf) {
-        if (params.gtf.endsWith('.gz')) {
-            ch_gtf      = GUNZIP_GTF ( [ [:], file(params.gtf) ] ).gunzip.map { it[1] }
+    if (gtf_file) {
+        if (gtf_file.endsWith('.gz')) {
+            ch_gtf      = GUNZIP_GTF ( [ [:], file(gtf_file) ] ).gunzip.map { it[1] }
             ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
         } else {
-            ch_gtf = Channel.value( file(params.gtf) )
+            ch_gtf = Channel.value( file(gtf_file) )
         }
     }
 

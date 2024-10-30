@@ -67,7 +67,7 @@ def input_to_adata(
     # index are gene IDs and symbols are a column
     # TODO: how to get gene_symbols for alevin?
     adata.var['gene_versions'] = adata.var.index
-    adata.var.index = adata.var['gene_versions'].str.split('.').str[0]
+    adata.var.index = adata.var['gene_versions'].str.split('.').str[0].values
     adata.var_names_make_unique()
 
     # write results

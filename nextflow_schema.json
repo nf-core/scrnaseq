@@ -142,6 +142,11 @@
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
                     "fa_icon": "fas fa-bookmark"
                 },
+                "save_align_intermeds": {
+                    "type": "boolean",
+                    "description": "Specify this parameter to save the intermediate alignment files (STAR, CellRanger) to the results.",
+                    "fa_icon": "fas fa-bookmark"
+                },
                 "igenomes_base": {
                     "type": "string",
                     "format": "directory-path",
@@ -270,11 +275,6 @@
                 "skip_cellranger_renaming": {
                     "type": "boolean",
                     "description": "Should it skip the automatic renaming included in cellranger-related modules?"
-                },
-                "cellranger_create_bam": {
-                    "type": "boolean",
-                    "description": "Create BAM alignment file. Note: Using the default value of true will increase computational resources and disk space.  Please see the [10x documentation about create-bam parameter](https://kb.10xgenomics.com/hc/en-us/articles/24292856143885-Understanding-the-create-bam-Parameter-in-Cell-Ranger-v8-0) for more information.",
-                    "default": true
                 }
             }
         },
@@ -371,11 +371,6 @@
                     "exists": true,
                     "mimetype": "text/csv",
                     "description": "Additional samplesheet to provide information about multiplexed samples. See the 'Usage' section for more details."
-                },
-                "cellranger_multi_create_bam": {
-                    "type": "boolean",
-                    "description": "Create BAM alignment file. Note: Using the default value of true will increase computational resources and disk space.  Please see the [10x documentation about create-bam parameter](https://kb.10xgenomics.com/hc/en-us/articles/24292856143885-Understanding-the-create-bam-Parameter-in-Cell-Ranger-v8-0) for more information.",
-                    "default": true
                 }
             }
         },

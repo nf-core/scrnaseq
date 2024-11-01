@@ -237,7 +237,7 @@ workflow SCRNASEQ {
             // add cellranger options that are currently handled by pipeline, coming from samplesheet
             // the module parses them from the 'gex' options
             if (meta.feature_type.toString() == 'gex') {
-                parsed_meta.options['create-bam'] = params.cellranger_multi_create_bam  // force bam creation -- param required by cellranger multi
+                parsed_meta.options['create-bam'] = params.save_align_intermeds  // force bam creation -- param required by cellranger multi
                 if (meta.expected_cells) { parsed_meta.options['expected-cells'] = meta.expected_cells }
             }
 

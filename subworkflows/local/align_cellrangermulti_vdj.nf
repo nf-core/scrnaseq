@@ -306,7 +306,7 @@ def expand_feature_by_demultiplexed_samples(in_ch, gex_ch) {
             meta_clone.sample_id = meta_clone.id
             [meta_clone, fns]
         }
-        .cross(gex_ch) { it[0][-1] } // test also it[0]["sample_id"]
+        .cross(gex_ch) { it[0]["sample_id"] }
         .map{ftx, gex ->
             def ftx_meta_clone = ftx[0].clone()
             def gex_meta_clone = gex[0].clone()

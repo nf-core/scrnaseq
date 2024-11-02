@@ -37,7 +37,7 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    // collecting paths from genome attributes (optional)
+    // collect paths from genome attributes file (e.g. iGenomes.config; optional)
     params.fasta            = getGenomeAttribute('fasta')
     params.gtf              = getGenomeAttribute('gtf')
     params.star_index       = getGenomeAttribute('star')

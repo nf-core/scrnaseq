@@ -44,7 +44,10 @@ workflow SCRNASEQ {
     params.salmon_index     = getGenomeAttribute('simpleaf')
     params.txp2gene         = getGenomeAttribute('simpleaf_tx2pgene')
     params.cellranger_index = getGenomeAttribute('cellranger')
-    params.cellranger_index = getGenomeAttribute('cellrangerarc')
+    // Make cellranger-arc index overwriting conditional
+    if (params.aligner == "cellrangerarc") {
+        params.cellranger_index = getGenomeAttribute('cellrangerarc')
+    }
 
     ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : []
     ch_gtf = params.gtf ? file(params.gtf, checkIfExists: true) : []

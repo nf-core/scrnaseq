@@ -1,7 +1,7 @@
 {
     "alevin": {
         "10XV1": {
-            "protocol": "10xv1",
+            "protocol": "1{b[14]u[10]x:}2{r:}",
             "whitelist": "assets/whitelist/10x_V1_barcode_whitelist.txt.gz"
         },
         "10XV2": {
@@ -13,7 +13,7 @@
             "whitelist": "assets/whitelist/10x_V3_barcode_whitelist.txt.gz"
         },
         "10XV4": {
-            "protocol": "10xv4",
+            "protocol": "1{b[16]u[12]x:}2{r:}",
             "whitelist": "assets/whitelist/10x_V4_barcode_whitelist.txt.gz"
         },
         "dropseq": {

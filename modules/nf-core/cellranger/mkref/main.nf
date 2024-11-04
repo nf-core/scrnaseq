@@ -35,6 +35,7 @@ process CELLRANGER_MKREF {
         --localmem=${task.memory.toGiga()} \\
         --nthreads=${task.cpus} \\
         $args
+    
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

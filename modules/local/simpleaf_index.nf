@@ -33,6 +33,7 @@ process SIMPLEAF_INDEX {
     simpleaf set-paths
 
     # run simpleaf index
+
     simpleaf \\
         index \\
         --threads $task.cpus \\

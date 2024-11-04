@@ -17,25 +17,45 @@ include { softwareVersionsToYAML             } from '../subworkflows/nf-core/uti
 include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
 include { getGenomeAttribute                 } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-
+include { AUTO_DETECT_PROTOCOL               } from '../modules/local/auto_detect_protocol'
+include { CAT_FASTQ                          } from '../modules/nf-core/cat/fastq/main'
 
 
 workflow SCRNASEQ {
 
     take:
-    ch_fastq
+    ch_reads
 
     main:
+    
+    if (params.cat_fastq){
+        ch_reads
+        .branch {
+            meta, fastqs ->
+                single  : fastqs.size() == 2
+                    return [ meta, fastqs.flatten() ]
+                multiple: fastqs.size() > 2
+                    return [ meta, fastqs.flatten() ]
+        }
+        .set { ch_fastq }
+    } else {
+        ch_fastq = ch_reads
+    }
+    
 
     protocol_config = Utils.getProtocol(workflow, log, params.aligner, params.protocol)
-    if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangerarc", "cellrangermulti"]) {
-        error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
-    }
 
+
+   
     params.fasta = getGenomeAttribute('fasta')
     params.gtf = getGenomeAttribute('gtf')
     params.star_index = getGenomeAttribute('star')
+    
+    // Add alevin index and txp2gene file
+    params.salmon_index = getGenomeAttribute('simpleaf')
+    params.txp2gene = getGenomeAttribute('simpleaf_tx2pgene')
 
+    
     ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : []
     ch_gtf = params.gtf ? file(params.gtf, checkIfExists: true) : []
 
@@ -73,9 +93,15 @@ workflow SCRNASEQ {
     //star params
     star_index = params.star_index ? file(params.star_index, checkIfExists: true) : null
     ch_star_index = star_index ? [[id: star_index.baseName], star_index] : []
+
     star_feature = params.star_feature
 
     //cellranger params
+    if (params.aligner in ["cellranger", "cellrangermulti"]){
+        params.cellranger_index = getGenomeAttribute('cellranger')
+    } else if (params.aligner == "cellrangerarc"){
+        params.cellranger_index = getGenomeAttribute('cellrangerarc')
+    }
     ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
 
     //universc params
@@ -89,11 +115,40 @@ workflow SCRNASEQ {
     ch_versions     = Channel.empty()
     ch_mtx_matrices = Channel.empty()
 
+    if (params.cat_fastq) {
+        CAT_FASTQ (
+            ch_fastq.multiple
+        )
+        .reads
+        .mix(ch_fastq.single)
+        .set { ch_fastq }
+    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
+
+    }
+    
+
+    
+
     // Run FastQC
     if (!params.skip_fastqc) {
         FASTQC_CHECK ( ch_fastq )
         ch_versions      = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_multiqc.flatten())
+    }
+
+
+    if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangerarc", "cellrangermulti", "universc"]) {
+        ch_protocol_json   = file( "$projectDir/assets/protocols.json", checkIfExists: true )
+        ch_whitlist = file ("$projectDir/assets/whitelist/*.gz", checkIfExists: true)
+
+        AUTO_DETECT_PROTOCOL(ch_fastq, params.aligner, ch_protocol_json, ch_whitlist)
+        protocol_config['protocol'] = AUTO_DETECT_PROTOCOL.out.protocol
+        ch_fastq = AUTO_DETECT_PROTOCOL.out.ch_fastq
+        ch_barcode_whitelist = AUTO_DETECT_PROTOCOL.out.whitelist
+        ch_extra_args = AUTO_DETECT_PROTOCOL.out.extra_args
+       
+    } else if (protocol_config['protocol'] == 'auto' && params.aligner == "universc") {
+        error "Auto-detection of protocol is not supported for UniversC"
     }
 
     //
@@ -316,7 +371,7 @@ workflow SCRNASEQ {
         ch_mtx_matrices,
         ch_input,
         ch_txp2gene,
-        ch_star_index
+        star_index
     )
 
     //Add Versions from MTX Conversion workflow too

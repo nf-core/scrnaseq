@@ -14,7 +14,9 @@ include { KALLISTO_BUSTOOLS                  } from '../subworkflows/local/kalli
 include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevin'
 include { STARSOLO                           } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN                   } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_MULTI_REF               } from "../subworkflows/local/cellrangermulti_ref"
 include { CELLRANGER_MULTI_ALIGN             } from "../subworkflows/local/align_cellrangermulti"
+include { CELLRANGER_MULTI_ALIGN_VDJ         } from "../subworkflows/local/align_cellrangermulti_vdj"
 include { CELLRANGERARC_ALIGN                } from "../subworkflows/local/align_cellrangerarc"
 include { UNIVERSC_ALIGN                     } from "../subworkflows/local/align_universc"
 include { MTX_CONVERSION                     } from "../subworkflows/local/mtx_conversion"
@@ -228,6 +230,14 @@ workflow SCRNASEQ {
     // Run cellrangermulti pipeline
     if (params.aligner == 'cellrangermulti') {
 
+        CELLRANGER_MULTI_REF(
+            ch_genome_fasta,
+            ch_filter_gtf,
+            ch_cellranger_index,
+            cellranger_vdj_index,
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_MULTI_REF.out.ch_versions)
+
         // parse the input data to generate a collected channel per sample, which will have
         // the metadata and data for each data-type of every sample.
         // then, inside the subworkflow, it can be parsed to manage inputs to the module
@@ -277,13 +287,22 @@ workflow SCRNASEQ {
         }
         .set{ ch_cellrangermulti_collected_channel }
 
+        // Split channel to either run standard cellranger multi or to run sample demultiplexing followed by immune profiling.
+        ch_cellrangermulti_collected_channel.branch { sample ->
+            def vdj_idx = sample.feature_type.findIndexOf{ it == 'vdj'}
+            def cmo_idx = sample.feature_type.findIndexOf{ it == 'cmo'}
+            demux_vdj:
+                // if files are listed for a feature_type, the value is null
+                // otherwise the value is a path to the empty file: assets/EMPTY
+                sample[vdj_idx].vdj == null && sample[cmo_idx].cmo == null
+            demux: true
+        }.set { ch_cellrangermulti_collected_channel_branched }
+
         // Run cellranger multi
         CELLRANGER_MULTI_ALIGN(
-            ch_genome_fasta,
-            ch_filter_gtf,
-            ch_cellrangermulti_collected_channel,
-            ch_cellranger_index,
-            cellranger_vdj_index,
+            ch_cellrangermulti_collected_channel_branched.demux,
+            CELLRANGER_MULTI_REF.out.ch_cellranger_gex_index,
+            CELLRANGER_MULTI_REF.out.ch_cellranger_vdj_index,
             ch_multi_samplesheet
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN.out.ch_versions)
@@ -292,6 +311,19 @@ workflow SCRNASEQ {
         })
         ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx)
 
+        // Run cellranger multi vdj
+        CELLRANGER_MULTI_ALIGN_VDJ(
+            ch_cellrangermulti_collected_channel_branched.demux_vdj,
+            CELLRANGER_MULTI_REF.out.ch_cellranger_gex_index,
+            CELLRANGER_MULTI_REF.out.ch_cellranger_vdj_index,
+            ch_multi_samplesheet,
+            empty_file
+        )
+        ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN_VDJ.out.ch_versions)
+        ch_multiqc_files = ch_multiqc_files.mix( CELLRANGER_MULTI_ALIGN_VDJ.out.cellrangermulti_out.map{
+            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
+        })
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN_VDJ.out.cellrangermulti_mtx)
     }
 
     // Run emptydrops calling module

@@ -43,7 +43,7 @@ workflow SCRNASEQ {
     params.star_index       = getGenomeAttribute('star')
     params.salmon_index     = getGenomeAttribute('simpleaf')
     params.txp2gene         = getGenomeAttribute('simpleaf_tx2pgene')
-    
+
     // Make cellranger or cellranger-arc index conditional
     if (params.aligner in ["cellranger", "cellrangermulti"]){
         params.cellranger_index = getGenomeAttribute('cellranger')

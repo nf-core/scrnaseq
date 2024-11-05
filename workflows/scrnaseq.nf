@@ -50,7 +50,7 @@ workflow SCRNASEQ {
     }
     else if (params.aligner == "cellrangerarc") {
         params.cellranger_index = getGenomeAttribute('cellrangerarc')
-    } 
+    }
 
     ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : []
     ch_gtf = params.gtf ? file(params.gtf, checkIfExists: true) : []

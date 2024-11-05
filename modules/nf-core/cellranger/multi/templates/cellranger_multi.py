@@ -78,6 +78,9 @@ for modality in ["gex", "vdj", "ab", "beam", "cmo", "cirspr"]:
                         Files involved:
                             - {r1}
                             - {r2}
+
+                        fastqs: {fastqs}
+                        fastqs list: {list(fastqs)}
                         """
                     )
                 )

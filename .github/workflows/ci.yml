@@ -20,6 +20,8 @@ env:
   NFT_WORKDIR: "~"
   NFT_DIFF: "pdiff"
   NFT_DIFF_ARGS: "--line-numbers --expand-tabs=2"
+  NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/.singularity
+  NXF_SINGULARITY_LIBRARYDIR: ${{ github.workspace }}/.singularity
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
@@ -34,7 +36,7 @@ jobs:
       fail-fast: false
       matrix:
         NXF_VER:
-          - "23.04.0"
+          - "24.04.2"
           - "latest-everything"
         profile: ["alevin", "cellranger", "cellrangermulti", "kallisto", "star"]
 

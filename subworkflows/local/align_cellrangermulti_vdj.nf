@@ -271,7 +271,7 @@ def extract_bam(in_ch) {
 def extractParts(filename) {
     // convert demux dir, sample ID, lane, read, and sequence chunk to integers to sort files.
     // example: ${meta.sample_id}_0_1_XWEDGYQN/bamtofastq_S1_L002_R1_001.fastq.gz
-    def matcher = filename =~ /\w+_0_1_(\w+)\/\w+_S(\d{1})_L(\d{3})_R([12])_(\d{3})/
+    def matcher = filename =~ /_0_1_(\w+)\/\w+_S(\d{1})_L(\d{3})_R([12])_(\d{3})/
     if (matcher.find()) {
         def fstq_dr = matcher.group(1)
         def smpl_id = matcher.group(2).toInteger()

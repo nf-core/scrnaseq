@@ -273,7 +273,7 @@ def extractParts(filename) {
     // example: ${meta.sample_id}_0_1_XWEDGYQN/bamtofastq_S1_L002_R1_001.fastq.gz
     def matcher = filename =~ /\w+_0_1_(\w+)\/\w+_S(\d{1})_L(\d{3})_R([12])_(\d{3})/
     if (matcher.find()) {
-        def fstq_dr = matcher.group(1).toInteger()
+        def fstq_dr = matcher.group(1)
         def smpl_id = matcher.group(2).toInteger()
         def lane_id = matcher.group(3).toInteger()
         def read_id = matcher.group(4).toInteger()
@@ -285,7 +285,7 @@ def extractParts(filename) {
 
 def extract_gex_fq(in_ch) {
     // Extract GEX fastq files from bamtofastq output and sort files in read pairs.
-    out_ch =
+    def out_ch =
     in_ch.map { meta, fns ->
         def meta_clone = meta.clone()
         meta_clone.options['check-library-compatibility'] = false // in order for downstream immune profiling not to fail.

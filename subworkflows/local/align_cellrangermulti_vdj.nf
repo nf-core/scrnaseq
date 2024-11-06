@@ -269,12 +269,18 @@ def extract_bam(in_ch) {
 }
 
 def extractParts(filename) {
-    // convert lane, read, and sequence number to integers to sort files.
-    def matcher = filename =~ /L(\d{3})_R(\d)_(\d{3})/
+    // convert demux dir, sample ID, lane, read, and sequence chunk to integers to sort files.
+    // example: ${meta.sample_id}_0_1_XWEDGYQN/bamtofastq_S1_L002_R1_001.fastq.gz
+    def matcher = filename =~ /\w+_0_1_(\w+)\/\w+_S(\d{1})_L(\d{3})_R([12])_(\d{3})/
     if (matcher.find()) {
-        return [matcher.group(1).toInteger(), matcher.group(2).toInteger(), matcher.group(3).toInteger()]
+        def fstq_dr = matcher.group(1).toInteger()
+        def smpl_id = matcher.group(2).toInteger()
+        def lane_id = matcher.group(3).toInteger()
+        def read_id = matcher.group(4).toInteger()
+        def chnk_id = matcher.group(5).toInteger()
+        return [fstq_dr, smpl_id, lane_id, chnk_id, read_id]
     }
-    return [0, 0, 0] // Default value if pattern not found
+    return [0, 0, 0, 0, 0] // Default value if pattern not found
 }
 
 def extract_gex_fq(in_ch) {
@@ -290,7 +296,7 @@ def extract_gex_fq(in_ch) {
         def sortedFiles = desired_files.sort { a, b ->
             def partsA = extractParts(a)
             def partsB = extractParts(b)
-            return partsA[0] <=> partsB[0] ?: partsA[2] <=> partsB[2] ?: partsA[1] <=> partsB[1]
+            return partsA[0] <=> partsB[0] ?: partsA[1] <=> partsB[1] ?: partsA[2] <=> partsB[2] ?: partsA[3] <=> partsB[3] ?: partsA[4] <=> partsB[4]
         }
         [ meta_clone, sortedFiles ]
     }

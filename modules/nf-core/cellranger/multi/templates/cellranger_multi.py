@@ -17,21 +17,6 @@ def chunk_iter(seq, size):
     return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
-def sorting_key(path):
-    """Sort fq files by fq dir, sample ID, lane number, chunk number, and read"""
-    parts = path.parts
-    # Extract directory & file name
-    fq_dr = parts[2]
-    fq_fn = parts[-1].split('_')
-    # Extract file name elements
-    smpl_id = fq_fn[1]
-    lane_id = fq_fn[2]
-    read_id = fq_fn[3]
-    chunk = fq_fn[4]
-
-    return (fq_dr, smpl_id, lane_id, chunk, read_id)
-
-
 sample_id = "${prefix}"
 EMPTY_FILE = "EMPTY"
 
@@ -51,7 +36,7 @@ for modality in ["gex", "vdj", "ab", "beam", "cmo", "cirspr"]:
     #   - ...
     # Since we require fastq files in the input channel to be ordered such that a R1/R2 pair
     # of files follows each other, ordering will get us a sequence of [R1, R2, R1, R2, ...]
-    fastqs = sorted([p for p in Path(".").glob(f"fastqs/{modality}/*/*") if p.name != EMPTY_FILE], key=sorting_key)
+    fastqs = sorted(p for p in Path(".").glob(f"fastqs/{modality}/*/*") if p.name != EMPTY_FILE)
     assert len(fastqs) % 2 == 0
 
     # target directory in which the renamed fastqs will be placed
@@ -79,8 +64,7 @@ for modality in ["gex", "vdj", "ab", "beam", "cmo", "cirspr"]:
                             - {r1}
                             - {r2}
 
-                        fastqs: {fastqs}
-                        fastqs list: {list(fastqs)}
+                        all {modality} fastqs: {fastqs} # TODO: remove
                         """
                     )
                 )

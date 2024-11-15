@@ -1,21 +1,24 @@
-include { MULTIQC                            } from '../modules/nf-core/multiqc/main'
-include { FASTQC_CHECK                       } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS                  } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_ALEVIN                    } from '../subworkflows/local/alevin'
-include { STARSOLO                           } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN                   } from '../subworkflows/local/align_cellranger'
-include { CELLRANGER_MULTI_ALIGN             } from '../subworkflows/local/align_cellrangermulti'
-include { CELLRANGERARC_ALIGN                } from '../subworkflows/local/align_cellrangerarc'
-include { UNIVERSC_ALIGN                     } from '../subworkflows/local/align_universc'
-include { MTX_CONVERSION                     } from '../subworkflows/local/mtx_conversion'
-include { GTF_GENE_FILTER                    } from '../modules/local/gtf_gene_filter'
-include { GUNZIP as GUNZIP_FASTA             } from '../modules/nf-core/gunzip/main'
-include { GUNZIP as GUNZIP_GTF               } from '../modules/nf-core/gunzip/main'
-include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
-include { getGenomeAttribute                 } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { MULTIQC                                       } from '../modules/nf-core/multiqc/main'
+include { FASTQC_CHECK                                  } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS                             } from '../subworkflows/local/kallisto_bustools'
+include { SCRNASEQ_ALEVIN                               } from '../subworkflows/local/alevin'
+include { STARSOLO                                      } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN                              } from '../subworkflows/local/align_cellranger'
+include { CELLRANGER_MULTI_ALIGN                        } from '../subworkflows/local/align_cellrangermulti'
+include { CELLRANGERARC_ALIGN                           } from '../subworkflows/local/align_cellrangerarc'
+include { UNIVERSC_ALIGN                                } from '../subworkflows/local/align_universc'
+include { MTX_TO_H5AD                                   } from '../modules/local/mtx_to_h5ad'
+include { H5AD_CONVERSION                               } from '../subworkflows/local/h5ad_conversion'
+include { H5AD_CONVERSION as EMPTYDROPS_H5AD_CONVERSION } from '../subworkflows/local/h5ad_conversion'
+include { EMPTY_DROPLET_REMOVAL                         } from '../subworkflows/local/emptydrops_removal.nf'
+include { GTF_GENE_FILTER                               } from '../modules/local/gtf_gene_filter'
+include { GUNZIP as GUNZIP_FASTA                        } from '../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_GTF                          } from '../modules/nf-core/gunzip/main'
+include { paramsSummaryMultiqc                          } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML                        } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText                        } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { paramsSummaryLog; paramsSummaryMap            } from 'plugin/nf-validation'
+include { getGenomeAttribute                            } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 
 
 
@@ -285,16 +288,58 @@ workflow SCRNASEQ {
 
     }
 
-    // Run mtx to h5ad conversion subworkflow
-    MTX_CONVERSION (
+    //
+    // MODULE: Convert mtx matrices to h5ad
+    //
+    MTX_TO_H5AD (
         ch_mtx_matrices,
         ch_txp2gene,
-        ch_star_index,
+        ch_star_index
+    )
+    ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
+
+    // fix channel size when kallisto non-standard workflow
+    if (params.aligner == 'kallisto' && !(params.kb_workflow == 'standard')) {
+        ch_h5ads =
+        MTX_TO_H5AD.out.h5ad
+            .transpose()
+            .map { meta, h5ad ->
+                def meta_clone = meta.clone()
+                def spc_prefix = h5ad.toString().contains('unspliced') ? 'un' : ''
+
+                meta_clone["input_type"] = "${meta.input_type}_${spc_prefix}spliced"
+
+                [ meta_clone, h5ad ]
+            }
+    } else {
+        ch_h5ads = MTX_TO_H5AD.out.h5ad
+    }
+
+    //
+    // SUBWORKFLOW: Run h5ad conversion and concatenation
+    //
+    ch_emptydrops = Channel.empty()
+    H5AD_CONVERSION (
+        ch_h5ads,
         ch_input
     )
+    ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
 
-    //Add Versions from MTX Conversion workflow too
-    ch_versions.mix(MTX_CONVERSION.out.ch_versions)
+    //
+    // SUBWORKFLOW: Run cellbender emptydrops filter
+    //
+    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
+
+        // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
+        EMPTY_DROPLET_REMOVAL (
+            H5AD_CONVERSION.out.h5ads.filter { meta, mtx_files -> meta.input_type.contains('raw') }
+        )
+        EMPTYDROPS_H5AD_CONVERSION (
+            EMPTY_DROPLET_REMOVAL.out.h5ad,
+            ch_input
+        )
+
+    }
 
     //
     // Collate and save software versions

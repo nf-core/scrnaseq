@@ -37,9 +37,20 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    params.fasta = getGenomeAttribute('fasta')
-    params.gtf = getGenomeAttribute('gtf')
-    params.star_index = getGenomeAttribute('star')
+    // collect paths from genome attributes file (e.g. iGenomes.config; optional)
+    params.fasta            = getGenomeAttribute('fasta')
+    params.gtf              = getGenomeAttribute('gtf')
+    params.star_index       = getGenomeAttribute('star')
+    params.salmon_index     = getGenomeAttribute('simpleaf')
+    params.txp2gene         = getGenomeAttribute('simpleaf_tx2pgene')
+
+    // Make cellranger or cellranger-arc index conditional
+    if (params.aligner in ["cellranger", "cellrangermulti"]){
+        params.cellranger_index = getGenomeAttribute('cellranger')
+    }
+    else if (params.aligner == "cellrangerarc") {
+        params.cellranger_index = getGenomeAttribute('cellrangerarc')
+    }
 
     ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : []
     ch_gtf = params.gtf ? file(params.gtf, checkIfExists: true) : []

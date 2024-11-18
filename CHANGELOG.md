@@ -5,7 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Add --create-bam parameter to cellranger count and multi pipelines ([#384](https://github.com/nf-core/scrnaseq/issues/384))
+- Add `--save_align_intermeds` parameter that publishes BAM files to the output directory (for `starsolo`, `cellranger` and `cellranger multi`) ([#384](https://github.com/nf-core/scrnaseq/issues/384))
+- Added support for pre-built indexes in `genomes.config` file for `cellranger`, `cellranger-arc`, `simpleaf` and `simpleaf txp2gene` ([#371](https://github.com/nf-core/scrnaseq/issues/371))
 
 ## v2.7.1 - 2024-08-13
 

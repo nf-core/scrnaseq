@@ -29,7 +29,7 @@ fastq_all.mkdir(exist_ok=True)
 # do not match "SRR12345", "file_INFIXR12", etc
 filename_pattern = r"([^a-zA-Z0-9])R1([^a-zA-Z0-9])"
 
-for modality in ["gex", "vdj", "ab", "beam", "cmo", "cirspr"]:
+for modality in ["gex", "vdj", "vdj_b", "vdj_t", "vdj_t_gd", "ab", "beam", "cmo", "cirspr"]:
     # get fastqs, ordered by path. Files are staged into
     #   - "fastq_001/{original_name.fastq.gz}"
     #   - "fastq_002/{original_name.fastq.gz}"
@@ -90,6 +90,9 @@ vdj_reference_path = "${vdj_reference_path}".replace("./", work_dir)
 primer_index = "${primer_index}".replace("./", work_dir)
 fastq_gex = "${fastq_gex}".replace("./", work_dir)
 fastq_vdj = "${fastq_vdj}".replace("./", work_dir)
+fastq_vdj_b = "${fastq_vdj_b}".replace("./", work_dir)
+fastq_vdj_t = "${fastq_vdj_t}".replace("./", work_dir)
+fastq_vdj_t_gd = "${fastq_vdj_t_gd}".replace("./", work_dir)
 fastq_antibody = "${fastq_antibody}".replace("./", work_dir)
 fastq_beam = "${fastq_beam}".replace("./", work_dir)
 fastq_crispr = "${fastq_crispr}".replace("./", work_dir)
@@ -132,6 +135,9 @@ ${vdj_options_r2_length}
 fastq_id,fastqs,lanes,feature_types
 {fastq_gex}
 {fastq_vdj}
+{fastq_vdj_b}
+{fastq_vdj_t}
+{fastq_vdj_t_gd}
 {fastq_antibody}
 {fastq_beam}
 {fastq_crispr}

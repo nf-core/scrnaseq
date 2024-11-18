@@ -40,6 +40,12 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
                     return [ meta, fastq ]
                 vdj: meta.feature_type == "vdj"
                     return [ meta, fastq ]
+                vdj_b: meta.feature_type == "vdj_b"
+                    return [ meta, fastq ]
+                vdj_t: meta.feature_type == "vdj_t"
+                    return [ meta, fastq ]
+                vdj_t_gd: meta.feature_type == "vdj_t_gd"
+                    return [ meta, fastq ]
                 ab: meta.feature_type == "ab"
                     return [ meta, fastq ]
                 beam: meta.feature_type == "beam"
@@ -59,6 +65,27 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
         }
         .first() // convert to value channel to be consumed indefinitely
         .set { ch_faux_vdj_fastq }
+        ch_grouped_fastq.vdj_b.map { meta, fastqs ->
+            def meta_clone = meta.clone()
+            meta_clone.options = "[:]"
+            [meta_clone, empty_file]
+        }
+        .first() // convert to value channel to be consumed indefinitely
+        .set { ch_faux_vdj_b_fastq }
+        ch_grouped_fastq.vdj_t.map { meta, fastqs ->
+            def meta_clone = meta.clone()
+            meta_clone.options = "[:]"
+            [meta_clone, empty_file]
+        }
+        .first() // convert to value channel to be consumed indefinitely
+        .set { ch_faux_vdj_t_fastq }
+        ch_grouped_fastq.vdj_t_gd.map { meta, fastqs ->
+            def meta_clone = meta.clone()
+            meta_clone.options = "[:]"
+            [meta_clone, empty_file]
+        }
+        .first() // convert to value channel to be consumed indefinitely
+        .set { ch_faux_vdj_t_gd_fastq }
         // Add faux CMO channel to first run cellranger without sample demultiplexing
         ch_grouped_fastq.cmo.map { meta, fastqs ->
             def meta_clone = meta.clone()
@@ -135,6 +162,9 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
             ch_grouped_fastq.gex.map{ it[0] },
             ch_grouped_fastq.gex,
             ch_faux_vdj_fastq,
+            ch_faux_vdj_b_fastq,
+            ch_faux_vdj_t_fastq,
+            ch_faux_vdj_t_gd_fastq,
             ch_faux_ab_fastq,
             ch_grouped_fastq.beam,
             ch_grouped_fastq.cmo,
@@ -166,6 +196,9 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
         ch_bamtofastq = extract_gex_fq(BAMTOFASTQ10X.out.fastq)
 
         ch_expanded_vdj = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.vdj, ch_bamtofastq)
+        ch_expanded_vdj_b = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.vdj_b, ch_bamtofastq)
+        ch_expanded_vdj_t = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.vdj_t, ch_bamtofastq)
+        ch_expanded_vdj_t_gd = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.vdj_t_gd, ch_bamtofastq)
         ch_expanded_ab = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.ab, ch_bamtofastq)
         ch_expanded_beam = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.beam, ch_bamtofastq)
         ch_expanded_crispr = expand_feature_by_demultiplexed_samples(ch_grouped_fastq.crispr, ch_bamtofastq)
@@ -177,6 +210,9 @@ workflow CELLRANGER_MULTI_ALIGN_VDJ {
             ch_bamtofastq.map{ it[0] },
             ch_bamtofastq,
             ch_expanded_vdj,
+            ch_expanded_vdj_b,
+            ch_expanded_vdj_t,
+            ch_expanded_vdj_t_gd,
             ch_expanded_ab,
             ch_expanded_beam,
             ch_faux_cmo_fastq,

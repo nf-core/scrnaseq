@@ -270,12 +270,15 @@ workflow SCRNASEQ {
             // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,
             // allowing to have multiple samples in the sheet, having all the data-type tuples initialized,
             // either empty or populated. It will be branched inside the subworkflow.
-            if (!map_collection_clone.any{ it.feature_type == 'gex' })    { map_collection_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
-            if (!map_collection_clone.any{ it.feature_type == 'vdj' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
-            if (!map_collection_clone.any{ it.feature_type == 'ab' })     { map_collection_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
-            if (!map_collection_clone.any{ it.feature_type == 'beam' })   { map_collection_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
-            if (!map_collection_clone.any{ it.feature_type == 'crispr' }) { map_collection_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
-            if (!map_collection_clone.any{ it.feature_type == 'cmo' })    { map_collection_clone.add( [id: sample_id, feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'gex' })      { map_collection_clone.add( [id: sample_id, feature_type: 'gex'     , gex:      empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'vdj' })      { map_collection_clone.add( [id: sample_id, feature_type: 'vdj'     , vdj:      empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'vdj_b' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj_b'   , vdj_b:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'vdj_t' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj_t'   , vdj_t:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'vdj_t_gd' }) { map_collection_clone.add( [id: sample_id, feature_type: 'vdj_t_gd', vdj_t_gd: empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'ab' })       { map_collection_clone.add( [id: sample_id, feature_type: 'ab'      , ab:       empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'beam' })     { map_collection_clone.add( [id: sample_id, feature_type: 'beam'    , beam:     empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
+            if (!map_collection_clone.any{ it.feature_type == 'crispr' })   { map_collection_clone.add( [id: sample_id, feature_type: 'crispr'  , crispr:   empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ it.feature_type == 'cmo' })      { map_collection_clone.add( [id: sample_id, feature_type: 'cmo'     , cmo:      empty_file, options:[:] ] ) }
 
             // return final map
             map_collection_clone
@@ -284,12 +287,28 @@ workflow SCRNASEQ {
 
         // Split channel to either run standard cellranger multi or to run sample demultiplexing followed by immune profiling.
         ch_cellrangermulti_collected_channel.branch { sample ->
-            def vdj_idx = sample.feature_type.findIndexOf{ it == 'vdj'}
+            def vdj_types = []
+            def vdj_indices = []
+            sample.feature_type.eachWithIndex {item, index ->
+                if (item.contains('vdj')) {
+                    vdj_types << item
+                    vdj_indices << index
+                }
+            }
             def cmo_idx = sample.feature_type.findIndexOf{ it == 'cmo'}
+
+            // check if any vdj feature_type is linked to a file, ie is null
+            // otherwise the value is a path to the empty file: assets/EMPTY
+            def vdj_fqs = false
+            vdj_types.eachWithIndex { vdj_type, type_idx ->
+                def vdj_idx = vdj_indices[type_idx]
+                if (sample[vdj_idx][vdj_type] == null) {vdj_fqs = true}
+            }
+
             demux_vdj:
                 // if files are listed for a feature_type, the value is null
                 // otherwise the value is a path to the empty file: assets/EMPTY
-                sample[vdj_idx].vdj == null && sample[cmo_idx].cmo == null
+                vdj_fqs == true && sample[cmo_idx].cmo == null
             demux: true
         }.set { ch_cellrangermulti_collected_channel_branched }
 

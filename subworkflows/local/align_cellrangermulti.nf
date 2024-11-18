@@ -37,6 +37,12 @@ workflow CELLRANGER_MULTI_ALIGN {
                     return [ meta, fastq ]
                 vdj: meta.feature_type == "vdj"
                     return [ meta, fastq ]
+                vdj_b: meta.feature_type == "vdj_b"
+                    return [ meta, fastq ]
+                vdj_t: meta.feature_type == "vdj_t"
+                    return [ meta, fastq ]
+                vdj_t_gd: meta.feature_type == "vdj_t_gd"
+                    return [ meta, fastq ]
                 ab: meta.feature_type == "ab"
                     if (params.fb_reference){
                         return [ meta, fastq ]
@@ -111,6 +117,9 @@ workflow CELLRANGER_MULTI_ALIGN {
             ch_grouped_fastq.gex.map{ it[0] },
             ch_grouped_fastq.gex,
             ch_grouped_fastq.vdj,
+            ch_grouped_fastq.vdj_b,
+            ch_grouped_fastq.vdj_t,
+            ch_grouped_fastq.vdj_t_gd,
             ch_grouped_fastq.ab,
             ch_grouped_fastq.beam,
             ch_grouped_fastq.cmo,

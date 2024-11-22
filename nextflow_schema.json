@@ -142,6 +142,11 @@
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
                     "fa_icon": "fas fa-bookmark"
                 },
+                "save_align_intermeds": {
+                    "type": "boolean",
+                    "description": "Specify this parameter to save the intermediate alignment files (STAR, CellRanger) to the results.",
+                    "fa_icon": "fas fa-bookmark"
+                },
                 "igenomes_base": {
                     "type": "string",
                     "format": "directory-path",

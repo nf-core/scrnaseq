@@ -15,7 +15,7 @@ process MTX_TO_H5AD {
     // for each sample, the sub-folders and files come directly in array.
     tuple val(meta), path(inputs)
     path txp2gene
-    tuple val(meta2), path(star_index)
+    path star_index
     val input_aligner
 
     output:

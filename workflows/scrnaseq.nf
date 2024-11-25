@@ -299,29 +299,12 @@ workflow SCRNASEQ {
     )
     ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
 
-    // fix channel size when kallisto non-standard workflow
-    if (params.aligner == 'kallisto' && !(params.kb_workflow == 'standard')) {
-        ch_h5ads =
-        MTX_TO_H5AD.out.h5ad
-            .transpose()
-            .map { meta, h5ad ->
-                def meta_clone = meta.clone()
-                def spc_prefix = h5ad.toString().contains('unspliced') ? 'un' : ''
-
-                meta_clone["input_type"] = "${meta.input_type}_${spc_prefix}spliced"
-
-                [ meta_clone, h5ad ]
-            }
-    } else {
-        ch_h5ads = MTX_TO_H5AD.out.h5ad
-    }
-
     //
     // SUBWORKFLOW: Run h5ad conversion and concatenation
     //
     ch_emptydrops = Channel.empty()
     H5AD_CONVERSION (
-        ch_h5ads,
+        MTX_TO_H5AD.out.h5ad,
         ch_input
     )
     ch_versions.mix(H5AD_CONVERSION.out.ch_versions)

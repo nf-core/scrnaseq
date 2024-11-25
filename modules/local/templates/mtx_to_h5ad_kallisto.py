@@ -38,7 +38,7 @@ def _add_metadata(adata: AnnData, t2g: str, sample: str):
     # index are gene IDs and symbols are a column
     adata.var["gene_versions"] = adata.var.index
     adata.var.index = adata.var["gene_versions"].str.split(".").str[0].values
-    assert adata.var_names.is_unique, "Gene IDs are expected to be unique"
+    adata.var_names_make_unique() # in case user does not use ensembl references, names might not be unique
 
 
 def format_yaml_like(data: dict, indent: int = 0) -> str:

@@ -3,19 +3,19 @@
         "content": [
             {
                 "stderr": [
-
+                    
                 ],
                 "errorReport": "",
                 "exitStatus": 0,
                 "failed": false,
                 "stdout": [
-
+                    
                 ],
                 "errorMessage": "",
                 "trace": {
                     "tasksFailed": 0,
-                    "tasksCount": 17,
-                    "tasksSucceeded": 17
+                    "tasksCount": 23,
+                    "tasksSucceeded": 23
                 },
                 "name": "workflow",
                 "success": true
@@ -30,15 +30,19 @@
             "matrix.mtx.gz:md5,0ae080bd0002e350531a5816e159345e",
             "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
             "barcodes.tsv.gz:md5,9b695b0b91bcb146ec9c4688ca10a690",
-            "Sample_X_raw_matrix.rds:md5,31604db3e7846acc8d9a60b1a171ce78",
-            "Sample_Y_raw_matrix.rds:md5,1a52c823e91acce2b29621c8c99c8c72",
-            "Sample_X_filtered_matrix.rds:md5,aa2d36dd8507aba864347c88e4ce0d27",
-            "Sample_Y_filtered_matrix.rds:md5,d459af8f99258bcc88b80b2f7c58e911"
+            "Sample_X_raw_matrix.seurat.rds:md5,db2aa4392b23bd2a0cf8261d9fa5ac1e",
+            "Sample_X_raw_matrix.sce.rds:md5,67894a2ca56c5d8f21097e7c93a0c61b",
+            "Sample_Y_raw_matrix.seurat.rds:md5,ea5351c9f871d535c9363aac56fb3e6f",
+            "Sample_Y_raw_matrix.sce.rds:md5,bf0dcb00f76fc190e0cdeac23128bdc4",
+            "Sample_X_filtered_matrix.seurat.rds:md5,97d5b28505fafe07bdec0ff942a782a7",
+            "Sample_X_filtered_matrix.sce.rds:md5,fb72a298bae9dd56bf19f2cf8b56fad8",
+            "Sample_Y_filtered_matrix.seurat.rds:md5,5f1bb403d80a8c2afd099373d20bfba7",
+            "Sample_Y_filtered_matrix.sce.rds:md5,a6887a7577a6121ca0a37f382beae820"
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "23.10.1"
+            "nf-test": "0.9.0",
+            "nextflow": "24.10.1"
         },
-        "timestamp": "2024-02-14T16:30:25.7971791"
+        "timestamp": "2024-11-25T15:19:07.532050762"
     }
 }

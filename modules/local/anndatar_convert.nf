@@ -14,7 +14,7 @@ process ANNDATAR_CONVERT {
     tuple val(meta), path(h5ad)
 
     output:
-    tuple val(meta), path("${meta.id}_${meta.input_type}_matrix.Rds"), emit: rds
+    tuple val(meta), path("${meta.id}_${meta.input_type}_matrix*.rds"), emit: rds
 
     when:
     task.ext.when == null || task.ext.when

@@ -15,7 +15,7 @@ process MTX_TO_H5AD {
     // for each sample, the sub-folders and files come directly in array.
     tuple val(meta), path(inputs)
     path txp2gene
-    path star_index
+    tuple val(meta2), path(star_index)
 
     output:
     tuple val(meta), path("${meta.id}_${meta.input_type}_matrix.h5ad"), emit: h5ad

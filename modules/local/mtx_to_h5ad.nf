@@ -16,6 +16,7 @@ process MTX_TO_H5AD {
     tuple val(meta), path(inputs)
     path txp2gene
     tuple val(meta2), path(star_index)
+    val input_aligner
 
     output:
     tuple val(meta), path("${meta.id}_${meta.input_type}_matrix.h5ad"), emit: h5ad
@@ -25,7 +26,7 @@ process MTX_TO_H5AD {
     task.ext.when == null || task.ext.when
 
     script:
-    def aligner = (params.aligner in [ 'cellranger', 'cellrangerarc', 'cellrangermulti' ]) ? 'cellranger' : params.aligner
+    def aligner = (input_aligner in [ 'cellranger', 'cellrangerarc', 'cellrangermulti' ]) ? 'cellranger' : input_aligner
 
     template "mtx_to_h5ad_${aligner}.py"
 

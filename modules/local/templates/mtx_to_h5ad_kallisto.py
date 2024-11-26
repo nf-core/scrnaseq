@@ -8,6 +8,7 @@ os.environ["NUMBA_CACHE_DIR"] = "."
 import scanpy as sc
 import pandas as pd
 from anndata import AnnData, concat as concat_ad
+from scipy.sparse import csr_matrix
 import platform
 import glob
 
@@ -38,7 +39,7 @@ def _add_metadata(adata: AnnData, t2g: str, sample: str):
     # index are gene IDs and symbols are a column
     adata.var["gene_versions"] = adata.var.index
     adata.var.index = adata.var["gene_versions"].str.split(".").str[0].values
-    adata.var_names_make_unique() # in case user does not use ensembl references, names might not be unique
+    adata.var_names_make_unique()  # in case user does not use ensembl references, names might not be unique
 
 
 def format_yaml_like(data: dict, indent: int = 0) -> str:
@@ -96,16 +97,32 @@ if __name__ == "__main__":
             features=glob.glob("${inputs}/unspliced*.genes.txt")[0],
         )
 
-        # move X into layers
-        spliced.layers["spliced"] = spliced.X
-        spliced.X = None
-        unspliced.layers["unspliced"] = unspliced.X
-        unspliced.X = None
+        # The barcodes of spliced / non-spliced are not necessarily the same.
+        # We fill the missing barcodes with zeros
+        all_barcodes = list(set(unspliced.obs_names) | set(spliced.obs_names))
+        missing_spliced = list(set(unspliced.obs_names) - set(spliced.obs_names))
+        missing_unspliced = list(set(spliced.obs_names) - set(unspliced.obs_names))
+        ad_missing_spliced = AnnData(
+            X=csr_matrix((len(missing_spliced), spliced.shape[1])),
+            obs=pd.DataFrame(index=missing_spliced),
+        )
+        ad_missing_unspliced = AnnData(
+            X=csr_matrix((len(missing_unspliced), spliced.shape[1])),
+            obs=pd.DataFrame(index=missing_unspliced),
+        )
 
-        # outer-join will fill missing values with 0s in case of sparse matrices.
-        adata = concat_ad([spliced, unspliced], join="outer")
-        # X as the sum of spliced and unspliced counts
-        adata.X = adata.layers["spliced"] + adata.layers["unspliced"]
+        spliced = concat_ad([spliced, ad_missing_spliced], join="outer")[
+            all_barcodes, :
+        ]
+        unspliced = concat_ad([unspliced, ad_missing_unspliced], join="outer")[
+            all_barcodes, :
+        ]
+
+        adata = AnnData(
+            X=spliced.X + unspliced.X,
+            layers={"unspliced": unspliced.X, "spliced": spliced.X},
+            obs=pd.DataFrame(index=all_barcodes),
+        )
 
     _add_metadata(adata, t2g="${txp2gene}", sample="${meta.id}")
     adata.write_h5ad("${meta.id}_${meta.input_type}_matrix.h5ad")

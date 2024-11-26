@@ -11,6 +11,7 @@ from anndata import AnnData, concat as concat_ad
 from scipy.sparse import csr_matrix
 import platform
 import glob
+import numpy as np
 
 
 def _mtx_to_adata(
@@ -105,10 +106,12 @@ if __name__ == "__main__":
         ad_missing_spliced = AnnData(
             X=csr_matrix((len(missing_spliced), spliced.shape[1])),
             obs=pd.DataFrame(index=missing_spliced),
+            var=spliced.var,
         )
         ad_missing_unspliced = AnnData(
             X=csr_matrix((len(missing_unspliced), spliced.shape[1])),
             obs=pd.DataFrame(index=missing_unspliced),
+            var=unspliced.var,
         )
 
         spliced = concat_ad([spliced, ad_missing_spliced], join="outer")[
@@ -118,10 +121,13 @@ if __name__ == "__main__":
             all_barcodes, :
         ]
 
+        assert np.all(spliced.var_names == unspliced.var_names)
+
         adata = AnnData(
             X=spliced.X + unspliced.X,
             layers={"unspliced": unspliced.X, "spliced": spliced.X},
             obs=pd.DataFrame(index=all_barcodes),
+            var=pd.DataFrame(index=spliced.var_names),
         )
 
     # out of the conditional: snippet for both standard and non-standard workflows

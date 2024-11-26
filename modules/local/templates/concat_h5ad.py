@@ -7,6 +7,7 @@ os.environ["NUMBA_CACHE_DIR"] = "."
 
 import scanpy as sc, anndata as ad, pandas as pd
 from pathlib import Path
+import platform
 
 
 def read_samplesheet(samplesheet):
@@ -20,6 +21,33 @@ def read_samplesheet(samplesheet):
 
     return df
 
+def format_yaml_like(data: dict, indent: int = 0) -> str:
+    """Formats a dictionary to a YAML-like string.
+    Args:
+        data (dict): The dictionary to format.
+        indent (int): The current indentation level.
+    Returns:
+        str: A string formatted as YAML.
+    """
+    yaml_str = ""
+    for key, value in data.items():
+        spaces = "  " * indent
+        if isinstance(value, dict):
+            yaml_str += f"{spaces}{key}:\\n{format_yaml_like(value, indent + 1)}"
+        else:
+            yaml_str += f"{spaces}{key}: {value}\\n"
+    return yaml_str
+
+def dump_versions():
+    versions = {
+        "${task.process}": {
+            "python": platform.python_version(),
+            "scanpy": sc.__version__,
+        }
+    }
+
+    with open("versions.yml", "w") as f:
+        f.write(format_yaml_like(versions))
 
 if __name__ == "__main__":
 
@@ -37,3 +65,6 @@ if __name__ == "__main__":
     adata.write_h5ad("combined_${meta.input_type}_matrix.h5ad")
 
     print("Wrote h5ad file to {}".format("combined_${meta.input_type}_matrix.h5ad"))
+
+    # dump versions
+    dump_versions()

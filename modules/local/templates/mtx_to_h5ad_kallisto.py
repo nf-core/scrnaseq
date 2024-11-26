@@ -7,6 +7,7 @@ os.environ["NUMBA_CACHE_DIR"] = "."
 
 import scanpy as sc
 import pandas as pd
+import anndata
 from anndata import AnnData, concat as concat_ad
 from scipy.sparse import csr_matrix
 import platform
@@ -67,6 +68,7 @@ def dump_versions():
             "python": platform.python_version(),
             "scanpy": sc.__version__,
             "pandas": pd.__version__,
+            "anndata": anndata.__version__,
         }
     }
 

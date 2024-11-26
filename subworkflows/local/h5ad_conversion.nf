@@ -31,6 +31,7 @@ workflow H5AD_CONVERSION {
             meta_clone.id = 'combined' // maintain output prefix
             [ meta_clone, file ]
         }
+        ch_versions = ch_versions.mix(CONCAT_H5AD.out.versions.first())
 
         //
         // MODULE: Convert to Rds with AnndataR package
@@ -38,9 +39,7 @@ workflow H5AD_CONVERSION {
         ANNDATAR_CONVERT (
             ch_h5ads.mix( ch_h5ad_concat )
         )
-
-        //TODO CONCAT h5ad and MTX to h5ad should also have versions.yaml output
-        // ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions, MTX_TO_SEURAT.out.versions)
+        ch_versions = ch_versions.mix(ANNDATAR_CONVERT.out.versions.first())
 
     emit:
     ch_versions

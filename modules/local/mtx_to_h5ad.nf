@@ -32,7 +32,7 @@ process MTX_TO_H5AD {
 
     stub:
     """
-    touch ${meta.id}_raw_matrix.h5ad
+    touch ${meta.id}_${meta.input_type}_matrix.h5ad
     touch versions.yml
     """
 }

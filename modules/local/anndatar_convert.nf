@@ -15,6 +15,7 @@ process ANNDATAR_CONVERT {
 
     output:
     tuple val(meta), path("${meta.id}_${meta.input_type}_matrix*.rds"), emit: rds
+    path  "versions.yml"                                              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -24,6 +25,7 @@ process ANNDATAR_CONVERT {
 
     stub:
     """
-    touch ${meta.id}.Rds
+    touch ${meta.id}_${meta.input_type}_matrix.Rds
+    touch versions.yml
     """
 }

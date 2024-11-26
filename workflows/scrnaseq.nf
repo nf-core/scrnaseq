@@ -307,7 +307,7 @@ workflow SCRNASEQ {
         MTX_TO_H5AD.out.h5ad,
         ch_input
     )
-    ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
+    ch_versions = ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
 
     //
     // SUBWORKFLOW: Run cellbender emptydrops filter

@@ -8,6 +8,7 @@ os.environ["NUMBA_CACHE_DIR"] = "."
 import scanpy as sc
 import pandas as pd
 import argparse
+import anndata
 from anndata import AnnData
 import platform
 
@@ -49,7 +50,8 @@ def dump_versions():
         "${task.process}": {
             "python": platform.python_version(),
             "scanpy": sc.__version__,
-            "pandas": pd.__version__
+            "pandas": pd.__version__,
+            "anndata": anndata.__version__,
         }
     }
 

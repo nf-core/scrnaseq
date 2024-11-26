@@ -18,6 +18,7 @@ process CONCAT_H5AD {
 
     output:
     tuple val(meta), path("*.h5ad"), emit: h5ad
+    path  "versions.yml"           , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -28,5 +29,6 @@ process CONCAT_H5AD {
     stub:
     """
     touch combined_matrix.h5ad
+    touch versions.yml
     """
 }

@@ -14,8 +14,8 @@
                 "errorMessage": "",
                 "trace": {
                     "tasksFailed": 0,
-                    "tasksCount": 18,
-                    "tasksSucceeded": 18
+                    "tasksCount": 24,
+                    "tasksSucceeded": 24
                 },
                 "name": "workflow",
                 "success": true
@@ -32,15 +32,19 @@
             "barcodes.tsv.gz:md5,081f72b5252ccaf5ffd535ffbd235c4c",
             "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
             "matrix.mtx.gz:md5,58182db2706d532ec970526de3d3b70f",
-            "Sample_X_raw_matrix.rds:md5,306a5477ace4d43d851b8389fdfeaf1f",
-            "Sample_Y_raw_matrix.rds:md5,74b31532da4cae5a8197d690021d77fc",
-            "Sample_X_filtered_matrix.rds:md5,f9191ba575a3ab79ada4807715f18573",
-            "Sample_Y_filtered_matrix.rds:md5,7be3f7b29d668dcf7e951b9f4d371a5e"
+            "Sample_X_raw_matrix.seurat.rds:md5,9313e78e79afc6003c75033529d1a9dd",
+            "Sample_X_raw_matrix.sce.rds:md5,e834517ca64a5c3f84265a6aa287086b",
+            "Sample_Y_raw_matrix.seurat.rds:md5,e6a9898842cd9090c2608795a8e266ee",
+            "Sample_Y_raw_matrix.sce.rds:md5,d8aaa5c6ffd2092b27716c6106b047e9",
+            "Sample_X_filtered_matrix.seurat.rds:md5,68c0f673aeb8b8391930e534ca0b2653",
+            "Sample_X_filtered_matrix.sce.rds:md5,52619bbf52478c4fdca8cb62606a567c",
+            "Sample_Y_filtered_matrix.seurat.rds:md5,bbb40897f4fabf9db1124e4fc28b624e",
+            "Sample_Y_filtered_matrix.sce.rds:md5,aa47704a2d43addbe37cb63cf977ac7b"
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "23.10.1"
+            "nf-test": "0.9.0",
+            "nextflow": "24.10.1"
         },
-        "timestamp": "2024-04-16T09:43:45.32298954"
+        "timestamp": "2024-11-26T09:27:10.525261276"
     }
 }

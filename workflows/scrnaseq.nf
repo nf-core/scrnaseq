@@ -294,7 +294,7 @@ workflow SCRNASEQ {
     MTX_TO_H5AD (
         ch_mtx_matrices,
         ch_txp2gene,
-        star_index ? ch_star_index : [],
+        star_index ? ch_star_index.map{it[1]} : [],
         params.aligner
     )
     ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())

@@ -14,8 +14,8 @@
                 "errorMessage": "",
                 "trace": {
                     "tasksFailed": 0,
-                    "tasksCount": 12,
-                    "tasksSucceeded": 12
+                    "tasksCount": 15,
+                    "tasksSucceeded": 15
                 },
                 "name": "workflow",
                 "success": true
@@ -26,13 +26,15 @@
             "cells_x_genes.barcodes.txt:md5,a8cf7ea4b2d075296a94bf066a64b7a4",
             "cells_x_genes.genes.txt:md5,acd9d00120f52031974b2add3e7521b6",
             "cells_x_genes.mtx:md5,abd83de117204d0a77df3c92d00cc025",
-            "Sample_X_raw_matrix.rds:md5,0938f4189b7a7fd1030abfcee798741c",
-            "Sample_Y_raw_matrix.rds:md5,93c12abe283ab37c5f37e5cd3cb25302"
+            "Sample_X_raw_matrix.seurat.rds:md5,2e93382c175b6b4f4a94e3a88f8a7190",
+            "Sample_X_raw_matrix.sce.rds:md5,27069a3772fbe4f6577d7ec0ddf29666",
+            "Sample_Y_raw_matrix.seurat.rds:md5,74f16124176dee919ca91d9890254b39",
+            "Sample_Y_raw_matrix.sce.rds:md5,584e0a2dc64798bc8a4e5a070d8a90bc"
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "23.10.1"
+            "nf-test": "0.9.0",
+            "nextflow": "24.10.1"
         },
-        "timestamp": "2024-03-18T14:51:42.040931572"
+        "timestamp": "2024-11-26T11:00:26.349961551"
     }
 }

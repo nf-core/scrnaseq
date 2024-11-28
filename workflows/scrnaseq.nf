@@ -63,12 +63,12 @@ workflow SCRNASEQ {
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
     ch_motifs = params.motifs ? file(params.motifs) : []
     ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
-    ch_txp2gene = txp2gene ? file(txp2gene) : []
+    ch_txp2gene = txp2gene ? file(txp2gene, checkIfExists: true) : []
     ch_multiqc_files = Channel.empty()
     if (params.barcode_whitelist) {
-        ch_barcode_whitelist = file(params.barcode_whitelist)
+        ch_barcode_whitelist = file(params.barcode_whitelist, checkIfExists: true)
     } else if (protocol_config.containsKey("whitelist")) {
-        ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}")
+        ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
     } else {
         ch_barcode_whitelist = []
     }
@@ -78,13 +78,13 @@ workflow SCRNASEQ {
     ch_input = file(params.input)
 
     //kallisto params
-    ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
+    ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index, checkIfExists: true) : []
     kb_workflow = params.kb_workflow
-    kb_t1c = params.kb_t1c ? file(params.kb_t1c) : []
-    kb_t2c = params.kb_t2c ? file(params.kb_t2c) : []
+    kb_t1c = params.kb_t1c ? file(params.kb_t1c, checkIfExists: true) : []
+    kb_t2c = params.kb_t2c ? file(params.kb_t2c, checkIfExists: true) : []
 
     //salmon params
-    ch_salmon_index = salmon_index ? file(salmon_index) : []
+    ch_salmon_index = salmon_index ? file(salmon_index, checkIfExists: true) : []
 
     //star params
     star_index = star_index ? file(star_index, checkIfExists: true) : null
@@ -92,10 +92,10 @@ workflow SCRNASEQ {
     star_feature = params.star_feature
 
     //cellranger params
-    ch_cellranger_index = cellranger_index ? file(cellranger_index) : []
+    ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
 
     //universc params
-    ch_universc_index = params.universc_index ? file(params.universc_index) : []
+    ch_universc_index = params.universc_index ? file(params.universc_index, checkIfExists: true) : []
 
     //cellrangermulti params
     cellranger_vdj_index              = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []

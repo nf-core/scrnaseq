@@ -40,28 +40,30 @@ workflow SCRNASEQ {
     }
 
     // collect paths from genome attributes file (e.g. iGenomes.config; optional)
-    params.fasta            = getGenomeAttribute('fasta')
-    params.gtf              = getGenomeAttribute('gtf')
-    params.star_index       = getGenomeAttribute('star')
-    params.salmon_index     = getGenomeAttribute('simpleaf')
-    params.txp2gene         = getGenomeAttribute('simpleaf_tx2pgene')
+    // we cannot overwrite params in the workflow (they stay null as coming from the config file)
+    def genome_fasta = params.fasta        ?: getGenomeAttribute('fasta')
+    def gtf          = params.gtf          ?: getGenomeAttribute('gtf')
+    def star_index   = params.star_index   ?: getGenomeAttribute('star')
+    def salmon_index = params.salmon_index ?: getGenomeAttribute('simpleaf')
+    def txp2gene     = params.txp2gene     ?: getGenomeAttribute('simpleaf_tx2pgene')
 
     // Make cellranger or cellranger-arc index conditional
+    def cellranger_index = []
     if (params.aligner in ["cellranger", "cellrangermulti"]){
-        params.cellranger_index = getGenomeAttribute('cellranger')
+        cellranger_index = params.cellranger_index ?: getGenomeAttribute('cellranger')
     }
     else if (params.aligner == "cellrangerarc") {
-        params.cellranger_index = getGenomeAttribute('cellrangerarc')
+        cellranger_index = params.cellranger_index ?: getGenomeAttribute('cellrangerarc')
     }
 
-    ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : []
-    ch_gtf = params.gtf ? file(params.gtf, checkIfExists: true) : []
+    ch_genome_fasta = genome_fasta ? file(genome_fasta, checkIfExists: true) : []
+    ch_gtf = gtf ? file(gtf, checkIfExists: true) : []
 
     // general input and params
     ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
     ch_motifs = params.motifs ? file(params.motifs) : []
     ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
-    ch_txp2gene = params.txp2gene ? file(params.txp2gene) : []
+    ch_txp2gene = txp2gene ? file(txp2gene) : []
     ch_multiqc_files = Channel.empty()
     if (params.barcode_whitelist) {
         ch_barcode_whitelist = file(params.barcode_whitelist)
@@ -71,12 +73,6 @@ workflow SCRNASEQ {
         ch_barcode_whitelist = []
     }
 
-    //kallisto params
-    ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
-    kb_workflow = params.kb_workflow
-    kb_t1c = params.kb_t1c ? file(params.kb_t1c) : []
-    kb_t2c = params.kb_t2c ? file(params.kb_t2c) : []
-
     // samplesheet - this is passed to the MTX conversion functions to add metadata to the
     // AnnData objects.
     ch_input = file(params.input)
@@ -84,9 +80,11 @@ workflow SCRNASEQ {
     //kallisto params
     ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index) : []
     kb_workflow = params.kb_workflow
+    kb_t1c = params.kb_t1c ? file(params.kb_t1c) : []
+    kb_t2c = params.kb_t2c ? file(params.kb_t2c) : []
 
     //salmon params
-    ch_salmon_index = params.salmon_index ? file(params.salmon_index) : []
+    ch_salmon_index = salmon_index ? file(salmon_index) : []
 
     //star params
     star_index = star_index ? file(star_index, checkIfExists: true) : null
@@ -94,7 +92,7 @@ workflow SCRNASEQ {
     star_feature = params.star_feature
 
     //cellranger params
-    ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index) : []
+    ch_cellranger_index = cellranger_index ? file(cellranger_index) : []
 
     //universc params
     ch_universc_index = params.universc_index ? file(params.universc_index) : []
@@ -117,8 +115,8 @@ workflow SCRNASEQ {
     //
     // Uncompress genome fasta file if required
     //
-    if (ch_genome_fasta) {
-        if (ch_genome_fasta.endsWith('.gz')) {
+    if (genome_fasta) {
+        if (genome_fasta.endsWith('.gz')) {
             ch_genome_fasta    = GUNZIP_FASTA ( [ [:], ch_genome_fasta ] ).gunzip.map { it[1] }
             ch_versions        = ch_versions.mix(GUNZIP_FASTA.out.versions)
         } else {
@@ -129,8 +127,8 @@ workflow SCRNASEQ {
     //
     // Uncompress GTF annotation file or create from GFF3 if required
     //
-    if (ch_gtf) {
-        if (ch_gtf.endsWith('.gz')) {
+    if (gtf) {
+        if (gtf.endsWith('.gz')) {
             ch_gtf      = GUNZIP_GTF ( [ [:], ch_gtf ] ).gunzip.map { it[1] }
             ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
         } else {

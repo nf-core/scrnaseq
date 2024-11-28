@@ -1,25 +1,6 @@
 {
     "test-dataset_cellranger_aligner": {
         "content": [
-            {
-                "stderr": [
-                    
-                ],
-                "errorReport": "",
-                "exitStatus": 0,
-                "failed": false,
-                "stdout": [
-                    
-                ],
-                "errorMessage": "",
-                "trace": {
-                    "tasksFailed": 0,
-                    "tasksCount": 24,
-                    "tasksSucceeded": 24
-                },
-                "name": "workflow",
-                "success": true
-            },
             "barcodes.tsv.gz:md5,fe6e51564b4405b37ca8604a844b1f2e",
             "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
             "matrix.mtx.gz:md5,1528b9b0fccc78dec95695928e42e710",

@@ -1,10 +1,10 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/scrnaseq/master/nextflow_schema.json",
     "title": "nf-core/scrnaseq pipeline parameters",
     "description": "Pipeline for processing 10x Genomics single cell rnaseq data",
     "type": "object",
-    "definitions": {
+    "$defs": {
         "input_output_options": {
             "title": "Input/output options",
             "type": "object",
@@ -59,7 +59,7 @@
                     "type": "string",
                     "description": "Name of the tool to use for scRNA (pseudo-) alignment.",
                     "default": "alevin",
-                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon Alevin + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon + Alevin-fry + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
                     "enum": ["kallisto", "star", "alevin", "cellranger", "universc", "cellrangerarc", "cellrangermulti"]
                 },
@@ -142,6 +142,11 @@
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
                     "fa_icon": "fas fa-bookmark"
                 },
+                "save_align_intermeds": {
+                    "type": "boolean",
+                    "description": "Specify this parameter to save the intermediate alignment files (STAR, CellRanger) to the results.",
+                    "fa_icon": "fas fa-bookmark"
+                },
                 "igenomes_base": {
                     "type": "string",
                     "format": "directory-path",
@@ -153,7 +158,7 @@
             }
         },
         "alevin_options": {
-            "title": "Alevin Options",
+            "title": "Alevin-fry Options",
             "type": "object",
             "description": "",
             "default": "",
@@ -167,8 +172,7 @@
                 },
                 "txp2gene": {
                     "type": "string",
-                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Salmon Alevin and AlevinQC.",
-                    "help_text": "> This is only used by the Salmon Alevin workflow.",
+                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Alevin-fry and AlevinQC.",
                     "fa_icon": "fas fa-map-marked-alt",
                     "format": "file-path",
                     "exists": true
@@ -417,41 +421,6 @@
                 }
             }
         },
-        "max_job_request_options": {
-            "title": "Max job request options",
-            "type": "object",
-            "fa_icon": "fab fa-acquisitions-incorporated",
-            "description": "Set the top limit for requested resources for any single job.",
-            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details.",
-            "properties": {
-                "max_cpus": {
-                    "type": "integer",
-                    "description": "Maximum number of CPUs that can be requested for any single job.",
-                    "default": 16,
-                    "fa_icon": "fas fa-microchip",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
-                },
-                "max_memory": {
-                    "type": "string",
-                    "description": "Maximum amount of memory that can be requested for any single job.",
-                    "default": "128.GB",
-                    "fa_icon": "fas fa-memory",
-                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
-                },
-                "max_time": {
-                    "type": "string",
-                    "description": "Maximum amount of time that can be requested for any single job.",
-                    "default": "240.h",
-                    "fa_icon": "far fa-clock",
-                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
-                }
-            }
-        },
         "generic_options": {
             "title": "Generic options",
             "type": "object",
@@ -459,12 +428,6 @@
             "description": "Less common options for the pipeline, typically set in a config file.",
             "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
-                "help": {
-                    "type": "boolean",
-                    "description": "Display help text.",
-                    "fa_icon": "fas fa-question-circle",
-                    "hidden": true
-                },
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",
@@ -541,27 +504,6 @@
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
-                "validationShowHiddenParams": {
-                    "type": "boolean",
-                    "fa_icon": "far fa-eye-slash",
-                    "description": "Show all params when using `--help`",
-                    "hidden": true,
-                    "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
-                },
-                "validationFailUnrecognisedParams": {
-                    "type": "boolean",
-                    "fa_icon": "far fa-check-circle",
-                    "description": "Validation of parameters fails when an unrecognised parameter is found.",
-                    "hidden": true,
-                    "help_text": "By default, when an unrecognised parameter is found, it returns a warinig."
-                },
-                "validationLenientMode": {
-                    "type": "boolean",
-                    "fa_icon": "far fa-check-circle",
-                    "description": "Validation of parameters in lenient more.",
-                    "hidden": true,
-                    "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
-                },
                 "pipelines_testdata_base_path": {
                     "type": "string",
                     "fa_icon": "far fa-check-circle",
@@ -574,46 +516,43 @@
     },
     "allOf": [
         {
-            "$ref": "#/definitions/input_output_options"
+            "$ref": "#/$defs/input_output_options"
         },
         {
-            "$ref": "#/definitions/mandatory_arguments"
+            "$ref": "#/$defs/mandatory_arguments"
         },
         {
-            "$ref": "#/definitions/skip_tools"
+            "$ref": "#/$defs/skip_tools"
         },
         {
-            "$ref": "#/definitions/reference_genome_options"
+            "$ref": "#/$defs/reference_genome_options"
         },
         {
-            "$ref": "#/definitions/alevin_options"
+            "$ref": "#/$defs/alevin_options"
         },
         {
-            "$ref": "#/definitions/starsolo_options"
+            "$ref": "#/$defs/starsolo_options"
         },
         {
-            "$ref": "#/definitions/kallisto_bus_options"
+            "$ref": "#/$defs/kallisto_bus_options"
         },
         {
-            "$ref": "#/definitions/cellranger_options"
+            "$ref": "#/$defs/cellranger_options"
         },
         {
-            "$ref": "#/definitions/cellrangerarc_options"
+            "$ref": "#/$defs/cellrangerarc_options"
         },
         {
-            "$ref": "#/definitions/universc_options"
+            "$ref": "#/$defs/universc_options"
         },
         {
-            "$ref": "#/definitions/cellranger_multi_options"
+            "$ref": "#/$defs/cellranger_multi_options"
         },
         {
-            "$ref": "#/definitions/institutional_config_options"
+            "$ref": "#/$defs/institutional_config_options"
         },
         {
-            "$ref": "#/definitions/max_job_request_options"
-        },
-        {
-            "$ref": "#/definitions/generic_options"
+            "$ref": "#/$defs/generic_options"
         }
     ]
 }

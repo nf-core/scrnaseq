@@ -10,11 +10,6 @@ nextflow_pipeline {
             params {
                 aligner    = 'alevin'
                 outdir     = "${outputDir}/results_alevin"
-
-                // Limit resources so that this can run on GitHub Actions -- for some reason it had not been taken from shared config
-                max_cpus   = 2
-                max_memory = '6.GB'
-                max_time   = '6.h'
             }
         }
 
@@ -50,7 +45,6 @@ nextflow_pipeline {
                 // Check if files are the same
                 //
                 {assert snapshot(
-                    workflow,
                     path( "${outputDir}/results_alevin/alevin/Sample_X/Sample_X_alevin_results/af_quant/alevin/quants_mat_cols.txt" ),
                     path( "${outputDir}/results_alevin/alevin/Sample_X/Sample_X_alevin_results/af_quant/alevin/quants_mat.mtx" ),
                     path( "${outputDir}/results_alevin/alevin/Sample_X/Sample_X_alevin_results/af_quant/alevin/quants_mat_rows.txt" ),

@@ -6,6 +6,7 @@ results/
 testing/
 testing*
 *.pyc
+null/
 log/
 reports/
 testme.sh

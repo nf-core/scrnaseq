@@ -1,6 +1,10 @@
 include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/removebackground'
 include { ADATA_BARCODES              } from '../../modules/local/adata_barcodes'
 
+//
+// TODO: Make it a nf-core subworkflow to be shared by scrnaseq and scdownstream pipelines.
+//
+
 workflow EMPTY_DROPLET_REMOVAL {
     take:
     ch_unfiltered

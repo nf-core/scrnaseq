@@ -13,19 +13,19 @@
             "barcodes.tsv.gz:md5,081f72b5252ccaf5ffd535ffbd235c4c",
             "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
             "matrix.mtx.gz:md5,58182db2706d532ec970526de3d3b70f",
-            "Sample_X_raw_matrix.seurat.rds:md5,9313e78e79afc6003c75033529d1a9dd",
-            "Sample_X_raw_matrix.sce.rds:md5,e834517ca64a5c3f84265a6aa287086b",
-            "Sample_Y_raw_matrix.seurat.rds:md5,e6a9898842cd9090c2608795a8e266ee",
-            "Sample_Y_raw_matrix.sce.rds:md5,d8aaa5c6ffd2092b27716c6106b047e9",
-            "Sample_X_filtered_matrix.seurat.rds:md5,68c0f673aeb8b8391930e534ca0b2653",
-            "Sample_X_filtered_matrix.sce.rds:md5,52619bbf52478c4fdca8cb62606a567c",
-            "Sample_Y_filtered_matrix.seurat.rds:md5,bbb40897f4fabf9db1124e4fc28b624e",
-            "Sample_Y_filtered_matrix.sce.rds:md5,aa47704a2d43addbe37cb63cf977ac7b"
+            "Sample_X_raw_matrix.seurat.rds:md5,155faccf5164a5c56819b267dee0ebb1",
+            "Sample_X_raw_matrix.sce.rds:md5,4bfef42037307e73f0135abb2373a21e",
+            "Sample_Y_raw_matrix.seurat.rds:md5,3f4a3e6529b10c646fd08173d5baa339",
+            "Sample_Y_raw_matrix.sce.rds:md5,061ab8ba3ed28e6312c0367a2a9dfeb3",
+            "Sample_X_filtered_matrix.seurat.rds:md5,847448239100d08e3ca44017f93ca05d",
+            "Sample_X_filtered_matrix.sce.rds:md5,797244c2cd63f2b814f2a0cd6c3f080e",
+            "Sample_Y_filtered_matrix.seurat.rds:md5,50e765e4559c94edd23b123f9232075f",
+            "Sample_Y_filtered_matrix.sce.rds:md5,dcf9ce35fba58c2b04ca72703b483804"
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "24.10.1"
+            "nextflow": "24.10.2"
         },
-        "timestamp": "2024-11-26T09:27:10.525261276"
+        "timestamp": "2024-11-29T07:53:03.653246538"
     }
 }

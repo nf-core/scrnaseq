@@ -90,7 +90,7 @@
                 },
                 "skip_emptydrops": {
                     "type": "boolean",
-                    "description": "Skip custom empty drops filter module"
+                    "description": "Skip cellbender empty drops filter subworkflow"
                 }
             }
         },

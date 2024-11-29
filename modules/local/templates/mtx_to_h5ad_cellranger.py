@@ -11,6 +11,7 @@ import argparse
 import anndata
 from anndata import AnnData
 import platform
+import glob
 
 def _mtx_to_adata(
     input: str,
@@ -92,7 +93,7 @@ os.makedirs("${meta.id}", exist_ok=True)
 
 # input_type comes from NF module
 adata = input_to_adata(
-    input_data="${meta.input_type}_feature_bc_matrix.h5",
+    input_data=glob.glob("*${meta.input_type}_feature_bc_matrix.h5")[0], # cellrangermulti has 'sample_' as prefix
     output="${meta.id}_${meta.input_type}_matrix.h5ad",
     sample="${meta.id}"
 )

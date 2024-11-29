@@ -8,7 +8,7 @@ process ANNDATAR_CONVERT {
 
     label 'process_medium'
 
-    container "docker.io/fmalmeida/anndatar:dev" // TODO: Fix
+    container "docker.io/nfcore/anndatar:20241129"
 
     input:
     tuple val(meta), path(h5ad)

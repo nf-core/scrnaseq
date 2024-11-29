@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Subset h5ad to a predefined set of barcodes"""
 
 import platform
 import anndata as ad

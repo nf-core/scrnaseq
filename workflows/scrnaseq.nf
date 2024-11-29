@@ -43,7 +43,7 @@ workflow SCRNASEQ {
     // we cannot overwrite params in the workflow (they stay null as coming from the config file)
     def genome_fasta = params.fasta        ?: getGenomeAttribute('fasta')
     def gtf          = params.gtf          ?: getGenomeAttribute('gtf')
-    def star_index   = params.star_index   ?: getGenomeAttribute('star')
+    def star_index   = params.star_index   // ?: getGenomeAttribute('star') TODO: Currently not fetching iGenomes star index due version incompatibility
     def salmon_index = params.salmon_index ?: getGenomeAttribute('simpleaf')
     def txp2gene     = params.txp2gene     ?: getGenomeAttribute('simpleaf_tx2pgene')
 

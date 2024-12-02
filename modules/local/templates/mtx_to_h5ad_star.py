@@ -67,6 +67,7 @@ def input_to_adata(
     adata.var["gene_symbol"] = adata.var.index
     adata.var['gene_versions'] = adata.var["gene_ids"]
     adata.var.index = adata.var['gene_versions'].str.split('.').str[0].values
+    adata.var_names_make_unique()  # in case user does not use ensembl references, names might not be unique
 
     # write results
     adata.write_h5ad(f"{output}")

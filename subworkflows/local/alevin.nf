@@ -1,11 +1,11 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { GFFREAD_TRANSCRIPTOME }             from '../../modules/local/gffread_transcriptome'
-include { ALEVINQC              }             from '../../modules/local/alevinqc'
-include { SIMPLEAF_INDEX        }             from '../../modules/local/simpleaf_index'
-include { SIMPLEAF_QUANT        }             from '../../modules/local/simpleaf_quant'
+include { GFFREAD_TRANSCRIPTOME } from '../../modules/local/gffread_transcriptome'
+include { ALEVINQC              } from '../../modules/local/alevinqc'
+include { SIMPLEAF_INDEX        } from '../../modules/local/simpleaf_index'
+include { SIMPLEAF_QUANT        } from '../../modules/local/simpleaf_quant'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
+include { GUNZIP                      } from '../../modules/nf-core/gunzip/main'
 include { GFFREAD as GFFREAD_TXP2GENE } from '../../modules/nf-core/gffread/main'
 
 def multiqc_report    = []
@@ -44,8 +44,6 @@ workflow SCRNASEQ_ALEVIN {
         }
     }
 
-
-
     /*
     * Perform quantification with salmon alevin
     */
@@ -66,6 +64,6 @@ workflow SCRNASEQ_ALEVIN {
 
     emit:
     ch_versions
-    alevin_results = SIMPLEAF_QUANT.out.alevin_results
-    alevinqc = ALEVINQC.out.report
+    alevin_results = SIMPLEAF_QUANT.out.alevin_results.map{ meta, files -> [meta + [input_type: 'raw'], files] }
+    alevinqc       = ALEVINQC.out.report
 }

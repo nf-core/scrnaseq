@@ -25,13 +25,13 @@ nextflow_pipeline {
                 {assert workflow.success},
 
                 // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 18},
+                {assert workflow.trace.tasks().size() == 24},
 
                 // How many results were produced?
                 {assert path("${outputDir}/results_cellranger").list().size() == 4},
                 {assert path("${outputDir}/results_cellranger/cellranger").list().size() == 4},
-                {assert path("${outputDir}/results_cellranger/cellranger/mtx_conversions").list().size() == 5},
-                {assert path("${outputDir}/results_cellranger/cellranger/count").list().size() == 3},
+                {assert path("${outputDir}/results_cellranger/cellranger/mtx_conversions").list().size() == 8},
+                {assert path("${outputDir}/results_cellranger/cellranger/count").list().size() == 2},
                 {assert path("${outputDir}/results_cellranger/fastqc").list().size() == 12},
                 {assert path("${outputDir}/results_cellranger/multiqc").list().size() == 3},
 
@@ -49,20 +49,24 @@ nextflow_pipeline {
                 {assert snapshot(
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ),
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/features.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/matrix.mtx.gz" ),
+                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/matrix.mtx.gz"   ),
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ),
                     path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/features.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/matrix.mtx.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/barcodes.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/features.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/matrix.mtx.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/barcodes.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/features.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/matrix.mtx.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_raw_matrix.rds" ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.rds" ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_filtered_matrix.rds" ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.rds" )
+                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/matrix.mtx.gz"   ),
+                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/barcodes.tsv.gz"      ),
+                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/features.tsv.gz"      ),
+                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/matrix.mtx.gz"        ),
+                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/barcodes.tsv.gz"      ),
+                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/features.tsv.gz"      ),
+                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/matrix.mtx.gz"        ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_raw_matrix.seurat.rds"        ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_raw_matrix.sce.rds"           ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.seurat.rds"        ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.sce.rds"           ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_filtered_matrix.seurat.rds"   ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_filtered_matrix.sce.rds"      ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.seurat.rds"   ),
+                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.sce.rds"      )
                 ).match()}
 
             ) // end of assertAll()

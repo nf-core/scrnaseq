@@ -1,4 +1,9 @@
 process GTF_GENE_FILTER {
+
+    //
+    // This module executes a custom script to filter input gtf to contain only annotations present in input genome
+    //
+
     tag "$fasta"
     label 'process_low'
 

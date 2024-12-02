@@ -199,9 +199,12 @@ def getGenomeAttribute(attribute) {
     if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
         if (params.genomes[ params.genome ].containsKey(attribute)) {
             return params.genomes[ params.genome ][ attribute ]
+        } else {
+            return null
         }
+    } else {
+        return null
     }
-    return null
 }
 
 //

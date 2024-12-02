@@ -1,4 +1,9 @@
 process STAR_ALIGN {
+
+    //
+    // This module executes STAR align quantification
+    //
+
     tag "$meta.id"
     label 'process_high'
 

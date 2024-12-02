@@ -1,4 +1,9 @@
 process SIMPLEAF_INDEX {
+
+    //
+    // This module executes simpleaf to generate alevin genome index
+    //
+
     tag "$transcript_gtf"
     label "process_medium"
 

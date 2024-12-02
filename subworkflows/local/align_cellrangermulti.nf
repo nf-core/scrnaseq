@@ -204,8 +204,9 @@ workflow CELLRANGER_MULTI_ALIGN {
 
     emit:
         ch_versions
-        cellrangermulti_out = CELLRANGER_MULTI.out.outs
-        cellrangermulti_mtx = ch_matrices_raw.mix( ch_matrices_filtered )
+        cellrangermulti_out          = CELLRANGER_MULTI.out.outs
+        cellrangermulti_mtx_raw      = ch_matrices_raw
+        cellrangermulti_mtx_filtered = ch_matrices_filtered
 }
 
 def parse_demultiplexed_output_channels(in_ch, pattern) {
@@ -218,6 +219,7 @@ def parse_demultiplexed_output_channels(in_ch, pattern) {
     .transpose()         // transpose for handling one meta/file pair at a time
     .map { meta, mtx_files ->
         def meta_clone = meta.clone()
+        meta_clone.input_type = pattern.contains('raw_') ? 'raw' : 'filtered' // add metadata for conversion workflow
         if ( mtx_files.toString().contains("per_sample_outs") ) {
             def demultiplexed_sample_id = mtx_files.toString().split('/per_sample_outs/')[1].split('/')[0]
             meta_clone.id = demultiplexed_sample_id.toString()

@@ -85,11 +85,6 @@
                         "git_sha": "46eca555142d6e597729fcb682adcc791796f514",
                         "installed_by": ["modules"]
                     },
-                    "universc": {
-                        "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
-                        "installed_by": ["modules"]
-                    },
                     "unzip": {
                         "branch": "master",
                         "git_sha": "b0c3ff2485534c09d9debbf20125d9c6b72ce118",

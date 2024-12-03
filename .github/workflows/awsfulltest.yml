@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        aligner: ["alevin", "kallisto", "star", "cellranger", "universc"]
+        aligner: ["alevin", "kallisto", "star", "cellranger"]
     steps:
       - uses: octokit/request-action@v2.x
         id: check_approvals

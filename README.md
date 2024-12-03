@@ -29,7 +29,6 @@ This is a community effort in building a pipeline capable to support:
 - STARSolo
 - Kallisto + BUStools
 - Cellranger
-- UniverSC
 
 ## Documentation
 
@@ -63,7 +62,7 @@ nextflow run nf-core/scrnaseq \
    --genome_fasta GRCm38.p6.genome.chr19.fa \
    --gtf gencode.vM19.annotation.chr19.gtf \
    --protocol 10XV2 \
-   --aligner <alevin/kallisto/star/cellranger/universc> \
+   --aligner <alevin/kallisto/star/cellranger> \
    --outdir <OUTDIR>
 ```
 
@@ -82,7 +81,6 @@ graph TD
     A[sc RNA] -->|CellRanger| B(h5ad/seurat/mtx matrices)
     A[sc RNA] -->|kbpython| B(h5ad/seurat/mtx matrices)
     A[sc RNA] -->|STARsolo| B(h5ad/seurat/mtx matrices)
-    A[sc RNA] -->|Universc| B(h5ad/seurat/mtx matrices)
 ```
 
 Options for the respective alignment method can be found [here](https://github.com/nf-core/scrnaseq/blob/dev/docs/usage.md#aligning-options) to choose between methods.

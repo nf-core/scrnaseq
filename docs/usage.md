@@ -58,10 +58,8 @@ Other aligner options for running the pipeline are:
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
   - `--aligner cellranger`
 - [Cellranger Multi](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-5p-multi#what) to perform the alignment and downstream analysis of samples with multiple libraries at the same time using Feature Barcode technology that enables simultaneous profiling of the V(D)J repertoire, cell surface protein, antigen, and gene expression (GEX) data.
-- [UniverSC](https://github.com/minoda-lab/universc) to run an open-source version of Cell Ranger on any technology
-  - '--aligner universc`
 
-### If using cellranger or universc
+### If using cellranger
 
 This pipeline automatically renames input FASTQ files to follow the
 [naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
@@ -75,7 +73,6 @@ For more details, see
 - [this issue](https://github.com/nf-core/scrnaseq/issues/241), discussing various mechanisms to deal with non-conformant filenames
 - [the README of the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/README.md) which demonstrates that renaming files does not affect the results.
 - [the code for renaming files in the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/templates/cellranger_count.py)
-- [the code for renaming files in UniverSC](https://github.com/minoda-lab/universc/blob/99a20652430c1dc9f962536a2793536f643810b7/launch_universc.sh#L1411-L1609)
 
 As a sanity check, we verify that filenames of a pair of FASTQ files only differ by `R1`/`R2`.
 
@@ -105,12 +102,6 @@ For more details, please refer to the [Kallisto/bustools documentation](https://
 Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slighly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
 
 For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614).
-
-#### UniverSC
-
-See the [UniverSC GitHub page](https://github.com/minoda-lab/universc#pre-set-configurations) for all supported protocols.
-
-Currently only 3\' scRNA-Seq parameters are supported in nextflow, although chemistry parameters for 5\' scRNA-Seq and full-length scRNA-Seq libraries are supported by teh container.
 
 ### If using cellranger-arc
 

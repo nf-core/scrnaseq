@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Remove universc workflow from pipeline ([#289](https://github.com/nf-core/scrnaseq/issues/289))
 - Add `--save_align_intermeds` parameter that publishes BAM files to the output directory (for `starsolo`, `cellranger` and `cellranger multi`) ([#384](https://github.com/nf-core/scrnaseq/issues/384))
 - Added support for pre-built indexes in `genomes.config` file for `cellranger`, `cellranger-arc`, `simpleaf` and `simpleaf txp2gene` ([#371](https://github.com/nf-core/scrnaseq/issues/371))
 - Cleanup and fix bugs in matrix conversion code, and change to use anndataR for conversions, and cellbender for emptydrops call. ([#369](https://github.com/nf-core/scrnaseq/pull/369))

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for pre-built indexes in `genomes.config` file for `cellranger`, `cellranger-arc`, `simpleaf` and `simpleaf txp2gene` ([#371](https://github.com/nf-core/scrnaseq/issues/371))
 - Cleanup and fix bugs in matrix conversion code, and change to use anndataR for conversions, and cellbender for emptydrops call. ([#369](https://github.com/nf-core/scrnaseq/pull/369))
 - Fix problem with `test_full` that was not running out of the box, since code was trying to overwrite parameters in the workflow, which is not possible ([#366](https://github.com/nf-core/scrnaseq/issues/366))
+- Fix bug in CRISPR data handling by `cellranger multi` ([#401](https://github.com/nf-core/scrnaseq/issues/401) 
 
 ## v2.7.1 - 2024-08-13
 

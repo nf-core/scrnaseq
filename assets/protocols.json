@@ -89,25 +89,5 @@
         "smartseq": {
             "protocol": "SMARTSEQ"
         }
-    },
-    "universc": {
-        "auto": {
-            "protocol": "10x"
-        },
-        "10XV1": {
-            "protocol": "10x-v1"
-        },
-        "10XV2": {
-            "protocol": "10x-v2"
-        },
-        "10XV3": {
-            "protocol": "10x-v3"
-        },
-        "10XV4": {
-            "protocol": "10x-v4"
-        },
-        "dropseq": {
-            "protocol": "dropseq"
-        }
     }
 }

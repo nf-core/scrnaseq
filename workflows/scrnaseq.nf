@@ -16,7 +16,6 @@ include { STARSOLO                                      } from '../subworkflows/
 include { CELLRANGER_ALIGN                              } from "../subworkflows/local/align_cellranger"
 include { CELLRANGER_MULTI_ALIGN                        } from "../subworkflows/local/align_cellrangermulti"
 include { CELLRANGERARC_ALIGN                           } from "../subworkflows/local/align_cellrangerarc"
-include { UNIVERSC_ALIGN                                } from "../subworkflows/local/align_universc"
 include { MTX_TO_H5AD                                   } from '../modules/local/mtx_to_h5ad'
 include { H5AD_CONVERSION                               } from '../subworkflows/local/h5ad_conversion'
 include { H5AD_CONVERSION as EMPTYDROPS_H5AD_CONVERSION } from '../subworkflows/local/h5ad_conversion'
@@ -93,9 +92,6 @@ workflow SCRNASEQ {
 
     //cellranger params
     ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
-
-    //universc params
-    ch_universc_index = params.universc_index ? file(params.universc_index, checkIfExists: true) : []
 
     //cellrangermulti params
     cellranger_vdj_index              = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
@@ -205,19 +201,6 @@ workflow SCRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map {
             meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
         })
-    }
-
-    // Run universc pipeline
-    if (params.aligner == "universc") {
-        UNIVERSC_ALIGN(
-            ch_genome_fasta,
-            ch_filter_gtf,
-            ch_universc_index,
-            protocol_config['protocol'],
-            ch_fastq
-        )
-        ch_versions = ch_versions.mix(UNIVERSC_ALIGN.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix(UNIVERSC_ALIGN.out.universc_out)
     }
 
     // Run cellrangerarc pipeline

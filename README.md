@@ -30,6 +30,9 @@ This is a community effort in building a pipeline capable to support:
 - Kallisto + BUStools
 - Cellranger
 
+> [!IMPORTANT]
+> Cellranger is a commercial tool from 10X Genomics Inc. and falls under the EULA from 10X Genomics Inc. The container provided for the CellRanger functionality in this pipeline has been built by the nf-core community and is therefore _not supported by 10X genomics_ directly. We are in discussions with 10X on how to improve the user experience and licence situation for both us as a community as well as 10X and end users and will update this statement here accordingly.
+
 ## Documentation
 
 The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage](https://nf-co.re/scrnaseq/usage), [parameters](https://nf-co.re/scrnaseq/parameters) and [output](https://nf-co.re/scrnaseq/output).

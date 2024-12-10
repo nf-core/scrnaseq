@@ -39,7 +39,7 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 
 This parameter is currently supported by
 
-- [Salmon Alevin](https://salmon.readthedocs.io/en/latest/alevin.html#expectcells)
+- [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/generate_permit_list.html#:~:text=procedure%20described%20above.-,%2D%2Dexpect%2Dcells,-%3Cncells%3E%3A%20This)
 - [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md)
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger)
 
@@ -47,7 +47,7 @@ Note that since cellranger v7, it is **not recommended** anymore to supply the `
 
 ## Aligning options
 
-By default, the pipeline uses [Salmon Alevin](https://salmon.readthedocs.io/en/latest/alevin.html) (i.e. --aligner alevin) to perform pseudo-alignment of reads to the reference genome and to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
+By default (i.e. `--aligner alevin`), the pipeline uses [Salmon](https://salmon.readthedocs.io/en/latest/) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
 
 Other aligner options for running the pipeline are:
 
@@ -58,10 +58,8 @@ Other aligner options for running the pipeline are:
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
   - `--aligner cellranger`
 - [Cellranger Multi](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-5p-multi#what) to perform the alignment and downstream analysis of samples with multiple libraries at the same time using Feature Barcode technology that enables simultaneous profiling of the V(D)J repertoire, cell surface protein, antigen, and gene expression (GEX) data.
-- [UniverSC](https://github.com/minoda-lab/universc) to run an open-source version of Cell Ranger on any technology
-  - '--aligner universc`
 
-### If using cellranger or universc
+### If using cellranger
 
 This pipeline automatically renames input FASTQ files to follow the
 [naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
@@ -75,7 +73,6 @@ For more details, see
 - [this issue](https://github.com/nf-core/scrnaseq/issues/241), discussing various mechanisms to deal with non-conformant filenames
 - [the README of the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/README.md) which demonstrates that renaming files does not affect the results.
 - [the code for renaming files in the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/templates/cellranger_count.py)
-- [the code for renaming files in UniverSC](https://github.com/minoda-lab/universc/blob/99a20652430c1dc9f962536a2793536f643810b7/launch_universc.sh#L1411-L1609)
 
 As a sanity check, we verify that filenames of a pair of FASTQ files only differ by `R1`/`R2`.
 
@@ -100,17 +97,11 @@ The command `kb --list` shows all supported, preconfigured protocols. Additional
 
 For more details, please refer to the [Kallisto/bustools documentation](https://pachterlab.github.io/kallisto/manual#bus).
 
-#### Alevin/fry
+#### Alevin-fry
 
-Alevin/fry also supports custom chemistries in a slighly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
+Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slighly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
 
-For more details, see the [simpleaf documentation](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag)
-
-#### UniverSC
-
-See the [UniverSC GitHub page](https://github.com/minoda-lab/universc#pre-set-configurations) for all supported protocols.
-
-Currently only 3\' scRNA-Seq parameters are supported in nextflow, although chemistry parameters for 5\' scRNA-Seq and full-length scRNA-Seq libraries are supported by teh container.
+For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614).
 
 ### If using cellranger-arc
 
@@ -322,9 +313,9 @@ The above pipeline run specified with a params file in yaml format:
 nextflow run nf-core/scrnaseq -profile docker -params-file params.yaml
 ```
 
-with `params.yaml` containing:
+with:
 
-```yaml
+```yaml title="params.yaml"
 input: './samplesheet.csv'
 outdir: './results/'
 genome: 'GRCh37'
@@ -437,14 +428,6 @@ In most cases, you will only need to create a custom config as a one-off but if 
 See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for more information about creating your own configuration files.
 
 If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack) on the [`#configs` channel](https://nfcore.slack.com/channels/configs).
-
-## Azure Resource Requests
-
-To be used with the `azurebatch` profile by specifying the `-profile azurebatch`.
-We recommend providing a compute `params.vm_type` of `Standard_D16_v3` VMs by default but these options can be changed if required.
-
-Note that the choice of VM size depends on your quota and the overall workload during the analysis.
-For a thorough list, please refer the [Azure Sizes for virtual machines in Azure](https://docs.microsoft.com/en-us/azure/virtual-machines/sizes).
 
 ## Running in the background
 

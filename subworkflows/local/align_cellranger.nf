@@ -2,9 +2,9 @@
  * Alignment with Cellranger
  */
 
-include {CELLRANGER_MKGTF} from "../../modules/nf-core/cellranger/mkgtf/main.nf"
-include {CELLRANGER_MKREF} from "../../modules/nf-core/cellranger/mkref/main.nf"
-include {CELLRANGER_COUNT} from "../../modules/nf-core/cellranger/count/main.nf"
+include { CELLRANGER_MKGTF } from "../../modules/nf-core/cellranger/mkgtf/main.nf"
+include { CELLRANGER_MKREF } from "../../modules/nf-core/cellranger/mkref/main.nf"
+include { CELLRANGER_COUNT } from "../../modules/nf-core/cellranger/count/main.nf"
 
 // Define workflow to subset and index a genome region fasta file
 workflow CELLRANGER_ALIGN {
@@ -49,7 +49,7 @@ workflow CELLRANGER_ALIGN {
             mtx_files.each{
                 if ( it.toString().contains("raw_feature_bc_matrix") ) { desired_files.add( it ) }
             }
-            [ meta, desired_files ]
+            [ meta + [input_type: 'raw'], desired_files ]
         }
 
         ch_matrices_filtered =
@@ -58,12 +58,13 @@ workflow CELLRANGER_ALIGN {
             mtx_files.each{
                 if ( it.toString().contains("filtered_feature_bc_matrix") ) { desired_files.add( it ) }
             }
-            [ meta, desired_files ]
+            [ meta + [input_type: 'filtered'], desired_files ]
         }
 
     emit:
         ch_versions
-        cellranger_out      = CELLRANGER_COUNT.out.outs
-        cellranger_matrices = ch_matrices_raw.mix( ch_matrices_filtered )
-        star_index          = cellranger_index
+        cellranger_out               = CELLRANGER_COUNT.out.outs
+        cellranger_matrices_raw      = ch_matrices_raw
+        cellranger_matrices_filtered = ch_matrices_filtered
+        star_index                   = cellranger_index
 }

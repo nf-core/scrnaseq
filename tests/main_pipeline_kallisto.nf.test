@@ -10,11 +10,6 @@ nextflow_pipeline {
             params {
                 aligner    = 'kallisto'
                 outdir     = "${outputDir}/results_kallisto"
-
-                // Limit resources so that this can run on GitHub Actions -- for some reason it had not been taken from shared config
-                max_cpus   = 2
-                max_memory = '6.GB'
-                max_time   = '6.h'
             }
         }
 
@@ -30,12 +25,12 @@ nextflow_pipeline {
                 {assert workflow.success},
 
                 // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 12},
+                {assert workflow.trace.tasks().size() == 15},
 
                 // How many results were produced?
                 {assert path("${outputDir}/results_kallisto").list().size() == 4},
-                {assert path("${outputDir}/results_kallisto/kallisto").list().size() == 4},
-                {assert path("${outputDir}/results_kallisto/kallisto/mtx_conversions").list().size() == 4},
+                {assert path("${outputDir}/results_kallisto/kallisto").list().size() == 3},
+                {assert path("${outputDir}/results_kallisto/kallisto/mtx_conversions").list().size() == 5},
                 {assert path("${outputDir}/results_kallisto/kallisto/Sample_X.count").list().size() == 9},
                 {assert path("${outputDir}/results_kallisto/kallisto/Sample_Y.count").list().size() == 9},
                 {assert path("${outputDir}/results_kallisto/fastqc").list().size() == 12},
@@ -51,15 +46,16 @@ nextflow_pipeline {
                 // Check if files are the same
                 //
                 {assert snapshot(
-                    workflow,
                     path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.barcodes.txt" ),
-                    path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.genes.txt" ),
-                    path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.mtx" ),
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.genes.txt"    ),
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_X.count/counts_unfiltered/cells_x_genes.mtx"          ),
                     path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.barcodes.txt" ),
-                    path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.genes.txt" ),
-                    path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.mtx" ),
-                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_raw_matrix.rds" ),
-                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.rds" )
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.genes.txt"    ),
+                    path( "${outputDir}/results_kallisto/kallisto/Sample_Y.count/counts_unfiltered/cells_x_genes.mtx"          ),
+                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_raw_matrix.seurat.rds"     ),
+                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_X/Sample_X_raw_matrix.sce.rds"        ),
+                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.seurat.rds"     ),
+                    path( "${outputDir}/results_kallisto/kallisto/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.sce.rds"        )
                 ).match()}
 
             ) // end of assertAll()

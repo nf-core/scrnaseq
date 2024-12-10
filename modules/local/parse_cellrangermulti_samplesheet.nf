@@ -1,4 +1,9 @@
 process PARSE_CELLRANGERMULTI_SAMPLESHEET {
+
+    //
+    // This module contains a custom script for checking special cellranger multi samplesheet
+    //
+
     label 'process_low'
     publishDir = [ enabled: false ]
 

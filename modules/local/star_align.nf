@@ -1,4 +1,9 @@
 process STAR_ALIGN {
+
+    //
+    // This module executes STAR align quantification
+    //
+
     tag "$meta.id"
     label 'process_high'
 
@@ -54,12 +59,18 @@ process STAR_ALIGN {
     // separate forward from reverse pairs
     def (forward, reverse) = reads.collate(2).transpose()
     """
+    if [[ $whitelist == *.gz ]]; then
+        gzip -cdf $whitelist > whitelist.uncompressed.txt
+    else
+        cp $whitelist whitelist.uncompressed.txt
+    fi
+
     STAR \\
         --genomeDir $index \\
         --readFilesIn ${reverse.join( "," )} ${forward.join( "," )} \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
-        --soloCBwhitelist <(gzip -cdf $whitelist) \\
+        --soloCBwhitelist whitelist.uncompressed.txt \\
         --soloType $protocol \\
         --soloFeatures $star_feature \\
         $other_10x_parameters \\

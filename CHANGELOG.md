@@ -3,6 +3,26 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v3.0.0 - 2024-12-09
+
+## Backwards-incompatible changes
+
+- Remove universc workflow from pipeline ([#289](https://github.com/nf-core/scrnaseq/issues/289)).
+- Remove emptydrops from the pipeline, in favor of cellbender ([#369](https://github.com/nf-core/scrnaseq/pull/369)).
+
+## Additions
+
+- Add `--save_align_intermeds` parameter that publishes BAM files to the output directory (for `starsolo`, `cellranger` and `cellranger multi`) ([#384](https://github.com/nf-core/scrnaseq/issues/384)).
+
+## Fixes
+
+- Add support for pre-built indexes in `genomes.config` file for `cellranger`, `cellranger-arc`, `simpleaf` and `simpleaf txp2gene` ([#371](https://github.com/nf-core/scrnaseq/issues/371)).
+- Refactor matrix conversion code. Output from all aligners is initially converted to AnnData h5ad that is used for
+  downstream code such as cellbender. H5ad objects are converted to Seurat and SingleCellExperiment at the end
+  using anndataR. This reduced the pipeline complexity and resolved various issues relating to output format conversion
+  ([#369](https://github.com/nf-core/scrnaseq/pull/369)).
+- Fix problem with `test_full` that was not running out of the box, since code was trying to overwrite parameters in the workflow, which is not possible ([#366](https://github.com/nf-core/scrnaseq/issues/366)).
+
 ## v2.7.1 - 2024-08-13
 
 - Fix that tests have not been executed with nf-test v0.9 ([#359](https://github.com/nf-core/scrnaseq/pull/359))

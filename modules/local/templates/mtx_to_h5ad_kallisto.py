@@ -88,7 +88,7 @@ if __name__ == "__main__":
             features=glob.glob("${inputs}/*.genes.txt")[0],
         )
 
-    else:
+    elif "${params.kb_workflow}" == "lamanno":
         spliced = _mtx_to_adata(
             matrix=glob.glob("${inputs}/spliced*.mtx")[0],
             barcodes=glob.glob("${inputs}/spliced*.barcodes.txt")[0],
@@ -103,15 +103,15 @@ if __name__ == "__main__":
         # The barcodes of spliced / non-spliced are not necessarily the same.
         # We fill the missing barcodes with zeros
         all_barcodes = list(set(unspliced.obs_names) | set(spliced.obs_names))
-        missing_spliced = list(set(unspliced.obs_names) - set(spliced.obs_names))
-        missing_unspliced = list(set(spliced.obs_names) - set(unspliced.obs_names))
+        missing_spliced = list(set(all_barcodes) - set(spliced.obs_names))
+        missing_unspliced = list(set(all_barcodes) - set(unspliced.obs_names))
         ad_missing_spliced = AnnData(
             X=csr_matrix((len(missing_spliced), spliced.shape[1])),
             obs=pd.DataFrame(index=missing_spliced),
             var=spliced.var,
         )
         ad_missing_unspliced = AnnData(
-            X=csr_matrix((len(missing_unspliced), spliced.shape[1])),
+            X=csr_matrix((len(missing_unspliced), unspliced.shape[1])),
             obs=pd.DataFrame(index=missing_unspliced),
             var=unspliced.var,
         )
@@ -132,7 +132,72 @@ if __name__ == "__main__":
             var=pd.DataFrame(index=spliced.var_names),
         )
 
+    elif "${params.kb_workflow}" == "nac":
+        barcodes = glob.glob("${inputs}/*.barcodes.txt")[0]
+        features = glob.glob("${inputs}/*.genes.txt")[0]
+
+        nascent = _mtx_to_adata(
+            matrix=glob.glob("${inputs}/*nascent.mtx")[0],
+            barcodes=barcodes,
+            features=features,
+        )
+        ambiguous = _mtx_to_adata(
+            matrix=glob.glob("${inputs}/*ambiguous.mtx")[0],
+            barcodes=barcodes,
+            features=features,
+        )
+        mature = _mtx_to_adata(
+            matrix=glob.glob("${inputs}/*mature.mtx")[0],
+            barcodes=barcodes,
+            features=features,
+        )
+
+        # The barcodes of nascent / mature / ambiguous are not necessarily the same.
+        # We fill the missing barcodes with zeros
+        all_barcodes = list(set(nascent.obs_names) | set(mature.obs_names) | set(ambiguous.obs_names))
+        missing_nascent = list(set(all_barcodes) - set(nascent.obs_names))
+        missing_mature = list(set(all_barcodes) - set(mature.obs_names))
+        missing_ambiguous = list(set(all_barcodes) - set(ambiguous.obs_names))
+
+        ad_missing_nascent = AnnData(
+            X=csr_matrix((len(missing_nascent), nascent.shape[1])),
+            obs=pd.DataFrame(index=missing_nascent),
+            var=nascent.var,
+        )
+        ad_missing_ambiguous = AnnData(
+            X=csr_matrix((len(missing_ambiguous), ambiguous.shape[1])),
+            obs=pd.DataFrame(index=missing_ambiguous),
+            var=ambiguous.var,
+        )
+        ad_missing_mature = AnnData(
+            X=csr_matrix((len(missing_mature), mature.shape[1])),
+            obs=pd.DataFrame(index=missing_mature),
+            var=mature.var,
+        )
+
+        nascent = concat_ad([nascent, ad_missing_nascent], join="outer")[
+            all_barcodes, :
+        ]
+        ambiguous = concat_ad([ambiguous, ad_missing_ambiguous], join="outer")[
+            all_barcodes, :
+        ]
+        mature = concat_ad([mature, ad_missing_mature], join="outer")[
+            all_barcodes, :
+        ]
+
+        assert np.all(nascent.var_names == ambiguous.var_names)
+        assert np.all(mature.var_names == ambiguous.var_names)
+
+        adata = AnnData(
+            X=nascent.X + ambiguous.X + mature.X,
+            layers={"nascent": nascent.X, "ambiguous": ambiguous.X, "mature": mature.X},
+            obs=pd.DataFrame(index=all_barcodes),
+            var=pd.DataFrame(index=nascent.var_names),
+        )
+
+    #
     # out of the conditional: snippet for both standard and non-standard workflows
+    #
 
     # finalize generated adata object
     _add_metadata(adata, t2g="${txp2gene}", sample="${meta.id}")

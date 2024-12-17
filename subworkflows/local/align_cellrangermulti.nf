@@ -43,7 +43,7 @@ workflow CELLRANGER_MULTI_ALIGN {
                 vdj: meta.feature_type == "vdj"
                     return [ meta, fastq ]
                 ab: meta.feature_type == "ab"
-                    if (params.fb_reference){
+                    if ((fastq == file("$projectDir/assets/EMPTY", checkIfExists: true)) || params.fb_reference) { // when empty, should not check for reference
                         return [ meta, fastq ]
                     } else {
                         error ("Antibody reference was not specified. Please provide a reference file for feature barcoding (e.g. antibody measurements).\nPlease refer to https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv for more details.")

@@ -87,7 +87,7 @@ workflow SCRNASEQ {
 
     //star params
     star_index = star_index ? file(star_index, checkIfExists: true) : null
-    ch_star_index = star_index ? Channel.of( [[id: star_index.baseName], star_index] ) : []
+    ch_star_index = star_index ? Channel.value( [[id: star_index.baseName], star_index] ) : []
     star_feature = params.star_feature
 
     //cellranger params

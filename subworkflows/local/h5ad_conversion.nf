@@ -31,7 +31,7 @@ workflow H5AD_CONVERSION {
     // MODULE: Convert to RDS with AnndataR package
     //
     ANNDATAR_CONVERT (
-        ch_h5ad_concat
+        ch_h5ads.mix(ch_h5ad_concat)
     )
     ch_versions = ch_versions.mix(ANNDATAR_CONVERT.out.versions.first())
 

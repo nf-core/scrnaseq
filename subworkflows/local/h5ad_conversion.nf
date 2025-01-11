@@ -16,7 +16,7 @@ workflow H5AD_CONVERSION {
     // Concat all raw and unfiltered h5ad files
     //
     ch_concat_h5ad_input = ch_h5ads
-        .map{ meta, file -> [ [id: meta.input_type], file ]}
+        .map{ meta, file -> [ [id: 'combined', input_type: meta.input_type], file ]}
         .groupTuple()
 
     CONCAT_H5AD (

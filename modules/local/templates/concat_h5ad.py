@@ -62,9 +62,9 @@ if __name__ == "__main__":
 
     # merge with data.frame, on sample information
     adata.obs = adata.obs.join(df_samplesheet, on="sample", how="left").astype(str)
-    adata.write_h5ad("combined_${meta.id}_matrix.h5ad")
+    adata.write_h5ad("${meta.id}_${meta.input_type}_matrix.h5ad")
 
-    print("Wrote h5ad file to {}".format("combined_${meta.id}_matrix.h5ad"))
+    print("Wrote h5ad file to {}".format("${meta.id}_${meta.input_type}_matrix.h5ad"))
 
     # dump versions
     dump_versions()

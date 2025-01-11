@@ -38,22 +38,11 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    // Make cellranger or cellranger-arc index conditional
-    def cellranger_index = []
-    if (params.aligner in ["cellranger", "cellrangermulti"]){
-        cellranger_index = params.cellranger_index ?: getGenomeAttribute('cellranger')
-    }
-    else if (params.aligner == "cellrangerarc") {
-        cellranger_index = params.cellranger_index ?: getGenomeAttribute('cellrangerarc')
-    }
-
-
     // general input and params
     ch_genome_fasta         = params.fasta                ? file(params.fasta, checkIfExists: true)    : []
     ch_gtf                  = params.gtf                  ? file(params.gtf, checkIfExists: true)      : []
     ch_transcript_fasta     = params.transcript_fasta     ? file(params.transcript_fasta)              : []
     ch_motifs               = params.motifs               ? file(params.motifs)                        : []
-    ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config)          : []
     ch_txp2gene             = params.txp2gene             ? file(params.txp2gene, checkIfExists: true) : []
 
     if (params.barcode_whitelist) {
@@ -83,12 +72,15 @@ workflow SCRNASEQ {
     star_feature = params.star_feature
 
     //cellranger params
-    ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
+    ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index, checkIfExists: true) : []
 
     //cellrangermulti params
-    cellranger_vdj_index              = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
-    ch_multi_samplesheet              = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
-    empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
+    cellranger_vdj_index = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
+    ch_multi_samplesheet = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
+    empty_file           = file("$projectDir/assets/EMPTY", checkIfExists: true)
+
+    // cellrangerarc params
+    ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config)          : []
 
     // Run FastQC
     if (!params.skip_fastqc) {

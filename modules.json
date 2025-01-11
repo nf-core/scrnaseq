@@ -5,10 +5,15 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "anndata/barcodes": {
+                        "branch": "master",
+                        "git_sha": "05e4d643e8a9cd600fdce51dccdfc68cf9a72489",
+                        "installed_by": ["h5ad_removebackground_barcodes_cellbender_anndata"]
+                    },
                     "cellbender/removebackground": {
                         "branch": "master",
                         "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
-                        "installed_by": ["modules"]
+                        "installed_by": ["h5ad_removebackground_barcodes_cellbender_anndata", "modules"]
                     },
                     "cellranger/count": {
                         "branch": "master",
@@ -94,6 +99,11 @@
             },
             "subworkflows": {
                 "nf-core": {
+                    "h5ad_removebackground_barcodes_cellbender_anndata": {
+                        "branch": "master",
+                        "git_sha": "23600f6cd1c7fc4da79709bb531e5ba3cd5e840e",
+                        "installed_by": ["subworkflows"]
+                    },
                     "utils_nextflow_pipeline": {
                         "branch": "master",
                         "git_sha": "3aa0aec1d52d492fe241919f0c6100ebf0074082",

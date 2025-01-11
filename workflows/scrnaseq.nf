@@ -3,28 +3,25 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { MULTIQC                                       } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap                              } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc                          } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML                        } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText                        } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { getGenomeAttribute                            } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { FASTQC_CHECK                                  } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS                             } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_ALEVIN                               } from '../subworkflows/local/alevin'
-include { STARSOLO                                      } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN                              } from "../subworkflows/local/align_cellranger"
-include { CELLRANGER_MULTI_ALIGN                        } from "../subworkflows/local/align_cellrangermulti"
-include { CELLRANGERARC_ALIGN                           } from "../subworkflows/local/align_cellrangerarc"
-include { MTX_TO_H5AD                                   } from '../modules/local/mtx_to_h5ad'
-include { H5AD_CONVERSION                               } from '../subworkflows/local/h5ad_conversion'
-include { H5AD_CONVERSION as EMPTYDROPS_H5AD_CONVERSION } from '../subworkflows/local/h5ad_conversion'
-include { EMPTY_DROPLET_REMOVAL                         } from '../subworkflows/local/emptydrops_removal.nf'
-include { GTF_GENE_FILTER                               } from '../modules/local/gtf_gene_filter'
-include { GUNZIP as GUNZIP_FASTA                        } from '../modules/nf-core/gunzip/main'
-include { GUNZIP as GUNZIP_GTF                          } from '../modules/nf-core/gunzip/main'
-
-
+include { MULTIQC                                           } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap                                  } from 'plugin/nf-schema'
+include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText                            } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { getGenomeAttribute                                } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { FASTQC_CHECK                                      } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS                                 } from '../subworkflows/local/kallisto_bustools'
+include { SCRNASEQ_ALEVIN                                   } from '../subworkflows/local/alevin'
+include { STARSOLO                                          } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN                                  } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_MULTI_ALIGN                            } from "../subworkflows/local/align_cellrangermulti"
+include { CELLRANGERARC_ALIGN                               } from "../subworkflows/local/align_cellrangerarc"
+include { MTX_TO_H5AD                                       } from '../modules/local/mtx_to_h5ad'
+include { H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA } from '../subworkflows/nf-core/h5ad_removebackground_barcodes_cellbender_anndata'
+include { GTF_GENE_FILTER                                   } from '../modules/local/gtf_gene_filter'
+include { GUNZIP as GUNZIP_FASTA                            } from '../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_GTF                              } from '../modules/nf-core/gunzip/main'
+include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
 
 workflow SCRNASEQ {
 
@@ -296,32 +293,29 @@ workflow SCRNASEQ {
         params.aligner
     )
     ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
-
-    //
-    // SUBWORKFLOW: Run h5ad conversion and concatenation
-    //
-    ch_emptydrops = Channel.empty()
-    H5AD_CONVERSION (
-        MTX_TO_H5AD.out.h5ad,
-        ch_input
-    )
-    ch_versions = ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
+    ch_h5ads = MTX_TO_H5AD.out.h5ad
 
     //
     // SUBWORKFLOW: Run cellbender emptydrops filter
     //
     if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
-
         // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
-        EMPTY_DROPLET_REMOVAL (
-            H5AD_CONVERSION.out.h5ads.filter { meta, mtx_files -> meta.input_type.contains('raw') }
+        H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA (
+            ch_h5ads.filter { meta, mtx_files -> meta.input_type == 'raw' }
         )
-        EMPTYDROPS_H5AD_CONVERSION (
-            EMPTY_DROPLET_REMOVAL.out.h5ad,
-            ch_input
+        ch_h5ads = ch_h5ads.mix(
+            H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA.out.h5ad
+                .map{ meta, file -> [ meta + [input_type: 'emptydrops'], file ]}
         )
-
     }
+
+    //
+    // SUBWORKFLOW: Concat samples and convert h5ad to other formats
+    //
+    H5AD_CONVERSION (
+        ch_h5ads,
+        ch_input
+    )
 
     //
     // Collate and save software versions

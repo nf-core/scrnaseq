@@ -59,17 +59,15 @@ workflow SCRNASEQ {
 
     //kallisto params
     ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index, checkIfExists: true) : []
-    kb_workflow = params.kb_workflow
-    kb_t1c = params.kb_t1c ? file(params.kb_t1c, checkIfExists: true) : []
-    kb_t2c = params.kb_t2c ? file(params.kb_t2c, checkIfExists: true) : []
+    kb_t1c            = params.kb_t1c         ? file(params.kb_t1c, checkIfExists: true) : []
+    kb_t2c            = params.kb_t2c         ? file(params.kb_t2c, checkIfExists: true) : []
 
     //salmon params
-    ch_salmon_index = params.salmon_index ? file(params.salmon_index, checkIfExists: true) : []
+    ch_salmon_index   = params.salmon_index ? file(params.salmon_index, checkIfExists: true) : []
 
     //star params
-    star_index = params.star_index ? file(params.star_index, checkIfExists: true) : null
-    ch_star_index = star_index ? Channel.value( [[id: star_index.baseName], star_index] ) : []
-    star_feature = params.star_feature
+    star_index        = params.star_index ? file(params.star_index, checkIfExists: true) : null
+    ch_star_index     = star_index ? Channel.value( [[id: star_index.baseName], star_index] ) : []
 
     //cellranger params
     ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index, checkIfExists: true) : []
@@ -126,7 +124,7 @@ workflow SCRNASEQ {
             kb_t1c,
             kb_t2c,
             protocol_config['protocol'],
-            kb_workflow,
+            params.kb_workflow,
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
@@ -160,7 +158,7 @@ workflow SCRNASEQ {
             protocol_config['protocol'],
             ch_barcode_whitelist,
             ch_fastq,
-            star_feature,
+            params.star_feature,
             protocol_config.get('extra_args', ""),
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)

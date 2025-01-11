@@ -27,7 +27,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrn
 */
 
 // Params cannot be changed if they have been set beforehand
-// Tus, manually provided files are not overwritten by the genome attributes
+// Thus, manually provided files are not overwritten by the genome attributes
 params.fasta            = getGenomeAttribute('fasta')
 params.gtf              = getGenomeAttribute('gtf')
 params.salmon_index     = getGenomeAttribute('simpleaf')

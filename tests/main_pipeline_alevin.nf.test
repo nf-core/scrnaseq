@@ -25,7 +25,7 @@ nextflow_pipeline {
                 {assert workflow.success},
 
                 // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 17},
+                {assert workflow.trace.tasks().size() == 15},
 
                 // How many results were produced?
                 {assert path("${outputDir}/results_alevin").list().size() == 5},

@@ -26,16 +26,16 @@ process STAR_ALIGN {
     val other_10x_parameters
 
     output:
-    tuple val(meta), path('*d.out.bam')                   , emit: bam
-    tuple val(meta), path('*.Solo.out')                   , emit: counts
-    tuple val(meta), path ("*.Solo.out/Gene*/raw")        , emit: raw_counts
-    tuple val(meta), path ("*.Solo.out/Gene*/filtered")   , emit: filtered_counts
-    tuple val(meta), path ("*.Solo.out/Velocyto/raw")     , emit: raw_velocyto, optional:true
-    tuple val(meta), path ("*.Solo.out/Velocyto/filtered"), emit: filtered_velocyto, optional:true
-    tuple val(meta), path('*Log.final.out')               , emit: log_final
-    tuple val(meta), path('*Log.out')                     , emit: log_out
-    tuple val(meta), path('*Log.progress.out')            , emit: log_progress
-    path  "versions.yml"                                  , emit: versions
+    tuple val(meta), path('*d.out.bam')                            , emit: bam
+    tuple val(meta), path('*.Solo.out')                            , emit: counts
+    tuple val(meta), path ("*.Solo.out/Gene*/raw")                 , emit: raw_counts
+    tuple val(meta), path ("*.Solo.out/Gene*/filtered")            , emit: filtered_counts
+    tuple val(meta), path ("*.Solo.out/Velocyto/velocyto_raw")     , emit: raw_velocyto, optional:true
+    tuple val(meta), path ("*.Solo.out/Velocyto/velocyto_filtered"), emit: filtered_velocyto, optional:true
+    tuple val(meta), path('*Log.final.out')                        , emit: log_final
+    tuple val(meta), path('*Log.out')                              , emit: log_out
+    tuple val(meta), path('*Log.progress.out')                     , emit: log_progress
+    path  "versions.yml"                                           , emit: versions
 
     tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
     tuple val(meta), path('*toTranscriptome.out.bam'), optional:true, emit: bam_transcript
@@ -96,6 +96,11 @@ process STAR_ALIGN {
     if [ -d ${prefix}.Solo.out ]; then
         # Backslashes still need to be escaped (https://github.com/nextflow-io/nextflow/issues/67)
         find ${prefix}.Solo.out \\( -name "*.tsv" -o -name "*.mtx" \\) -exec gzip {} \\;
+    fi
+
+    if [ -d ${prefix}.Solo.out/Velocyto ]; then
+        mv ${prefix}.Solo.out/Velocyto/raw ${prefix}.Solo.out/Velocyto/velocyto_raw
+        mv ${prefix}.Solo.out/Velocyto/filtered ${prefix}.Solo.out/Velocyto/velocyto_filtered
     fi
 
     cat <<-END_VERSIONS > versions.yml

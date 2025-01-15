@@ -7,7 +7,7 @@
                 "nf-core": {
                     "cellbender/removebackground": {
                         "branch": "master",
-                        "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
+                        "git_sha": "e01435f46b46adff59546d6a4b4002e31f6c4457",
                         "installed_by": ["modules"]
                     },
                     "cellranger/count": {

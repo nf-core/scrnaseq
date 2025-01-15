@@ -15,10 +15,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { SCRNASEQ  } from './workflows/scrnaseq'
+include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { SCRNASEQ                } from './workflows/scrnaseq'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,10 +26,15 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrn
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
-params.fasta = getGenomeAttribute('fasta')
+// Params cannot be changed if they have been set beforehand
+// Thus, manually provided files are not overwritten by the genome attributes
+params.fasta            = getGenomeAttribute('fasta')
+params.gtf              = getGenomeAttribute('gtf')
+params.salmon_index     = getGenomeAttribute('simpleaf')
+params.txp2gene         = getGenomeAttribute('simpleaf_tx2pgene')
+params.cellranger_index = params.aligner == 'cellrangerarc' ?
+                            getGenomeAttribute('cellrangerarc') :
+                            getGenomeAttribute('cellranger')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,7 +56,7 @@ workflow NFCORE_SCRNASEQ {
     // WORKFLOW: Run pipeline
     //
     SCRNASEQ (
-        samplesheet
+        samplesheet,
     )
     emit:
     multiqc_report = SCRNASEQ.out.multiqc_report // channel: /path/to/multiqc_report.html
@@ -81,7 +86,7 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     NFCORE_SCRNASEQ (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.samplesheet,
     )
     //
     // SUBWORKFLOW: Run completion tasks

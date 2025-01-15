@@ -62,7 +62,7 @@ Now, you can run the pipeline using:
 nextflow run nf-core/scrnaseq \
    -profile <docker/singularity/.../institute> \
    --input samplesheet.csv \
-   --genome_fasta GRCm38.p6.genome.chr19.fa \
+   --fasta GRCm38.p6.genome.chr19.fa \
    --gtf gencode.vM19.annotation.chr19.gtf \
    --protocol 10XV2 \
    --aligner <alevin/kallisto/star/cellranger> \

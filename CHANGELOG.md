@@ -3,11 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## dev
+## [Unreleased]
 
 - Add a checker so that `--fb_reference` does not break the pipeline in case `ab` files are not used in `cellranger multi` sub-workflow.
-- Update cellbender module to latest nf-core version
-- Add profile for gpu processes
+- Update cellbender module to latest nf-core version ([#419](https://github.com/nf-core/scrnaseq/pull/419/))
+- Add profile for gpu processes ([#419](https://github.com/nf-core/scrnaseq/pull/419/))
+- Update example usage command in README with valid reference genome parameter ([#339](https://github.com/nf-core/scrnaseq/issues/339))
 
 ## v3.0.0 - 2024-12-09
 

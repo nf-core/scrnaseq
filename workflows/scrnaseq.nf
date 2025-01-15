@@ -8,7 +8,6 @@ include { paramsSummaryMap                              } from 'plugin/nf-schema
 include { paramsSummaryMultiqc                          } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML                        } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText                        } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { getGenomeAttribute                            } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { FASTQC_CHECK                                  } from '../subworkflows/local/fastqc'
 include { KALLISTO_BUSTOOLS                             } from '../subworkflows/local/kallisto_bustools'
 include { SCRNASEQ_ALEVIN                               } from '../subworkflows/local/alevin'
@@ -24,46 +23,28 @@ include { GTF_GENE_FILTER                               } from '../modules/local
 include { GUNZIP as GUNZIP_FASTA                        } from '../modules/nf-core/gunzip/main'
 include { GUNZIP as GUNZIP_GTF                          } from '../modules/nf-core/gunzip/main'
 
-
-
 workflow SCRNASEQ {
 
     take:
     ch_fastq
 
     main:
+    ch_multiqc_files = Channel.empty()
+    ch_versions      = Channel.empty()
+    ch_mtx_matrices  = Channel.empty()
 
     protocol_config = Utils.getProtocol(workflow, log, params.aligner, params.protocol)
     if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangerarc", "cellrangermulti"]) {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    // collect paths from genome attributes file (e.g. iGenomes.config; optional)
-    // we cannot overwrite params in the workflow (they stay null as coming from the config file)
-    def genome_fasta = params.fasta        ?: getGenomeAttribute('fasta')
-    def gtf          = params.gtf          ?: getGenomeAttribute('gtf')
-    def star_index   = params.star_index   // ?: getGenomeAttribute('star') TODO: Currently not fetching iGenomes star index due version incompatibility
-    def salmon_index = params.salmon_index ?: getGenomeAttribute('simpleaf')
-    def txp2gene     = params.txp2gene     ?: getGenomeAttribute('simpleaf_tx2pgene')
-
-    // Make cellranger or cellranger-arc index conditional
-    def cellranger_index = []
-    if (params.aligner in ["cellranger", "cellrangermulti"]){
-        cellranger_index = params.cellranger_index ?: getGenomeAttribute('cellranger')
-    }
-    else if (params.aligner == "cellrangerarc") {
-        cellranger_index = params.cellranger_index ?: getGenomeAttribute('cellrangerarc')
-    }
-
-    ch_genome_fasta = genome_fasta ? file(genome_fasta, checkIfExists: true) : []
-    ch_gtf = gtf ? file(gtf, checkIfExists: true) : []
-
     // general input and params
-    ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
-    ch_motifs = params.motifs ? file(params.motifs) : []
-    ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
-    ch_txp2gene = txp2gene ? file(txp2gene, checkIfExists: true) : []
-    ch_multiqc_files = Channel.empty()
+    ch_genome_fasta         = params.fasta                ? file(params.fasta, checkIfExists: true)    : []
+    ch_gtf                  = params.gtf                  ? file(params.gtf, checkIfExists: true)      : []
+    ch_transcript_fasta     = params.transcript_fasta     ? file(params.transcript_fasta)              : []
+    ch_motifs               = params.motifs               ? file(params.motifs)                        : []
+    ch_txp2gene             = params.txp2gene             ? file(params.txp2gene, checkIfExists: true) : []
+
     if (params.barcode_whitelist) {
         ch_barcode_whitelist = file(params.barcode_whitelist, checkIfExists: true)
     } else if (protocol_config.containsKey("whitelist")) {
@@ -78,28 +59,26 @@ workflow SCRNASEQ {
 
     //kallisto params
     ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index, checkIfExists: true) : []
-    kb_workflow = params.kb_workflow
-    kb_t1c = params.kb_t1c ? file(params.kb_t1c, checkIfExists: true) : []
-    kb_t2c = params.kb_t2c ? file(params.kb_t2c, checkIfExists: true) : []
+    kb_t1c            = params.kb_t1c         ? file(params.kb_t1c, checkIfExists: true) : []
+    kb_t2c            = params.kb_t2c         ? file(params.kb_t2c, checkIfExists: true) : []
 
     //salmon params
-    ch_salmon_index = salmon_index ? file(salmon_index, checkIfExists: true) : []
+    ch_salmon_index   = params.salmon_index ? file(params.salmon_index, checkIfExists: true) : []
 
     //star params
-    star_index = star_index ? file(star_index, checkIfExists: true) : null
-    ch_star_index = star_index ? Channel.of( [[id: star_index.baseName], star_index] ) : []
-    star_feature = params.star_feature
+    star_index        = params.star_index ? file(params.star_index, checkIfExists: true) : null
+    ch_star_index     = star_index ? Channel.value( [[id: star_index.baseName], star_index] ) : []
 
     //cellranger params
-    ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
+    ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index, checkIfExists: true) : []
 
     //cellrangermulti params
-    cellranger_vdj_index              = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
-    ch_multi_samplesheet              = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
-    empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
+    cellranger_vdj_index = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
+    ch_multi_samplesheet = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
+    empty_file           = file("$projectDir/assets/EMPTY", checkIfExists: true)
 
-    ch_versions      = Channel.empty()
-    ch_mtx_matrices = Channel.empty()
+    // cellrangerarc params
+    ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config)          : []
 
     // Run FastQC
     if (!params.skip_fastqc) {
@@ -111,8 +90,8 @@ workflow SCRNASEQ {
     //
     // Uncompress genome fasta file if required
     //
-    if (genome_fasta) {
-        if (genome_fasta.endsWith('.gz')) {
+    if (params.fasta) {
+        if (params.fasta.endsWith('.gz')) {
             ch_genome_fasta    = GUNZIP_FASTA ( [ [:], ch_genome_fasta ] ).gunzip.map { it[1] }
             ch_versions        = ch_versions.mix(GUNZIP_FASTA.out.versions)
         } else {
@@ -123,8 +102,8 @@ workflow SCRNASEQ {
     //
     // Uncompress GTF annotation file or create from GFF3 if required
     //
-    if (gtf) {
-        if (gtf.endsWith('.gz')) {
+    if (params.gtf) {
+        if (params.gtf.endsWith('.gz')) {
             ch_gtf      = GUNZIP_GTF ( [ [:], ch_gtf ] ).gunzip.map { it[1] }
             ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
         } else {
@@ -145,7 +124,7 @@ workflow SCRNASEQ {
             kb_t1c,
             kb_t2c,
             protocol_config['protocol'],
-            kb_workflow,
+            params.kb_workflow,
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
@@ -179,7 +158,7 @@ workflow SCRNASEQ {
             protocol_config['protocol'],
             ch_barcode_whitelist,
             ch_fastq,
-            star_feature,
+            params.star_feature,
             protocol_config.get('extra_args', ""),
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)

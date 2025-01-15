@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add a checker so that `--fb_reference` does not break the pipeline in case `ab` files are not used in `cellranger multi` sub-workflow.
+
 ## v3.0.0 - 2024-12-09
 
 ## Backwards-incompatible changes

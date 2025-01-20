@@ -251,11 +251,6 @@
                     "description": "Type of workflow. Use `nac` for an index type that can quantify nascent and mature RNA. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. (default: standard)",
                     "fa_icon": "fas fa-rainbow",
                     "enum": ["standard", "lamanno", "nac"]
-                },
-                "kb_filter": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-fish",
-                    "description": "Activate Kallisto/BUStools filtering algorithm"
                 }
             }
         },

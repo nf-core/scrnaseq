@@ -281,7 +281,7 @@ workflow SCRNASEQ {
     //
     // SUBWORKFLOW: Run cellbender remove background subworkflow
     //
-    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
+    if ( !params.skip_cellbender && !(params.aligner in ['cellrangerarc']) ) {
         // module should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
         H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA (
             ch_h5ads.filter { meta, mtx_files -> meta.input_type == 'raw' }

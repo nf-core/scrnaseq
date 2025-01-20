@@ -128,7 +128,7 @@ for the corresponding documentation.
 
 The pipeline also possess a subworkflow imported from scdownstream to perform filter empty drops using [cellbender](https://github.com/broadinstitute/CellBender) remove background function. The process is simple, it takes a raw/unfiltered matrix file, and performs the filltering on it, generating another matrix file.
 
-> Users can turn it of with `--skip_emptydrops`.
+> Users can turn it of with `--skip_cellbender`.
 
 **Output directory: `results/${params.aligner}/${meta.id}/cellbender_removebackground`**
 

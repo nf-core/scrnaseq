@@ -84,7 +84,7 @@ nextflow_pipeline {
                     path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_2/metrics_summary.csv" ),
 
                     // RDS
-                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/*/*.rds" ),
+                    file( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions" ).find { file(it).name ==~ /.*.rds/ }
 
                 ).match()}
 

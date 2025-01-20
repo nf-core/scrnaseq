@@ -133,7 +133,7 @@ Battenberg, K., Kelly, S.T., Ras, R.A., Hetherington, N.A., Hayashi, K., and Min
 
 The pipeline also possess a module to perform empty-drops calling and filtering with a custom-made script that uses a library called `bioconductor-dropletutils` that is available in `bioconda`. The process is simple, it takes a raw/unfiltered matrix file, and performs the empty-drops calling and filtering on it, generating another matrix file.
 
-> Users can turn it of with `--skip_emptydrops`.
+> Users can turn it of with `--skip_cellbender`.
 
 **Output directory: `results/${params.aligner}/emptydrops_filtered`**
 

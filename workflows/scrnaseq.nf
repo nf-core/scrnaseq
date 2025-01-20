@@ -287,7 +287,7 @@ workflow SCRNASEQ {
     }
 
     // Run emptydrops calling module
-    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc', 'cellrangermulti']) ) { // TODO: Can it run with 'cellrangermulti'?
+    if ( !params.skip_cellbender && !(params.aligner in ['cellrangerarc', 'cellrangermulti']) ) { // TODO: Can it run with 'cellrangermulti'?
 
         //
         // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it

@@ -88,9 +88,9 @@
                     "type": "boolean",
                     "description": "Skip FastQC"
                 },
-                "skip_emptydrops": {
+                "skip_cellbender": {
                     "type": "boolean",
-                    "description": "Skip custom empty drops filter module"
+                    "description": "Skip custom cellbender empty drops filter module"
                 }
             }
         },

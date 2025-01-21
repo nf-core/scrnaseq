@@ -88,7 +88,7 @@
                     "type": "boolean",
                     "description": "Skip FastQC"
                 },
-                "skip_emptydrops": {
+                "skip_cellbender": {
                     "type": "boolean",
                     "description": "Skip cellbender empty drops filter subworkflow"
                 }

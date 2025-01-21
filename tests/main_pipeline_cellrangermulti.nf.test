@@ -18,7 +18,7 @@ nextflow_pipeline {
                 gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
                 aligner                   = 'cellrangermulti'
                 protocol                  = 'auto'
-                skip_emptydrops           = true
+                skip_cellbender           = true
             }
         }
 

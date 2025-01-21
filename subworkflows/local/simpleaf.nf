@@ -8,54 +8,77 @@ def multiqc_report    = []
 workflow SCRNASEQ_SIMPLEAF {
 
     take:
-    genome_fasta
-    gtf
+    genome_fasta // channel
+    genome_gtf   // channel
     transcript_fasta
     simpleaf_index
     txp2gene
     barcode_whitelist
+    chemistry
     resolution
-    ch_fastq
+    ch_fastq   // channel
     map_dir
 
     main:
     ch_versions = Channel.empty()
 
-    // we have four types of input:
-    // 1. genome fasta and gtf -> build augmented index including spliced transcripts and intronic information
-    // 2. transcript fasta and t2g file -> build index directly from transcript fasta
-    // 3. simpleaf index and t2g file -> use the index directly
-    // 4. mapping results -> skip mapping
-    assert ( txp2gene && simpleaf_index  && !transcript_fasta && !genome_fasta && !gtf&& !map_dir ) || // existing index
-           ( txp2gene && !simpleaf_index && transcript_fasta && !genome_fasta && !gtf && !map_dir ) || // transcript fasta
-           ( !simpleaf_index && !transcript_fasta && genome_fasta && gtf && !map_dir ) || // genome fasta and gtf
-           ( !simpleaf_index && !transcript_fasta && !genome_fasta && !gtf && map_dir ) : // existing mapping
-        """Must provide either of the followings: (i) --genome_fasta + --gtf, (ii) --transcript_fasta + --txp2gene, (iii) --simpleaf_index + --txp2gene, and (iv) --map_dir""".stripIndent()
-
     /*
     * Build salmon index
     */
-    if ( !simpleaf_index && !map_dir ) {
-        SIMPLEAF_INDEX( genome_fasta, gtf, transcript_fasta )
+    if ( !simpleaf_index || !map_dir ) {
+        // define input channels for index building
+        // we can either use the genome fasta and gtf files or the transcript fasta file
+        if ( transcript_fasta ) {
+            ch_genome_fasta_gtf = [ [:],[],[] ]
+            ch_transcript_fasta = Channel.of( [ [id: transcript_fasta.baseName], transcript_fasta ] )
+        } else {
+            ch_genome_fasta_gtf = genome_fasta.combine( genome_gtf ).map{ fasta, gtf -> [[id: gtf.baseName], fasta, gtf] }
+            ch_transcript_fasta = Channel.of( [ [:], [] ] )
+        }
+
+        SIMPLEAF_INDEX(
+            ch_genome_fasta_gtf,
+            ch_transcript_fasta
+        )
+        // Channel of tuple(meta, index dir)
         simpleaf_index = SIMPLEAF_INDEX.out.index.collect()
-        transcript_tsv = SIMPLEAF_INDEX.out.transcript_tsv.collect()
+        // Channel of t2g path or empty
+        t2g = SIMPLEAF_INDEX.out.t2g.collect()
         ch_versions = ch_versions.mix(SIMPLEAF_INDEX.out.versions)
 
+        // ensure txp2gene is a Channel
         if (!txp2gene) {
-            txp2gene = transcript_tsv
+            txp2gene = t2g
+        } else {
+            txp2gene = Channel.of( txp2gene )
         }
+    } else {
+        // ensure simpleaf index and txp2gene are Channels
+        simpleaf_index = Channel.of( [ [:], simpleaf_index ] )
+        txp2gene = Channel.of( txp2gene )
+    }
+
+    // define input channels for quantification
+    // we can either use the mapping results or the reads and index files
+    if ( map_dir ) {
+        ch_chemistry_reads = Channel.of( [ [:],[],[] ] )
+        ch_index_t2g = Channel.of( [ [:],[],[] ] )
+        ch_map_dir = Channel.of( [ [id: map_dir.baseName], map_dir ] )
+    } else {
+        ch_chemistry_reads = ch_fastq.map{ meta, files -> tuple(meta + ["chemistry": chemistry], chemistry, files) }
+        ch_index_t2g = simpleaf_index.combine( txp2gene )
+        ch_map_dir = [ [:],[],[] ]
     }
 
     /*
     * Perform quantification with salmon alevin
     */
     SIMPLEAF_QUANT (
-        ch_fastq,
-        simpleaf_index,
-        txp2gene,
+        ch_chemistry_reads,
+        ch_index_t2g,
+        [[:], "unfiltered-pl", [], barcode_whitelist ],
         resolution,
-        barcode_whitelist,
-        map_dir // this takes a directory of mapping result. Not applicable here
+        ch_map_dir
     )
     ch_versions = ch_versions.mix(SIMPLEAF_QUANT.out.versions)
 
@@ -65,8 +88,11 @@ workflow SCRNASEQ_SIMPLEAF {
     ALEVINQC( SIMPLEAF_QUANT.out.quant, SIMPLEAF_QUANT.out.quant, SIMPLEAF_QUANT.out.map )
     ch_versions = ch_versions.mix(ALEVINQC.out.versions)
 
+
     emit:
     ch_versions
-    simpleaf_results = SIMPLEAF_QUANT.out.simpleaf.map{ meta, files -> [meta + [input_type: 'raw'], files] }
+    index = simpleaf_index
+    map = SIMPLEAF_QUANT.out.map
+    quant = SIMPLEAF_QUANT.out.quant.map{ meta, files -> [meta + [input_type: meta["count_type"]], files] }
     alevinqc       = ALEVINQC.out.report
 }

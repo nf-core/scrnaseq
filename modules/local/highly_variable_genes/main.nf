@@ -1,5 +1,6 @@
 process HIGHLY_VARIABLE_GENES  {
-    tag "Feature selection and dimensionality reduction"
+    tag "$meta.id"
+
     publishDir "results/table", pattern: "*.csv", mode:'copy'
     publishDir "results/figures", pattern: "*.png", mode:'copy'
 

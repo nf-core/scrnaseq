@@ -19,6 +19,7 @@ include { CELLRANGERARC_ALIGN                           } from "../subworkflows/
 include { MTX_TO_H5AD                                   } from '../modules/local/mtx_to_h5ad'
 include { H5AD_CONVERSION                               } from '../subworkflows/local/h5ad_conversion'
 include { H5AD_CONVERSION as EMPTYDROPS_H5AD_CONVERSION } from '../subworkflows/local/h5ad_conversion'
+include { NORMALIZATION_AND_HVG                         } from '../subworkflows/local/normalization_and_hvg'
 include { EMPTY_DROPLET_REMOVAL                         } from '../subworkflows/local/emptydrops_removal.nf'
 include { GTF_GENE_FILTER                               } from '../modules/local/gtf_gene_filter'
 include { GUNZIP as GUNZIP_FASTA                        } from '../modules/nf-core/gunzip/main'
@@ -306,6 +307,13 @@ workflow SCRNASEQ {
         ch_input
     )
     ch_versions = ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
+
+    //
+    // SUBWORKFLOW: Run normalization on the concatenated h5ad files
+    //
+    NORMALIZATION_AND_HVG (
+        H5AD_CONVERSION.out.h5ads
+    )
 
     //
     // SUBWORKFLOW: Run cellbender emptydrops filter

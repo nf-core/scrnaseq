@@ -28,6 +28,8 @@ process MTX_TO_H5AD {
     script:
     def aligner = (input_aligner in [ 'cellranger', 'cellrangerarc', 'cellrangermulti' ]) ? 'cellranger' : input_aligner
 
+    aligner = input_aligner == "alevin" ? "simpleaf" : aligner
+
     template "mtx_to_h5ad_${aligner}.py"
 
     stub:

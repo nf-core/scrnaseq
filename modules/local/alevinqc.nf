@@ -1,20 +1,22 @@
 process ALEVINQC {
 
     //
-    // This module executes alevinfry QC reporting tool on alevin results
+    // This module executes alevinfry QC reporting tool on alevin-fry results
     //
 
     tag "$meta.id"
     label 'process_low'
 
-    //The alevinqc 1.14.0 container is broken, missing some libraries - thus reverting this to previous 1.12.1 version
-    conda "bioconda::bioconductor-alevinqc=1.12.1"
+    conda "bioconda::bioconductor-alevinqc=1.18.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.12.1--r41h9f5acd7_0' :
-        'biocontainers/bioconductor-alevinqc:1.12.1--r41h9f5acd7_0' }"
+        'https://depot.galaxyproject.org/singularity/bioconductor-alevinqc:1.18.0--r43hf17093f_0' :
+        'biocontainers/bioconductor-alevinqc:1.18.0--r43hf17093f_0' }"
 
+    // all metas are the same
     input:
-    tuple val(meta), path(alevin_results)
+    tuple val(meta), path(quant_dir, stageAs: "quant_dir")
+    tuple val(meta1), path(permit_dir, stageAs: "permit_dir")
+    tuple val(meta2), path(map_dir)
 
     output:
     tuple val(meta), path("alevin_report_${meta.id}.html"), emit: report
@@ -29,9 +31,9 @@ process ALEVINQC {
     #!/usr/bin/env Rscript
     require(alevinQC)
     alevinFryQCReport(
-        mapDir = "${alevin_results}/af_map",
-        quantDir = "${alevin_results}/af_quant",
-        permitDir= "${alevin_results}/af_quant",
+        mapDir = "${map_dir}",
+        permitDir= "${permit_dir}",
+        quantDir = "${quant_dir}",
         sampleId = "${prefix}",
         outputFile = "alevin_report_${meta.id}.html",
         outputFormat = "html_document",

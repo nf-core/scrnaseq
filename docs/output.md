@@ -93,7 +93,7 @@ This pipeline uses the simplified and flexible modules in [Simpleaf](https://sim
 
 **Output directory: `results/reference_genome`**
 
-- `salmon_index`
+- `simpleaf_index`
   - Contains the indexed reference transcriptome for the Salmon mapper
 - `alevin/txp2gene.tsv`
   - The transcriptome to gene mapping TSV file utilized by Alevin-fry

@@ -50,7 +50,7 @@ def main():
         epilog = "This function reduce the dimensionality of the dataset and only include the most informative genes.")
     parser.add_argument('-ad','--input-h5ad-file',metavar= 'H5AD_INPUT_FILES', type=pathlib.Path, dest='input_h5ad_files',
                         required=True, help="paths of existing count matrix files in h5 format (including file names)")
-    parser.add_argument('-o', '--out', metavar='H5AD_OUTPUT_FILE', type=pathlib.Path, default="combined_matrix_DR.h5ad",
+    parser.add_argument('-o', '--out', metavar='H5AD_OUTPUT_FILE', type=pathlib.Path, default="matrix.hvg.h5ad",
                         help="name of the output h5ad file after dimensionality reduction")
     parser.add_argument('-csv', '--csv_out', metavar='CSV_TABLE',type=pathlib.Path, default="UMAP_coordinates.csv",
                         help="csv tabel with UMAP coordinates for each cell")
@@ -97,7 +97,7 @@ def main():
     # select highly=variable genes for each sample
     print("\nSelecting highly-variable genes are selected within each batch separately and merged")
 
-    sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5, batch_key = 'run_id',subset=False)
+    sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5, batch_key = 'sample',subset=False)
 
     print("\n===== DIMENSIONALITY REDUCTION =====")
     print("\nPerforming dimensionality reduction by running principal component analysis (PCA)")
@@ -122,7 +122,7 @@ def main():
     # Visualize UMAP plot 
 
     print("\nVisualized UMAP plot")
-    sc.pl.umap(adata, color ='run_id',legend_loc='on data',show=False)
+    sc.pl.umap(adata, color ='sample',legend_loc='on data',show=False)
     plt.savefig(os.path.join(args.results,'UMAP_plot.png'))
     plt.close()
 

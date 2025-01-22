@@ -85,7 +85,7 @@ os.makedirs("${meta.id}", exist_ok=True)
 
 # input_type comes from NF module
 input_to_adata(
-    input_data="${meta.id}_alevin_results/af_quant/alevin/",
+    input_data="${inputs}/alevin/",
     output="${meta.id}_${meta.input_type}_matrix.h5ad",
     sample="${meta.id}"
 )

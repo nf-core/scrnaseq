@@ -177,13 +177,7 @@
                     "format": "file-path",
                     "exists": true
                 },
-                "simpleaf_rlen": {
-                    "type": "integer",
-                    "default": 91,
-                    "description": "It is the target read length the index will be built for, using simpleaf.",
-                    "fa_icon": "fas fa-map-marked-alt"
-                },
-                "simpleaf_resolution": {
+                "simpleaf_umi_resolution": {
                     "type": "string",
                     "default": "cr-like",
                     "enum": ["cr-like", "cr-like-em", "parsimony", "parsimony-em", "parsimony-gene", "parsimony-gene-em"],

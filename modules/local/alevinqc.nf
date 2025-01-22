@@ -14,8 +14,8 @@ process ALEVINQC {
 
     // all metas are the same
     input:
-    tuple val(meta), path(quant_dir)
-    tuple val(meta1), path(permit_dir)
+    tuple val(meta), path(quant_dir, stageAs: "quant_dir")
+    tuple val(meta1), path(permit_dir, stageAs: "permit_dir")
     tuple val(meta2), path(map_dir)
 
     output:

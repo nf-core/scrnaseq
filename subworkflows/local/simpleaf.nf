@@ -3,13 +3,11 @@ include { ALEVINQC              } from '../../modules/local/alevinqc'
 include { SIMPLEAF_INDEX        } from '../../../modules/modules/nf-core/simpleaf/index'
 include { SIMPLEAF_QUANT        } from '../../../modules/modules/nf-core/simpleaf/quant'
 
-def multiqc_report    = []
-
 workflow SCRNASEQ_SIMPLEAF {
 
     take:
-    genome_fasta // channel
-    genome_gtf   // channel
+    ch_genome_fasta // channel
+    ch_genome_gtf   // channel
     transcript_fasta
     simpleaf_index
     txp2gene
@@ -30,9 +28,9 @@ workflow SCRNASEQ_SIMPLEAF {
         // we can either use the genome fasta and gtf files or the transcript fasta file
         if ( transcript_fasta ) {
             ch_genome_fasta_gtf = [ [:],[],[] ]
-            ch_transcript_fasta = Channel.of( [ [id: transcript_fasta.baseName], transcript_fasta ] )
+            ch_transcript_fasta = Channel.of( [ [id: "${transcript_fasta.getBaseName()}"], transcript_fasta ] )
         } else {
-            ch_genome_fasta_gtf = genome_fasta.combine( genome_gtf ).map{ fasta, gtf -> [[id: gtf.baseName], fasta, gtf] }
+            ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ fasta, gtf -> [[id: "${fasta.getBaseName()}"], fasta, gtf] }
             ch_transcript_fasta = Channel.of( [ [:], [] ] )
         }
 
@@ -67,7 +65,7 @@ workflow SCRNASEQ_SIMPLEAF {
     } else {
         ch_chemistry_reads = ch_fastq.map{ meta, files -> tuple(meta + ["chemistry": chemistry], chemistry, files) }
         ch_index_t2g = simpleaf_index.combine( txp2gene )
-        ch_map_dir = [ [:],[],[] ]
+        ch_map_dir = [ [:],[] ]
     }
 
     /*
@@ -82,17 +80,19 @@ workflow SCRNASEQ_SIMPLEAF {
     )
     ch_versions = ch_versions.mix(SIMPLEAF_QUANT.out.versions)
 
+    ch_af_map = map_dir ? ch_map_dir : SIMPLEAF_QUANT.out.map
     /*
     * Run alevinQC
     */
-    ALEVINQC( SIMPLEAF_QUANT.out.quant, SIMPLEAF_QUANT.out.quant, SIMPLEAF_QUANT.out.map )
+    ALEVINQC( SIMPLEAF_QUANT.out.quant, SIMPLEAF_QUANT.out.quant, ch_af_map )
     ch_versions = ch_versions.mix(ALEVINQC.out.versions)
 
 
     emit:
     ch_versions
-    index = simpleaf_index
-    map = SIMPLEAF_QUANT.out.map
-    quant = SIMPLEAF_QUANT.out.quant.map{ meta, files -> [meta + [input_type: meta["count_type"]], files] }
-    alevinqc       = ALEVINQC.out.report
+    txp2gene
+    index       = simpleaf_index
+    map         = SIMPLEAF_QUANT.out.map
+    quant       = SIMPLEAF_QUANT.out.quant
+    alevinqc    = ALEVINQC.out.report
 }

@@ -144,13 +144,23 @@ workflow SCRNASEQ {
             ch_txp2gene,
             ch_barcode_whitelist,
             protocol_config['protocol'],
-            params.simpleaf_resolution,
+            params.simpleaf_umi_resolution,
             ch_fastq,
             [] // for existing map dir; not applicable
         )
         ch_versions = ch_versions.mix(SCRNASEQ_SIMPLEAF.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_SIMPLEAF.out.quant.map{ meta, it -> it })
-        ch_mtx_matrices = ch_mtx_matrices.mix( SCRNASEQ_SIMPLEAF.out.quant )
+        ch_mtx_matrices = ch_mtx_matrices.mix(
+            SCRNASEQ_SIMPLEAF.out.quant.map{
+                meta, files -> [
+                    meta +
+                    [input_type: meta["filtered"] ? "filtered" : "raw" ],
+                    files
+                ]
+            }
+        )
+
+        ch_txp2gene = SCRNASEQ_SIMPLEAF.out.txp2gene
     }
 
     // Run STARSolo pipeline
@@ -285,9 +295,12 @@ workflow SCRNASEQ {
     // SUBWORKFLOW: Run cellbender emptydrops filter
     //
     if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
+
         // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
         H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA (
-            ch_h5ads.filter { meta, mtx_files -> meta.input_type == 'raw' }
+            ch_h5ads
+                .filter { meta, mtx_files -> meta.input_type == 'raw' }
+                .map { meta, mtx_files -> [ meta + [input_type: 'filtered'], mtx_files ]} // to avoid name collision
         )
         ch_h5ads = ch_h5ads.mix(
             H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA.out.h5ad

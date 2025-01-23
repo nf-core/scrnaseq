@@ -65,7 +65,7 @@ workflow SCRNASEQ_SIMPLEAF {
     } else {
         ch_chemistry_reads = ch_fastq.map{ meta, files -> tuple(meta + ["chemistry": chemistry], chemistry, files) }
 
-        ch_index_t2g = simpleaf_index.combine( txp2gene.map{ _m, t -> t } )}
+        ch_index_t2g = simpleaf_index.combine( txp2gene.map{ _m, t -> t } )
         ch_map_dir = [ [:],[] ]
     }
 

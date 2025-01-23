@@ -41,19 +41,19 @@ workflow SCRNASEQ_SIMPLEAF {
         // Channel of tuple(meta, index dir)
         simpleaf_index = SIMPLEAF_INDEX.out.index.collect()
         // Channel of t2g path or empty
-        t2g = SIMPLEAF_INDEX.out.t2g.collect()
+        t2g = SIMPLEAF_INDEX.out.t2g.collect().map { _meta, it -> it }
         ch_versions = ch_versions.mix(SIMPLEAF_INDEX.out.versions)
 
         // ensure txp2gene is a Channel
         if (!txp2gene) {
             txp2gene = t2g
         } else {
-            txp2gene = Channel.of( [ [:], txp2gene ] )
+            txp2gene = Channel.of( [ txp2gene ] )
         }
     } else {
         // ensure simpleaf index and txp2gene are Channels
-        simpleaf_index = Channel.of( [ [:], simpleaf_index ] )
-        txp2gene = Channel.of( [ [:], txp2gene ] )
+        simpleaf_index = Channel.of( [ simpleaf_index ] )
+        txp2gene = Channel.of( [ txp2gene ] )
     }
 
     // define input channels for quantification
@@ -65,7 +65,7 @@ workflow SCRNASEQ_SIMPLEAF {
     } else {
         ch_chemistry_reads = ch_fastq.map{ meta, files -> tuple(meta + ["chemistry": chemistry], chemistry, files) }
 
-        ch_index_t2g = simpleaf_index.combine( txp2gene.map{ _m, t -> t } )
+        ch_index_t2g = simpleaf_index.combine( txp2gene )
         ch_map_dir = [ [:],[] ]
     }
 

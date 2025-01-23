@@ -48,12 +48,12 @@ workflow SCRNASEQ_SIMPLEAF {
         if (!txp2gene) {
             txp2gene = t2g
         } else {
-            txp2gene = Channel.of( txp2gene )
+            txp2gene = Channel.of( [ [:], txp2gene ] )
         }
     } else {
         // ensure simpleaf index and txp2gene are Channels
         simpleaf_index = Channel.of( [ [:], simpleaf_index ] )
-        txp2gene = Channel.of( txp2gene )
+        txp2gene = Channel.of( [ [:], txp2gene ] )
     }
 
     // define input channels for quantification
@@ -64,7 +64,8 @@ workflow SCRNASEQ_SIMPLEAF {
         ch_map_dir = Channel.of( [ [id: map_dir.baseName], map_dir ] )
     } else {
         ch_chemistry_reads = ch_fastq.map{ meta, files -> tuple(meta + ["chemistry": chemistry], chemistry, files) }
-        ch_index_t2g = simpleaf_index.combine( txp2gene )
+
+        ch_index_t2g = simpleaf_index.combine( txp2gene.map{ _m, t -> t } )}
         ch_map_dir = [ [:],[] ]
     }
 

@@ -18,7 +18,7 @@ nextflow_pipeline {
                 gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
                 aligner                   = 'cellrangermulti'
                 protocol                  = 'auto'
-                skip_emptydrops           = true
+                skip_cellbender           = true
             }
         }
 
@@ -34,7 +34,7 @@ nextflow_pipeline {
                 {assert workflow.success},
 
                 // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 85},
+                {assert workflow.trace.tasks().size() == 57},
 
                 // How many results were produced?
                 {assert path("${outputDir}/results_cellrangermulti").list().size() == 4},

@@ -1,4 +1,3 @@
-bump_version: null
 lint:
   files_exist:
     - lib/Utils.groovy
@@ -6,8 +5,7 @@ lint:
     - .github/ISSUE_TEMPLATE/bug_report.yml
   schema_params: false
   template_strings: false
-nf_core_version: 3.0.2
-org_path: null
+nf_core_version: 3.1.1
 repository_type: pipeline
 template:
   author: Bailey PJ, Botvinnik O, Marques de Almeida F, Peltzer A, Sturm G
@@ -17,6 +15,4 @@ template:
   name: scrnaseq
   org: nf-core
   outdir: .
-  skip_features: null
   version: 2.8.0dev
-update: null

@@ -5,8 +5,8 @@
   </picture>
 </h1>
 
-[![GitHub Actions CI Status](https://github.com/nf-core/scrnaseq/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/scrnaseq/actions?query=workflow%3A%22nf-core+CI%22)
-[![GitHub Actions Linting Status](https://github.com/nf-core/scrnaseq/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/scrnaseq/actions?query=workflow%3A%22nf-core+linting%22)
+[![GitHub Actions CI Status](https://github.com/nf-core/scrnaseq/actions/workflows/ci.yml/badge.svg)](https://github.com/nf-core/scrnaseq/actions/workflows/ci.yml)
+[![GitHub Actions Linting Status](https://github.com/nf-core/scrnaseq/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/scrnaseq/actions/workflows/linting.yml)
 [![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/scrnaseq/results)
 [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.3568187-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.3568187)
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
@@ -42,7 +42,7 @@ The nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage
 ## Usage
 
 > [!NOTE]
-> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
+> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow.Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
 First, prepare a samplesheet with your input data that looks as follows:
 
@@ -62,7 +62,7 @@ Now, you can run the pipeline using:
 nextflow run nf-core/scrnaseq \
    -profile <docker/singularity/.../institute> \
    --input samplesheet.csv \
-   --genome_fasta GRCm38.p6.genome.chr19.fa \
+   --fasta GRCm38.p6.genome.chr19.fa \
    --gtf gencode.vM19.annotation.chr19.gtf \
    --protocol 10XV2 \
    --aligner <alevin/kallisto/star/cellranger> \
@@ -116,7 +116,7 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 
 If you use nf-core/scrnaseq for your analysis, please cite it using the following doi: [10.5281/zenodo.3568187](https://doi.org/10.5281/zenodo.3568187)
 
-The basic benchmarks that were used as motivation for incorporating the three available modular workflows can be found in [this publication](https://www.biorxiv.org/content/10.1101/673285v2).
+The basic benchmarks that were used as motivation for incorporating the available modular workflows can be found in [this publication](https://www.biorxiv.org/content/10.1101/673285v2).
 
 We offer all three paths for the processing of scRNAseq data so it remains up to the user to decide which pipeline workflow is chosen for a particular analysis question.
 

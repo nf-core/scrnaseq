@@ -22,6 +22,8 @@ include { GTF_GENE_FILTER                                   } from '../modules/l
 include { GUNZIP as GUNZIP_FASTA                            } from '../modules/nf-core/gunzip/main'
 include { GUNZIP as GUNZIP_GTF                              } from '../modules/nf-core/gunzip/main'
 include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
+include { NORMALIZATION_AND_HVG                             } from '../subworkflows/local/normalization_and_hvg'
+
 
 
 workflow SCRNASEQ {
@@ -277,6 +279,23 @@ workflow SCRNASEQ {
     )
     ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
     ch_h5ads = MTX_TO_H5AD.out.h5ad
+
+    //
+    // SUBWORKFLOW: Run h5ad conversion and concatenation
+    //
+    ch_emptydrops = Channel.empty()
+    H5AD_CONVERSION (
+        MTX_TO_H5AD.out.h5ad,
+        ch_input
+    )
+    ch_versions = ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
+
+    //
+    // SUBWORKFLOW: Run normalization on the concatenated h5ad files
+    //
+    NORMALIZATION_AND_HVG (
+        H5AD_CONVERSION.out.h5ads
+    )
 
     //
     // SUBWORKFLOW: Run cellbender remove background subworkflow

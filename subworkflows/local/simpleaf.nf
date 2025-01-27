@@ -1,7 +1,7 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { ALEVINQC              } from '../../modules/local/alevinqc'
-include { SIMPLEAF_INDEX        } from '../../../modules/modules/nf-core/simpleaf/index'
-include { SIMPLEAF_QUANT        } from '../../../modules/modules/nf-core/simpleaf/quant'
+include { SIMPLEAF_INDEX        } from '../../modules/modules/nf-core/simpleaf/index'
+include { SIMPLEAF_QUANT        } from '../../modules/modules/nf-core/simpleaf/quant'
 
 workflow SCRNASEQ_SIMPLEAF {
 
@@ -59,13 +59,18 @@ workflow SCRNASEQ_SIMPLEAF {
     // define input channels for quantification
     // we can either use the mapping results or the reads and index files
     if ( map_dir ) {
+        // meta, chemistry, files
         ch_chemistry_reads = Channel.of( [ [:],[],[] ] )
+        // meta, index, t2g file
         ch_index_t2g = Channel.of( [ [:],[],[] ] )
+        // meta, map dir
         ch_map_dir = Channel.of( [ [id: map_dir.baseName], map_dir ] )
     } else {
+        // meta, chemistry, files
         ch_chemistry_reads = ch_fastq.map{ meta, files -> tuple(meta + ["chemistry": chemistry], chemistry, files) }
-
+        // meta, index, t2g file
         ch_index_t2g = simpleaf_index.combine( txp2gene )
+        // meta, map dir
         ch_map_dir = [ [:],[] ]
     }
 
@@ -75,6 +80,7 @@ workflow SCRNASEQ_SIMPLEAF {
     SIMPLEAF_QUANT (
         ch_chemistry_reads,
         ch_index_t2g,
+        // meta, cell filtering method, cell filtering params, whitelist
         [[:], "unfiltered-pl", [], barcode_whitelist ],
         resolution,
         ch_map_dir

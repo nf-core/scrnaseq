@@ -519,7 +519,7 @@
             "$ref": "#/$defs/reference_genome_options"
         },
         {
-            "$ref": "#/$defs/alevin_options"
+            "$ref": "#/$defs/simpleaf_options"
         },
         {
             "$ref": "#/$defs/starsolo_options"

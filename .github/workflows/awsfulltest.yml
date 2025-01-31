@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        aligner: ["alevin", "kallisto", "star", "cellranger"]
+        aligner: ["simpleaf", "kallisto", "star", "cellranger"]
     steps:
       - name: Get PR reviews
         uses: octokit/request-action@v2.x

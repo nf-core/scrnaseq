@@ -17,6 +17,8 @@ def say(quiet, words):
     if not quiet:
         print(words)
 
+# From pyroe https://github.com/COMBINE-lab/pyroe/blob/develop/src/pyroe/load_fry.py
+# this can be removed because the simpleaf quant module on nf-core/modules with simpleaf 0.19.0 exports an h5ad file directly.
 def load_fry(
     frydir,
     output_format="snRNA",

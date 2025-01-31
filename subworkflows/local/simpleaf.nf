@@ -27,44 +27,52 @@ workflow SCRNASEQ_SIMPLEAF {
         // define input channels for index building
         // we can either use the genome fasta and gtf files or the transcript fasta file
         if ( transcript_fasta ) {
-            ch_genome_fasta_gtf = [ [:],[],[] ]
-            ch_transcript_fasta = Channel.of( [ [id: "${transcript_fasta.getBaseName()}"], transcript_fasta ] )
+            ch_genome_fasta_gtf = [ [:],[],[] ] // meta, genome fasta, genome gtf
+            ch_transcript_fasta = [ [id: "${transcript_fasta.getName()}"], transcript_fasta ] // meta, transcript fasta
         } else {
-            ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ fasta, gtf -> [[id: "${fasta.getBaseName()}"], fasta, gtf] }
-            ch_transcript_fasta = Channel.of( [ [:], [] ] )
+            ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ fasta, gtf -> [[id: "${fasta.getName()}"], fasta, gtf] }
+            ch_transcript_fasta = [ [:], [] ] // meta, transcript fasta
         }
 
         SIMPLEAF_INDEX(
             ch_genome_fasta_gtf,
-            ch_transcript_fasta
+            ch_transcript_fasta,
+            [[:], []], // meta, probe CSV
+            [[:], []] // meta, feature CSV
         )
         // Channel of tuple(meta, index dir)
         simpleaf_index = SIMPLEAF_INDEX.out.index.collect()
         // Channel of t2g path or empty
-        t2g = SIMPLEAF_INDEX.out.t2g.collect()
+        t2g = SIMPLEAF_INDEX.out.t2g.collect().map { _meta, it -> it }
         ch_versions = ch_versions.mix(SIMPLEAF_INDEX.out.versions)
 
         // ensure txp2gene is a Channel
         if (!txp2gene) {
             txp2gene = t2g
         } else {
-            txp2gene = Channel.of( txp2gene )
+            txp2gene = Channel.of( [ txp2gene ] )
         }
     } else {
         // ensure simpleaf index and txp2gene are Channels
-        simpleaf_index = Channel.of( [ [:], simpleaf_index ] )
-        txp2gene = Channel.of( txp2gene )
+        simpleaf_index = Channel.of( [ simpleaf_index ] )
+        txp2gene = Channel.of( [ txp2gene ] )
     }
 
     // define input channels for quantification
     // we can either use the mapping results or the reads and index files
     if ( map_dir ) {
-        ch_chemistry_reads = Channel.of( [ [:],[],[] ] )
-        ch_index_t2g = Channel.of( [ [:],[],[] ] )
-        ch_map_dir = Channel.of( [ [id: map_dir.baseName], map_dir ] )
+        // meta, chemistry, files
+        ch_chemistry_reads = [ [:],[],[] ]
+        // meta, index, t2g file
+        ch_index_t2g = [ [:],[],[] ]
+        // meta, map dir
+        ch_map_dir = [ [id: map_dir.baseName], map_dir ]
     } else {
+        // meta, chemistry, files
         ch_chemistry_reads = ch_fastq.map{ meta, files -> tuple(meta + ["chemistry": chemistry], chemistry, files) }
-        ch_index_t2g = simpleaf_index.combine( txp2gene )
+        // meta, index, t2g file
+        ch_index_t2g = simpleaf_index.combine( txp2gene ).collect()
+        // meta, map dir
         ch_map_dir = [ [:],[] ]
     }
 
@@ -74,6 +82,7 @@ workflow SCRNASEQ_SIMPLEAF {
     SIMPLEAF_QUANT (
         ch_chemistry_reads,
         ch_index_t2g,
+        // meta, cell filtering method, cell filtering params, whitelist
         [[:], "unfiltered-pl", [], barcode_whitelist ],
         resolution,
         ch_map_dir
@@ -81,10 +90,11 @@ workflow SCRNASEQ_SIMPLEAF {
     ch_versions = ch_versions.mix(SIMPLEAF_QUANT.out.versions)
 
     ch_af_map = map_dir ? ch_map_dir : SIMPLEAF_QUANT.out.map
+    ch_af_quant = SIMPLEAF_QUANT.out.quant
     /*
     * Run alevinQC
     */
-    ALEVINQC( SIMPLEAF_QUANT.out.quant, SIMPLEAF_QUANT.out.quant, ch_af_map )
+    ALEVINQC( ch_af_quant, ch_af_quant, ch_af_map )
     ch_versions = ch_versions.mix(ALEVINQC.out.versions)
 
 
@@ -92,7 +102,7 @@ workflow SCRNASEQ_SIMPLEAF {
     ch_versions
     txp2gene
     index       = simpleaf_index
-    map         = SIMPLEAF_QUANT.out.map
-    quant       = SIMPLEAF_QUANT.out.quant
+    map         = ch_af_map
+    quant       = ch_af_quant
     alevinqc    = ALEVINQC.out.report
 }

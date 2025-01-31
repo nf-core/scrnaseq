@@ -19,7 +19,7 @@ process ALEVINQC {
     tuple val(meta2), path(map_dir)
 
     output:
-    tuple val(meta), path("alevin_report_${meta.id}.html"), emit: report
+    tuple val(meta), path("simpleaf_qc_report_${meta.id}.html"), emit: report
     path  "versions.yml", emit: versions
 
     when:
@@ -35,7 +35,7 @@ process ALEVINQC {
         permitDir= "${permit_dir}",
         quantDir = "${quant_dir}",
         sampleId = "${prefix}",
-        outputFile = "alevin_report_${meta.id}.html",
+        outputFile = "simpleaf_qc_report_${meta.id}.html",
         outputFormat = "html_document",
         outputDir = "./",
         forceOverwrite = TRUE

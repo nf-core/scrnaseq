@@ -133,8 +133,8 @@ workflow SCRNASEQ {
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
-    // Run salmon alevin pipeline
-    if (params.aligner == "alevin") {
+    // Run salmon simpleaf pipeline
+    if (params.aligner == "simpleaf") {
 
         SCRNASEQ_SIMPLEAF(
             ch_genome_fasta,

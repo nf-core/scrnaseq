@@ -8,7 +8,7 @@ nextflow_pipeline {
         when {
             // the rest is taken from shared config
             params {
-                aligner    = 'alevin'
+                aligner    = 'simpleaf'
                 outdir     = "${outputDir}/results_alevin"
             }
         }

@@ -134,7 +134,7 @@ workflow SCRNASEQ {
     }
 
     // Run salmon simpleaf pipeline
-    if (params.aligner == "simpleaf") {
+    if (params.aligner == "simpleaf" || params.aligner == "alevin") {
 
         SCRNASEQ_SIMPLEAF(
             ch_genome_fasta,

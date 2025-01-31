@@ -30,7 +30,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrn
 // Thus, manually provided files are not overwritten by the genome attributes
 params.fasta            = getGenomeAttribute('fasta')
 params.gtf              = getGenomeAttribute('gtf')
-params.simpleaf_index     = getGenomeAttribute('simpleaf')
+params.simpleaf_index     = getGenomeAttribute('simpleaf') ?: getGenomeAttribute('salmon')
 params.txp2gene         = getGenomeAttribute('simpleaf_txp2gene')
 params.cellranger_index = params.aligner == 'cellrangerarc' ?
                             getGenomeAttribute('cellrangerarc') :

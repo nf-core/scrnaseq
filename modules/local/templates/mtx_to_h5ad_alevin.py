@@ -2,15 +2,14 @@
 
 # Set numba chache dir to current working directory (which is a writable mount also in containers)
 import os
-
-os.environ["NUMBA_CACHE_DIR"] = "."
-
 import scanpy as sc
 import pandas as pd
 import argparse
 import anndata
 from anndata import AnnData
 import platform
+
+os.environ["NUMBA_CACHE_DIR"] = "."
 
 def _mtx_to_adata(
     input: str,

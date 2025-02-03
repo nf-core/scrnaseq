@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import argparse
-import os
+# import os
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate the lib.csv for cellranger-arc.")

@@ -4,10 +4,6 @@ process CELLRANGERARC_COUNT {
 
     container "nf-core/cellranger-arc:2.0.2"
 
-    // Exit if running this module with -profile conda / -profile mamba
-    if (workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1) {
-        exit 1, "CELLRANGERARC_COUNT module does not support Conda. Please use Docker / Singularity / Podman instead."
-    }
 
     input:
     tuple val(meta), val(sample_type), val(sub_sample), path(reads, stageAs: "fastqs/*")
@@ -22,6 +18,11 @@ process CELLRANGERARC_COUNT {
     task.ext.when == null || task.ext.when
 
     script:
+    // Exit if running this module with -profile conda / -profile mamba
+    if (workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1) {
+        exit 1, "CELLRANGERARC_COUNT module does not support Conda. Please use Docker / Singularity / Podman instead."
+    }
+
     def args = task.ext.args ?: ''
     def reference_name = reference.name
     def sample_types = sample_type.join(",")

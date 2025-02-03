@@ -5,7 +5,7 @@ process PARSE_CELLRANGERMULTI_SAMPLESHEET {
     //
 
     label 'process_low'
-    publishDir = [ enabled: false ]
+    publishDir enabled: false
 
     conda "conda-forge::python=3.9.5"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

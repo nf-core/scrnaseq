@@ -27,7 +27,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sys, argparse
+import sys
+import argparse
 
 
 def create_transcript_list(input, use_name=True, use_version=False):

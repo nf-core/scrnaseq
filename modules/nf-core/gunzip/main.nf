@@ -40,7 +40,7 @@ process GUNZIP {
     """
 
     stub:
-    def args        = task.ext.args ?: ''
+    // def args        = task.ext.args ?: ''
     def extension   = ( archive.toString() - '.gz' ).tokenize('.')[-1]
     def name        = archive.toString() - '.gz' - ".$extension"
     def prefix      = task.ext.prefix ?: name

@@ -48,4 +48,10 @@ process ALEVINQC {
         "versions.yml"
     )
     """
+
+    stub:
+    """
+    touch alevin_report_${meta.id}.html
+    touch versions.yml
+    """
 }

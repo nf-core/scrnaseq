@@ -33,6 +33,7 @@ process KALLISTOBUSTOOLS_REF {
             -i kb_ref_out.idx \\
             -g t2g.txt \\
             -f1 cdna.fa \\
+            $args \\
             --workflow $workflow_mode \\
             $fasta \\
             $gtf
@@ -53,6 +54,7 @@ process KALLISTOBUSTOOLS_REF {
             -c1 cdna_t2c.txt \\
             -c2 intron_t2c.txt \\
             --workflow $workflow_mode \\
+            $args \\
             $fasta \\
             $gtf
 

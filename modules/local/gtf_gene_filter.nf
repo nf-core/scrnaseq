@@ -34,4 +34,12 @@ process GTF_GENE_FILTER {
         python: \$(python --version | sed 's/Python //g')
     END_VERSIONS
     """
+
+    stub:
+    """
+    touch ${fasta.baseName}_genes.gtf
+    touch versions.yml
+    """
+
+
 }

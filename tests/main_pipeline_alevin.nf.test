@@ -1,5 +1,4 @@
 nextflow_pipeline {
-
     name "Test Workflow main.nf"
     script "main.nf"
 
@@ -58,7 +57,6 @@ nextflow_pipeline {
                 ).match()}
 
             ) // end of assertAll()
-
         }
     }
 

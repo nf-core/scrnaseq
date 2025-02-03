@@ -33,7 +33,7 @@ workflow SCRNASEQ {
 
     main:
 
-    protocol_config = Utils.getProtocol(workflow, log, params.aligner, params.protocol)
+    protocol_config = WorkflowScrnaseq.getProtocol(workflow, log, params.aligner, params.protocol)
     if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangerarc", "cellrangermulti"]) {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
@@ -42,7 +42,7 @@ workflow SCRNASEQ {
     // we cannot overwrite params in the workflow (they stay null as coming from the config file)
     def genome_fasta = params.fasta        ?: getGenomeAttribute('fasta')
     def gtf          = params.gtf          ?: getGenomeAttribute('gtf')
-    def star_index   = params.star_index   // ?: getGenomeAttribute('star') TODO: Currently not fetching iGenomes star index due version incompatibility
+    def star_index   = params.star_index   // ?: getGenomeAttribute('star') TODO: Currently not fetching iGenomes star index due to version incompatibility
     def salmon_index = params.salmon_index ?: getGenomeAttribute('simpleaf')
     def txp2gene     = params.txp2gene     ?: getGenomeAttribute('simpleaf_tx2pgene')
 
@@ -166,7 +166,7 @@ workflow SCRNASEQ {
             ch_fastq
         )
         ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
-        ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_ALEVIN.out.alevin_results.map{ meta, it -> it })
+        ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_ALEVIN.out.alevin_results.map{ _meta, it -> it })
         ch_mtx_matrices = ch_mtx_matrices.mix( SCRNASEQ_ALEVIN.out.alevin_results )
     }
 
@@ -199,7 +199,7 @@ workflow SCRNASEQ {
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
         ch_mtx_matrices = ch_mtx_matrices.mix( CELLRANGER_ALIGN.out.cellranger_matrices_raw, CELLRANGER_ALIGN.out.cellranger_matrices_filtered )
         ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map {
-            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
+            _meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
         })
     }
 
@@ -280,7 +280,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix( CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out.map{
-            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
+            _meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
         })
         ch_mtx_matrices = ch_mtx_matrices.mix( CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx_raw, CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx_filtered )
 
@@ -300,7 +300,7 @@ workflow SCRNASEQ {
     //
     // SUBWORKFLOW: Run h5ad conversion and concatenation
     //
-    ch_emptydrops = Channel.empty()
+    // ch_emptydrops = Channel.empty()
     H5AD_CONVERSION (
         MTX_TO_H5AD.out.h5ad,
         ch_input
@@ -314,7 +314,7 @@ workflow SCRNASEQ {
 
         // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
         EMPTY_DROPLET_REMOVAL (
-            H5AD_CONVERSION.out.h5ads.filter { meta, mtx_files -> meta.input_type.contains('raw') }
+            H5AD_CONVERSION.out.h5ads.filter { meta, _mtx_files -> meta.input_type.contains('raw') }
         )
         EMPTYDROPS_H5AD_CONVERSION (
             EMPTY_DROPLET_REMOVAL.out.h5ad,

@@ -24,6 +24,13 @@ process ADATA_BARCODES {
     task.ext.when == null || task.ext.when
 
     script:
-    prefix = task.ext.prefix ?: "${meta.id}"
+    def prefix = task.ext.prefix ?: "${meta.id}"
     template 'barcodes.py'
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    touch ${prefix}.h5ad
+    touch versions.yml
+    """
 }

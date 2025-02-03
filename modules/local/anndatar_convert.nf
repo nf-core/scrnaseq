@@ -5,17 +5,16 @@ process ANNDATAR_CONVERT {
     //
 
     tag "${meta.id}"
-
     label 'process_medium'
 
-    container "docker.io/nfcore/anndatar:20241129"
+    container 'docker.io/nfcore/anndatar:20241129'
 
     input:
     tuple val(meta), path(h5ad)
 
     output:
     tuple val(meta), path("${meta.id}_${meta.input_type}_matrix*.rds"), emit: rds
-    path  "versions.yml"                                              , emit: versions
+    path  "versions.yml",                                               emit: versions
 
     when:
     task.ext.when == null || task.ext.when

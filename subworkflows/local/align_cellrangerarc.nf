@@ -33,10 +33,7 @@ workflow CELLRANGERARC_ALIGN {
                     ( params.cellrangerarc_reference && cellrangerarc_config ) ) :
                 "If you provide a config file you also have to specific the reference name and vice versa."
 
-            cellrangerarc_reference = 'cellrangerarc_reference'
-            if ( params.cellrangerarc_reference ){
-                cellrangerarc_reference = params.cellrangerarc_reference
-            }
+            cellrangerarc_reference = params.cellrangerarc_reference ?: 'cellrangerarc_reference'
 
             CELLRANGERARC_MKREF( fasta, filtered_gtf, motifs, cellrangerarc_config, cellrangerarc_reference )
             ch_versions = ch_versions.mix(CELLRANGERARC_MKREF.out.versions)

@@ -32,4 +32,10 @@ process GFFREAD_TRANSCRIPTOME {
         gffread: \$(gffread --version 2>&1)
     END_VERSIONS
     """
+
+    stub:
+    """
+    touch ${genome_fasta}.transcriptome.fa
+    touch versions.yml
+    """
 }

@@ -1,13 +1,13 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { STAR_ALIGN  } from '../../modules/local/star_align'
-include { MTX_TO_H5AD } from '../../modules/local/mtx_to_h5ad'
+include { STAR_ALIGN             }     from '../../modules/local/star_align'
+include { MTX_TO_H5AD            }     from '../../modules/local/mtx_to_h5ad'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
-include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/star/genomegenerate/main'
+include { GUNZIP                 }     from '../../modules/nf-core/gunzip/main'
+include { STAR_GENOMEGENERATE    }     from '../../modules/nf-core/star/genomegenerate/main'
 
 
-def multiqc_report    = []
+// def multiqc_report    = []
 
 workflow STARSOLO {
     take:
@@ -61,5 +61,5 @@ workflow STARSOLO {
     star_counts     = STAR_ALIGN.out.counts
     raw_counts      = STAR_ALIGN.out.raw_counts.map{ meta, files -> [meta + [input_type: 'raw'], files] }
     filtered_counts = STAR_ALIGN.out.filtered_counts.map{ meta, files -> [meta + [input_type: 'filtered'], files] }
-    for_multiqc     = STAR_ALIGN.out.log_final.map{ meta, it -> it }
+    for_multiqc     = STAR_ALIGN.out.log_final.map{ _meta, it -> it }
 }

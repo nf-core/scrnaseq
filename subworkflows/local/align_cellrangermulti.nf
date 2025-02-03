@@ -32,7 +32,7 @@ workflow CELLRANGER_MULTI_ALIGN {
         .map{ meta ->
             def meta_clone = meta.clone()
             def data_dict  = meta_clone.find{ it.key == "${meta_clone.feature_type}" }
-            fastqs = data_dict?.value
+            def fastqs = data_dict?.value
             meta_clone.remove( data_dict?.key )
             [ meta_clone, fastqs ]
         }
@@ -210,7 +210,7 @@ workflow CELLRANGER_MULTI_ALIGN {
 }
 
 def parse_demultiplexed_output_channels(in_ch, pattern) {
-    out_ch =
+    def out_ch =
     in_ch.map { meta, mtx_files ->
         def desired_files = []
         mtx_files.each{ if ( it.toString().contains("${pattern}") ) { desired_files.add( it ) } }

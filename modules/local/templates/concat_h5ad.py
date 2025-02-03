@@ -2,13 +2,11 @@
 
 # Set numba chache dir to current working directory (which is a writable mount also in containers)
 import os
-
-os.environ["NUMBA_CACHE_DIR"] = "."
-
 import scanpy as sc, anndata as ad, pandas as pd
 from pathlib import Path
 import platform
 
+os.environ["NUMBA_CACHE_DIR"] = "."
 
 def read_samplesheet(samplesheet):
     df = pd.read_csv(samplesheet)

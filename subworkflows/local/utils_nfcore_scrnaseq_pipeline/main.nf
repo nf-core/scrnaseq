@@ -83,7 +83,7 @@ workflow PIPELINE_INITIALISATION {
                     }
             }
             .groupTuple( by: [0,1] )
-            .map{ id, type, meta, reads -> [ id, meta, reads ] }
+            .map{ id, _type, meta, reads -> [ id, meta, reads ] }
             .map {
                 validateInputSamplesheet(it)
             }

@@ -6,11 +6,10 @@ process CONCAT_H5AD {
 
 
     tag "${meta.id}"
-
     label 'process_medium'
 
     conda "conda-forge::scanpy==1.10.2 conda-forge::python-igraph conda-forge::leidenalg"
-    container "community.wave.seqera.io/library/scanpy:1.10.2--e83da2205b92a538"
+    container "community.wave.seqera.io/library/scanpy:1.10.4--f905699eb17b6536"
 
     input:
     tuple val(meta), path(h5ad)

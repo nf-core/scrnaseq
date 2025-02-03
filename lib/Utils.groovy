@@ -11,7 +11,7 @@ class WorkflowScrnaseq {
         def protocols = jsonSlurper.parseText(json)
         aligner = (aligner == 'cellrangermulti') ? 'cellranger' : aligner
         def aligner_map = protocols[aligner]
-        if(aligner_map.containsKey(protocol)) {
+        if (aligner_map.containsKey(protocol)) {
             return aligner_map[protocol]
         } else {
             log.warn("Protocol '${protocol}' not recognized by the pipeline. Passing on the protocol to the aligner unmodified.")

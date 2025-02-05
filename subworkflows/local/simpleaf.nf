@@ -21,7 +21,7 @@ workflow SCRNASEQ_SIMPLEAF {
     ch_versions = Channel.empty()
 
     /*
-    * Build salmon index
+    * Build simpleaf index
     */
     if ( !simpleaf_index || !map_dir ) {
         // define input channels for index building
@@ -50,7 +50,7 @@ workflow SCRNASEQ_SIMPLEAF {
         if (!txp2gene) {
             txp2gene = t2g
         } else {
-            txp2gene = Channel.of( [ txp2gene ] )
+            txp2gene = Channel.of( txp2gene )
         }
     } else {
         // ensure simpleaf index and txp2gene are Channels
@@ -76,7 +76,7 @@ workflow SCRNASEQ_SIMPLEAF {
     }
 
     /*
-    * Perform quantification with salmon alevin
+    * Perform quantification with simpleaf quant
     */
     SIMPLEAF_QUANT (
         ch_chemistry_reads,

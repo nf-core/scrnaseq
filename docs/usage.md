@@ -47,7 +47,7 @@ Note that since cellranger v7, it is **not recommended** anymore to supply the `
 
 ## Aligning options
 
-By default (i.e. `--aligner alevin`), the pipeline uses [Salmon](https://salmon.readthedocs.io/en/latest/) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
+By default (i.e. `--aligner simpleaf`), the pipeline uses [Salmon](https://salmon.readthedocs.io/en/latest/) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
 
 Other aligner options for running the pipeline are:
 

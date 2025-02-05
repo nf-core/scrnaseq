@@ -63,7 +63,7 @@ workflow SCRNASEQ {
     kb_t1c            = params.kb_t1c         ? file(params.kb_t1c, checkIfExists: true) : []
     kb_t2c            = params.kb_t2c         ? file(params.kb_t2c, checkIfExists: true) : []
 
-    //salmon params
+    //simpleaf params
     ch_simpleaf_index   = params.simpleaf_index ? file(params.simpleaf_index, checkIfExists: true) : []
 
     //star params
@@ -133,7 +133,7 @@ workflow SCRNASEQ {
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
-    // Run salmon simpleaf pipeline
+    // Run simpleaf pipeline
     if (params.aligner == "simpleaf" || params.aligner == "alevin") {
 
         SCRNASEQ_SIMPLEAF(

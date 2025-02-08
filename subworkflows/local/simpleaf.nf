@@ -1,7 +1,7 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { ALEVINQC              } from '../../modules/local/alevinqc'
-include { SIMPLEAF_INDEX        } from '../../../modules/modules/nf-core/simpleaf/index'
-include { SIMPLEAF_QUANT        } from '../../../modules/modules/nf-core/simpleaf/quant'
+include { SIMPLEAF_INDEX        } from '../../modules/nf-core/simpleaf/index'
+include { SIMPLEAF_QUANT        } from '../../modules/nf-core/simpleaf/quant'
 
 workflow SCRNASEQ_SIMPLEAF {
 

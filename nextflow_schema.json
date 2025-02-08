@@ -182,7 +182,14 @@
                 "simpleaf_umi_resolution": {
                     "type": "string",
                     "default": "cr-like",
-                    "enum": ["cr-like", "cr-like-em", "parsimony", "parsimony-em", "parsimony-gene", "parsimony-gene-em"],
+                    "enum": [
+                        "cr-like",
+                        "cr-like-em",
+                        "parsimony",
+                        "parsimony-em",
+                        "parsimony-gene",
+                        "parsimony-gene-em"
+                    ],
                     "description": "UMI resolution strategy to deduplicate UMIs.",
                     "help_text": "This parameter specifies the [UMI resolution strategy](https://simpleaf.readthedocs.io/en/latest/quant-command.html) to use for deduplicating UMIs. The default is `cr-like`, which mimics the behavior of Cell Ranger, i.e., discarding UMIs equally compatible to multiple genes. Strategies that resolve multi-mapped UMIs by expectation maximization are available, like `cr-like-em`, `parsimony-em`, and `parsimony-gene-em`.",
                     "fa_icon": "fas fa-map-marked-alt"

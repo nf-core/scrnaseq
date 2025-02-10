@@ -6,11 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Add a checker so that `--fb_reference` does not break the pipeline in case `ab` files are not used in `cellranger multi` sub-workflow.
+- Fix concatenation of multiple samples into the combined output AnnData ([416](https://github.com/nf-core/scrnaseq/pull/416))
+- Make sure STARsolo velocity output is added to the combined output AnnData, if `star_feature = 'Gene Velocyto'` ([417](https://github.com/nf-core/scrnaseq/pull/417))
 - Update cellbender module to latest nf-core version ([#419](https://github.com/nf-core/scrnaseq/pull/419/))
 - Add profile for gpu processes ([#419](https://github.com/nf-core/scrnaseq/pull/419/))
 - Update example usage command in README with valid reference genome parameter ([#339](https://github.com/nf-core/scrnaseq/issues/339))
 - Removed `--kb_filter` parameter. Kallisto filtering is triggered by default and can be turned off with `ext.args` ([#421](https://github.com/nf-core/scrnaseq/issues/421))
 - Document better that `cellbender` is used for empty drops calling and not the `emptydrops` method (([#420](https://github.com/nf-core/scrnaseq/issues/420)))
+- Add `--limitBAMsortRAM` to STARsolo alignment, to make sure BAM sorting memory scales with the task memory ([#430](https://github.com/nf-core/scrnaseq/pull/430))
 
 ## v3.0.0 - 2024-12-09
 

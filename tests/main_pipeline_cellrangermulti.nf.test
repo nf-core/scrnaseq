@@ -1,0 +1,187 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_cellrangermulti_aligner") {
+
+        when {
+            // the rest is taken from shared config
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_samplesheet.csv"
+                gex_frna_probe_set        = "${baseDir}/assets/frna_probeset_subset.csv"
+                fb_reference              = "${baseDir}/assets/fb_reference.csv"
+                fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
+                gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                aligner                   = 'cellrangermulti'
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+        }
+
+        then {
+
+            assertAll(
+
+                //
+                // General assertions
+                //
+
+                // Did it finish successfully?
+                {assert workflow.success},
+
+                // How many tasks were executed?
+                {assert workflow.trace.tasks().size() == 57},
+
+                // How many results were produced?
+                {assert path("${outputDir}/results_cellrangermulti").list().size() == 4},
+                {assert path("${outputDir}/results_cellrangermulti/cellrangermulti").list().size() == 5},
+                {assert path("${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions").list().size() == 16},
+                {assert path("${outputDir}/results_cellrangermulti/cellrangermulti/count").list().size() == 4},
+                {assert path("${outputDir}/results_cellrangermulti/fastqc").list().size() == 48},
+                {assert path("${outputDir}/results_cellrangermulti/multiqc").list().size() == 3},
+
+                //
+                // Check if files were produced
+                //
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/4PLEX_HUMAN/4PLEX_HUMAN_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Colorectal_BC3/Colorectal_BC3_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Colorectal_BC3/Colorectal_BC3_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Liver_BC1/Liver_BC1_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Liver_BC1/Liver_BC1_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Ovarian_BC2/Ovarian_BC2_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Ovarian_BC2/Ovarian_BC2_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K/PBMC_10K_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K/PBMC_10K_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO/PBMC_10K_CMO_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO_PBMCs_human_1/PBMC_10K_CMO_PBMCs_human_1_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO_PBMCs_human_2/PBMC_10K_CMO_PBMCs_human_2_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMV/PBMC_10K_CMV_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMV/PBMC_10K_CMV_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Pancreas_BC4/Pancreas_BC4_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Pancreas_BC4/Pancreas_BC4_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/combined_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/combined_filtered_matrix.h5ad" ).exists()},
+
+                //
+                // Check if files are the same
+                //
+                {assert snapshot(
+                    // barcodes.tsv.gz files
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/multi/count/raw_feature_bc_matrix/barcodes.tsv.gz"                                                   ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz"              ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/count/sample_raw_feature_bc_matrix/barcodes.tsv.gz"                   ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Liver_BC1/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz"                   ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Liver_BC1/count/sample_raw_feature_bc_matrix/barcodes.tsv.gz"                        ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Ovarian_BC2/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz"                 ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Ovarian_BC2/count/sample_raw_feature_bc_matrix/barcodes.tsv.gz"                      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Pancreas_BC4/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz"                ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Pancreas_BC4/count/sample_raw_feature_bc_matrix/barcodes.tsv.gz"                     ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K/outs/multi/count/raw_feature_bc_matrix/barcodes.tsv.gz"                                                      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K/outs/per_sample_outs/PBMC_10K/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz"                       ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/multi/count/raw_feature_bc_matrix/barcodes.tsv.gz"                                                  ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_1/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_2/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMV/outs/multi/count/raw_feature_bc_matrix/barcodes.tsv.gz"                                                  ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMV/outs/per_sample_outs/PBMC_10K_CMV/count/sample_filtered_feature_bc_matrix/barcodes.tsv.gz"               ),
+
+                    // features.tsv.gz files
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/multi/count/raw_feature_bc_matrix/features.tsv.gz" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/count/sample_filtered_feature_bc_matrix/features.tsv.gz"              ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/count/sample_raw_feature_bc_matrix/features.tsv.gz"                   ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Liver_BC1/count/sample_filtered_feature_bc_matrix/features.tsv.gz"                   ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Liver_BC1/count/sample_raw_feature_bc_matrix/features.tsv.gz"                        ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Ovarian_BC2/count/sample_filtered_feature_bc_matrix/features.tsv.gz"                 ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Ovarian_BC2/count/sample_raw_feature_bc_matrix/features.tsv.gz"                      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Pancreas_BC4/count/sample_filtered_feature_bc_matrix/features.tsv.gz"                ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Pancreas_BC4/count/sample_raw_feature_bc_matrix/features.tsv.gz"                     ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K/outs/multi/count/raw_feature_bc_matrix/features.tsv.gz"                                                      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K/outs/per_sample_outs/PBMC_10K/count/sample_filtered_feature_bc_matrix/features.tsv.gz"                       ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/multi/count/raw_feature_bc_matrix/features.tsv.gz"                                                  ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_1/count/sample_filtered_feature_bc_matrix/features.tsv.gz" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_2/count/sample_filtered_feature_bc_matrix/features.tsv.gz" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMV/outs/multi/count/raw_feature_bc_matrix/features.tsv.gz"                                                  ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMV/outs/per_sample_outs/PBMC_10K_CMV/count/sample_filtered_feature_bc_matrix/features.tsv.gz"               ),
+
+                    // matrix.mtx.gz files
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/multi/count/raw_feature_bc_matrix/matrix.mtx.gz" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/count/sample_filtered_feature_bc_matrix/matrix.mtx.gz"              ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/count/sample_raw_feature_bc_matrix/matrix.mtx.gz"                   ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Liver_BC1/count/sample_filtered_feature_bc_matrix/matrix.mtx.gz"                   ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Liver_BC1/count/sample_raw_feature_bc_matrix/matrix.mtx.gz"                        ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Ovarian_BC2/count/sample_filtered_feature_bc_matrix/matrix.mtx.gz"                 ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Ovarian_BC2/count/sample_raw_feature_bc_matrix/matrix.mtx.gz"                      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Pancreas_BC4/count/sample_filtered_feature_bc_matrix/matrix.mtx.gz"                ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Pancreas_BC4/count/sample_raw_feature_bc_matrix/matrix.mtx.gz"                     ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K/outs/multi/count/raw_feature_bc_matrix/matrix.mtx.gz"                                                      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K/outs/per_sample_outs/PBMC_10K/count/sample_filtered_feature_bc_matrix/matrix.mtx.gz"                       ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/multi/count/raw_feature_bc_matrix/matrix.mtx.gz"                                                  ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_1/count/sample_filtered_feature_bc_matrix/matrix.mtx.gz" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_2/count/sample_filtered_feature_bc_matrix/matrix.mtx.gz" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMV/outs/multi/count/raw_feature_bc_matrix/matrix.mtx.gz"                                                  ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMV/outs/per_sample_outs/PBMC_10K_CMV/count/sample_filtered_feature_bc_matrix/matrix.mtx.gz"               ),
+
+                    // metrics_summary.csv files
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Colorectal_BC3/metrics_summary.csv"              ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Liver_BC1/metrics_summary.csv"                   ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Ovarian_BC2/metrics_summary.csv"                 ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/4PLEX_HUMAN/outs/per_sample_outs/Pancreas_BC4/metrics_summary.csv"                ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K/outs/per_sample_outs/PBMC_10K/metrics_summary.csv"                       ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_1/metrics_summary.csv" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMO/outs/per_sample_outs/PBMC_10K_CMO_PBMCs_human_2/metrics_summary.csv" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/count/PBMC_10K_CMV/outs/per_sample_outs/PBMC_10K_CMV/metrics_summary.csv"               ),
+
+                    // .rds files
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/4PLEX_HUMAN/4PLEX_HUMAN_raw_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/4PLEX_HUMAN/4PLEX_HUMAN_raw_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Colorectal_BC3/Colorectal_BC3_raw_matrix.seurat.rds"      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Colorectal_BC3/Colorectal_BC3_raw_matrix.sce.rds"         ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Colorectal_BC3/Colorectal_BC3_filtered_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Colorectal_BC3/Colorectal_BC3_filtered_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Liver_BC1/Liver_BC1_raw_matrix.seurat.rds"      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Liver_BC1/Liver_BC1_raw_matrix.sce.rds"         ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Liver_BC1/Liver_BC1_filtered_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Liver_BC1/Liver_BC1_filtered_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Ovarian_BC2/Ovarian_BC2_raw_matrix.seurat.rds"      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Ovarian_BC2/Ovarian_BC2_raw_matrix.sce.rds"         ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Ovarian_BC2/Ovarian_BC2_filtered_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Ovarian_BC2/Ovarian_BC2_filtered_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K/PBMC_10K_raw_matrix.seurat.rds"      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K/PBMC_10K_raw_matrix.sce.rds"         ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K/PBMC_10K_filtered_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K/PBMC_10K_filtered_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO/PBMC_10K_CMO_raw_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO/PBMC_10K_CMO_raw_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO_PBMCs_human_1/PBMC_10K_CMO_PBMCs_human_1_filtered_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO_PBMCs_human_1/PBMC_10K_CMO_PBMCs_human_1_filtered_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO_PBMCs_human_2/PBMC_10K_CMO_PBMCs_human_2_filtered_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMO_PBMCs_human_2/PBMC_10K_CMO_PBMCs_human_2_filtered_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMV/PBMC_10K_CMV_raw_matrix.seurat.rds"      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMV/PBMC_10K_CMV_raw_matrix.sce.rds"         ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMV/PBMC_10K_CMV_filtered_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/PBMC_10K_CMV/PBMC_10K_CMV_filtered_matrix.sce.rds"    ),
+
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Pancreas_BC4/Pancreas_BC4_raw_matrix.seurat.rds"      ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Pancreas_BC4/Pancreas_BC4_raw_matrix.sce.rds"         ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Pancreas_BC4/Pancreas_BC4_filtered_matrix.seurat.rds" ),
+                    path( "${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions/Pancreas_BC4/Pancreas_BC4_filtered_matrix.sce.rds"    )
+
+                ).match()}
+
+            ) // end of assertAll()
+
+        }
+    }
+
+}

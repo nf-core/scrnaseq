@@ -7,3 +7,8 @@ testing/
 testing*
 *.pyc
 null/
+log/
+reports/
+testme.sh
+.nf-test*
+.vscode

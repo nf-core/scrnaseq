@@ -168,7 +168,6 @@ So, the conversion modules generate data with the following syntax: **`*_{raw,fi
 > Some aligners, like `alevin` do not produce both raw&filtered matrices. When aligners give only one output, they are treated with the `raw` suffix.
 > Some aligners may have an option to give both raw&filtered and only one, like `kallisto`. Be aware when using the tools.
 
-
 ## MultiQC
 
 <details markdown="1">

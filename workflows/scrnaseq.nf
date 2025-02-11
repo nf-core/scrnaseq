@@ -11,7 +11,7 @@ include { methodsDescriptionText                            } from '../subworkfl
 include { getGenomeAttribute                                } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { FASTQC_CHECK                                      } from '../subworkflows/local/fastqc'
 include { KALLISTO_BUSTOOLS                                 } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_SIMPLEAF                                 } from '../subworkflows/local/simpleaf'
+include { SIMPLEAF                                          } from '../subworkflows/local/simpleaf'
 include { STARSOLO                                          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN                                  } from "../subworkflows/local/align_cellranger"
 include { CELLRANGER_MULTI_ALIGN                            } from "../subworkflows/local/align_cellrangermulti"
@@ -134,9 +134,9 @@ workflow SCRNASEQ {
     }
 
     // Run simpleaf pipeline
-    if (params.aligner == "simpleaf" || params.aligner == "alevin") {
+    if ( params.aligner == "simpleaf" ) {
 
-        SCRNASEQ_SIMPLEAF(
+        SIMPLEAF(
             ch_genome_fasta,
             ch_filter_gtf,
             ch_transcript_fasta,
@@ -148,10 +148,10 @@ workflow SCRNASEQ {
             ch_fastq,
             [] // for existing map dir; not applicable
         )
-        ch_versions = ch_versions.mix(SCRNASEQ_SIMPLEAF.out.ch_versions)
-        ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_SIMPLEAF.out.quant.map{ meta, it -> it })
+        ch_versions = ch_versions.mix(SIMPLEAF.out.ch_versions)
+        ch_multiqc_files = ch_multiqc_files.mix(SIMPLEAF.out.quant.map{ meta, it -> it })
         ch_mtx_matrices = ch_mtx_matrices.mix(
-            SCRNASEQ_SIMPLEAF.out.quant.map{
+            SIMPLEAF.out.quant.map{
                 meta, files -> [
                     meta +
                     [input_type: meta["filtered"] ? "filtered" : "raw" ],
@@ -160,7 +160,7 @@ workflow SCRNASEQ {
             }
         )
 
-        ch_txp2gene = SCRNASEQ_SIMPLEAF.out.txp2gene
+        ch_txp2gene = SIMPLEAF.out.txp2gene
     }
 
     // Run STARSolo pipeline
@@ -299,11 +299,10 @@ workflow SCRNASEQ {
         H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA (
             ch_h5ads
                 .filter { meta, mtx_files -> meta.input_type == 'raw' }
-                .map { meta, mtx_files -> [ meta + [input_type: 'filtered'], mtx_files ]} // to avoid name collision
+                .map { meta, mtx_files -> [ meta + [input_type: 'cellbender_filter'], mtx_files ]} // to avoid name collision
         )
         ch_h5ads = ch_h5ads.mix(
             H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA.out.h5ad
-                .map{ meta, file -> [ meta + [input_type: 'cellbender_filter'], file ]}
         )
     }
 

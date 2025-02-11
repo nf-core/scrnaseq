@@ -3,7 +3,7 @@ include { ALEVINQC              } from '../../modules/local/alevinqc'
 include { SIMPLEAF_INDEX        } from '../../modules/nf-core/simpleaf/index'
 include { SIMPLEAF_QUANT        } from '../../modules/nf-core/simpleaf/quant'
 
-workflow SCRNASEQ_SIMPLEAF {
+workflow SIMPLEAF {
 
     take:
     ch_genome_fasta // channel
@@ -21,38 +21,48 @@ workflow SCRNASEQ_SIMPLEAF {
     ch_versions = Channel.empty()
 
     /*
-    * Build simpleaf index
+    * Build simpleaf index if needed
+    * If simpleaf_index is provided, we skip this step
+    * If map_dir is provided, we skip this step
+    * Otherwise, we build the index
     */
-    if ( !simpleaf_index || !map_dir ) {
-        // define input channels for index building
-        // we can either use a genome fasta and gtf file pair or a transcript fasta file
-        if ( transcript_fasta ) {
-            ch_genome_fasta_gtf = [ [:],[],[] ] // meta, genome fasta, genome gtf
-            ch_transcript_fasta = [ [id: "${transcript_fasta.getName()}"], transcript_fasta ] // meta, transcript fasta
-        } else {
-            ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ fasta, gtf -> [[id: "${fasta.getName()}"], fasta, gtf] }
-            ch_transcript_fasta = [ [:], [] ] // meta, transcript fasta
-        }
+    if ( !simpleaf_index ) {
+        if ( !map_dir ) {
+            // We do not have a simpleaf index or a map dir, so we need to build the index
 
-        SIMPLEAF_INDEX(
-            ch_genome_fasta_gtf,
-            ch_transcript_fasta,
-            [[:], []], // meta, probe CSV
-            [[:], []] // meta, feature CSV
-        )
-        // Channel of tuple(meta, index dir)
-        simpleaf_index = SIMPLEAF_INDEX.out.index.collect()
-        // Channel of t2g path or empty
-        t2g = SIMPLEAF_INDEX.out.t2g.collect().map { _meta, it -> it }
-        ch_versions = ch_versions.mix( SIMPLEAF_INDEX.out.versions )
+            // define input channels for index building
+            // we can either use a genome fasta and gtf file pair or a transcript fasta file
+            if ( transcript_fasta ) {
+                ch_genome_fasta_gtf = [ [:],[],[] ] // meta, genome fasta, genome gtf
+                ch_transcript_fasta = [ [id: "${transcript_fasta.getName()}"], transcript_fasta ] // meta, transcript fasta
+            } else {
+                ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ fasta, gtf -> [[id: "${fasta.getName()}"], fasta, gtf] }
+                ch_transcript_fasta = [ [:], [] ] // meta, transcript fasta
+            }
 
-        // ensure txp2gene is a Channel
-        if (!txp2gene) {
-            txp2gene = t2g
+            SIMPLEAF_INDEX(
+                ch_genome_fasta_gtf,
+                ch_transcript_fasta,
+                [[:], []], // meta, probe CSV
+                [[:], []] // meta, feature CSV
+            )
+            // Channel of tuple(meta, index dir)
+            simpleaf_index = SIMPLEAF_INDEX.out.index.collect()
+            // Channel of version
+            ch_versions = ch_versions.mix( SIMPLEAF_INDEX.out.versions )
+
+            // ensure txp2gene is a Channel
+            if (!txp2gene) {
+                txp2gene = SIMPLEAF_INDEX.out.t2g.collect().map { _meta, it -> it }
+            } else {
+                txp2gene = Channel.of( txp2gene )
+            }
         } else {
-            txp2gene = Channel.of( txp2gene )
+            // we have a map dir, so we do not need to build the index
+            simpleaf_index = Channel.of( [ [:], [] ] )
         }
     } else {
+        // we have a simpleaf index, we use it directly
         // ensure simpleaf index and txp2gene are Channels
         simpleaf_index = Channel.of( [ [ id: simpleaf_index.getName() ], simpleaf_index ] )
     }

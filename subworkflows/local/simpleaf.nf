@@ -80,10 +80,16 @@ workflow SIMPLEAF {
         // meta, chemistry, files
         ch_chemistry_reads = ch_fastq.map{ meta, files -> [meta + ["chemistry": chemistry], chemistry, files] }
         // meta, index, t2g file
-        ch_index_t2g = simpleaf_index.combine( txp2gene ).collect()
+        if ( txp2gene ) {
+            ch_index_t2g = simpleaf_index.combine( txp2gene ).collect()
+        } else {
+            ch_index_t2g = simpleaf_index.map {meta, dir -> [meta, dir, []]}.collect()
+        }
         // meta, map dir
         ch_map_dir = [ [:],[] ]
     }
+
+    ch_index_t2g.view()
 
     /*
     * Perform quantification with simpleaf quant

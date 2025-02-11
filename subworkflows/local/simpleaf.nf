@@ -65,6 +65,9 @@ workflow SIMPLEAF {
         // we have a simpleaf index, we use it directly
         // ensure simpleaf index and txp2gene are Channels
         simpleaf_index = Channel.of( [ [ id: simpleaf_index.getName() ], simpleaf_index ] )
+        if (!txp2gene) {
+        txp2gene = Channel.of( txp2gene )
+        }
     }
 
     // define input channels for quantification

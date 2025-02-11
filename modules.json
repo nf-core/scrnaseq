@@ -87,12 +87,12 @@
                     },
                     "simpleaf/index": {
                         "branch": "master",
-                        "git_sha": "094299f4e5460f014fcc637e069adc33e420cf8e",
+                        "git_sha": "e743c6fbe569f66d48b8e11a06e8b514a87d12c9",
                         "installed_by": ["modules"]
                     },
                     "simpleaf/quant": {
                         "branch": "master",
-                        "git_sha": "094299f4e5460f014fcc637e069adc33e420cf8e",
+                        "git_sha": "e743c6fbe569f66d48b8e11a06e8b514a87d12c9",
                         "installed_by": ["modules"]
                     },
                     "star/genomegenerate": {

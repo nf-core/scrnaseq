@@ -59,12 +59,7 @@ def input_to_adata(
 
     # standard format
     # index are gene IDs and symbols are a column
-    if "gene_symbol" in adata.var.columns:
-        adata.var['gene_ids'] = adata.var['gene_symbol']
-    else:
-        adata.var['gene_ids'] = adata.var['gene_id']
-
-    adata.var['gene_versions'] = adata.var['gene_ids']
+    adata.var['gene_versions'] = adata.var['gene_id']
     adata.var.index = adata.var['gene_versions'].str.split('.').str[0].values
     adata.var_names_make_unique()
 

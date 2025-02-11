@@ -25,7 +25,7 @@ workflow SCRNASEQ_SIMPLEAF {
     */
     if ( !simpleaf_index || !map_dir ) {
         // define input channels for index building
-        // we can either use the genome fasta and gtf files or the transcript fasta file
+        // we can either use a genome fasta and gtf file pair or a transcript fasta file
         if ( transcript_fasta ) {
             ch_genome_fasta_gtf = [ [:],[],[] ] // meta, genome fasta, genome gtf
             ch_transcript_fasta = [ [id: "${transcript_fasta.getName()}"], transcript_fasta ] // meta, transcript fasta

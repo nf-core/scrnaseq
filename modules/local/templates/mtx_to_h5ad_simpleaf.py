@@ -55,6 +55,7 @@ def input_to_adata(
 
     # the simpleaf quant module exports an h5ad file.
     adata = sc.read_h5ad(simpleaf_h5ad_path)
+    adata.obs_names = adata.obs['barcodes'].values
     adata.obs["sample"] = sample
 
     # standard format

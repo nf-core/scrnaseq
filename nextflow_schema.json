@@ -128,7 +128,8 @@
                     "description": "A cDNA FASTA file",
                     "fa_icon": "fas fa-dna",
                     "format": "file-path",
-                    "exists": true
+                    "exists": true,
+                    "help_text": "If simpleaf is used as the aligner, this must be provided together with a transcript-to-gene ID mapping file (`txp2gene`)."
                 },
                 "gtf": {
                     "type": "string",

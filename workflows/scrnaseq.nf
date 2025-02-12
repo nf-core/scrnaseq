@@ -159,8 +159,6 @@ workflow SCRNASEQ {
                 ]
             }
         )
-
-        ch_txp2gene = SIMPLEAF.out.txp2gene
     }
 
     // Run STARSolo pipeline

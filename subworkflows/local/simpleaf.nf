@@ -35,6 +35,9 @@ workflow SIMPLEAF {
             if ( transcript_fasta ) {
                 ch_genome_fasta_gtf = [ [:],[],[] ] // meta, genome fasta, genome gtf
                 ch_transcript_fasta = [ [id: "${transcript_fasta.getName()}"], transcript_fasta ] // meta, transcript fasta
+                if ( !txp2gene ) {
+                    error "txp2gene file is required when using `transcript_fasta` to build the index"
+                }
             } else {
                 ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ fasta, gtf -> [[id: "${fasta.getName()}"], fasta, gtf] }
                 ch_transcript_fasta = [ [:], [] ] // meta, transcript fasta
@@ -94,7 +97,6 @@ workflow SIMPLEAF {
         // meta, map dir
         ch_map_dir = [ [:],[] ]
     }
-
 
     /*
     * Perform quantification with simpleaf quant

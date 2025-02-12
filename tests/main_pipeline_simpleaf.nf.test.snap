@@ -1,0 +1,17 @@
+{
+    "test-dataset_simpleaf_aligner": {
+        "content": [
+            "Sample_X_raw_matrix.seurat.rds:md5,26f5e53312e5bac059989cf6f64494f3",
+            "Sample_X_raw_matrix.sce.rds:md5,e4d042fef2883257f2ab0983d2931401",
+            "Sample_X_raw_matrix.h5ad:md5,b3c2911bc3ceec5028b06541c6ce7569",
+            "Sample_Y_raw_matrix.seurat.rds:md5,1ebcda5c59d2360141deb09fe180e115",
+            "Sample_Y_raw_matrix.sce.rds:md5,7c3e2fd7314781e057af5a470b098da0",
+            "Sample_Y_raw_matrix.h5ad:md5,cddbc02c3d0752ac1add4c544731b9d1"
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "24.10.4"
+        },
+        "timestamp": "2025-02-12T02:54:27.120903537"
+    }
+}

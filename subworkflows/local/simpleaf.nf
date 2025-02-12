@@ -65,8 +65,10 @@ workflow SIMPLEAF {
         // we have a simpleaf index, we use it directly
         // ensure simpleaf index and txp2gene are Channels
         simpleaf_index = Channel.of( [ [ id: simpleaf_index.getName() ], simpleaf_index ] )
-        if (!txp2gene) {
-        txp2gene = Channel.of( txp2gene )
+
+        // channel or null
+        if (txp2gene) {
+            txp2gene = Channel.of( txp2gene )
         }
     }
 
@@ -83,6 +85,7 @@ workflow SIMPLEAF {
         // meta, chemistry, files
         ch_chemistry_reads = ch_fastq.map{ meta, files -> [meta + ["chemistry": chemistry], chemistry, files] }
         // meta, index, t2g file
+        // as empty channel cannot be combined, we need this if
         if ( txp2gene ) {
             ch_index_t2g = simpleaf_index.combine( txp2gene ).collect()
         } else {
@@ -92,7 +95,6 @@ workflow SIMPLEAF {
         ch_map_dir = [ [:],[] ]
     }
 
-    ch_index_t2g.view()
 
     /*
     * Perform quantification with simpleaf quant

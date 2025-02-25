@@ -69,6 +69,6 @@ workflow KALLISTO_BUSTOOLS {
     counts          = KALLISTOBUSTOOLS_COUNT.out.count
     counts_raw      = ch_raw_counts
     counts_filtered = ch_filtered_counts
-    txp2gene        = txp2gene.collect()
+    txp2gene        = txp2gene
 
 }

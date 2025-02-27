@@ -22,7 +22,8 @@ include { GTF_GENE_FILTER                                   } from '../modules/l
 include { GUNZIP as GUNZIP_FASTA                            } from '../modules/nf-core/gunzip/main'
 include { GUNZIP as GUNZIP_GTF                              } from '../modules/nf-core/gunzip/main'
 include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
-
+include { CONCATENATE_VDJ                                   } from '../modules/local/concatenate_vdj'
+include { CONVERT_MUDATA                                    } from '../modules/local/convert_mudata'
 
 workflow SCRNASEQ {
 
@@ -311,6 +312,23 @@ workflow SCRNASEQ {
         ch_h5ads,
         ch_input
     )
+
+    //
+    // MODULE: Concat vdj samples and save as h5ad format
+    //
+
+    CONCATENATE_VDJ (
+        CELLRANGER_MULTI_ALIGN.out.vdj
+    )
+    
+    //
+    // SUBWORKFLOW: Concat GEX, VDJ and CITE data and save as MuData object
+    //
+
+    CONVERT_MUDATA(
+        H5AD_CONVERSION.out.h5ad,
+        CONCATENATE_VDJ.out.h5ad
+        )
 
     //
     // Collate and save software versions

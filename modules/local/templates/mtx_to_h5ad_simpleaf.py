@@ -11,19 +11,7 @@ import argparse
 import anndata
 from anndata import AnnData
 import platform
-
-def _mtx_to_adata(
-    input: str,
-    sample: str,
-):
-
-    adata = sc.read_mtx(f"{input}/quants_mat.mtx")
-    adata.obs_names = pd.read_csv(f"{input}/quants_mat_rows.txt", header=None, sep="\\t")[0].values
-    adata.var_names = pd.read_csv(f"{input}/quants_mat_cols.txt", header=None, sep="\\t")[0].values
-    adata.obs["sample"] = sample
-
-    return adata
-
+import json
 
 def format_yaml_like(data: dict, indent: int = 0) -> str:
     """Formats a dictionary to a YAML-like string.
@@ -63,14 +51,21 @@ def input_to_adata(
     print(f"Reading in {input_data}")
 
     # open main data
-    adata = _mtx_to_adata(input_data, sample)
+    simpleaf_h5ad_path = f"{input_data}/alevin/quants.h5ad"
+
+    # the simpleaf quant module exports an h5ad file.
+    adata = sc.read_h5ad(simpleaf_h5ad_path)
+    adata.obs_names = adata.obs['barcodes'].values
+    adata.obs["sample"] = sample
 
     # standard format
     # index are gene IDs and symbols are a column
-    # TODO: how to get gene_symbols for alevin?
-    adata.var['gene_versions'] = adata.var.index
+    adata.var['gene_versions'] = adata.var['gene_id']
     adata.var.index = adata.var['gene_versions'].str.split('.').str[0].values
     adata.var_names_make_unique()
+
+    # sort adata column- and row- wise to avoid positional differences
+    adata = adata[adata.obs_names.sort_values(), adata.var_names.sort_values()]
 
     # write results
     adata.write_h5ad(f"{output}")
@@ -85,7 +80,7 @@ os.makedirs("${meta.id}", exist_ok=True)
 
 # input_type comes from NF module
 input_to_adata(
-    input_data="${meta.id}_alevin_results/af_quant/alevin/",
+    input_data="${inputs}",
     output="${meta.id}_${meta.input_type}_matrix.h5ad",
     sample="${meta.id}"
 )

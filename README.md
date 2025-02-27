@@ -25,7 +25,7 @@
 
 This is a community effort in building a pipeline capable to support:
 
-- Alevin-Fry + AlevinQC
+- SimpleAF(Alevin-Fry) + AlevinQC
 - STARSolo
 - Kallisto + BUStools
 - Cellranger
@@ -65,7 +65,7 @@ nextflow run nf-core/scrnaseq \
    --fasta GRCm38.p6.genome.chr19.fa \
    --gtf gencode.vM19.annotation.chr19.gtf \
    --protocol 10XV2 \
-   --aligner <alevin/kallisto/star/cellranger> \
+   --aligner <simpleaf/kallisto/star/cellranger> \
    --outdir <OUTDIR>
 ```
 

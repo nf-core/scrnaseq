@@ -11,7 +11,7 @@ include { methodsDescriptionText                            } from '../subworkfl
 include { getGenomeAttribute                                } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { FASTQC_CHECK                                      } from '../subworkflows/local/fastqc'
 include { KALLISTO_BUSTOOLS                                 } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_ALEVIN                                   } from '../subworkflows/local/alevin'
+include { SIMPLEAF                                          } from '../subworkflows/local/simpleaf'
 include { STARSOLO                                          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN                                  } from "../subworkflows/local/align_cellranger"
 include { CELLRANGER_MULTI_ALIGN                            } from "../subworkflows/local/align_cellrangermulti"
@@ -63,8 +63,8 @@ workflow SCRNASEQ {
     kb_t1c            = params.kb_t1c         ? file(params.kb_t1c, checkIfExists: true) : []
     kb_t2c            = params.kb_t2c         ? file(params.kb_t2c, checkIfExists: true) : []
 
-    //salmon params
-    ch_salmon_index   = params.salmon_index ? file(params.salmon_index, checkIfExists: true) : []
+    //simpleaf params
+    ch_simpleaf_index   = params.simpleaf_index ? file(params.simpleaf_index, checkIfExists: true) : []
 
     //star params
     star_index        = params.star_index ? file(params.star_index, checkIfExists: true) : null
@@ -133,21 +133,32 @@ workflow SCRNASEQ {
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
-    // Run salmon alevin pipeline
-    if (params.aligner == "alevin") {
-        SCRNASEQ_ALEVIN(
+    // Run simpleaf pipeline
+    if ( params.aligner == "simpleaf" ) {
+
+        SIMPLEAF(
             ch_genome_fasta,
             ch_filter_gtf,
             ch_transcript_fasta,
-            ch_salmon_index,
+            ch_simpleaf_index,
             ch_txp2gene,
             ch_barcode_whitelist,
             protocol_config['protocol'],
-            ch_fastq
+            params.simpleaf_umi_resolution,
+            ch_fastq,
+            [] // for existing map dir; not applicable
         )
-        ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
-        ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_ALEVIN.out.alevin_results.map{ meta, it -> it })
-        ch_mtx_matrices = ch_mtx_matrices.mix( SCRNASEQ_ALEVIN.out.alevin_results )
+        ch_versions = ch_versions.mix(SIMPLEAF.out.ch_versions)
+        ch_multiqc_files = ch_multiqc_files.mix(SIMPLEAF.out.quant.map{ _meta, it -> it })
+        ch_mtx_matrices = ch_mtx_matrices.mix(
+            SIMPLEAF.out.quant.map{
+                meta, files -> [
+                    meta +
+                    [input_type: meta["filtered"] ? "filtered" : "raw" ],
+                    files
+                ]
+            }
+        )
     }
 
     // Run STARSolo pipeline
@@ -284,11 +295,12 @@ workflow SCRNASEQ {
     if ( !params.skip_cellbender && !(params.aligner in ['cellrangerarc']) ) {
         // module should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
         H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA (
-            ch_h5ads.filter { meta, mtx_files -> meta.input_type == 'raw' }
+            ch_h5ads
+                .filter { meta, mtx_files -> meta.input_type == 'raw' }
+                .map { meta, mtx_files -> [ meta + [input_type: 'cellbender_filter'], mtx_files ]} // to avoid name collision
         )
         ch_h5ads = ch_h5ads.mix(
             H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA.out.h5ad
-                .map{ meta, file -> [ meta + [input_type: 'cellbender_filter'], file ]}
         )
     }
 

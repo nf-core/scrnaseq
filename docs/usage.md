@@ -47,7 +47,7 @@ Note that since cellranger v7, it is **not recommended** anymore to supply the `
 
 ## Aligning options
 
-By default (i.e. `--aligner alevin`), the pipeline uses [Salmon](https://salmon.readthedocs.io/en/latest/) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with AlevinQC.
+By default (i.e. `--aligner simpleaf`), the pipeline uses [piscem](https://github.com/COMBINE-lab/piscem) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with [AlevinQC](https://github.com/csoneson/alevinQC).
 
 Other aligner options for running the pipeline are:
 
@@ -97,11 +97,11 @@ The command `kb --list` shows all supported, preconfigured protocols. Additional
 
 For more details, please refer to the [Kallisto/bustools documentation](https://pachterlab.github.io/kallisto/manual#bus).
 
-#### Alevin-fry
+#### Simpleaf
 
-Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slighly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
+Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slightly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
 
-For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614).
+For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614) and the [detailed description](https://hackmd.io/@PI7Og0l1ReeBZu_pjQGUQQ/rJMgmvr13).
 
 ### If using cellranger-arc
 
@@ -193,6 +193,10 @@ genome: 'GRCh37'
 ```
 
 You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-co.re/launch).
+
+### If using Simpleaf
+
+When building reference index, the underlying mapper of Simpleaf operates on a large number of temporary files on disk simutaneously. Therefore, for environments where CPUs and disk I/O are limited, such as on AWS, specifying `scratch=true` for the `SIMPLEAF_INDEX` module in the `conf/modules.config` file is necessary to avoid slowdowns and potential failures.
 
 ### If using cellranger-multi
 

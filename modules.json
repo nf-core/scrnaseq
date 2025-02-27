@@ -85,6 +85,16 @@
                         "git_sha": "f0719ae309075ae4a291533883847c3f7c441dad",
                         "installed_by": ["modules"]
                     },
+                    "simpleaf/index": {
+                        "branch": "master",
+                        "git_sha": "e743c6fbe569f66d48b8e11a06e8b514a87d12c9",
+                        "installed_by": ["modules"]
+                    },
+                    "simpleaf/quant": {
+                        "branch": "master",
+                        "git_sha": "e743c6fbe569f66d48b8e11a06e8b514a87d12c9",
+                        "installed_by": ["modules"]
+                    },
                     "star/genomegenerate": {
                         "branch": "master",
                         "git_sha": "46eca555142d6e597729fcb682adcc791796f514",

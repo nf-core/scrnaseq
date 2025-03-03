@@ -27,7 +27,7 @@ process CONVERT_MUDATA  {
     cat <<-END_VERSIONS >> versions.yml
     "${task.process}":
     END_VERSIONS
-    convert.py --version >> versions.yml
+    convert_mudata.py --version >> versions.yml
     """
 
     stub:
@@ -38,7 +38,7 @@ process CONVERT_MUDATA  {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
     END_VERSIONS
-    convert.py --version >> versions.yml
+    convert_mudata.py --version >> versions.yml
 
     """
 }

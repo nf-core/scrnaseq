@@ -92,6 +92,24 @@ workflow PIPELINE_INITIALISATION {
                     return [ meta, fastqs.flatten() ]
             }
             .set { ch_samplesheet }
+    } else if (params.aligner == 'cellrangerarc') { // the cellrangerarc sub-workflow logic needs that channels have a meta, type, subsample, fastqs structure.
+        Channel
+            .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
+            .map {
+                meta, fastq_1, fastq_2 ->
+                    if (!fastq_2) {
+                        return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
+                    } else {
+                        return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
+                    }
+            }
+            .groupTuple()
+            .view()
+            .map {
+                cellrangerarcStructure(it)
+            }
+            .view()
+            .set { ch_samplesheet }
     } else {
         Channel
             .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
@@ -192,6 +210,37 @@ def validateInputSamplesheet(input) {
     }
 
     return [ metas[0], fastqs ]
+}
+//
+// cellrangerarc structure for samplesheet channel
+//
+def cellrangerarcStructure(input) {
+    def (metas, fastqs) = input[1..2]
+
+    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
+    def endedness_ok = metas.collect{ meta -> meta.single_end }.unique().size == 1
+    if (!endedness_ok) {
+        error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
+    }
+
+    // Define a new common meta for all the fastqs in this channel instance
+    def sampleMeta = metas[0].clone()
+    sampleMeta.remove("sample_type")
+    sampleMeta.remove("feature_type")
+
+    // Create a list with all the entries of meta.sample_type
+    def sampletypes = metas.collect { meta -> meta.sample_type }
+
+    // Create a list with all the base name of the fastq files
+    def subsamples = fastqs.collect { fastq ->
+        def match = (fastq[0].baseName =~ /^(.*?)_S\d+_L\d+_R\d+_\d+\.fastq(\.gz)?$/)
+        if (!match) {
+            error("Filename does not follow the expected FASTQ filename convention (SampleName_S1_L001_R1_001.fastq.gz): ${fastq[0]}")
+        }
+        return match[0][1]
+    }
+
+    return [ sampleMeta, sampletypes, subsamples, fastqs ]
 }
 //
 // Get attribute from genome config file e.g. fasta

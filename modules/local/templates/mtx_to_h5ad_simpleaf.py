@@ -65,7 +65,7 @@ def input_to_adata(
     adata.var_names_make_unique()
 
     # sort adata column- and row- wise to avoid positional differences
-    adata = adata[adata.obs_names.sort_values(), adata.var_names.sort_values()]
+    adata = adata[adata.obs_names.sort_values(), adata.var_names.sort_values()].copy()
 
     # write results
     adata.write_h5ad(f"{output}")

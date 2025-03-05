@@ -95,20 +95,16 @@ workflow PIPELINE_INITIALISATION {
     } else if (params.aligner == 'cellrangerarc') { // the cellrangerarc sub-workflow logic needs that channels have a meta, type, subsample, fastqs structure.
         Channel
             .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
-            .map {
-                meta, fastq_1, fastq_2 ->
-                    if (!fastq_2) {
-                        return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
-                    } else {
-                        return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
-                    }
+            .map { meta, fastq_1, fastq_2, fastq_barcode ->
+                if (!fastq_2 || (meta.sample_type == "atac" && !fastq_barcode)) {
+                    error("Please check input samplesheet -> cellrangerarc requires both paired-end reads and barcode fastq files: ${meta.id}")
+                }
+                return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2, fastq_barcode ] ]
             }
             .groupTuple()
-            .view()
             .map {
                 cellrangerarcStructure(it)
             }
-            .view()
             .set { ch_samplesheet }
     } else {
         Channel
@@ -223,6 +219,13 @@ def cellrangerarcStructure(input) {
         error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
     }
 
+    // Validate that the property "sample_type" is present and has valid values
+    def valid_sample_types = ["gex", "atac"]
+    def sample_type_ok = metas.collect { meta -> meta.sample_type }.unique().every { it in valid_sample_types }
+    if (!sample_type_ok) {
+        error("Please check input samplesheet -> The property 'sample_type' is required and can only be 'gex' or 'atac'.")
+    }
+
     // Define a new common meta for all the fastqs in this channel instance
     def sampleMeta = metas[0].clone()
     sampleMeta.remove("sample_type")
@@ -240,7 +243,7 @@ def cellrangerarcStructure(input) {
         return match[0][1]
     }
 
-    return [ sampleMeta, sampletypes, subsamples, fastqs ]
+    return [ sampleMeta, sampletypes, subsamples, fastqs.flatten() ]
 }
 //
 // Get attribute from genome config file e.g. fasta

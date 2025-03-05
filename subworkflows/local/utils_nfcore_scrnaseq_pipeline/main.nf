@@ -99,7 +99,11 @@ workflow PIPELINE_INITIALISATION {
                 if (!fastq_2 || (meta.sample_type == "atac" && !meta.fastq_barcode)) {
                     error("Please check input samplesheet -> cellrangerarc requires both paired-end reads and barcode fastq files: ${meta.id}")
                 }
-                return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2, file(meta.fastq_barcode, checkIfExists: true) ] ]
+                if (meta.sample_type == "atac") {
+                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2, file(meta.fastq_barcode, checkIfExists: true) ] ]
+                } else {
+                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
+                }
             }
             .groupTuple()
             .map {

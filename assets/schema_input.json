@@ -29,10 +29,7 @@
             },
             "fastq_barcode": {
                 "type": "string",
-                "format": "file-path",
-                "exists": true,
-                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 3 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "meta": ["fastq_barcode"]
             },
             "expected_cells": {
                 "type": "integer",

@@ -95,11 +95,11 @@ workflow PIPELINE_INITIALISATION {
     } else if (params.aligner == 'cellrangerarc') { // the cellrangerarc sub-workflow logic needs that channels have a meta, type, subsample, fastqs structure.
         Channel
             .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
-            .map { meta, fastq_1, fastq_2, fastq_barcode ->
-                if (!fastq_2 || (meta.sample_type == "atac" && !fastq_barcode)) {
+            .map { meta, fastq_1, fastq_2 ->
+                if (!fastq_2 || (meta.sample_type == "atac" && !meta.fastq_barcode)) {
                     error("Please check input samplesheet -> cellrangerarc requires both paired-end reads and barcode fastq files: ${meta.id}")
                 }
-                return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2, fastq_barcode ] ]
+                return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2, file(meta.fastq_barcode, checkIfExists: true) ] ]
             }
             .groupTuple()
             .map {

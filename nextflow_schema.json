@@ -155,6 +155,13 @@
                     "default": "s3://ngi-igenomes/igenomes/",
                     "fa_icon": "fas fa-cloud-download-alt",
                     "hidden": true
+                },
+                "txp2gene": {
+                    "type": "string",
+                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Kallisto/BUS and Alevin-fry with AlevinQC.",
+                    "fa_icon": "fas fa-map-marked-alt",
+                    "format": "file-path",
+                    "exists": true
                 }
             }
         },
@@ -170,14 +177,6 @@
                     "description": "Path to pre-built Simpleaf index.",
                     "fa_icon": "fas fa-fish",
                     "format": "path",
-                    "exists": true
-                },
-                "txp2gene": {
-                    "type": "string",
-                    "description": "Path to transcript to gene mapping file.",
-                    "help_text": "This allows the specification of a transcript to gene mapping file for Simpleaf. Only required if the index is generated from a transcriptomic reference FASTA file (`transcript_fasta`).",
-                    "fa_icon": "fas fa-map-marked-alt",
-                    "format": "file-path",
                     "exists": true
                 },
                 "simpleaf_umi_resolution": {

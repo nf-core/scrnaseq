@@ -56,7 +56,11 @@ def input_to_adata(
     # the simpleaf quant module exports an h5ad file.
     adata = sc.read_h5ad(simpleaf_h5ad_path)
     adata.obs_names = adata.obs['barcodes'].values
+    adata.var_names = adata.var['gene_id'].values
     adata.obs["sample"] = sample
+
+    # sort adata column- and row- wise to avoid positional differences
+    adata = adata[adata.obs_names.sort_values(), adata.var_names.sort_values()].copy()
 
     # standard format
     # index are gene IDs and symbols are a column

@@ -8,7 +8,7 @@ process CONCATENATE_VDJ   {
     tuple val(meta), path(input_vdj, stageAs: '?/*')
 
     output:
-    tuple val(meta), path("*.vdj.h5ad") , emit: h5ad
+    tuple val(meta), path("*.vdj.h5ad") , emit: h5ad, optional: true
     path "versions.yml",  emit: versions
     
     when:

@@ -11,6 +11,7 @@ import glob
 import scanpy as sc                 # single-cell data processing
 import scirpy as ir                 # single-cell AIRR-data
 import anndata as ad                # store annotated matrix as anndata object
+import os
 
 
 warnings.filterwarnings("ignore")
@@ -82,9 +83,12 @@ def main():
             # Read folders with the filtered contigue annotation and store datasets in a dictionary
             print("\n===== READING CONTIGUE ANNOTATION MATRIX =====")
             print("\nProcessing filtered contigue table in folder ... ", end ='')
-            adata_vdj= ir.io.read_10x_vdj(vdj)
-            print("Done!")
-            adata_vdj_list.append(adata_vdj)
+            if os.path.getsize(vdj) == 0:
+                print(f"Warning: {vdj} is empty and will be skipped.")
+            else:
+                adata_vdj= ir.io.read_10x_vdj(vdj)
+                print("Done!")
+                adata_vdj_list.append(adata_vdj)
     else:
         print("No valid input file provided. Skipping reading of the vdj annotation.")
 
@@ -94,21 +98,27 @@ def main():
 
     print("\n===== CONCATENATING VDJ TABLES =====")
 
-    if len(adata_vdj_list) > 1:
-        adata_vdj_concatenated = ad.concat(adata_vdj_list, join= "outer", merge ="same", label="sample",
+    if len(adata_vdj_list) == 0:
+        print("No valid files were found. Nothing to save.")
+    else:
+        if len(adata_vdj_list) == 1:
+            adata_vdj_concatenated = adata_vdj_list[0]
+            print(f"Only one non-empty file found. Saving the file as is without concatenation.")
+        else:
+            adata_vdj_concatenated = ad.concat(adata_vdj_list, join= "outer", merge ="same", label="sample",
                                         keys= input_run_id, index_unique="_")
 
-    print(f"Concatenated vdj table for {len(input_run_id)} batched has {adata_vdj_concatenated.shape[0]} cells")
-    print("Done!")
+        print(f"Concatenated vdj table for {len(input_run_id)} batched has {adata_vdj_concatenated.shape[0]} cells")
+        print("Done!")
 # --------------------------------------------------------------------------------------------------------------------
 #                           SAVE OUTPUT FILE
 # --------------------------------------------------------------------------------------------------------------------
 
-    print("\n===== SAVING OUTPUT FILE =====")
+        print("\n===== SAVING OUTPUT FILE =====")
 
-    print(f"Saving vdj table data in {output}")
-    adata_vdj_concatenated.write(output)
-    print("Done!")
+        print(f"Saving vdj table data in {output}")
+        adata_vdj_concatenated.write(output)
+        print("Done!")
 
 
 #####################################################################################################

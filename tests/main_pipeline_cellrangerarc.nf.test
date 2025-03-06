@@ -1,0 +1,26 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_cellrangerarc_aligner") {
+
+        when {
+            params {
+                aligner                   = 'cellrangerarc'
+                outdir                    = "${outputDir}/results_cellrangerarc"
+                input                     = "${baseDir}/assets/cellrangerarc_samplesheet.csv"
+                fb_reference              = "${baseDir}/assets/fb_reference.csv"
+                fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz'
+                gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                protocol                  = 'auto'
+            }
+        }
+
+        then {
+            assert workflow.success
+        }
+
+    }
+
+}

@@ -1,0 +1,2 @@
+sample,fastq_1,fastq_2,fastq_barcode,sample_type
+test_scATAC,https://github.com/nf-core/test-datasets/raw/refs/heads/modules/data/genomics/homo_sapiens/10xgenomics/cellranger-atac/test_scATAC_S1_L001_R1_001.fastq.gz,https://github.com/nf-core/test-datasets/raw/refs/heads/modules/data/genomics/homo_sapiens/10xgenomics/cellranger-atac/test_scATAC_S1_L001_R2_001.fastq.gz,https://github.com/nf-core/test-datasets/raw/refs/heads/modules/data/genomics/homo_sapiens/10xgenomics/cellranger-atac/test_scATAC_S1_L001_R3_001.fastq.gz,atac

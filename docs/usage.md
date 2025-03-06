@@ -198,9 +198,13 @@ You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-c
 
 When building reference index, the underlying mapper of Simpleaf operates on a large number of temporary files on disk simutaneously. Therefore, for environments where CPUs and disk I/O are limited, such as on AWS, specifying `scratch=true` for the `SIMPLEAF_INDEX` module in the `conf/modules.config` file is necessary to avoid slowdowns and potential failures.
 
+Example:
+
 ```nextflow title="conf/modules.config"
-withNAME: SIMPLEAF_INDEX {
-  scratch=true
+process {
+  withName: SIMPLEAF_INDEX {
+    scratch=true
+  }
 }
 ```
 

@@ -201,10 +201,8 @@ When building reference index, the underlying mapper of Simpleaf operates on a l
 Example:
 
 ```nextflow title="conf/modules.config"
-process {
-  withName: SIMPLEAF_INDEX {
-    scratch=true
-  }
+withNAME: SIMPLEAF_INDEX {
+  scratch=true
 }
 ```
 

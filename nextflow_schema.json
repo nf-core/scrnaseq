@@ -91,6 +91,11 @@
                 "skip_cellbender": {
                     "type": "boolean",
                     "description": "Skip cellbender empty drops filter subworkflow"
+                },
+                "skip_emptydrops": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "errorMessage": "Parameter has been deprecated in favour of --skip_cellbender to properly match name of workflow."
                 }
             }
         },

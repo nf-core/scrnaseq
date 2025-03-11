@@ -313,7 +313,7 @@ workflow SCRNASEQ {
         ch_h5ads,
         ch_input
     )
-
+    ch_versions = ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
     //
     // MODULE: Concat vdj samples and save as h5ad format
     //
@@ -321,7 +321,8 @@ workflow SCRNASEQ {
     CONCATENATE_VDJ (
         CELLRANGER_MULTI_ALIGN.out.vdj
     )
-    
+    ch_versions = ch_versions.mix(CONCATENATE_VDJ.out.versions)
+
     //
     // SUBWORKFLOW: Concat GEX, VDJ and CITE data and save as MuData object
     //
@@ -335,7 +336,7 @@ workflow SCRNASEQ {
         H5AD_CONVERSION.out.h5ad,
         ch_vdj
     )
-    
+    ch_versions = ch_versions.mix(CONVERT_MUDATA.out.versions)
     //
     // Collate and save software versions
     //

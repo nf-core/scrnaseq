@@ -26,11 +26,11 @@ process CONVERT_MUDATA  {
 
     convert_mudata.py -ad $input_h5ad $ai
 
-    echo "" >> versions.yml
     cat <<-END_VERSIONS >> versions.yml
     "${task.process}":
+        convert_mudata.py --version >> versions.yml
     END_VERSIONS
-    convert_mudata.py --version >> versions.yml
+    
     """
 
     stub:
@@ -40,8 +40,7 @@ process CONVERT_MUDATA  {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
+        convert_mudata.py --version >> versions.yml
     END_VERSIONS
-    convert_mudata.py --version >> versions.yml
-
     """
 }

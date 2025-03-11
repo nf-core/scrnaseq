@@ -22,11 +22,11 @@ process CONCATENATE_VDJ   {
 
     concatenate_vdj.py -ai ${input_vdj.join(' ')} -id ${meta.collect{ it.id }.join(' ')}
     
-    echo "" >> versions.yml
     cat <<-END_VERSIONS >> versions.yml
     "${task.process}":
+        concatenate_vdj.py --version >> versions.yml
     END_VERSIONS
-    concatenate_vdj.py --version >> versions.yml
+    
     """
 
     stub:
@@ -35,8 +35,8 @@ process CONCATENATE_VDJ   {
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
+        concatenate_vdj.py --version >> versions.yml
     END_VERSIONS
-    concatenate_vdj.py --version >> versions.yml
-    
+       
     """   
 }

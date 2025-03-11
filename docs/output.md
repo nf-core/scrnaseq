@@ -141,7 +141,7 @@ The 'filtered_contig_annotation' tables are concatenated to generate a unified h
 **Output directory: `results/concatenate`**
 
 ## Multimodal Data implementation
-This step enables handling multimodal data. It takes .h5ad AnnData objects from both the Gene Expression (GEX) and V(D)J modalities and constructs MuData objects, which is then saved as .h5mu file.
+This step enables handling multimodal data. It takes .h5ad AnnData objects from both the Gene Expression (GEX), Cellular Indexing of Transcriptomes and Epitopes by sequencing (CITE) and V(D)J modalities and constructs MuData objects, which is then saved as .h5mu file.
 
 **Output directory: `results/convert`**
 

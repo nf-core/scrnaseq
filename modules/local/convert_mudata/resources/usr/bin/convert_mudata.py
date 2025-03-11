@@ -44,7 +44,7 @@ def main():
     parser.add_argument('-ad','--input-gex-file',metavar= 'GEX_INPUT_FILES', type=pathlib.Path, dest='input_gex_files',
                         help="paths of existing count matrix files in h5ad format (including file names)")
     parser.add_argument('-ai', '--input-vdj-file', metavar='VDJ_INPUT_FILES',type=pathlib.Path, dest='input_vdj_files',
-                        help="paths of existing vdj matrix files in h5ad format (including file names)")
+                        default=pathlib.Path(''),help="paths of existing vdj matrix files in h5ad format (including file names)")
     parser.add_argument('-o', '--out', metavar='MUDATA_OUTPUT_FILE', type=pathlib.Path, default="matrix.mudata.h5mu",
                         help="name of the muData object")
     parser.add_argument('-v', '--version', action='version', version=VERSION)
@@ -83,7 +83,7 @@ def main():
 # --------------------------------------------------------------------------------------------------------------------
 #                                 READ VDJ FILES
 # --------------------------------------------------------------------------------------------------------------------
-    if input_vdj_file:
+    if input_vdj_file and input_vdj_file != pathlib.Path(''):
         # Read folders with the filtered contigue annotation and store datasets in a dictionary
         print("\n===== READING CONTIGUE ANNOTATION MATRIX =====")
         # read the filtered contigue annotation file for the combined samples and print some initial info

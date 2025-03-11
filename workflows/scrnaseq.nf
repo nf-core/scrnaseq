@@ -25,6 +25,7 @@ include { H5AD_CONVERSION                                   } from '../subworkfl
 include { CONCATENATE_VDJ                                   } from '../modules/local/concatenate_vdj'
 include { CONVERT_MUDATA                                    } from '../modules/local/convert_mudata'
 
+
 workflow SCRNASEQ {
 
     take:
@@ -324,12 +325,17 @@ workflow SCRNASEQ {
     //
     // SUBWORKFLOW: Concat GEX, VDJ and CITE data and save as MuData object
     //
+    
+    ch_vdj = CONCATENATE_VDJ.out.h5ad
+        .map { meta, file -> [meta, file] }
+        .ifEmpty { [[id: 'dummy'], []] }
+
 
     CONVERT_MUDATA(
         H5AD_CONVERSION.out.h5ad,
-        CONCATENATE_VDJ.out.h5ad
-        )
-
+        ch_vdj
+    )
+    
     //
     // Collate and save software versions
     //

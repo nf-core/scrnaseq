@@ -1,5 +1,5 @@
 {
-    "alevin": {
+    "simpleaf": {
         "10XV1": {
             "protocol": "10xv1",
             "whitelist": "assets/whitelist/10x_V1_barcode_whitelist.txt.gz"

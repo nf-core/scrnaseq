@@ -15,6 +15,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { SCRNASEQ                } from './workflows/scrnaseq'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
@@ -24,7 +25,16 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrn
     GENOME PARAMETER VALUES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-// we cannot modify params. here, we must load the files
+
+// Params cannot be changed if they have been set beforehand
+// Thus, manually provided files are not overwritten by the genome attributes
+params.fasta            = getGenomeAttribute('fasta')
+params.gtf              = getGenomeAttribute('gtf')
+params.simpleaf_index   = getGenomeAttribute('simpleaf') ?: getGenomeAttribute('salmon')
+params.txp2gene         = getGenomeAttribute('simpleaf_txp2gene')
+params.cellranger_index = params.aligner == 'cellrangerarc' ?
+                            getGenomeAttribute('cellrangerarc') :
+                            getGenomeAttribute('cellranger')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -3,27 +3,25 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { MULTIQC                                       } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap                              } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc                          } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML                        } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText                        } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { getGenomeAttribute                            } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { FASTQC_CHECK                                  } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS                             } from '../subworkflows/local/kallisto_bustools'
-include { SCRNASEQ_ALEVIN                               } from '../subworkflows/local/alevin'
-include { STARSOLO                                      } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN                              } from "../subworkflows/local/align_cellranger"
-include { CELLRANGER_MULTI_ALIGN                        } from "../subworkflows/local/align_cellrangermulti"
-include { CELLRANGERARC_ALIGN                           } from "../subworkflows/local/align_cellrangerarc"
-include { MTX_TO_H5AD                                   } from '../modules/local/mtx_to_h5ad'
-include { H5AD_CONVERSION                               } from '../subworkflows/local/h5ad_conversion'
-include { H5AD_CONVERSION as EMPTYDROPS_H5AD_CONVERSION } from '../subworkflows/local/h5ad_conversion'
-include { EMPTY_DROPLET_REMOVAL                         } from '../subworkflows/local/emptydrops_removal.nf'
-include { GTF_GENE_FILTER                               } from '../modules/local/gtf_gene_filter'
-include { GUNZIP as GUNZIP_FASTA                        } from '../modules/nf-core/gunzip/main'
-include { GUNZIP as GUNZIP_GTF                          } from '../modules/nf-core/gunzip/main'
-
+include { MULTIQC                                           } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap                                  } from 'plugin/nf-schema'
+include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText                            } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { getGenomeAttribute                                } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { FASTQC_CHECK                                      } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS                                 } from '../subworkflows/local/kallisto_bustools'
+include { SIMPLEAF                                          } from '../subworkflows/local/simpleaf'
+include { STARSOLO                                          } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN                                  } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_MULTI_ALIGN                            } from "../subworkflows/local/align_cellrangermulti"
+include { CELLRANGERARC_ALIGN                               } from "../subworkflows/local/align_cellrangerarc"
+include { MTX_TO_H5AD                                       } from '../modules/local/mtx_to_h5ad'
+include { H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA } from '../subworkflows/nf-core/h5ad_removebackground_barcodes_cellbender_anndata'
+include { GTF_GENE_FILTER                                   } from '../modules/local/gtf_gene_filter'
+include { GUNZIP as GUNZIP_FASTA                            } from '../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_GTF                              } from '../modules/nf-core/gunzip/main'
+include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
 
 
 workflow SCRNASEQ {
@@ -32,38 +30,22 @@ workflow SCRNASEQ {
     ch_fastq
 
     main:
+    ch_multiqc_files = Channel.empty()
+    ch_versions      = Channel.empty()
+    ch_mtx_matrices  = Channel.empty()
 
     protocol_config = Utils.getProtocol(workflow, log, params.aligner, params.protocol)
     if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangerarc", "cellrangermulti"]) {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    // collect paths from genome attributes file (e.g. iGenomes.config; optional)
-    // we cannot overwrite params in the workflow (they stay null as coming from the config file)
-    def genome_fasta = params.fasta        ?: getGenomeAttribute('fasta')
-    def gtf          = params.gtf          ?: getGenomeAttribute('gtf')
-    def star_index   = params.star_index   // ?: getGenomeAttribute('star') TODO: Currently not fetching iGenomes star index due version incompatibility
-    def salmon_index = params.salmon_index ?: getGenomeAttribute('simpleaf')
-    def txp2gene     = params.txp2gene     ?: getGenomeAttribute('simpleaf_tx2pgene')
-
-    // Make cellranger or cellranger-arc index conditional
-    def cellranger_index = []
-    if (params.aligner in ["cellranger", "cellrangermulti"]){
-        cellranger_index = params.cellranger_index ?: getGenomeAttribute('cellranger')
-    }
-    else if (params.aligner == "cellrangerarc") {
-        cellranger_index = params.cellranger_index ?: getGenomeAttribute('cellrangerarc')
-    }
-
-    ch_genome_fasta = genome_fasta ? file(genome_fasta, checkIfExists: true) : []
-    ch_gtf = gtf ? file(gtf, checkIfExists: true) : []
-
     // general input and params
-    ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta): []
-    ch_motifs = params.motifs ? file(params.motifs) : []
-    ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
-    ch_txp2gene = txp2gene ? file(txp2gene, checkIfExists: true) : []
-    ch_multiqc_files = Channel.empty()
+    ch_genome_fasta         = params.fasta                ? file(params.fasta, checkIfExists: true)    : []
+    ch_gtf                  = params.gtf                  ? file(params.gtf, checkIfExists: true)      : []
+    ch_transcript_fasta     = params.transcript_fasta     ? file(params.transcript_fasta)              : []
+    ch_motifs               = params.motifs               ? file(params.motifs)                        : []
+    ch_txp2gene             = params.txp2gene             ? file(params.txp2gene, checkIfExists: true) : []
+
     if (params.barcode_whitelist) {
         ch_barcode_whitelist = file(params.barcode_whitelist, checkIfExists: true)
     } else if (protocol_config.containsKey("whitelist")) {
@@ -78,28 +60,26 @@ workflow SCRNASEQ {
 
     //kallisto params
     ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index, checkIfExists: true) : []
-    kb_workflow = params.kb_workflow
-    kb_t1c = params.kb_t1c ? file(params.kb_t1c, checkIfExists: true) : []
-    kb_t2c = params.kb_t2c ? file(params.kb_t2c, checkIfExists: true) : []
+    kb_t1c            = params.kb_t1c         ? file(params.kb_t1c, checkIfExists: true) : []
+    kb_t2c            = params.kb_t2c         ? file(params.kb_t2c, checkIfExists: true) : []
 
-    //salmon params
-    ch_salmon_index = salmon_index ? file(salmon_index, checkIfExists: true) : []
+    //simpleaf params
+    ch_simpleaf_index   = params.simpleaf_index ? file(params.simpleaf_index, checkIfExists: true) : []
 
     //star params
-    star_index = star_index ? file(star_index, checkIfExists: true) : null
-    ch_star_index = star_index ? Channel.of( [[id: star_index.baseName], star_index] ) : []
-    star_feature = params.star_feature
+    star_index        = params.star_index ? file(params.star_index, checkIfExists: true) : null
+    ch_star_index     = star_index ? Channel.value( [[id: star_index.baseName], star_index] ) : []
 
     //cellranger params
-    ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
+    ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index, checkIfExists: true) : []
 
     //cellrangermulti params
-    cellranger_vdj_index              = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
-    ch_multi_samplesheet              = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
-    empty_file                        = file("$projectDir/assets/EMPTY", checkIfExists: true)
+    cellranger_vdj_index = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
+    ch_multi_samplesheet = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
+    empty_file           = file("$projectDir/assets/EMPTY", checkIfExists: true)
 
-    ch_versions      = Channel.empty()
-    ch_mtx_matrices = Channel.empty()
+    // cellrangerarc params
+    ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config)          : []
 
     // Run FastQC
     if (!params.skip_fastqc) {
@@ -111,8 +91,8 @@ workflow SCRNASEQ {
     //
     // Uncompress genome fasta file if required
     //
-    if (genome_fasta) {
-        if (genome_fasta.endsWith('.gz')) {
+    if (params.fasta) {
+        if (params.fasta.endsWith('.gz')) {
             ch_genome_fasta    = GUNZIP_FASTA ( [ [:], ch_genome_fasta ] ).gunzip.map { it[1] }
             ch_versions        = ch_versions.mix(GUNZIP_FASTA.out.versions)
         } else {
@@ -123,8 +103,8 @@ workflow SCRNASEQ {
     //
     // Uncompress GTF annotation file or create from GFF3 if required
     //
-    if (gtf) {
-        if (gtf.endsWith('.gz')) {
+    if (params.gtf) {
+        if (params.gtf.endsWith('.gz')) {
             ch_gtf      = GUNZIP_GTF ( [ [:], ch_gtf ] ).gunzip.map { it[1] }
             ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
         } else {
@@ -145,7 +125,7 @@ workflow SCRNASEQ {
             kb_t1c,
             kb_t2c,
             protocol_config['protocol'],
-            kb_workflow,
+            params.kb_workflow,
             ch_fastq
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
@@ -153,21 +133,32 @@ workflow SCRNASEQ {
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
-    // Run salmon alevin pipeline
-    if (params.aligner == "alevin") {
-        SCRNASEQ_ALEVIN(
+    // Run simpleaf pipeline
+    if ( params.aligner == "simpleaf" ) {
+
+        SIMPLEAF(
             ch_genome_fasta,
             ch_filter_gtf,
             ch_transcript_fasta,
-            ch_salmon_index,
+            ch_simpleaf_index,
             ch_txp2gene,
             ch_barcode_whitelist,
             protocol_config['protocol'],
-            ch_fastq
+            params.simpleaf_umi_resolution,
+            ch_fastq,
+            [] // for existing map dir; not applicable
         )
-        ch_versions = ch_versions.mix(SCRNASEQ_ALEVIN.out.ch_versions)
-        ch_multiqc_files = ch_multiqc_files.mix(SCRNASEQ_ALEVIN.out.alevin_results.map{ meta, it -> it })
-        ch_mtx_matrices = ch_mtx_matrices.mix( SCRNASEQ_ALEVIN.out.alevin_results )
+        ch_versions = ch_versions.mix(SIMPLEAF.out.ch_versions)
+        ch_multiqc_files = ch_multiqc_files.mix(SIMPLEAF.out.quant.map{ _meta, it -> it })
+        ch_mtx_matrices = ch_mtx_matrices.mix(
+            SIMPLEAF.out.quant.map{
+                meta, files -> [
+                    meta +
+                    [input_type: meta["filtered"] ? "filtered" : "raw" ],
+                    files
+                ]
+            }
+        )
     }
 
     // Run STARSolo pipeline
@@ -179,7 +170,7 @@ workflow SCRNASEQ {
             protocol_config['protocol'],
             ch_barcode_whitelist,
             ch_fastq,
-            star_feature,
+            params.star_feature,
             protocol_config.get('extra_args', ""),
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
@@ -296,32 +287,30 @@ workflow SCRNASEQ {
         params.aligner
     )
     ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
+    ch_h5ads = MTX_TO_H5AD.out.h5ad
 
     //
-    // SUBWORKFLOW: Run h5ad conversion and concatenation
+    // SUBWORKFLOW: Run cellbender remove background subworkflow
     //
-    ch_emptydrops = Channel.empty()
+    if ( !params.skip_cellbender && !(params.aligner in ['cellrangerarc']) ) {
+        // module should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
+        H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA (
+            ch_h5ads
+                .filter { meta, mtx_files -> meta.input_type == 'raw' }
+                .map { meta, mtx_files -> [ meta + [input_type: 'cellbender_filter'], mtx_files ]} // to avoid name collision
+        )
+        ch_h5ads = ch_h5ads.mix(
+            H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA.out.h5ad
+        )
+    }
+
+    //
+    // SUBWORKFLOW: Concat samples and convert h5ad to other formats
+    //
     H5AD_CONVERSION (
-        MTX_TO_H5AD.out.h5ad,
+        ch_h5ads,
         ch_input
     )
-    ch_versions = ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
-
-    //
-    // SUBWORKFLOW: Run cellbender emptydrops filter
-    //
-    if ( !params.skip_emptydrops && !(params.aligner in ['cellrangerarc']) ) {
-
-        // emptydrops should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
-        EMPTY_DROPLET_REMOVAL (
-            H5AD_CONVERSION.out.h5ads.filter { meta, mtx_files -> meta.input_type.contains('raw') }
-        )
-        EMPTYDROPS_H5AD_CONVERSION (
-            EMPTY_DROPLET_REMOVAL.out.h5ad,
-            ch_input
-        )
-
-    }
 
     //
     // Collate and save software versions
@@ -329,7 +318,7 @@ workflow SCRNASEQ {
     softwareVersionsToYAML(ch_versions)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
-            name: 'nf_core_'  + 'pipeline_software_' +  'mqc_'  + 'versions.yml',
+            name: 'nf_core_'  +  'scrnaseq_software_'  + 'mqc_'  + 'versions.yml',
             sort: true,
             newLine: true
         ).set { ch_collated_versions }

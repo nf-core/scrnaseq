@@ -58,10 +58,10 @@
                 "aligner": {
                     "type": "string",
                     "description": "Name of the tool to use for scRNA (pseudo-) alignment.",
-                    "default": "alevin",
-                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- Salmon + Alevin-fry + AlevinQC\n- STARsolo\n\nTo choose which one to use, please specify either `alevin`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `alevin` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "default": "simpleaf",
+                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- SimpleAF \n- STARsolo\n\nTo choose which one to use, please specify either `simpleaf`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `simpleaf` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
                     "fa_icon": "fas fa-align-center",
-                    "enum": ["kallisto", "star", "alevin", "cellranger", "cellrangerarc", "cellrangermulti"]
+                    "enum": ["kallisto", "star", "simpleaf", "cellranger", "cellrangerarc", "cellrangermulti"]
                 },
                 "protocol": {
                     "type": "string",
@@ -88,9 +88,14 @@
                     "type": "boolean",
                     "description": "Skip FastQC"
                 },
-                "skip_emptydrops": {
+                "skip_cellbender": {
                     "type": "boolean",
                     "description": "Skip cellbender empty drops filter subworkflow"
+                },
+                "skip_emptydrops": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "errorMessage": "Parameter has been deprecated in favour of --skip_cellbender to properly match name of workflow."
                 }
             }
         },
@@ -128,7 +133,8 @@
                     "description": "A cDNA FASTA file",
                     "fa_icon": "fas fa-dna",
                     "format": "file-path",
-                    "exists": true
+                    "exists": true,
+                    "help_text": "If simpleaf is used as the aligner, this must be provided together with a transcript-to-gene ID mapping file (`txp2gene`)."
                 },
                 "gtf": {
                     "type": "string",
@@ -139,7 +145,7 @@
                 },
                 "save_reference": {
                     "type": "boolean",
-                    "description": "Specify this parameter to save the indices created (STAR, Kallisto, Salmon) to the results.",
+                    "description": "Specify this parameter to save the indices created (STAR, Kallisto, Simpleaf) to the results.",
                     "fa_icon": "fas fa-bookmark"
                 },
                 "save_align_intermeds": {
@@ -154,33 +160,43 @@
                     "default": "s3://ngi-igenomes/igenomes/",
                     "fa_icon": "fas fa-cloud-download-alt",
                     "hidden": true
+                },
+                "txp2gene": {
+                    "type": "string",
+                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Kallisto/BUS and Alevin-fry with AlevinQC.",
+                    "fa_icon": "fas fa-map-marked-alt",
+                    "format": "file-path",
+                    "exists": true
                 }
             }
         },
-        "alevin_options": {
-            "title": "Alevin-fry Options",
+        "simpleaf_options": {
+            "title": "Simpleaf Options",
             "type": "object",
             "description": "",
             "default": "",
             "properties": {
-                "salmon_index": {
+                "simpleaf_index": {
                     "type": "string",
-                    "description": "This can be used to specify a precomputed Salmon index in the pipeline, in order to skip the generation of required indices by Salmon itself.",
+                    "help_text": "This can be used to specify a precomputed Simpleaf index in the pipeline, in order to skip the generation of required indices by Simpleaf itself.",
+                    "description": "Path to pre-built Simpleaf index.",
                     "fa_icon": "fas fa-fish",
                     "format": "path",
                     "exists": true
                 },
-                "txp2gene": {
+                "simpleaf_umi_resolution": {
                     "type": "string",
-                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Alevin-fry and AlevinQC.",
-                    "fa_icon": "fas fa-map-marked-alt",
-                    "format": "file-path",
-                    "exists": true
-                },
-                "simpleaf_rlen": {
-                    "type": "integer",
-                    "default": 91,
-                    "description": "It is the target read length the index will be built for, using simpleaf.",
+                    "default": "cr-like",
+                    "enum": [
+                        "cr-like",
+                        "cr-like-em",
+                        "parsimony",
+                        "parsimony-em",
+                        "parsimony-gene",
+                        "parsimony-gene-em"
+                    ],
+                    "description": "UMI resolution strategy to deduplicate UMIs.",
+                    "help_text": "This parameter specifies the [UMI resolution strategy](https://simpleaf.readthedocs.io/en/latest/quant-command.html) to use for deduplicating UMIs. The default is `cr-like`, which mimics the behavior of Cell Ranger, i.e., discarding UMIs equally compatible to multiple genes. Strategies that resolve multi-mapped UMIs by expectation maximization are available, like `cr-like-em`, `parsimony-em`, and `parsimony-gene-em`.",
                     "fa_icon": "fas fa-map-marked-alt"
                 }
             }
@@ -251,11 +267,6 @@
                     "description": "Type of workflow. Use `nac` for an index type that can quantify nascent and mature RNA. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. (default: standard)",
                     "fa_icon": "fas fa-rainbow",
                     "enum": ["standard", "lamanno", "nac"]
-                },
-                "kb_filter": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-fish",
-                    "description": "Activate Kallisto/BUStools filtering algorithm"
                 }
             }
         },
@@ -496,6 +507,12 @@
                     "description": "Base URL or local path to location of pipeline test dataset files",
                     "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
                     "hidden": true
+                },
+                "trace_report_suffix": {
+                    "type": "string",
+                    "fa_icon": "far calendar",
+                    "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
+                    "hidden": true
                 }
             }
         }
@@ -514,7 +531,7 @@
             "$ref": "#/$defs/reference_genome_options"
         },
         {
-            "$ref": "#/$defs/alevin_options"
+            "$ref": "#/$defs/simpleaf_options"
         },
         {
             "$ref": "#/$defs/starsolo_options"

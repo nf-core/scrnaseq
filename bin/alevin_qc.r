@@ -15,6 +15,6 @@ sampleId <- args[2]
 outDir <- args[3]
 
 alevinQCReport(baseDir = baseDir, sampleId = sampleId,
-                outputFile = "alevinReport.html",
+                outputFile = "simpleafQCReport.html",
                 outputFormat = "html_document",
                 outputDir = outDir, forceOverwrite = TRUE)

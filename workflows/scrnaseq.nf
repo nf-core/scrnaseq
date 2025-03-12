@@ -317,20 +317,22 @@ workflow SCRNASEQ {
     //
     // MODULE: Concat vdj samples and save as h5ad format
     //
-
-    CONCATENATE_VDJ (
-        CELLRANGER_MULTI_ALIGN.out.vdj
-    )
-    ch_versions = ch_versions.mix(CONCATENATE_VDJ.out.versions)
-
+    if (params.aligner == "cellrangermulti") {
+        CONCATENATE_VDJ (
+            CELLRANGER_MULTI_ALIGN.out.vdj
+        )
+        ch_versions = ch_versions.mix(CONCATENATE_VDJ.out.versions)
+    
     //
     // SUBWORKFLOW: Concat GEX, VDJ and CITE data and save as MuData object
     //
     
-    ch_vdj = CONCATENATE_VDJ.out.h5ad
-        .map { meta, file -> [meta, file] }
-        .ifEmpty { [[id: 'dummy'], []] }
-
+        ch_vdj = CONCATENATE_VDJ.out.h5ad
+            .map { meta, file -> [meta, file] }
+            .ifEmpty { [[id: 'dummy'], []] }
+    } else {
+        ch_vdj = [[id: 'dummy'], []]
+    }
 
     CONVERT_MUDATA(
         H5AD_CONVERSION.out.h5ad,

@@ -21,8 +21,8 @@
         {
             "@id": "./",
             "@type": "Dataset",
-            "creativeWorkStatus": "Stable",
-            "datePublished": "2025-03-04T11:35:48+00:00",
+            "creativeWorkStatus": "InProgress",
+            "datePublished": "2025-03-11T08:09:41+00:00",
             "description": "<h1>\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"docs/images/nf-core-scrnaseq_logo_dark.png\">\n    <img alt=\"nf-core/scrnaseq\" src=\"docs/images/nf-core-scrnaseq_logo_light.png\">\n  </picture>\n</h1>\n\n[![GitHub Actions CI Status](https://github.com/nf-core/scrnaseq/actions/workflows/ci.yml/badge.svg)](https://github.com/nf-core/scrnaseq/actions/workflows/ci.yml)\n[![GitHub Actions Linting Status](https://github.com/nf-core/scrnaseq/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/scrnaseq/actions/workflows/linting.yml)\n[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/scrnaseq/results)\n[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.3568187-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.3568187)\n[![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)\n\n[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.04.2-23aa62.svg)](https://www.nextflow.io/)\n[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)\n[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)\n[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)\n[![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/launch?pipeline=https://github.com/nf-core/scrnaseq)\n\n[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23scrnaseq-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/scrnaseq)[![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?labelColor=000000&logo=twitter)](https://twitter.com/nf_core)[![Follow on Mastodon](https://img.shields.io/badge/mastodon-nf__core-6364ff?labelColor=FFFFFF&logo=mastodon)](https://mstdn.science/@nf_core)[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)\n\n## Introduction\n\n**nf-core/scrnaseq** is a bioinformatics best-practice analysis pipeline for processing 10x Genomics single-cell RNA-seq data.\n\nThis is a community effort in building a pipeline capable to support:\n\n- SimpleAF(Alevin-Fry) + AlevinQC\n- STARSolo\n- Kallisto + BUStools\n- Cellranger\n\n> [!IMPORTANT]\n> Cellranger is a commercial tool from 10X Genomics Inc. and falls under the EULA from 10X Genomics Inc. The container provided for the CellRanger functionality in this pipeline has been built by the nf-core community and is therefore _not supported by 10X genomics_ directly. We are in discussions with 10X on how to improve the user experience and licence situation for both us as a community as well as 10X and end users and will update this statement here accordingly.\n\n## Documentation\n\nThe nf-core/scrnaseq pipeline comes with documentation about the pipeline [usage](https://nf-co.re/scrnaseq/usage), [parameters](https://nf-co.re/scrnaseq/parameters) and [output](https://nf-co.re/scrnaseq/output).\n\n![scrnaseq workflow](docs/images/scrnaseq_pipeline_V3.0-metro_clean.png)\n\n## Usage\n\n> [!NOTE]\n> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.\n\nFirst, prepare a samplesheet with your input data that looks as follows:\n\n`samplesheet.csv`:\n\n```csv\nsample,fastq_1,fastq_2,expected_cells\npbmc8k,pbmc8k_S1_L007_R1_001.fastq.gz,pbmc8k_S1_L007_R2_001.fastq.gz,10000\npbmc8k,pbmc8k_S1_L008_R1_001.fastq.gz,pbmc8k_S1_L008_R2_001.fastq.gz,10000\n```\n\nEach row represents a fastq file (single-end) or a pair of fastq files (paired end).\n\nNow, you can run the pipeline using:\n\n```bash\nnextflow run nf-core/scrnaseq \\\n   -profile <docker/singularity/.../institute> \\\n   --input samplesheet.csv \\\n   --fasta GRCm38.p6.genome.chr19.fa \\\n   --gtf gencode.vM19.annotation.chr19.gtf \\\n   --protocol 10XV2 \\\n   --aligner <simpleaf/kallisto/star/cellranger> \\\n   --outdir <OUTDIR>\n```\n\n> [!WARNING]\n> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).\n\nFor more details and further functionality, please refer to the [usage documentation](https://nf-co.re/scrnaseq/usage) and the [parameter documentation](https://nf-co.re/scrnaseq/parameters).\n\n## Decision Tree for users\n\nThe nf-core/scrnaseq pipeline features several paths to analyze your single cell data. Future additions will also be done soon, e.g. the addition of multi-ome analysis types. To aid users in analyzing their data, we have added a decision tree to help people decide on what type of analysis they want to run and how to choose appropriate parameters for that.\n\n```mermaid\ngraph TD\n    A[sc RNA] -->|alevin-fry| B(h5ad/seurat/mtx matrices)\n    A[sc RNA] -->|CellRanger| B(h5ad/seurat/mtx matrices)\n    A[sc RNA] -->|kbpython| B(h5ad/seurat/mtx matrices)\n    A[sc RNA] -->|STARsolo| B(h5ad/seurat/mtx matrices)\n```\n\nOptions for the respective alignment method can be found [here](https://github.com/nf-core/scrnaseq/blob/dev/docs/usage.md#aligning-options) to choose between methods.\n\n## Pipeline output\n\nTo see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/scrnaseq/results) tab on the nf-core website pipeline page.\nFor more details about the output files and reports, please refer to the\n[output documentation](https://nf-co.re/scrnaseq/output).\n\n## Credits\n\nnf-core/scrnaseq was originally written by Bailey PJ, Botvinnik O, Marques de Almeida F, Gabernet G, Peltzer A, Sturm G.\n\nWe thank the following people and teams for their extensive assistance in the development of this pipeline:\n\n- @heylf\n- @KevinMenden\n- @FloWuenne\n- @rob-p\n- [GHGA](https://www.ghga.de/)\n\n## Contributions and Support\n\nIf you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).\n\nFor further information or help, don't hesitate to get in touch on the [Slack `#scrnaseq` channel](https://nfcore.slack.com/channels/scrnaseq) (you can join with [this invite](https://nf-co.re/join/slack)).\n\n## Citations\n\nIf you use nf-core/scrnaseq for your analysis, please cite it using the following doi: [10.5281/zenodo.3568187](https://doi.org/10.5281/zenodo.3568187)\n\nThe basic benchmarks that were used as motivation for incorporating the available modular workflows can be found in [this publication](https://www.biorxiv.org/content/10.1101/673285v2).\n\nWe offer all three paths for the processing of scRNAseq data so it remains up to the user to decide which pipeline workflow is chosen for a particular analysis question.\n\nAn extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.\n",
             "hasPart": [
                 {
@@ -108,7 +108,7 @@
             },
             "mentions": [
                 {
-                    "@id": "#471cfddd-df99-46ed-add7-eed3c1fa2839"
+                    "@id": "#93e3b50c-a8ef-45f8-986a-494c649624ee"
                 }
             ],
             "name": "nf-core/scrnaseq"
@@ -140,29 +140,29 @@
                     "@id": "https://orcid.org/0000-0001-5010-9539"
                 },
                 {
-                    "@id": "https://orcid.org/0000-0002-4639-0935"
-                },
-                {
-                    "@id": "#drpatelhh@gmail.com"
-                },
-                {
-                    "@id": "https://orcid.org/0000-0001-9584-7842"
-                },
-                {
-                    "@id": "#rob.syme@gmail.com"
-                },
-                {
                     "@id": "https://orcid.org/0000-0003-4412-7970"
                 },
                 {
                     "@id": "https://orcid.org/0000-0002-6503-2180"
                 },
                 {
+                    "@id": "https://orcid.org/0000-0002-4639-0935"
+                },
+                {
+                    "@id": "https://orcid.org/0000-0001-9584-7842"
+                },
+                {
+                    "@id": "#drpatelhh@gmail.com"
+                },
+                {
                     "@id": "#felipemarques89@gmail.com"
+                },
+                {
+                    "@id": "#rob.syme@gmail.com"
                 }
             ],
             "dateCreated": "",
-            "dateModified": "2025-03-04T11:35:48Z",
+            "dateModified": "2025-03-11T08:09:41Z",
             "dct:conformsTo": "https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/",
             "keywords": [
                 "nf-core",
@@ -191,10 +191,10 @@
             },
             "url": [
                 "https://github.com/nf-core/scrnaseq",
-                "https://nf-co.re/scrnaseq/3.1.0/"
+                "https://nf-co.re/scrnaseq/dev/"
             ],
             "version": [
-                "3.1.0"
+                "4.1.0dev"
             ]
         },
         {
@@ -210,11 +210,11 @@
             "version": "!>=24.04.2"
         },
         {
-            "@id": "#471cfddd-df99-46ed-add7-eed3c1fa2839",
+            "@id": "#93e3b50c-a8ef-45f8-986a-494c649624ee",
             "@type": "TestSuite",
             "instance": [
                 {
-                    "@id": "#aa781c50-b786-4fc8-8c22-6917011f2527"
+                    "@id": "#ec91c6c3-aa71-4260-9902-c0030fa4f49b"
                 }
             ],
             "mainEntity": {
@@ -223,7 +223,7 @@
             "name": "Test suite for nf-core/scrnaseq"
         },
         {
-            "@id": "#aa781c50-b786-4fc8-8c22-6917011f2527",
+            "@id": "#ec91c6c3-aa71-4260-9902-c0030fa4f49b",
             "@type": "TestInstance",
             "name": "GitHub Actions workflow for testing nf-core/scrnaseq",
             "resource": "repos/nf-core/scrnaseq/actions/workflows/ci.yml",
@@ -373,30 +373,6 @@
             "name": "Sangram Keshari Sahu"
         },
         {
-            "@id": "https://orcid.org/0000-0002-4639-0935",
-            "@type": "Person",
-            "email": "nictru32@gmail.com",
-            "name": "Nico Trummer"
-        },
-        {
-            "@id": "#drpatelhh@gmail.com",
-            "@type": "Person",
-            "email": "drpatelhh@gmail.com",
-            "name": "Harshil Patel"
-        },
-        {
-            "@id": "https://orcid.org/0000-0001-9584-7842",
-            "@type": "Person",
-            "email": "mail@gregor-sturm.de",
-            "name": "Gregor Sturm"
-        },
-        {
-            "@id": "#rob.syme@gmail.com",
-            "@type": "Person",
-            "email": "rob.syme@gmail.com",
-            "name": "Rob Syme"
-        },
-        {
             "@id": "https://orcid.org/0000-0003-4412-7970",
             "@type": "Person",
             "email": "olga.botvinnik@gmail.com",
@@ -409,10 +385,34 @@
             "name": "Alexander Peltzer"
         },
         {
+            "@id": "https://orcid.org/0000-0002-4639-0935",
+            "@type": "Person",
+            "email": "nictru32@gmail.com",
+            "name": "Nico Trummer"
+        },
+        {
+            "@id": "https://orcid.org/0000-0001-9584-7842",
+            "@type": "Person",
+            "email": "mail@gregor-sturm.de",
+            "name": "Gregor Sturm"
+        },
+        {
+            "@id": "#drpatelhh@gmail.com",
+            "@type": "Person",
+            "email": "drpatelhh@gmail.com",
+            "name": "Harshil Patel"
+        },
+        {
             "@id": "#felipemarques89@gmail.com",
             "@type": "Person",
             "email": "felipemarques89@gmail.com",
             "name": "Felipe Marques de Almeida"
+        },
+        {
+            "@id": "#rob.syme@gmail.com",
+            "@type": "Person",
+            "email": "rob.syme@gmail.com",
+            "name": "Rob Syme"
         }
     ]
 }

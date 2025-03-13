@@ -34,10 +34,10 @@ nextflow_pipeline {
                 {assert workflow.success},
 
                 // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 57},
+                {assert workflow.trace.tasks().size() == 59},
 
                 // How many results were produced?
-                {assert path("${outputDir}/results_cellrangermulti").list().size() == 4},
+                {assert path("${outputDir}/results_cellrangermulti").list().size() == 6},
                 {assert path("${outputDir}/results_cellrangermulti/cellrangermulti").list().size() == 5},
                 {assert path("${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions").list().size() == 16},
                 {assert path("${outputDir}/results_cellrangermulti/cellrangermulti/count").list().size() == 4},

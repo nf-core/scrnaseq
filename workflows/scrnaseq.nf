@@ -334,11 +334,15 @@ workflow SCRNASEQ {
         ch_vdj = [[id: 'dummy'], []]
     }
 
-    CONVERT_MUDATA(
-        H5AD_CONVERSION.out.h5ad,
-        ch_vdj
-    )
-    ch_versions = ch_versions.mix(CONVERT_MUDATA.out.versions)
+    if (params.aligner == "cellrangermulti") {
+        CONVERT_MUDATA(
+            H5AD_CONVERSION.out.h5ad,
+            ch_vdj
+        )
+        ch_versions = ch_versions.mix(CONVERT_MUDATA.out.versions)
+    } else {'nothing to convert to MuData'}
+    
+
     //
     // Collate and save software versions
     //

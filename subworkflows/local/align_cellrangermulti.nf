@@ -212,20 +212,20 @@ workflow CELLRANGER_MULTI_ALIGN {
             else {
             }
         }
-        
+
         ch_vdj_files_collect =  ch_vdj_files.collect()
-        
-        
+ 
+
         ch_transformed_channel = ch_vdj_files_collect.map { list ->
         def meta = []
         def files = []
- 
+
         list.collate(2).each { pair ->
             meta << pair[0]
             files << pair[1]
         }
-        return [meta, files.flatten()]  
-        } 
+        return [meta, files.flatten()]
+        }
 
     emit:
         ch_versions

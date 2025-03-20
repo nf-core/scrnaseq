@@ -4,7 +4,6 @@ process CONVERT_MUDATA  {
 
     container = 'quay.io/biocontainers/scirpy:0.20.1--pyhdfd78af_0'
 
-    
     input:
     tuple val(meta), path(input_h5ad)
     tuple val(meta), path (input_vdj)
@@ -12,13 +11,13 @@ process CONVERT_MUDATA  {
     output:
     tuple val(meta), path("*.mudata.h5mu") , emit: h5mu
     path "versions.yml",  emit: versions
-    
+
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def ai = input_vdj ? "-ai $input_vdj" : ''
-    
+
     """
     export NUMBA_CACHE_DIR=/tmp
     export MPLCONFIGDIR=/tmp
@@ -30,13 +29,12 @@ process CONVERT_MUDATA  {
     "${task.process}":
         convert_mudata.py --version >> versions.yml
     END_VERSIONS
-    
+
     """
 
     stub:
     """
     touch matrix.mudata.h5mu
-    
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

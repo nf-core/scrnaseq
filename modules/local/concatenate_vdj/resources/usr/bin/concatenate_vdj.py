@@ -8,10 +8,10 @@ import warnings
 import argparse                     # command line arguments parser
 import pathlib                      # library for handle filesystem paths
 import glob
+import os
 import scanpy as sc                 # single-cell data processing
 import scirpy as ir                 # single-cell AIRR-data
 import anndata as ad                # store annotated matrix as anndata object
-import os
 
 
 warnings.filterwarnings("ignore")
@@ -71,7 +71,7 @@ def main():
 # --------------------------------------------------------------------------------------------------------------------
 #                                 READ VDJ FILES
 # --------------------------------------------------------------------------------------------------------------------
-    
+ 
     vdj_files = []
     for folder in glob.glob("*/filtered_contig_annotations.csv"):
         vdj_files.append(folder)
@@ -103,7 +103,7 @@ def main():
     else:
         if len(adata_vdj_list) == 1:
             adata_vdj_concatenated = adata_vdj_list[0]
-            print(f"Only one non-empty file found. Saving the file as is without concatenation.")
+            print("Only one non-empty file found. Saving the file as is without concatenation.")
         else:
             adata_vdj_concatenated = ad.concat(adata_vdj_list, join= "outer", merge ="same", label="sample",
                                         keys= input_run_id, index_unique="_")

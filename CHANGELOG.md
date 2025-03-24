@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v4.0.1 - 2025-03-24
+
+- Fix simpleaf protocol name for 10xv4 ([#452](https://github.com/nf-core/scrnaseq/pull/452))
+
 ## v4.0.0 - 2025-03-10
 
 - Move `txp2gene` to `reference_genome_options` in schema as it is required by `kb_python` and `alevin` ([434](https://github.com/nf-core/scrnaseq/pull/434))

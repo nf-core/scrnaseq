@@ -143,6 +143,13 @@
                     "format": "file-path",
                     "exists": true
                 },
+                "gff": {
+                    "type": "string",
+                    "description": "Reference GFF annotation file",
+                    "fa_icon": "fas fa-code-branch",
+                    "format": "file-path",
+                    "exists": true
+                },
                 "save_reference": {
                     "type": "boolean",
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Simpleaf) to the results.",

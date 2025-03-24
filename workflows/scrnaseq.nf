@@ -21,6 +21,8 @@ include { H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA } from '../subworkfl
 include { GTF_GENE_FILTER                                   } from '../modules/local/gtf_gene_filter'
 include { GUNZIP as GUNZIP_FASTA                            } from '../modules/nf-core/gunzip/main'
 include { GUNZIP as GUNZIP_GTF                              } from '../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_GFF                              } from '../modules/nf-core/gunzip/main'
+include { GFFREAD as GFFREAD                                } from '../modules/nf-core/gffread/main'
 include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
 
 
@@ -42,6 +44,7 @@ workflow SCRNASEQ {
     // general input and params
     ch_genome_fasta         = params.fasta                ? file(params.fasta, checkIfExists: true)    : []
     ch_gtf                  = params.gtf                  ? file(params.gtf, checkIfExists: true)      : []
+    ch_gff                  = params.gff                  ? file(params.gff, checkIfExists: true)      : []
     ch_transcript_fasta     = params.transcript_fasta     ? file(params.transcript_fasta)              : []
     ch_motifs               = params.motifs               ? file(params.motifs)                        : []
     ch_txp2gene             = params.txp2gene             ? file(params.txp2gene, checkIfExists: true) : []
@@ -52,6 +55,11 @@ workflow SCRNASEQ {
         ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
     } else {
         ch_barcode_whitelist = []
+    }
+
+    // Warn if both GTF and GFF files are provided
+    if (params.gtf && params.gff) {
+        log.warn("Both GTF and GFF files are provided. GTF file will be used.")
     }
 
     // samplesheet - this is passed to the MTX conversion functions to add metadata to the
@@ -107,9 +115,21 @@ workflow SCRNASEQ {
         if (params.gtf.endsWith('.gz')) {
             ch_gtf      = GUNZIP_GTF ( [ [:], ch_gtf ] ).gunzip.map { it[1] }
             ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
-        } else {
+        }
+        else {
             ch_gtf = Channel.value( ch_gtf )
         }
+    }
+    else if (params.gff) {
+        if (params.gff.endsWith('.gz')) {
+            ch_gff      = GUNZIP_GFF ( [ [:], params.gff ] ).gunzip
+            ch_versions = ch_versions.mix(GUNZIP_GFF.out.versions)
+        }
+        else {
+            ch_gff   = Channel.value( params.gff ).map { [['id': "${params.gff.baseName}"], it] }
+        }
+        ch_gtf      = GFFREAD ( ch_gff, [] ).gtf.map { it[1] }
+        ch_versions = ch_versions.mix(GFFREAD.out.versions)
     }
 
     // filter gtf

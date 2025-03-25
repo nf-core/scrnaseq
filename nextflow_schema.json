@@ -32,7 +32,7 @@
                     "type": "string",
                     "description": "Email address for completion summary.",
                     "fa_icon": "fas fa-envelope",
-                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
+                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`), then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
                 },
                 "multiqc_title": {
@@ -66,7 +66,7 @@
                 "protocol": {
                     "type": "string",
                     "description": "The protocol that was used to generate the single cell data, e.g. 10x Genomics v2 Chemistry.\n\n Can be 'auto' (cellranger only), '10XV1', '10XV2', '10XV3', '10XV4', or any other protocol string that will get directly passed the respective aligner.",
-                    "help_text": "The default is to auto-detect the protocol when running cellranger. For all other aligners the protocol MUST be manually specified. \n\n The following protocols are recognized by the pipeline and mapped to the corresponding protocol name of the respective aligner: '10XV1', '10XV2', '10XV3', '10XV4'. \n\nAny other protocol value is passed to the aligner in verbatim to support other sequencing platforms. See the [kallisto](https://pachterlab.github.io/kallisto/manual#bus), [simpleaf](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag), [starsolo](https://gensoft.pasteur.fr/docs/STAR/2.7.9a/STARsolo.html)",
+                    "help_text": "The default is to auto-detect the protocol when running cellranger. For all other aligners, the protocol MUST be manually specified. \n\n The following protocols are recognized by the pipeline and mapped to the corresponding protocol name of the respective aligner: '10XV1', '10XV2', '10XV3', '10XV4'. \n\nAny other protocol value is passed to the aligner verbatim to support other sequencing platforms. See the [kallisto](https://pachterlab.github.io/kallisto/manual#bus), [simpleaf](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag), [starsolo](https://gensoft.pasteur.fr/docs/STAR/2.7.9a/STARsolo.html)",
                     "default": "auto",
                     "fa_icon": "fas fa-cogs"
                 }
@@ -76,7 +76,7 @@
         "skip_tools": {
             "title": "Skip Tools",
             "type": "object",
-            "description": "This section can be used to  disable certain tools in the pipeline",
+            "description": "This section can be used to disable certain tools in the pipeline",
             "default": "",
             "fa_icon": "fas fa-forward",
             "properties": {
@@ -118,7 +118,7 @@
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available, this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
                     "fa_icon": "far fa-file-code"
                 },
                 "igenomes_ignore": {
@@ -334,12 +334,12 @@
                     "type": "string",
                     "description": "Provide a panel description for targeted sequencing.",
                     "format": "file-path",
-                    "exists": "true"
+                    "exists": true
                 },
                 "gex_cmo_set": {
                     "type": "string",
                     "format": "file-path",
-                    "exists": "true",
+                    "exists": true,
                     "description": "Provide a Cell Multiplexing Oligo (CMO) description file when working with multiplexed samples. This is only necessary if you with to override Cell Ranger's default CMO-set. Please refer to the [10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#cmo-ref) about CMO references for more details."
                 },
                 "fb_reference": {
@@ -359,7 +359,7 @@
                     "format": "file-path",
                     "mimetype": "text/csv",
                     "exists": true,
-                    "description": "This is only necessary to override Cell Ranger's default cell calling and tag calling steps. In most cases you need to only use the `cellranger_multi_barcodes` parameter. Please refer to the [10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#barcode-asst) for more information about this file."
+                    "description": "This is only necessary to override Cell Ranger's default cell calling and tag calling steps. In most cases, you need to only use the `cellranger_multi_barcodes` parameter. Please refer to the [10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#barcode-asst) for more information about this file."
                 },
                 "cellranger_multi_barcodes": {
                     "type": "string",

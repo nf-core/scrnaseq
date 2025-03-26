@@ -278,7 +278,7 @@
             "properties": {
                 "cellranger_index": {
                     "type": "string",
-                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. ",
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. Provide the base directory of the index (e.g., '/PATH/TO/10X_REF/refdata-gex-GRCh38-2024-A/')",
                     "format": "path",
                     "exists": true
                 },

@@ -1,0 +1,26 @@
+{
+    "test-dataset_cellrangerarc_aligner": {
+        "content": [
+            "barcodes.tsv.gz:md5,b5499384bbd9ecbd448c90dd73d9e84c",
+            "barcodes.tsv.gz:md5,dc8ef24c54122529bdb2c7cd5969c805",
+            "features.tsv.gz:md5,456af0e5fa4a7bcb3968400f300d12e9",
+            "features.tsv.gz:md5,456af0e5fa4a7bcb3968400f300d12e9",
+            "matrix.mtx.gz:md5,83c4b3e84668282fbe55d02d84256b3f",
+            "matrix.mtx.gz:md5,4b3aa16b720d414f5df50c533052d360",
+            "summary.csv:md5,90da383cd94786c0a3810b903c8de8f6",
+            "10k_PBMC_raw_matrix.sce.rds:md5,196adfcb230f9ba9bb7d0aba36e7e261",
+            "10k_PBMC_filtered_matrix.sce.rds:md5,359160d80821c5dbf1ebc7a88dbe8400",
+            "10k_PBMC_raw_matrix.seurat.rds:md5,8ff4d68d88a6a7e3528147e06aeaa4dd",
+            "10k_PBMC_filtered_matrix.seurat.rds:md5,ca44f68f2ea255bfd556c71a6b91423e",
+            "combined_raw_matrix.sce.rds:md5,4846edfc332c65c129b554c27a357dc7",
+            "combined_filtered_matrix.sce.rds:md5,4c1dee683e3d0e602556a69b9b64b3a5",
+            "combined_raw_matrix.seurat.rds:md5,8900e93d58f613d56f02a4243769498a",
+            "combined_filtered_matrix.seurat.rds:md5,91f83560d80b7b1ab238161d73c64831"
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "24.10.5"
+        },
+        "timestamp": "2025-03-26T16:19:15.398105567"
+    }
+}

@@ -27,6 +27,10 @@
                 "pattern": "^\\S+\\.f(ast)?q\\.gz$",
                 "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
             },
+            "fastq_barcode": {
+                "type": "string",
+                "meta": ["fastq_barcode"]
+            },
             "expected_cells": {
                 "type": "integer",
                 "errorMessage": "Expected cells must be an Integer",

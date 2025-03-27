@@ -1,0 +1,87 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_cellrangerarc_aligner") {
+
+        when {
+            // the rest is taken from shared config
+            params {
+                aligner                   = 'cellrangerarc'
+                outdir                    = "${outputDir}/results_cellrangerarc"
+                input                     = "${baseDir}/assets/cellrangerarc_samplesheet.csv"
+                fasta                     = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/chr21/sequence/genome.fasta'
+                gtf                       = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/chr21/sequence/chr21_gencode.gtf'
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+        }
+
+        then {
+
+            assertAll(
+
+                //
+                // General assertions
+                //
+
+                // Did it finish successfully?
+                {assert workflow.success},
+
+                // How many tasks were executed?
+                {assert workflow.trace.tasks().size() == 14},
+
+                // How many results were produced?
+                {assert path("${outputDir}/results_cellrangerarc").list().size() == 4},
+                {assert path("${outputDir}/results_cellrangerarc/cellrangerarc").list().size() == 4},
+                {assert path("${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions").list().size() == 7},
+                {assert path("${outputDir}/results_cellrangerarc/cellrangerarc/count").list().size() == 3},
+                {assert path("${outputDir}/results_cellrangerarc/fastqc").list().size() == 10},
+                {assert path("${outputDir}/results_cellrangerarc/multiqc").list().size() == 3},
+
+                //
+                // Check if files were produced
+                //
+                {assert new File( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/10k_PBMC/10k_PBMC_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/10k_PBMC/10k_PBMC_filtered_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/combined_raw_matrix.h5ad" ).exists()},
+                {assert new File( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/combined_filtered_matrix.h5ad" ).exists()},
+
+                //
+                // Check if files are the same
+                //
+                {assert snapshot(
+                    // barcodes.tsv.gz files
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/count/10k_PBMC/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/count/10k_PBMC/outs/raw_feature_bc_matrix/barcodes.tsv.gz"      ),
+
+                    // features.tsv.gz files
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/count/10k_PBMC/outs/filtered_feature_bc_matrix/features.tsv.gz" ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/count/10k_PBMC/outs/raw_feature_bc_matrix/features.tsv.gz"      ),
+
+                    // matrix.mtx.gz files
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/count/10k_PBMC/outs/filtered_feature_bc_matrix/matrix.mtx.gz"   ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/count/10k_PBMC/outs/raw_feature_bc_matrix/matrix.mtx.gz"        ),
+
+                    // metrics_summary.csv files
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/count/10k_PBMC/outs/summary.csv"                                ),
+
+                    // .rds files
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/10k_PBMC/10k_PBMC_raw_matrix.sce.rds"           ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/10k_PBMC/10k_PBMC_filtered_matrix.sce.rds"      ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/10k_PBMC/10k_PBMC_raw_matrix.seurat.rds"        ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/10k_PBMC/10k_PBMC_filtered_matrix.seurat.rds"   ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/combined_raw_matrix.sce.rds"                    ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/combined_filtered_matrix.sce.rds"               ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/combined_raw_matrix.seurat.rds"                 ),
+                    path( "${outputDir}/results_cellrangerarc/cellrangerarc/mtx_conversions/combined_filtered_matrix.seurat.rds"            ),
+
+                ).match()}
+
+            ) // end of assertAll()
+
+        }
+    }
+
+}

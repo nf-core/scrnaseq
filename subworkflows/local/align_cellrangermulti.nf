@@ -214,8 +214,6 @@ workflow CELLRANGER_MULTI_ALIGN {
         }
 
         ch_vdj_files_collect =  ch_vdj_files.collect()
- 
-
         ch_transformed_channel = ch_vdj_files_collect.map { list ->
         def meta = []
         def files = []

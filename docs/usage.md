@@ -87,16 +87,16 @@ by all aligners in the pipeline and mapped to the correct options automatically.
 A full overview of the protocols supported by each aligner is given below.
 If the protocol is unknown to the pipeline, the value specified to `--protocol` is passed to the aligner _in verbatim_ to support additional protocols.
 
-| Protocol | Accession | Cellranger | Simpleaf | STARsolo | Kallisto/bustools | Cellranger-arc |
-|----------|-----------|------------|-----------|-----------|------------------|----------------|
-| 10x V1 | `10XV1` | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 10x V2 | `10XV2` | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 10x V3 | `10XV3` | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 10x V4 | `10XV4` | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Drop-seq | `dropseq` | ❌ | ✅ | ✅ | ✅ | ❌ |
-| Smart-seq3 | `smartseq` | ❌ | ❌ | ✅ | ✅ | ❌ |
-| auto | `auto` | ✅ | ❌ | ❌ | ❌ | ✅ |
-| custom | custom string | ❌ | ✅ | ✅ | ✅ | ❌ |
+| Protocol   | Accession     | Cellranger | Simpleaf | STARsolo | Kallisto/bustools | Cellranger-arc |
+| ---------- | ------------- | ---------- | -------- | -------- | ----------------- | -------------- |
+| 10x V1     | `10XV1`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V2     | `10XV2`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V3     | `10XV3`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V4     | `10XV4`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| Drop-seq   | `dropseq`     | ❌         | ✅       | ✅       | ✅                | ❌             |
+| Smart-seq3 | `smartseq`    | ❌         | ❌       | ✅       | ✅                | ❌             |
+| auto       | `auto`        | ✅         | ❌       | ❌       | ❌                | ✅             |
+| custom     | custom string | ❌         | ✅       | ✅       | ✅                | ❌             |
 
 Here are some hints on running the various aligners with different protocols:
 
@@ -172,9 +172,11 @@ the reference genome name that you have used and stated as _genome:_ in your con
 nf-core/scrnaseq is designed specifically for barcode-based single-cell RNA sequencing protocols. Several types of protocols are currently not supported:
 
 ##### Smart-seq2
+
 Smart-seq2 data should be processed with [nf-core/rnaseq](https://nf-co.re/rnaseq) pipeline instead, as it is better suited for plate-based full-length transcript sequencing without UMIs.
 
 ##### Cell hashing and genotype-based demultiplexing
+
 For cell hashing or genetic demultiplexing of pooled samples, we recommend using the [hadge pipeline](https://hadge.readthedocs.io/en/latest/). While not currently part of nf-core, hadge is being prepared for integration. You can follow its development progress [in the nf-core Slack](https://nfcore.slack.com/archives/C067K2P6GUV).
 
 ## Running the pipeline

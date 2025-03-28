@@ -334,9 +334,16 @@ workflow SCRNASEQ {
         ch_vdj = [[id: 'dummy'], []]
     }
 
+    ch_h5ad_concat = H5AD_CONVERSION.out.h5ads
+
+    // Filter input_type:'filtered'
+    ch_h5ad_concat_filtered = ch_h5ad_concat.filter { item ->
+        item[0].input_type == 'filtered'
+    }
+
     if (params.aligner == "cellrangermulti") {
         CONVERT_MUDATA(
-            H5AD_CONVERSION.out.h5ad,
+            ch_h5ad_concat_filtered,
             ch_vdj
         )
         ch_versions = ch_versions.mix(CONVERT_MUDATA.out.versions)

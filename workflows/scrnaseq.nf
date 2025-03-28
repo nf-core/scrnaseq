@@ -22,6 +22,8 @@ include { GTF_GENE_FILTER                                   } from '../modules/l
 include { GUNZIP as GUNZIP_FASTA                            } from '../modules/nf-core/gunzip/main'
 include { GUNZIP as GUNZIP_GTF                              } from '../modules/nf-core/gunzip/main'
 include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
+include { CONCATENATE_VDJ                                   } from '../modules/local/concatenate_vdj'
+include { CONVERT_MUDATA                                    } from '../modules/local/convert_mudata'
 
 
 workflow SCRNASEQ {
@@ -311,6 +313,42 @@ workflow SCRNASEQ {
         ch_h5ads,
         ch_input
     )
+    ch_versions = ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
+    //
+    // MODULE: Concat vdj samples and save as h5ad format
+    //
+    if (params.aligner == "cellrangermulti") {
+        CONCATENATE_VDJ (
+            CELLRANGER_MULTI_ALIGN.out.vdj
+        )
+        ch_versions = ch_versions.mix(CONCATENATE_VDJ.out.versions)
+
+    //
+    // SUBWORKFLOW: Concat GEX, VDJ and CITE data and save as MuData object
+    //
+
+        ch_vdj = CONCATENATE_VDJ.out.h5ad
+            .map { meta, file -> [meta, file] }
+            .ifEmpty { [[id: 'dummy'], []] }
+    } else {
+        ch_vdj = [[id: 'dummy'], []]
+    }
+
+    ch_h5ad_concat = H5AD_CONVERSION.out.h5ads
+
+    // Filter input_type:'filtered'
+    ch_h5ad_concat_filtered = ch_h5ad_concat.filter { item ->
+        item[0].input_type == 'filtered'
+    }
+
+    if (params.aligner == "cellrangermulti") {
+        CONVERT_MUDATA(
+            ch_h5ad_concat_filtered,
+            ch_vdj
+        )
+        ch_versions = ch_versions.mix(CONVERT_MUDATA.out.versions)
+    } else {'nothing to convert to MuData'}
+
 
     //
     // Collate and save software versions

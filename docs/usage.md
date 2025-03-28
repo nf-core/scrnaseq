@@ -79,18 +79,35 @@ As a sanity check, we verify that filenames of a pair of FASTQ files only differ
 ### Support for different scRNA-seq protocols
 
 The single-cell protocol used in the experiment can be specified using the `--protocol` flag.
-For cellranger, it is recommended to stick with the default value `'auto'` for automatic detection of the protocol.
-For all other aligner, you need to specify the protocol manually.
+Note that the nf-core/scrnaseq pipeline is designed to support only barcode-based protocols.
+An overview of unsupported protocols can be found in the [unsupported protocols](#unsupported-protocols) section.
 
-The three 10x Genomics protocols 3' v1 (`10XV1`), 3' v2 (`10XV2`), 3' v3 (`10XV3`), and 3' v4 (`10XV4`) are universally supported
-by all aligners in the pipeline and mapped to the correct options automatically. If the protocol is unknown to the
-nf-core pipeline, the value specified to `--protocol` is passed to the aligner _in verbatim_ to support additional protocols.
+The four 10x Genomics protocols 3' v1, 3' v2, 3' v3, and 3' v4 are universally supported
+by all aligners in the pipeline and mapped to the correct options automatically.
+A full overview of the protocols supported by each aligner is given below.
+If the protocol is unknown to the pipeline, the value specified to `--protocol` is passed to the aligner _in verbatim_ to support additional protocols.
 
-Here are some hints on running the various aligners with different protocols
+| Protocol   | Accession     | Cellranger | Simpleaf | STARsolo | Kallisto/bustools | Cellranger-arc |
+| ---------- | ------------- | ---------- | -------- | -------- | ----------------- | -------------- |
+| 10x V1     | `10XV1`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V2     | `10XV2`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V3     | `10XV3`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V4     | `10XV4`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| Drop-seq   | `dropseq`     | ❌         | ✅       | ✅       | ✅                | ❌             |
+| Smart-seq3 | `smartseq`    | ❌         | ❌       | ✅       | ✅                | ❌             |
+| auto       | `auto`        | ✅         | ❌       | ❌       | ❌                | ✅             |
+| custom     | custom string | ❌         | ✅       | ✅       | ✅                | ❌             |
+
+Here are some hints on running the various aligners with different protocols:
+
+#### Cell Ranger
+
+Cell Ranger only supports the processing of 10x Genomics protocols.
+It is recommended to stick with the default value `'auto'` for the `--protocol` flag for automatic detection of the protocol.
 
 #### Kallisto/bustools
 
-The command `kb --list` shows all supported, preconfigured protocols. Additionally, a custom technology string such as
+The command `kb --list` shows all supported, preconfigured protocols. All of these can be used with the `--protocol` flag and will be directly passed to the aligner. Additionally, a custom technology string such as
 `0,0,16:0,16,26:1,0,0` can be speficied:
 
 > Additionally kallisto bus will accept a string specifying a new technology in the format of bc:umi:seq where each of bc,umi and seq are a triplet of integers separated by a comma, denoting the file index, start and stop of the sequence used. For example to specify the 10xV2 technology we would use 0,0,16:0,16,26:1,0,0
@@ -103,11 +120,11 @@ Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slightly
 
 For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614) and the [detailed description](https://hackmd.io/@PI7Og0l1ReeBZu_pjQGUQQ/rJMgmvr13).
 
-### If using cellranger-arc
+#### Cell Ranger ARC
 
-#### Automatic file name detection
+##### Automatic file name detection
 
-This pipeline currently **does not** automatically renames input FASTQ files to follow the
+This pipeline currently **does not** automatically rename input FASTQ files to follow the
 [naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
 
 ```
@@ -116,7 +133,7 @@ This pipeline currently **does not** automatically renames input FASTQ files to 
 
 Thus please make sure your files follow this naming convention.
 
-#### Sample sheet definition
+##### Sample sheet definition
 
 If you are using cellranger-arc you have to add the column _sample_type_ (atac for scATAC or gex for scRNA) and _fastq_barcode_ (part of the scATAC data) to your samplesheet as an input.
 
@@ -137,7 +154,7 @@ test_scARC,path/test_scARC_gex_S1_L001_R1_001.fastq.gz,path/test_scARC_gex_S1_L0
 test_scARC,path/test_scARC_gex_S1_L002_R1_001.fastq.gz,path/test_scARC_gex_S1_L002_R2_001.fastq.gz,,gex
 ```
 
-#### Config file and index
+##### Config file and index
 
 Cellranger-arc needs a reference index directory that you can provide with `--cellranger_index`.
 Besure to provide the base path of the index (e.g., `--cellranger_index /PATH/TO/10X_REF/refdata-gex-GRCh38-2024-A/`).
@@ -150,6 +167,18 @@ If you decide to create a cellranger-arc index, then you need to create a config
 can do this autmatically for you if you provide a `--fasta`, `--gtf`, and an optional `--motif` file. However, you can
 also decide to provide your own config file with `--cellrangerarc_config`, then you also have to specify with `--cellrangerarc_reference`
 the reference genome name that you have used and stated as _genome:_ in your config file.
+
+#### Unsupported protocols
+
+nf-core/scrnaseq is designed specifically for barcode-based single-cell RNA sequencing protocols. Several types of protocols are currently not supported:
+
+##### Smart-seq2
+
+Smart-seq2 data should be processed with [nf-core/rnaseq](https://nf-co.re/rnaseq) pipeline instead, as it is better suited for plate-based full-length transcript sequencing without UMIs.
+
+##### Cell hashing and genotype-based demultiplexing
+
+For cell hashing or genetic demultiplexing of pooled samples, we recommend using the [hadge pipeline](https://hadge.readthedocs.io/en/latest/). While not currently part of nf-core, hadge is being prepared for integration. You can follow its development progress [in the nf-core Slack](https://nfcore.slack.com/archives/C067K2P6GUV).
 
 ## Running the pipeline
 

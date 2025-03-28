@@ -86,7 +86,7 @@ graph TD
     A[sc RNA] -->|STARsolo| B(h5ad/seurat/mtx matrices)
 ```
 
-Options for the respective alignment method can be found [here](https://github.com/nf-core/scrnaseq/blob/dev/docs/usage.md#aligning-options) to choose between methods.
+Options for the respective alignment method can be found [here](https://nf-co.re/scrnaseq/docs/usage/#aligning-options) to choose between methods.
 
 ## Pipeline output
 

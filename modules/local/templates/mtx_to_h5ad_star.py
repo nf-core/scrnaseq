@@ -5,13 +5,14 @@ import os
 
 os.environ["NUMBA_CACHE_DIR"] = "."
 
-import scanpy as sc
-import pandas as pd
-import argparse
-import anndata
-from anndata import AnnData, concat
 import platform
+
+import anndata
+import pandas as pd
+import scanpy as sc
+from anndata import AnnData, concat
 from scipy.sparse import csr_matrix
+
 
 def _mtx_to_adata(
     input: str,
@@ -36,7 +37,7 @@ def _mtx_to_adata(
             adata_missing = AnnData(
                 X=csr_matrix((len(missing_obs), adata.shape[1])),
                 obs=pd.DataFrame(index=missing_obs),
-                var=adata_state.var
+                var=adata_state.var,
             )
             adata_state = concat([adata_state, adata_missing], join="outer")
             adata_state = adata_state[adata.obs_names, adata.var["gene_ids"]].copy()
@@ -45,13 +46,17 @@ def _mtx_to_adata(
 
     return adata
 
+
 def format_yaml_like(data: dict, indent: int = 0) -> str:
     """Formats a dictionary to a YAML-like string.
+
     Args:
         data (dict): The dictionary to format.
         indent (int): The current indentation level.
+
     Returns:
         str: A string formatted as YAML.
+
     """
     yaml_str = ""
     for key, value in data.items():
@@ -61,6 +66,7 @@ def format_yaml_like(data: dict, indent: int = 0) -> str:
         else:
             yaml_str += f"{spaces}{key}: {value}\\n"
     return yaml_str
+
 
 def dump_versions():
     versions = {
@@ -75,6 +81,7 @@ def dump_versions():
     with open("versions.yml", "w") as f:
         f.write(format_yaml_like(versions))
 
+
 def input_to_adata(
     input_data: str,
     output: str,
@@ -88,13 +95,14 @@ def input_to_adata(
     # standard format
     # index are gene IDs and symbols are a column
     adata.var["gene_symbol"] = adata.var.index
-    adata.var['gene_versions'] = adata.var["gene_ids"]
-    adata.var.index = adata.var['gene_versions'].str.split('.').str[0].values
+    adata.var["gene_versions"] = adata.var["gene_ids"]
+    adata.var.index = adata.var["gene_versions"].str.split(".").str[0].values
     adata.var_names_make_unique()  # in case user does not use ensembl references, names might not be unique
 
     # write results
     adata.write_h5ad(f"{output}")
     print(f"Wrote h5ad file to {output}")
+
 
 #
 # Run main script
@@ -104,11 +112,7 @@ def input_to_adata(
 os.makedirs("${meta.id}", exist_ok=True)
 
 # input_type comes from NF module
-input_to_adata(
-    input_data="${meta.input_type}",
-    output="${meta.id}_${meta.input_type}_matrix.h5ad",
-    sample="${meta.id}"
-)
+input_to_adata(input_data="${meta.input_type}", output="${meta.id}_${meta.input_type}_matrix.h5ad", sample="${meta.id}")
 
 # dump versions
 dump_versions()

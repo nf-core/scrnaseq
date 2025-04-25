@@ -5,14 +5,16 @@ import os
 
 os.environ["NUMBA_CACHE_DIR"] = "."
 
-import scanpy as sc
-import pandas as pd
-import anndata
-from anndata import AnnData, concat as concat_ad
-from scipy.sparse import csr_matrix
-import platform
 import glob
+import platform
+
+import anndata
 import numpy as np
+import pandas as pd
+import scanpy as sc
+from anndata import AnnData
+from anndata import concat as concat_ad
+from scipy.sparse import csr_matrix
 
 
 def _mtx_to_adata(
@@ -20,7 +22,7 @@ def _mtx_to_adata(
     barcodes: str,
     features: str,
 ):
-    """Load kallisto-formatted mtx files into AnnData"""
+    """Load kallisto-formatted mtx files into AnnData."""
     adata = sc.read_mtx(matrix)
     adata.obs_names = pd.read_csv(barcodes, header=None, sep="\\t")[0].values
     adata.var_names = pd.read_csv(features, header=None, sep="\\t")[0].values
@@ -28,12 +30,10 @@ def _mtx_to_adata(
 
 
 def _add_metadata(adata: AnnData, t2g: str, sample: str):
-    """Add var and obs metadata"""
+    """Add var and obs metadata."""
     adata.obs["sample"] = sample
 
-    txp2gene = pd.read_table(
-        t2g, header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2]
-    )
+    txp2gene = pd.read_table(t2g, header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2])
     txp2gene = txp2gene.drop_duplicates(subset="gene_id").set_index("gene_id")
     adata.var = adata.var.join(txp2gene, how="left")
 
@@ -46,11 +46,14 @@ def _add_metadata(adata: AnnData, t2g: str, sample: str):
 
 def format_yaml_like(data: dict, indent: int = 0) -> str:
     """Formats a dictionary to a YAML-like string.
+
     Args:
         data (dict): The dictionary to format.
         indent (int): The current indentation level.
+
     Returns:
         str: A string formatted as YAML.
+
     """
     yaml_str = ""
     for key, value in data.items():
@@ -116,12 +119,8 @@ if __name__ == "__main__":
             var=unspliced.var,
         )
 
-        spliced = concat_ad([spliced, ad_missing_spliced], join="outer")[
-            all_barcodes, :
-        ]
-        unspliced = concat_ad([unspliced, ad_missing_unspliced], join="outer")[
-            all_barcodes, :
-        ]
+        spliced = concat_ad([spliced, ad_missing_spliced], join="outer")[all_barcodes, :]
+        unspliced = concat_ad([unspliced, ad_missing_unspliced], join="outer")[all_barcodes, :]
 
         assert np.all(spliced.var_names == unspliced.var_names)
 
@@ -175,15 +174,9 @@ if __name__ == "__main__":
             var=mature.var,
         )
 
-        nascent = concat_ad([nascent, ad_missing_nascent], join="outer")[
-            all_barcodes, :
-        ]
-        ambiguous = concat_ad([ambiguous, ad_missing_ambiguous], join="outer")[
-            all_barcodes, :
-        ]
-        mature = concat_ad([mature, ad_missing_mature], join="outer")[
-            all_barcodes, :
-        ]
+        nascent = concat_ad([nascent, ad_missing_nascent], join="outer")[all_barcodes, :]
+        ambiguous = concat_ad([ambiguous, ad_missing_ambiguous], join="outer")[all_barcodes, :]
+        mature = concat_ad([mature, ad_missing_mature], join="outer")[all_barcodes, :]
 
         assert np.all(nascent.var_names == ambiguous.var_names)
         assert np.all(mature.var_names == ambiguous.var_names)

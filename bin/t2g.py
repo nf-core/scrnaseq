@@ -27,7 +27,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sys, argparse
+import argparse
+import sys
 
 
 def create_transcript_list(input, use_name=True, use_version=False):
@@ -77,9 +78,9 @@ def create_transcript_list(input, use_name=True, use_version=False):
 def print_output(output, r, use_name=True):
     for tid in r:
         if use_name:
-            output.write("%s\t%s\t%s\n" % (tid, r[tid][0], r[tid][1]))
+            output.write(f"{tid}\t{r[tid][0]}\t{r[tid][1]}\n")
         else:
-            output.write("%s\t%s\n" % (tid, r[tid][0]))
+            output.write(f"{tid}\t{r[tid][0]}\n")
 
 
 if __name__ == "__main__":

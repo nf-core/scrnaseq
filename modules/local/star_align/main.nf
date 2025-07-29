@@ -75,6 +75,12 @@ process STAR_ALIGN {
         echo "Whitelist file provided - $whitelist." >&2
     fi
 
+    # If the SmartSeq protocol is used,  set soloUMIdedup to NoDedup
+    if [[ "$protocol" == "SmartSeq" ]]; then
+        echo "SmartSeq protocol detected, setting --soloUMIdedup to NoDedup." >&2
+        soloUMIdedupArg="--soloUMIdedup NoDedup"
+    fi
+
     STAR \\
         --genomeDir $index \\
         --readFilesIn ${reverse.join( "," )} ${forward.join( "," )} \\
@@ -83,6 +89,7 @@ process STAR_ALIGN {
         \$soloCBwhitelistArg \\
         --soloType $protocol \\
         --soloFeatures $star_feature \\
+        \$soloUMIdedupArg \\
         $other_10x_parameters \\
         $out_sam_type \\
         $ignore_gtf \\

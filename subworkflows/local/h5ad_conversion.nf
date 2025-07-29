@@ -23,7 +23,6 @@ workflow H5AD_CONVERSION {
         ch_concat_h5ad_input,
         samplesheet
     )
-
     ch_h5ad_concat = CONCAT_H5AD.out.h5ad
     ch_versions = ch_versions.mix(CONCAT_H5AD.out.versions.first())
 

@@ -17,7 +17,7 @@ process ANNDATAR_CONVERT {
     tuple val(meta), path(h5ad)
 
     output:
-    tuple val(meta), path("${meta.id}_${meta.input_type}_matrix*.rds"), emit: rds
+    tuple val(meta), path("${meta.id}_${meta.input_type}_matrix*.rds"), emit: rds, optional: true
     path  "versions.yml"                                              , emit: versions
 
     when:

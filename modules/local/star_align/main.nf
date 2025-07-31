@@ -79,6 +79,8 @@ process STAR_ALIGN {
     if [[ "$protocol" == "SmartSeq" ]]; then
         echo "SmartSeq protocol detected, setting --soloUMIdedup to NoDedup." >&2
         soloUMIdedupArg="--soloUMIdedup NoDedup"
+    else
+        soloUMIdedupArg=""
     fi
 
     STAR \\

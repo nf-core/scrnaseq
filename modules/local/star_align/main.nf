@@ -60,19 +60,38 @@ process STAR_ALIGN {
 
     // separate forward from reverse pairs
     def (forward, reverse) = reads.collate(2).transpose()
+
+    // parse whitelist file(s)
+    arg_whitelist = ""
+    decompress_cmd = ""
+    def whitelistList = whitelist ? (whitelist instanceof List ? whitelist : [whitelist]) : []
+
+    println "Using whitelist files: ${whitelist}"
+
+    if (whitelistList) {
+        if (whitelistList.size() == 1) {
+            def file = whitelistList[0]
+            def fileStr = file.toString()
+            if (fileStr.endsWith('.gz')) {
+                def uncompressed = file.getBaseName() // strips .gz
+                decompress_cmd = "gzip -cdf ${file} > ${uncompressed}"
+                arg_whitelist = "--soloCBwhitelist ${uncompressed}"
+            } else {
+                arg_whitelist = "--soloCBwhitelist ${fileStr}"
+            }
+        } else {
+            arg_whitelist = "--soloCBwhitelist ${whitelistList.join(' ')}"
+        }
+    }
     """
-    if [[ $whitelist == *.gz ]]; then
-        gzip -cdf $whitelist > whitelist.uncompressed.txt
-    else
-        cp $whitelist whitelist.uncompressed.txt
-    fi
+    ${decompress_cmd}
 
     STAR \\
         --genomeDir $index \\
         --readFilesIn ${reverse.join( "," )} ${forward.join( "," )} \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
-        --soloCBwhitelist whitelist.uncompressed.txt \\
+        $arg_whitelist \\
         --soloType $protocol \\
         --soloFeatures $star_feature \\
         $other_10x_parameters \\

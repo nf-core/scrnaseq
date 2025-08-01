@@ -62,7 +62,10 @@ workflow SCRNASEQ {
     ch_txp2gene             = txp2gene         ? file(txp2gene, checkIfExists: true)         : []
 
     if (params.barcode_whitelist) {
-        ch_barcode_whitelist = file(params.barcode_whitelist, checkIfExists: true)
+        // if multiple files -> create channel with single list that keeps the order of the whitelist files preserved
+        ch_barcode_whitelist = params.barcode_whitelist.contains(',') ?
+            params.barcode_whitelist.split(',').collect { file(it.trim(), exists: true) } :
+            file(params.barcode_whitelist, checkIfExists: true)
     } else if (protocol_config.containsKey("whitelist")) {
         ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
     } else {

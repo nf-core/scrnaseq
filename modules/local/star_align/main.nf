@@ -29,7 +29,7 @@ process STAR_ALIGN {
     tuple val(meta), path('*d.out.bam')                            , emit: bam
     tuple val(meta), path('*.Solo.out')                            , emit: counts
     tuple val(meta), path ("*.Solo.out/Gene*/raw")                 , emit: raw_counts
-    tuple val(meta), path ("*.Solo.out/Gene*/filtered")            , emit: filtered_counts
+    tuple val(meta), path ("*.Solo.out/Gene*/filtered")            , emit: filtered_counts, optional: true
     tuple val(meta), path ("*.Solo.out/Velocyto/velocyto_raw")     , emit: raw_velocyto, optional:true
     tuple val(meta), path ("*.Solo.out/Velocyto/velocyto_filtered"), emit: filtered_velocyto, optional:true
     tuple val(meta), path('*Log.final.out')                        , emit: log_final

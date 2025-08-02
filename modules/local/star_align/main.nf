@@ -66,8 +66,6 @@ process STAR_ALIGN {
     decompress_cmd = ""
     def whitelistList = whitelist ? (whitelist instanceof List ? whitelist : [whitelist]) : []
 
-    println "Using whitelist files: ${whitelist}"
-
     if (whitelistList) {
         if (whitelistList.size() == 1) {
             def file = whitelistList[0]

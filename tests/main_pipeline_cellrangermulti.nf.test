@@ -13,6 +13,7 @@ nextflow_pipeline {
                 input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
                 cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_samplesheet.csv"
                 gex_frna_probe_set        = "${baseDir}/assets/frna_probeset_subset.csv"
+                gex_reference             = "GRCh38"
                 fb_reference              = "${baseDir}/assets/fb_reference.csv"
                 fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
                 gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
@@ -37,7 +38,7 @@ nextflow_pipeline {
                 {assert workflow.trace.tasks().size() == 57},
 
                 // How many results were produced?
-                {assert path("${outputDir}/results_cellrangermulti").list().size() == 4},
+                {assert path("${outputDir}/results_cellrangermulti").list().size() == 5},
                 {assert path("${outputDir}/results_cellrangermulti/cellrangermulti").list().size() == 5},
                 {assert path("${outputDir}/results_cellrangermulti/cellrangermulti/mtx_conversions").list().size() == 16},
                 {assert path("${outputDir}/results_cellrangermulti/cellrangermulti/count").list().size() == 4},
@@ -184,4 +185,59 @@ nextflow_pipeline {
         }
     }
 
+    test("test-dataset_cellrangermulti_missing_gex_reference") {
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_missing_ref"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_samplesheet.csv"
+                gex_frna_probe_set        = "${baseDir}/assets/frna_probeset_subset.csv"
+                fb_reference              = "${baseDir}/assets/fb_reference.csv"
+                fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
+                gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                protocol                  = 'auto'
+                skip_cellbender           = true
+                // Note: gex_reference is intentionally NOT provided to test validation
+            }
+        }
+
+        then {
+            // Should fail with validation error
+            assertAll(
+                {assert !workflow.success},
+                {assert workflow.failed},
+                {assert workflow.stdout.any { it.contains("Parameter 'gex_reference' is required when 'gex_frna_probe_set' is provided and 'cellranger_index' is not provided") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_mismatched_gex_reference") {
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_mismatch"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_samplesheet.csv"
+                gex_frna_probe_set        = "${baseDir}/assets/frna_probeset_subset.csv"
+                gex_reference             = "GRCm39" // Intentionally wrong - probeset is GRCh38
+                fb_reference              = "${baseDir}/assets/fb_reference.csv"
+                fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
+                gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+        }
+
+        then {
+            // Should fail with validation error
+            assertAll(
+                {assert !workflow.success},
+                {assert workflow.failed},
+                {assert workflow.stdout.any { it.contains("Parameter 'gex_reference' (GRCm39) does not match the probeset reference genome (GRCh38)") } }
+            )
+        }
+    }
 }

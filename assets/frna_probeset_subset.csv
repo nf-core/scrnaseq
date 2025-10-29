@@ -1,7 +1,7 @@
 #probe_set_file_format=2.0
 #panel_name=Chromium Human Transcriptome Probe Set v1.0.1
 #panel_type=predesigned
-#reference_genome=gex_reference
+#reference_genome=GRCh38
 #reference_version=2020-A
 gene_id,probe_seq,probe_id,included,region
 ENSG00000000003,GGTGACACCACAACAATGCAACGTATTTTGGATCTTGTCTACTGCATGGC,ENSG00000000003|TSPAN6|8eab823,TRUE,spliced

@@ -2,10 +2,9 @@
 # Script originally written by Pranathi Vemuri (github.com/pranathivemuri)
 #   modified by Harshil Patel (github.com/drpatelh)
 
-from __future__ import print_function
+import argparse
 import logging
 from itertools import groupby
-import argparse
 
 # Create a logger
 logging.basicConfig(format="%(name)s - %(asctime)s %(levelname)s: %(message)s")
@@ -18,11 +17,12 @@ def is_header(line):
 
 
 def extract_fasta_seq_names(fasta_name):
-    """
-    modified from Brent Pedersen
+    """Get sequence names from FFASTA files.
+
+    Modified from Brent Pedersen
     Correct Way To Parse A Fasta File In Python
     given a fasta file. yield tuples of header, sequence
-    from https://www.biostars.org/p/710/
+    from https://www.biostars.org/p/710/.
     """
     # first open the file outside
     fh = open(fasta_name)
@@ -31,7 +31,7 @@ def extract_fasta_seq_names(fasta_name):
     # we know they alternate.
     faiter = (x[1] for x in groupby(fh, is_header))
 
-    for i, header in enumerate(faiter):
+    for _i, header in enumerate(faiter):
         line = next(header)
         if is_header(line):
             # drop the ">"
@@ -41,9 +41,9 @@ def extract_fasta_seq_names(fasta_name):
 
 def extract_genes_in_genome(fasta, gtf_in, gtf_out):
     seq_names_in_genome = set(extract_fasta_seq_names(fasta))
-    logger.info("Extracted chromosome sequence names from : %s" % fasta)
+    logger.info(f"Extracted chromosome sequence names from : {fasta}")
     logger.info("All chromosome names: " + ", ".join(sorted(x for x in seq_names_in_genome)))
-    seq_names_in_gtf = set([])
+    seq_names_in_gtf = set()
 
     n_total_lines = 0
     n_lines_in_genome = 0
@@ -56,12 +56,10 @@ def extract_genes_in_genome(fasta, gtf_in, gtf_out):
                 if seq_name_gtf in seq_names_in_genome:
                     n_lines_in_genome += 1
                     f.write(line)
-    logger.info(
-        "Extracted %d / %d lines from %s matching sequences in %s" % (n_lines_in_genome, n_total_lines, gtf_in, fasta)
-    )
+    logger.info(f"Extracted {n_lines_in_genome} / {n_total_lines} lines from {gtf_in} matching sequences in {fasta}")
     logger.info("All sequence IDs from GTF: " + ", ".join(sorted(x for x in seq_name_gtf)))
 
-    logger.info("Wrote matching lines to %s" % gtf_out)
+    logger.info(f"Wrote matching lines to {gtf_out}")
 
 
 if __name__ == "__main__":

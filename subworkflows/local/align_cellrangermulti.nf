@@ -73,11 +73,11 @@ workflow CELLRANGER_MULTI_ALIGN {
             //
             // Here, we parse the received cellranger multi barcodes samplesheet.
             // We first use the get the PARSE_CELLRANGERMULTI_SAMPLESHEET module to check it and guarantee structure
-            // and also split it to have one fnra/cmo .csv for each sample.
+            // and also split it to have one fnra/cmo/ocm .csv for each sample.
             //
             // The selection of the GEX fastqs is because samples are always expected to have at least GEX data.
             // Then, using "combined" map, which means, the "additional barcode information" of each sample, we then,
-            // parse it to generate the cmo / frna samplesheets to be used by each sample.
+            // parse it to generate the cmo / ocm /frna samplesheets to be used by each sample.
             //
             // Here, to guarantee it and take advantage of the "FIFO"-rule and are sure that the data used in the
             // module is from the same sample from the "normal" samplesheet. We have to use the .concat().groupTuple()
@@ -90,6 +90,7 @@ workflow CELLRANGER_MULTI_ALIGN {
 
             PARSE_CELLRANGERMULTI_SAMPLESHEET( ch_multi_samplesheet )
 
+            // CMO
             ch_grouped_fastq.gex
             .map{ [it[0].id] }
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.flatten().map { [ "${it.baseName}" - "_cmo", it ] } )
@@ -97,6 +98,15 @@ workflow CELLRANGER_MULTI_ALIGN {
             .map { if ( it.size() == 2 ) { it[1] } else { [] } } // a correct tuple from snippet will have: [ sample, cmo.csv ]
             .set { ch_cmo_barcode_csv }
 
+            // OCM
+            ch_grouped_fastq.gex
+            .map{ [it[0].id] }
+            .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.ocm.flatten().map { [ "${it.baseName}" - "_ocm", it ] } )
+            .groupTuple()
+            .map { if ( it.size() == 2 ) { it[1] } else { [] } } // a correct tuple from snippet will have: [ sample, ocm.csv ]
+            .set { ch_ocm_barcode_csv }
+
+            // FRNA
             ch_grouped_fastq.gex
             .map{ [it[0].id] }
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.flatten().map { [ "${it.baseName}" - "_frna", it ] } )
@@ -106,6 +116,7 @@ workflow CELLRANGER_MULTI_ALIGN {
 
         } else {
             ch_cmo_barcode_csv = []
+            ch_ocm_barcode_csv = []
             ch_frna_sample_csv = []
         }
 
@@ -125,11 +136,38 @@ workflow CELLRANGER_MULTI_ALIGN {
         //
         if ( !cellranger_gex_index ) {
 
+            // Validate that gex_reference_version is provided when required
+            if ( params.gex_frna_probe_set && !params.gex_reference_version ) {
+                error "Parameter 'gex_reference_version' is required when 'gex_frna_probe_set' is provided and 'cellranger_index' is not provided. The reference genome version must match the probeset reference."
+            }
+
+            // Validate that gex_reference_version matches the probeset reference genome
+            if ( params.gex_frna_probe_set && params.gex_reference_version ) {
+                def probeset_file = file(params.gex_frna_probe_set)
+                def probeset_reference = null
+                probeset_file.withReader { reader ->
+                    String line
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("#reference_genome=")) {
+                            ref_split = line.split("=")
+                            if (ref_split.size() > 1) {
+                                probeset_reference = ref_split[1].trim()
+                            }
+                            break
+                        }
+                    }
+                }
+                if ( probeset_reference != params.gex_reference_version ) {
+                    error "Parameter 'gex_reference_version' (${params.gex_reference_version}) does not match the probeset reference genome (${probeset_reference}). Please ensure the reference genome version matches the probeset file."
+                }
+            }
+
             // Make reference genome
+            def reference_name = params.gex_reference_version ?: "gex_reference_version"
             CELLRANGER_MKREF(
                 ch_fasta,
                 CELLRANGER_MKGTF.out.gtf,
-                "gex_reference"
+                reference_name
             )
             ch_versions = ch_versions.mix(CELLRANGER_MKREF.out.versions)
             ch_cellranger_gex_index = CELLRANGER_MKREF.out.reference.ifEmpty { [] }
@@ -184,6 +222,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             ch_cmo_barcode_csv,
             [],
             ch_frna_sample_csv,
+            ch_ocm_barcode_csv,
             params.skip_cellranger_renaming
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI.out.versions)
@@ -222,10 +261,14 @@ def parse_demultiplexed_output_channels(in_ch, pattern) {
         meta_clone.input_type = pattern.contains('raw_') ? 'raw' : 'filtered' // add metadata for conversion workflow
         if ( mtx_files.toString().contains("per_sample_outs") ) {
             def demultiplexed_sample_id = mtx_files.toString().split('/per_sample_outs/')[1].split('/')[0]
+            if ( demultiplexed_sample_id.toString() == meta.id) {
+                return null
+            }
             meta_clone.id = demultiplexed_sample_id.toString()
         }
         [ meta_clone, mtx_files ]
     }                    // check if output is from demultiplexed sample, if yes, correct meta.id for proper conversion naming
+    .filter{ it != null } // remove nulls from previous step
     .groupTuple( by: 0 ) // group it back as one file collection per sample
 
     return out_ch

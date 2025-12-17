@@ -7,8 +7,6 @@ include { GUNZIP }                      from '../../modules/nf-core/gunzip/main'
 include { STAR_GENOMEGENERATE }         from '../../modules/nf-core/star/genomegenerate/main'
 
 
-def multiqc_report    = []
-
 workflow STARSOLO {
     take:
     genome_fasta

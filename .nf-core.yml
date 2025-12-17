@@ -1,18 +1,19 @@
 lint:
   files_exist:
     - lib/Utils.groovy
+    - tests/default.nf.test
   files_unchanged:
     - .github/ISSUE_TEMPLATE/bug_report.yml
   schema_params: false
   template_strings: false
-nf_core_version: 3.2.0
+nf_core_version: 3.4.1
 repository_type: pipeline
 template:
-  author: Bailey PJ, Botvinnik O, Marques de Almeida F, Peltzer A, Sturm G
+  author: Bailey PJ, Botvinnik O, Marques de Almeida F, Peltzer A, Sturm G, Dongze H
   description: Pipeline for processing 10x Genomics single cell rnaseq data
   force: false
   is_nfcore: true
   name: scrnaseq
   org: nf-core
   outdir: .
-  version: 2.8.0dev
+  version: 4.1.0

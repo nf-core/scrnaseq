@@ -79,18 +79,35 @@ As a sanity check, we verify that filenames of a pair of FASTQ files only differ
 ### Support for different scRNA-seq protocols
 
 The single-cell protocol used in the experiment can be specified using the `--protocol` flag.
-For cellranger, it is recommended to stick with the default value `'auto'` for automatic detection of the protocol.
-For all other aligner, you need to specify the protocol manually.
+Note that the nf-core/scrnaseq pipeline is designed to support only barcode-based protocols.
+An overview of unsupported protocols can be found in the [unsupported protocols](#unsupported-protocols) section.
 
-The three 10x Genomics protocols 3' v1 (`10XV1`), 3' v2 (`10XV2`), 3' v3 (`10XV3`), and 3' v4 (`10XV4`) are universally supported
-by all aligners in the pipeline and mapped to the correct options automatically. If the protocol is unknown to the
-nf-core pipeline, the value specified to `--protocol` is passed to the aligner _in verbatim_ to support additional protocols.
+The four 10x Genomics protocols 3' v1, 3' v2, 3' v3, and 3' v4 are universally supported
+by all aligners in the pipeline and mapped to the correct options automatically.
+A full overview of the protocols supported by each aligner is given below.
+If the protocol is unknown to the pipeline, the value specified to `--protocol` is passed to the aligner _in verbatim_ to support additional protocols.
 
-Here are some hints on running the various aligners with different protocols
+| Protocol   | Accession     | Cellranger | Simpleaf | STARsolo | Kallisto/bustools | Cellranger-arc |
+| ---------- | ------------- | ---------- | -------- | -------- | ----------------- | -------------- |
+| 10x V1     | `10XV1`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V2     | `10XV2`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V3     | `10XV3`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V4     | `10XV4`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| Drop-seq   | `dropseq`     | ❌         | ✅       | ✅       | ✅                | ❌             |
+| Smart-seq3 | `smartseq`    | ❌         | ❌       | ✅       | ✅                | ❌             |
+| auto       | `auto`        | ✅         | ❌       | ❌       | ❌                | ✅             |
+| custom     | custom string | ❌         | ✅       | ✅       | ✅                | ❌             |
+
+Here are some hints on running the various aligners with different protocols:
+
+#### Cell Ranger
+
+Cell Ranger only supports the processing of 10x Genomics protocols.
+It is recommended to stick with the default value `'auto'` for the `--protocol` flag for automatic detection of the protocol.
 
 #### Kallisto/bustools
 
-The command `kb --list` shows all supported, preconfigured protocols. Additionally, a custom technology string such as
+The command `kb --list` shows all supported, preconfigured protocols. All of these can be used with the `--protocol` flag and will be directly passed to the aligner. Additionally, a custom technology string such as
 `0,0,16:0,16,26:1,0,0` can be speficied:
 
 > Additionally kallisto bus will accept a string specifying a new technology in the format of bc:umi:seq where each of bc,umi and seq are a triplet of integers separated by a comma, denoting the file index, start and stop of the sequence used. For example to specify the 10xV2 technology we would use 0,0,16:0,16,26:1,0,0
@@ -103,11 +120,11 @@ Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slightly
 
 For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614) and the [detailed description](https://hackmd.io/@PI7Og0l1ReeBZu_pjQGUQQ/rJMgmvr13).
 
-### If using cellranger-arc
+#### Cell Ranger ARC
 
-#### Automatic file name detection
+##### Automatic file name detection
 
-This pipeline currently **does not** automatically renames input FASTQ files to follow the
+This pipeline currently **does not** automatically rename input FASTQ files to follow the
 [naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
 
 ```
@@ -116,7 +133,7 @@ This pipeline currently **does not** automatically renames input FASTQ files to 
 
 Thus please make sure your files follow this naming convention.
 
-#### Sample sheet definition
+##### Sample sheet definition
 
 If you are using cellranger-arc you have to add the column _sample_type_ (atac for scATAC or gex for scRNA) and _fastq_barcode_ (part of the scATAC data) to your samplesheet as an input.
 
@@ -137,10 +154,11 @@ test_scARC,path/test_scARC_gex_S1_L001_R1_001.fastq.gz,path/test_scARC_gex_S1_L0
 test_scARC,path/test_scARC_gex_S1_L002_R1_001.fastq.gz,path/test_scARC_gex_S1_L002_R2_001.fastq.gz,,gex
 ```
 
-#### Config file and index
+##### Config file and index
 
-Cellranger-arc needs a reference index directory that you can provide with `--cellranger_index`. Be aware, you can use
-for cellranger-arc the same index you use for cellranger ([see](https://kb.10xgenomics.com/hc/en-us/articles/4408281606797-Are-the-references-interchangeable-between-pipelines)).
+Cellranger-arc needs a reference index directory that you can provide with `--cellranger_index`.
+Besure to provide the base path of the index (e.g., `--cellranger_index /PATH/TO/10X_REF/refdata-gex-GRCh38-2024-A/`).
+Be aware, you can use for cellranger-arc the same index you use for cellranger ([see](https://kb.10xgenomics.com/hc/en-us/articles/4408281606797-Are-the-references-interchangeable-between-pipelines)).
 Yet, a cellranger-arc index might include additional data (e.g., TF binding motifs). Therefore, please first check if
 you have to create a new cellranger-arc index ([see here](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/advanced/references) for
 more information)
@@ -149,6 +167,18 @@ If you decide to create a cellranger-arc index, then you need to create a config
 can do this autmatically for you if you provide a `--fasta`, `--gtf` or `--gff`, and an optional `--motif` file. However, you can
 also decide to provide your own config file with `--cellrangerarc_config`, then you also have to specify with `--cellrangerarc_reference`
 the reference genome name that you have used and stated as _genome:_ in your config file.
+
+#### Unsupported protocols
+
+nf-core/scrnaseq is designed specifically for barcode-based single-cell RNA sequencing protocols. Several types of protocols are currently not supported:
+
+##### Smart-seq2
+
+Smart-seq2 data should be processed with [nf-core/rnaseq](https://nf-co.re/rnaseq) pipeline instead, as it is better suited for plate-based full-length transcript sequencing without UMIs.
+
+##### Cell hashing and genotype-based demultiplexing
+
+For cell hashing or genetic demultiplexing of pooled samples, we recommend using the [hadge pipeline](https://hadge.readthedocs.io/en/latest/). While not currently part of nf-core, hadge is being prepared for integration. You can follow its development progress [in the nf-core Slack](https://nfcore.slack.com/archives/C067K2P6GUV).
 
 ## Running the pipeline
 
@@ -240,41 +270,9 @@ If you are using cellranger-multi you have to add the column _feature_type_ to i
 
 - It is important that you give the same sample name for the different feature barcode technologies data that correspond to the same and should be analysed together.
 - The pipeline will **automatically** generate the cellranger multi config file based on the given data.
-- When working with multiplexed data (FFPE or CMO), you'll need a **second samplesheet** relating the multiplexed samples to the corresponding "physical" sample (details below). The `sample` column in the main samplesheet refers to the "physical" sample that may contain multiple multiplexed samples.
+- When working with multiplexed data (FFPE/CMO/OCM), you'll need a **second samplesheet** relating the multiplexed samples to the corresponding "physical" sample (details below). The `sample` column in the main samplesheet refers to the "physical" sample that may contain multiple multiplexed samples.
 
-An example samplesheet could look like this:
-
-```csv
-sample,fastq_1,fastq_2,feature_type,expected_cells
-PBMC_10K,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc/fastqs/5gex/5gex/subsampled_sc5p_v2_hs_PBMC_10k_5gex_S1_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc/fastqs/5gex/5gex/subsampled_sc5p_v2_hs_PBMC_10k_5gex_S1_L001_R2_001.fastq.gz,gex,1000
-PBMC_10K,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc/fastqs/bcell/subsampled_sc5p_v2_hs_PBMC_10k_b_S1_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc/fastqs/bcell/subsampled_sc5p_v2_hs_PBMC_10k_b_S1_L001_R2_001.fastq.gz,vdj,1000
-PBMC_10K,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc/fastqs/5gex/5fb/subsampled_sc5p_v2_hs_PBMC_10k_5fb_S1_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc/fastqs/5gex/5fb/subsampled_sc5p_v2_hs_PBMC_10k_5fb_S1_L001_R2_001.fastq.gz,ab,1000
-PBMC_10K_CMO,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/gex_1/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_gex_S2_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/gex_1/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_gex_S2_L001_R2_001.fastq.gz,gex,1000
-PBMC_10K_CMO,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/cmo/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_multiplexing_capture_S1_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/cmo/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_multiplexing_capture_S1_L001_R2_001.fastq.gz,cmo,1000
-PBMC_10K_CMV,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/5k_cmvpos_tcells/fastqs/gex_1/subsampled_5k_human_antiCMV_T_TBNK_connect_GEX_1_S1_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/5k_cmvpos_tcells/fastqs/gex_1/subsampled_5k_human_antiCMV_T_TBNK_connect_GEX_1_S1_L001_R2_001.fastq.gz,gex,1000
-PBMC_10K_CMV,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/5k_cmvpos_tcells/fastqs/ab/subsampled_5k_human_antiCMV_T_TBNK_connect_AB_S2_L004_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/5k_cmvpos_tcells/fastqs/ab/subsampled_5k_human_antiCMV_T_TBNK_connect_AB_S2_L004_R2_001.fastq.gz,ab,1000
-PBMC_10K_CMV,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/5k_cmvpos_tcells/fastqs/vdj/subsampled_5k_human_antiCMV_T_TBNK_connect_VDJ_S1_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/5k_cmvpos_tcells/fastqs/vdj/subsampled_5k_human_antiCMV_T_TBNK_connect_VDJ_S1_L001_R2_001.fastq.gz,vdj,1000
-4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L001_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L001_R2_001.subsampled.fastq.gz,gex,
-4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L002_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L002_R2_001.subsampled.fastq.gz,gex,
-4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L003_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L003_R2_001.subsampled.fastq.gz,gex,
-4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L004_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L004_R2_001.subsampled.fastq.gz,gex,
-```
-
-#### Additional samplesheet for multiplexed samples
-
-You must provide those via a CSV with the `--cellranger_multi_barcodes` parameter. The file should look like this:
-
-```csv
-sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,description
-PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_1,,CMO301,PBMCs_human_1
-PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_2,,CMO302,PBMCs_human_2
-4PLEX_HUMAN,Liver_BC1,BC001,,Healthy liver dissociated using the Miltenyi FFPE Tissue Dissociation Kit
-4PLEX_HUMAN,Ovarian_BC2,BC002,,Ovarian cancer dissociated using the Miltenyi FFPE Dissociation Kit
-4PLEX_HUMAN,Colorectal_BC3,BC003,,Colorectal cancer dissociated using the Miltenyi FFPE Dissociation Kit
-4PLEX_HUMAN,Pancreas_BC4,BC004,,Healthy pancreas dissociated using the Miltenyi FFPE Tissue Dissociation Kit
-```
-
-The `sample` column must match the corresponding entry in the main samplesheet.
+> Please note that FFPE; CMO and OCM are mutually exclusive in the `cellranger/multi` module. Using more than one for a single sample will cause the module to fail.
 
 #### Additional reference data
 
@@ -284,15 +282,91 @@ The `sample` column must match the corresponding entry in the main samplesheet.
 
   > When running cellranger multi, without any VDJ data, users can also skip VDJ automated ref building with: `--skip_cellrangermulti_vdjref`.
 
-- When working with **FFPE data**, a prob set needs to be specified via `--gex_frna_probe_set`. This file is typically
-  [provided by 10x](https://www.10xgenomics.com/support/software/cell-ranger/downloads#probe-set-downloads).
+- When working with **FFPE data**:
+  - a probe set needs to be specified via `--gex_frna_probe_set`. This file is typically
+    [provided by 10x](https://www.10xgenomics.com/support/software/cell-ranger/downloads#probe-set-downloads). E.g. [testing ffpe probe set](../assets/frna_probeset_subset.csv).
+  - a GEX reference genome version (e.g. GRCh38, GRCm39) via `--gex_reference_version` must be specified unless a pre-built index is provided via `--cellranger_index`. This **must** match the reference in the probe set, which can be found in the header.
 
-- When working with **Cell Multiplexing Oligos (CMOs)**, a reference file needs to be provided via `--gex_cmo_set`. The
-  default reference file, as well as a description how to write a custom one, are [available from the 10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#cmo-ref)
+- When working with **Cell Multiplexing Oligos (CMOs)**, a reference file can to be provided via `--gex_cmo_set`. The
+  default reference file, as well as a description how to write a custom one, are [available from the 10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#cmo-ref). By default, the Cell Ranger's default CMO-set.
 
 - When working with **Feature barcoding (antibody capture)**, a reference file needs to be provided via `--fb_reference`.
   It relates each "feature" to the corresponding barcode sequence. The structure of this file is described in
-  the [cellranger documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-feature-bc-analysis#feature-ref)
+  the [cellranger documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-feature-bc-analysis#feature-ref). E.g. [testing fb reference](../assets/fb_reference.csv)
+
+#### Examples
+
+You can find the **complete** testing files used in the testing profiles here:
+
+- [input samplesheet](../assets/cellrangermulti_samplesheet.csv)
+- [barcodes samplesheet](../assets/cellranger_barcodes_samplesheet.csv)
+
+In the sub-sections below we collect specific examples of CMO/FFPE/OCM samples for quicker visualisation.
+
+##### with CMOs
+
+Input samplesheet:
+
+```csv
+sample,fastq_1,fastq_2,feature_type,expected_cells
+PBMC_10K_CMO,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/gex_1/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_gex_S2_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/gex_1/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_gex_S2_L001_R2_001.fastq.gz,gex,1000
+PBMC_10K_CMO,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/cmo/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_multiplexing_capture_S1_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/cmo/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_multiplexing_capture_S1_L001_R2_001.fastq.gz,cmo,1000
+```
+
+Barcode samplesheet:
+
+```csv
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_1,,CMO301,,PBMCs_human_1
+PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_2,,CMO302,,PBMCs_human_2
+```
+
+> You must provide the barcodes CSV with the `--cellranger_multi_barcodes` parameter.
+
+##### with FFPE
+
+Input samplesheet:
+
+```csv
+sample,fastq_1,fastq_2,feature_type,expected_cells
+4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L001_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L001_R2_001.subsampled.fastq.gz,gex,
+4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L002_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L002_R2_001.subsampled.fastq.gz,gex,
+4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L003_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L003_R2_001.subsampled.fastq.gz,gex,
+4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L004_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L004_R2_001.subsampled.fastq.gz,gex,
+```
+
+Barcode samplesheet:
+
+```csv
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+4PLEX_HUMAN,Liver_BC1,BC001,,,Healthy liver dissociated using the Miltenyi FFPE Tissue Dissociation Kit
+4PLEX_HUMAN,Ovarian_BC2,BC002,,,Ovarian cancer dissociated using the Miltenyi FFPE Dissociation Kit
+4PLEX_HUMAN,Colorectal_BC3,BC003,,,Colorectal cancer dissociated using the Miltenyi FFPE Dissociation Kit
+4PLEX_HUMAN,Pancreas_BC4,BC004,,,Healthy pancreas dissociated using the Miltenyi FFPE Tissue Dissociation Kit
+```
+
+> You must provide the barcodes CSV with the `--cellranger_multi_barcodes` parameter.
+
+##### with OCMs
+
+Input samplesheet:
+
+```csv
+sample,fastq_1,fastq_2,feature_type,expected_cells
+10k_Wistar_Rat,/path to data/10k_Wistar_Rat_PBMCs_Multiplex_3p_gem-x_Universal_OCM_fastqs/10k_Wistar_Rat_PBMCs_Multiplex_3p_gem-x_Universal_OCM_S1_L002_R1_001.fastq.gz,/data/gcbds/externals/almeifel/NFCORE_PIPELINES/scrnaseq/testing/OCM_MULTI/10k_Wistar_Rat_PBMCs_Multiplex_3p_gem-x_Universal_OCM_fastqs/10k_Wistar_Rat_PBMCs_Multiplex_3p_gem-x_Universal_OCM_S1_L002_R2_001.fastq.gz,gex,
+```
+
+Barcode samplesheet:
+
+```csv
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB1,,,OB1,2.5k_Wistar_Rat_PBMCs_gem-x_OB1
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB2,,,OB2,2.5k_Wistar_Rat_PBMCs_gem-x_OB2
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB3,,,OB3,2.5k_Wistar_Rat_PBMCs_gem-x_OB3
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB4,,,OB4,2.5k_Wistar_Rat_PBMCs_gem-x_OB4
+```
+
+> You must provide the barcodes CSV with the `--cellranger_multi_barcodes` parameter.
 
 ## Running the pipeline
 
@@ -393,7 +467,7 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 - `shifter`
   - A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
 - `charliecloud`
-  - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
+  - A generic configuration profile to be used with [Charliecloud](https://charliecloud.io/)
 - `apptainer`
   - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
 - `wave`

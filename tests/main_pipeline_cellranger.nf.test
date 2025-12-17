@@ -9,68 +9,28 @@ nextflow_pipeline {
             // the rest is taken from shared config
             params {
                 aligner    = 'cellranger'
-                outdir     = "${outputDir}/results_cellranger"
+                outdir     = "$outputDir"
             }
         }
 
         then {
-
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
             assertAll(
-
-                //
-                // General assertions
-                //
-
-                // Did it finish successfully?
-                {assert workflow.success},
-
-                // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 20},
-
-                // How many results were produced?
-                {assert path("${outputDir}/results_cellranger").list().size() == 4},
-                {assert path("${outputDir}/results_cellranger/cellranger").list().size() == 4},
-                {assert path("${outputDir}/results_cellranger/cellranger/mtx_conversions").list().size() == 8},
-                {assert path("${outputDir}/results_cellranger/cellranger/count").list().size() == 2},
-                {assert path("${outputDir}/results_cellranger/fastqc").list().size() == 12},
-                {assert path("${outputDir}/results_cellranger/multiqc").list().size() == 3},
-
-                //
-                // Check if files were produced
-                //
-                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_raw_matrix.h5ad" ).exists()},
-                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.h5ad" ).exists()},
-                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_filtered_matrix.h5ad" ).exists()},
-                {assert new File( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.h5ad" ).exists()},
-
-                //
-                // Check if files are the same
-                //
-                {assert snapshot(
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/features.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/filtered_feature_bc_matrix/matrix.mtx.gz"   ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/barcodes.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/features.tsv.gz" ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/filtered_feature_bc_matrix/matrix.mtx.gz"   ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/barcodes.tsv.gz"      ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/features.tsv.gz"      ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_X/outs/raw_feature_bc_matrix/matrix.mtx.gz"        ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/barcodes.tsv.gz"      ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/features.tsv.gz"      ),
-                    path( "${outputDir}/results_cellranger/cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/matrix.mtx.gz"        ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_raw_matrix.seurat.rds"        ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_raw_matrix.sce.rds"           ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.seurat.rds"        ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.sce.rds"           ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_filtered_matrix.seurat.rds"   ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_X/Sample_X_filtered_matrix.sce.rds"      ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.seurat.rds"   ),
-                    path( "${outputDir}/results_cellranger/cellranger/mtx_conversions/Sample_Y/Sample_Y_filtered_matrix.sce.rds"      )
-                ).match()}
-
-            ) // end of assertAll()
-
+                { assert workflow.success},
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeFromYamlMap("$params.outdir/pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml", "Workflow"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path
+                ).match() }
+            )
         }
     }
 

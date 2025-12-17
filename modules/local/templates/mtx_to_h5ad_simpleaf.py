@@ -5,21 +5,23 @@ import os
 
 os.environ["NUMBA_CACHE_DIR"] = "."
 
-import scanpy as sc
-import pandas as pd
-import argparse
-import anndata
-from anndata import AnnData
 import platform
-import json
+
+import anndata
+import pandas as pd
+import scanpy as sc
+
 
 def format_yaml_like(data: dict, indent: int = 0) -> str:
     """Formats a dictionary to a YAML-like string.
+
     Args:
         data (dict): The dictionary to format.
         indent (int): The current indentation level.
+
     Returns:
         str: A string formatted as YAML.
+
     """
     yaml_str = ""
     for key, value in data.items():
@@ -29,6 +31,7 @@ def format_yaml_like(data: dict, indent: int = 0) -> str:
         else:
             yaml_str += f"{spaces}{key}: {value}\\n"
     return yaml_str
+
 
 def dump_versions():
     versions = {
@@ -43,6 +46,7 @@ def dump_versions():
     with open("versions.yml", "w") as f:
         f.write(format_yaml_like(versions))
 
+
 def input_to_adata(
     input_data: str,
     output: str,
@@ -55,8 +59,8 @@ def input_to_adata(
 
     # the simpleaf quant module exports an h5ad file.
     adata = sc.read_h5ad(simpleaf_h5ad_path)
-    adata.obs_names = adata.obs['barcodes'].values
-    adata.var_names = adata.var['gene_id'].values
+    adata.obs_names = adata.obs["barcodes"].values
+    adata.var_names = adata.var["gene_id"].values
     adata.obs["sample"] = sample
 
     # sort adata column- and row- wise to avoid positional differences
@@ -64,8 +68,8 @@ def input_to_adata(
 
     # standard format
     # index are gene IDs and symbols are a column
-    adata.var['gene_versions'] = adata.var['gene_id']
-    adata.var.index = adata.var['gene_versions'].str.split('.').str[0].values
+    adata.var["gene_versions"] = adata.var["gene_id"]
+    adata.var.index = adata.var["gene_versions"].str.split(".").str[0].values
     adata.var_names_make_unique()
 
     # sort adata column- and row- wise to avoid positional differences
@@ -75,6 +79,7 @@ def input_to_adata(
     adata.write_h5ad(f"{output}")
     print(f"Wrote h5ad file to {output}")
 
+
 #
 # Run main script
 #
@@ -83,11 +88,7 @@ def input_to_adata(
 os.makedirs("${meta.id}", exist_ok=True)
 
 # input_type comes from NF module
-input_to_adata(
-    input_data="${inputs}",
-    output="${meta.id}_${meta.input_type}_matrix.h5ad",
-    sample="${meta.id}"
-)
+input_to_adata(input_data="${inputs}", output="${meta.id}_${meta.input_type}_matrix.h5ad", sample="${meta.id}")
 
 # dump versions
 dump_versions()

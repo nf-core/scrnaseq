@@ -17,6 +17,7 @@ process PARSE_CELLRANGERMULTI_SAMPLESHEET {
 
     output:
     path "cmo_files/*" , emit: cmo,  optional: true
+    path "ocm_files/*" , emit: ocm,  optional: true
     path "frna_files/*", emit: frna, optional: true
 
     when:
@@ -29,8 +30,9 @@ process PARSE_CELLRANGERMULTI_SAMPLESHEET {
 
     stub:
     """
-    mkdir -p cmo_files frna_files
+    mkdir -p cmo_files ocm_files frna_files
     touch frna_files/test.csv
-    touch cmd_files/test.csv
+    touch cmo_files/test.csv
+    touch ocm_files/test.csv
     """
 }

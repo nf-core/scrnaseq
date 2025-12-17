@@ -9,58 +9,30 @@ nextflow_pipeline {
             // the rest is taken from shared config
             params {
                 aligner    = 'simpleaf'
-                outdir     = "${outputDir}/results_simpleaf"
+                outdir     = "$outputDir"
             }
         }
 
         then {
-
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
             assertAll(
-
-                //
-                // General assertions
-                //
-
-                // Did it finish successfully?
-                {assert workflow.success},
-
-                // How many tasks were executed?
-                {assert workflow.trace.tasks().size() == 15},
-
-                // How many results were produced?
-                {assert path("${outputDir}/results_simpleaf").list().size() == 4},
-                {assert path("${outputDir}/results_simpleaf/simpleaf").list().size() == 3},
-                {assert path("${outputDir}/results_simpleaf/simpleaf/mtx_conversions").list().size() == 5},
-                {assert path("${outputDir}/results_simpleaf/fastqc").list().size() == 12},
-                {assert path("${outputDir}/results_simpleaf/multiqc").list().size() == 3},
-
-                //
-                // Check if files were produced
-                //
-                {assert new File( "${outputDir}/results_simpleaf/simpleaf/Sample_X/simpleaf_quant/af_quant/alevin/quants_mat_cols.txt" ).exists()},
-                {assert new File( "${outputDir}/results_simpleaf/simpleaf/Sample_X/simpleaf_quant/af_quant/alevin/quants_mat_rows.txt" ).exists()},
-                {assert new File( "${outputDir}/results_simpleaf/simpleaf/Sample_X/simpleaf_quant/af_quant/alevin/quants_mat.mtx" ).exists()},
-                {assert new File( "${outputDir}/results_simpleaf/simpleaf/Sample_X/simpleaf_quant/af_quant/alevin/quants.h5ad" ).exists()},
-                {assert new File( "${outputDir}/results_simpleaf/simpleaf/Sample_Y/simpleaf_quant/af_quant/alevin/quants_mat_cols.txt" ).exists()},
-                {assert new File( "${outputDir}/results_simpleaf/simpleaf/Sample_Y/simpleaf_quant/af_quant/alevin/quants_mat_rows.txt" ).exists()},
-                {assert new File( "${outputDir}/results_simpleaf/simpleaf/Sample_Y/simpleaf_quant/af_quant/alevin/quants_mat.mtx" ).exists()},
-                {assert new File( "${outputDir}/results_simpleaf/simpleaf/Sample_Y/simpleaf_quant/af_quant/alevin/quants.h5ad" ).exists()},
-
-                //
-                // Check if files are the same
-                //
-                {assert snapshot(
-                    path( "${outputDir}/results_simpleaf/simpleaf/mtx_conversions/Sample_X/Sample_X_raw_matrix.seurat.rds" ),
-                    path( "${outputDir}/results_simpleaf/simpleaf/mtx_conversions/Sample_X/Sample_X_raw_matrix.sce.rds" ),
-                    path( "${outputDir}/results_simpleaf/simpleaf/mtx_conversions/Sample_X/Sample_X_raw_matrix.h5ad" ),
-                    path( "${outputDir}/results_simpleaf/simpleaf/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.seurat.rds" ),
-                    path( "${outputDir}/results_simpleaf/simpleaf/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.sce.rds" ),
-                    path( "${outputDir}/results_simpleaf/simpleaf/mtx_conversions/Sample_Y/Sample_Y_raw_matrix.h5ad" ),
-                ).match()}
-
-            ) // end of assertAll()
-
+                { assert workflow.success},
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeFromYamlMap("$params.outdir/pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml", "Workflow"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path
+                ).match() }
+            )
         }
+
     }
 
 }

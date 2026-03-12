@@ -85,6 +85,11 @@
                         "git_sha": "e10b76ca0c66213581bec2833e30d31f239dec0b",
                         "installed_by": ["modules"]
                     },
+                    "samtools/sort": {
+                        "branch": "master",
+                        "git_sha": "5cb9a8694da0a0e550921636bb60bc8c56445fd7",
+                        "installed_by": ["modules"]
+                    },
                     "simpleaf/index": {
                         "branch": "master",
                         "git_sha": "4ce8f451b1c44e02f5846b39276f5c501ca199ac",
@@ -103,6 +108,11 @@
                     "unzip": {
                         "branch": "master",
                         "git_sha": "b0c3ff2485534c09d9debbf20125d9c6b72ce118",
+                        "installed_by": ["modules"]
+                    },
+                    "velocyto": {
+                        "branch": "master",
+                        "git_sha": "ca3514e876459e9dd482a477a281b5b5886a1a84",
                         "installed_by": ["modules"]
                     }
                 }

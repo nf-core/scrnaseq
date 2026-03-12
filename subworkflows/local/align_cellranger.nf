@@ -5,6 +5,9 @@
 include { CELLRANGER_MKGTF } from "../../modules/nf-core/cellranger/mkgtf/main.nf"
 include { CELLRANGER_MKREF } from "../../modules/nf-core/cellranger/mkref/main.nf"
 include { CELLRANGER_COUNT } from "../../modules/nf-core/cellranger/count/main.nf"
+// Modules for Velocyto launch:
+include { VELOCYTO } from "../../modules/nf-core/velocyto/main.nf"
+include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort/main'
 
 // Define workflow to subset and index a genome region fasta file
 workflow CELLRANGER_ALIGN {
@@ -59,6 +62,53 @@ workflow CELLRANGER_ALIGN {
                 if ( it.toString().contains("filtered_feature_bc_matrix") ) { desired_files.add( it ) }
             }
             [ meta + [input_type: 'filtered'], desired_files ]
+        }
+        
+        // Run Velocyto on the output if requested by --run_velocyto true:
+        if ( params.run_velocyto ) {
+            // Extract the two Cell Ranger files that VELOCYTO needs:
+            ch_velocyto_files =
+                CELLRANGER_COUNT.out.outs
+                    .map { meta, cellranger_output_files ->
+
+                        def bam = cellranger_output_files.find {
+                            it.toString().endsWith('/possorted_genome_bam.bam')
+                        }
+
+                        def barcodes = cellranger_output_files.find {
+                            it.toString().endsWith('/filtered_feature_bc_matrix/barcodes.tsv.gz')
+                        }
+
+                        assert bam      : "Missing possorted_genome_bam.bam for sample ${meta.id}"
+                        assert barcodes : "Missing barcodes.tsv.gz for sample ${meta.id}"
+
+                        tuple(meta, barcodes, bam)
+                    }
+
+            // SAMTOOLS_SORT requires this extra input (index, optional).
+            ch_no_index    = Channel.value('')
+            ch_fasta_for_sort = fasta.map { fa -> tuple([id: 'genome'], fa) }
+
+
+            // Create cellsorted_possorted_genome_bam.bam
+            SAMTOOLS_SORT(
+                ch_velocyto_files.map { meta, barcodes, bam -> tuple(meta, bam) },
+                ch_fasta_for_sort,
+                ch_no_index
+            )
+
+            // Recombine into the exact tuple VELOCYTO expects
+            ch_velocyto_input =
+                ch_velocyto_files
+                    .join(SAMTOOLS_SORT.out.bam)
+                    .map { meta, barcodes, bam, sorted_bam ->
+                        tuple(meta + [input_type: 'velocyto'], barcodes, bam, sorted_bam)
+                    }
+
+            VELOCYTO(
+                ch_velocyto_input,
+                gtf
+            )
         }
 
     emit:

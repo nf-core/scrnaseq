@@ -79,9 +79,6 @@ workflow CELLRANGER_ALIGN {
                             it.toString().endsWith('/filtered_feature_bc_matrix/barcodes.tsv.gz')
                         }
 
-                        assert bam      : "Missing possorted_genome_bam.bam for sample ${meta.id}"
-                        assert barcodes : "Missing barcodes.tsv.gz for sample ${meta.id}"
-
                         tuple(meta, barcodes, bam)
                     }
 

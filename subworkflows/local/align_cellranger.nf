@@ -63,7 +63,7 @@ workflow CELLRANGER_ALIGN {
             }
             [ meta + [input_type: 'filtered'], desired_files ]
         }
-        
+
         // Run Velocyto on the output if requested by --run_velocyto true:
         if ( params.run_velocyto ) {
             // Extract the two Cell Ranger files that VELOCYTO needs:

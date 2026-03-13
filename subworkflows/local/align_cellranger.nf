@@ -86,7 +86,6 @@ workflow CELLRANGER_ALIGN {
             ch_no_index    = Channel.value('')
             ch_fasta_for_sort = fasta.map { fa -> tuple([id: 'genome'], fa) }
 
-
             // Create cellsorted_possorted_genome_bam.bam
             SAMTOOLS_SORT(
                 ch_velocyto_files.map { meta, barcodes, bam -> tuple(meta, bam) },
@@ -106,6 +105,7 @@ workflow CELLRANGER_ALIGN {
                 ch_velocyto_input,
                 gtf
             )
+            ch_versions = ch_versions.mix(VELOCYTO.out.versions)
         }
 
     emit:

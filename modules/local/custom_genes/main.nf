@@ -2,18 +2,18 @@ process CUSTOM_GENES {
     tag "${meta_geneset.res}_${meta_geneset.genes}"
     label 'process_medium'
 
-    container = 'docker.io/nfdata/sc_rnaseq:v1.0.1'
+    container 'docker.io/nfdata/sc_rnaseq:v1.0.1'
 
     input:
     tuple val(meta), path(input_h5mu)
     tuple val(meta_geneset), val(resolution), path(custom_geneset)
 
     output:
-    path "*_features_plots.pdf"         , emit: feat_plot
-    path "*_dotplot_r*.pdf"             , optional: true, emit: dotplot
-    path "*_heatmap_r*.pdf"             , optional: true, emit: heatmap
-    path "*_violin_r*.pdf"              , optional: true, emit: violin
-    path "versions.yml"                 , emit: versions
+    path "*_features_plots.pdf", emit: feat_plot
+    path "*_dotplot_r*.pdf", optional: true, emit: dotplot
+    path "*_heatmap_r*.pdf", optional: true, emit: heatmap
+    path "*_violin_r*.pdf", optional: true, emit: violin
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -24,7 +24,7 @@ process CUSTOM_GENES {
     export MPLCONFIGDIR=/tmp
     export XDG_CONFIG_HOME=/tmp
 
-    custom_genes.py -ad $input_h5mu -g $custom_geneset -res $resolution
+    custom_genes.py -ad ${input_h5mu} -g ${custom_geneset} -res ${resolution}
 
     cat <<-END_VERSIONS >> versions.yml
     "${task.process}":
@@ -43,5 +43,4 @@ process CUSTOM_GENES {
         clustering.py --version >> versions.yml
     END_VERSIONS
     """
-
 }

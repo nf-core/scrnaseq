@@ -3,42 +3,41 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { MULTIQC                                           } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap                                  } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText                            } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { getGenomeAttribute                                } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { FASTQC_CHECK                                      } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS                                 } from '../subworkflows/local/kallisto_bustools'
-include { SIMPLEAF                                          } from '../subworkflows/local/simpleaf'
-include { STARSOLO                                          } from '../subworkflows/local/starsolo'
-include { CELLRANGER_ALIGN                                  } from "../subworkflows/local/align_cellranger"
-include { CELLRANGER_MULTI_ALIGN                            } from "../subworkflows/local/align_cellrangermulti"
-include { CELLRANGERARC_ALIGN                               } from "../subworkflows/local/align_cellrangerarc"
-include { MTX_TO_H5AD                                       } from '../modules/local/mtx_to_h5ad'
+include { MULTIQC } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap } from 'plugin/nf-schema'
+include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { getGenomeAttribute } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { FASTQC_CHECK } from '../subworkflows/local/fastqc'
+include { KALLISTO_BUSTOOLS } from '../subworkflows/local/kallisto_bustools'
+include { SIMPLEAF } from '../subworkflows/local/simpleaf'
+include { STARSOLO } from '../subworkflows/local/starsolo'
+include { CELLRANGER_ALIGN } from "../subworkflows/local/align_cellranger"
+include { CELLRANGER_MULTI_ALIGN } from "../subworkflows/local/align_cellrangermulti"
+include { CELLRANGERARC_ALIGN } from "../subworkflows/local/align_cellrangerarc"
+include { MTX_TO_H5AD } from '../modules/local/mtx_to_h5ad'
 include { H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA } from '../subworkflows/nf-core/h5ad_removebackground_barcodes_cellbender_anndata'
-include { GTF_GENE_FILTER                                   } from '../modules/local/gtf_gene_filter'
-include { GUNZIP as GUNZIP_FASTA                            } from '../modules/nf-core/gunzip/main'
-include { GUNZIP as GUNZIP_GTF                              } from '../modules/nf-core/gunzip/main'
-include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
-include { ATAC_PREPROCESSING                                } from '../subworkflows/local/preprocessing_atac'
-include { CONCATENATE_VDJ                                   } from '../modules/local/concatenate_vdj'
-include { CONVERT_MUDATA                                    } from '../modules/local/convert_mudata'
-include { DOUBLETS_QUALITYFILTERING                         } from '../subworkflows/local/doublets_qualityfiltering'
-include { NORMALIZATION_AND_HVG                             } from '../subworkflows/local/normalization_and_hvg'
-include { CELL_ANNOTATION                                   } from '../modules/local/cellannotation'
-include { INTEGRATION_MODALITIES                            } from '../subworkflows/local/integration_modalities'
-include { CLUSTERING                                        } from '../modules/local/clustering'
-include { CLUSTREE                                          } from '../modules/local/clustree'
-include { ENRICH_MARKERS                                    } from '../modules/local/enrich_markers'
-include { CUSTOM_GENES                                      } from '../modules/local/custom_genes'
-include { DIFFERENTIAL_ABUNDANCE                            } from '../modules/local/differential_abundance'
-include { PSEUDOBULK_ANALYSIS                               } from '../subworkflows/local/pseudobulk_analysis'
-include { CELL_INTERACTION                                  } from '../modules/local/cell_interaction'
+include { GTF_GENE_FILTER } from '../modules/local/gtf_gene_filter'
+include { GUNZIP as GUNZIP_FASTA } from '../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_GTF } from '../modules/nf-core/gunzip/main'
+include { H5AD_CONVERSION } from '../subworkflows/local/h5ad_conversion'
+include { ATAC_PREPROCESSING } from '../subworkflows/local/preprocessing_atac'
+include { CONCATENATE_VDJ } from '../modules/local/concatenate_vdj'
+include { CONVERT_MUDATA } from '../modules/local/convert_mudata'
+include { DOUBLETS_QUALITYFILTERING } from '../subworkflows/local/doublets_qualityfiltering'
+include { NORMALIZATION_AND_HVG } from '../subworkflows/local/normalization_and_hvg'
+include { CELL_ANNOTATION } from '../modules/local/cellannotation'
+include { INTEGRATION_MODALITIES } from '../subworkflows/local/integration_modalities'
+include { CLUSTERING } from '../modules/local/clustering'
+include { CLUSTREE } from '../modules/local/clustree'
+include { ENRICH_MARKERS } from '../modules/local/enrich_markers'
+include { CUSTOM_GENES } from '../modules/local/custom_genes'
+include { DIFFERENTIAL_ABUNDANCE } from '../modules/local/differential_abundance'
+include { PSEUDOBULK_ANALYSIS } from '../subworkflows/local/pseudobulk_analysis'
+include { CELL_INTERACTION } from '../modules/local/cell_interaction'
 
 workflow SCRNASEQ {
-
     take:
     ch_fastq
     counts
@@ -46,92 +45,92 @@ workflow SCRNASEQ {
 
     main:
     ch_multiqc_files = channel.empty()
-    ch_versions      = channel.empty()
-    ch_mtx_matrices  = channel.empty()
+    ch_versions = channel.empty()
+    ch_mtx_matrices = channel.empty()
 
     protocol_config = Utils.getProtocol(workflow, log, params.aligner, params.protocol)
     if (protocol_config['protocol'] == 'auto' && params.aligner !in ["cellranger", "cellrangerarc", "cellrangermulti"]) {
-        error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
+        error("Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!")
     }
 
     // general input and params
-    ch_genome_fasta         = params.fasta                ? file(params.fasta, checkIfExists: true)    : []
-    ch_gtf                  = params.gtf                  ? file(params.gtf, checkIfExists: true)      : []
-    ch_transcript_fasta     = params.transcript_fasta     ? file(params.transcript_fasta)              : []
-    ch_motifs               = params.motifs               ? file(params.motifs)                        : []
-    ch_txp2gene             = params.txp2gene             ? file(params.txp2gene, checkIfExists: true) : []
+    ch_genome_fasta = params.fasta ? file(params.fasta, checkIfExists: true) : []
+    ch_gtf = params.gtf ? file(params.gtf, checkIfExists: true) : []
+    ch_transcript_fasta = params.transcript_fasta ? file(params.transcript_fasta) : []
+    ch_motifs = params.motifs ? file(params.motifs) : []
+    ch_txp2gene = params.txp2gene ? file(params.txp2gene, checkIfExists: true) : []
 
     if (params.barcode_whitelist) {
         ch_barcode_whitelist = file(params.barcode_whitelist, checkIfExists: true)
-    } else if (protocol_config.containsKey("whitelist")) {
-        ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
-    } else {
+    }
+    else if (protocol_config.containsKey("whitelist")) {
+        ch_barcode_whitelist = file("${projectDir}/${protocol_config['whitelist']}", checkIfExists: true)
+    }
+    else {
         ch_barcode_whitelist = []
     }
 
     // samplesheet - this is passed to the MTX conversion functions to add metadata to the
     // AnnData objects.
-    ch_input = params.input                ? file(params.input, checkIfExists: true)    : []
-    ch_counts = params.counts              ? file(params.counts, checkIfExists: true)    : []
-    ch_h5ad_matrix = params.h5ad_matrix    ? file(params.h5ad_matrix, checkIfExists: true): []
+    ch_input = params.input ? file(params.input, checkIfExists: true) : []
+    ch_counts = params.counts ? file(params.counts, checkIfExists: true) : []
 
     //kallisto params
     ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index, checkIfExists: true) : []
-    kb_t1c            = params.kb_t1c         ? file(params.kb_t1c, checkIfExists: true) : []
-    kb_t2c            = params.kb_t2c         ? file(params.kb_t2c, checkIfExists: true) : []
+    kb_t1c = params.kb_t1c ? file(params.kb_t1c, checkIfExists: true) : []
+    kb_t2c = params.kb_t2c ? file(params.kb_t2c, checkIfExists: true) : []
 
     //simpleaf params
-    ch_simpleaf_index   = params.simpleaf_index ? file(params.simpleaf_index, checkIfExists: true) : []
+    ch_simpleaf_index = params.simpleaf_index ? file(params.simpleaf_index, checkIfExists: true) : []
 
     //star params
-    star_index        = params.star_index ? file(params.star_index, checkIfExists: true) : null
-    ch_star_index     = star_index ? channel.value( [[id: star_index.baseName], star_index] ) : []
+    star_index = params.star_index ? file(params.star_index, checkIfExists: true) : null
+    ch_star_index = star_index ? channel.value([[id: star_index.baseName], star_index]) : []
 
     //cellranger params
     ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index, checkIfExists: true) : []
 
     //cellrangermulti params
-    cellranger_vdj_index = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []
+    cellranger_vdj_index = params.cellranger_vdj_index ? file(params.cellranger_vdj_index, checkIfExists: true) : []
     ch_multi_samplesheet = params.cellranger_multi_barcodes ? file(params.cellranger_multi_barcodes, checkIfExists: true) : []
-    empty_file           = file("$projectDir/assets/EMPTY", checkIfExists: true)
+    empty_file = file("${projectDir}/assets/EMPTY", checkIfExists: true)
 
     // cellrangerarc params
-    ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config)          : []
+    ch_cellrangerarc_config = params.cellrangerarc_config ? file(params.cellrangerarc_config) : []
 
     // Differential analysis params
-    ch_diff_abundance_comparisons = params.diff_abundance_comparisons ? Channel
-        .fromList(params.diff_abundance_comparisons.split(',').flatten())
+    ch_diff_abundance_comparisons = params.diff_abundance_comparisons
+        ? channel.fromList(params.diff_abundance_comparisons.split(',').flatten())
         : channel.empty()
 
     // Pseudobulk params
-    ch_pseudobulk_group = params.pseudobulk_group ? Channel
-        .value(params.pseudobulk_group)
-        : Channel.empty()
-
-    ch_pseudobulk_comparisons = params.pseudobulk_comparisons ? Channel
-        .fromList(params.pseudobulk_comparisons.split(',').flatten())
+    ch_pseudobulk_group = params.pseudobulk_group
+        ? channel.value(params.pseudobulk_group)
         : channel.empty()
 
-    ch_pseudobulk_formula = params.pseudobulk_formula ? Channel
-        .value(params.pseudobulk_formula)
-        : Channel.empty()
+    ch_pseudobulk_comparisons = params.pseudobulk_comparisons
+        ? channel.fromList(params.pseudobulk_comparisons.split(',').flatten())
+        : channel.empty()
 
-    ch_pseudobulk_fdr = params.pseudobulk_fdr ? Channel
-        .value(params.pseudobulk_fdr)
-        : Channel.empty()
+    ch_pseudobulk_formula = params.pseudobulk_formula
+        ? channel.value(params.pseudobulk_formula)
+        : channel.empty()
 
+    ch_pseudobulk_fdr = params.pseudobulk_fdr
+        ? channel.value(params.pseudobulk_fdr)
+        : channel.empty()
     // Cell interaction params
-    ch_liana_method = params.liana_method ? Channel
-        .value(params.liana_method)
+    ch_liana_method = params.liana_method
+        ? channel.value(params.liana_method)
         : channel.empty()
-    ch_liana_resource = params.liana_resource ? Channel
-        .value(params.liana_resource)
+    ch_liana_resource = params.liana_resource
+        ? channel.value(params.liana_resource)
         : channel.empty()
 
     // Run FastQC
     if (!params.skip_fastqc) {
-        FASTQC_CHECK ( ch_fastq )
-        ch_versions      = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
+        FASTQC_CHECK(ch_fastq)
+        ch_versions = ch_versions.mix(FASTQC_CHECK.out.fastqc_version)
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_CHECK.out.fastqc_multiqc.flatten())
     }
 
@@ -140,10 +139,11 @@ workflow SCRNASEQ {
     //
     if (params.fasta) {
         if (params.fasta.endsWith('.gz')) {
-            ch_genome_fasta    = GUNZIP_FASTA ( [ [:], ch_genome_fasta ] ).gunzip.map { it[1] }
-            ch_versions        = ch_versions.mix(GUNZIP_FASTA.out.versions)
-        } else {
-            ch_genome_fasta = channel.value( ch_genome_fasta )
+            ch_genome_fasta = GUNZIP_FASTA([[:], ch_genome_fasta]).gunzip.map { it -> it[1] }
+            ch_versions = ch_versions.mix(GUNZIP_FASTA.out.versions)
+        }
+        else {
+            ch_genome_fasta = channel.value(ch_genome_fasta)
         }
     }
 
@@ -152,15 +152,16 @@ workflow SCRNASEQ {
     //
     if (params.gtf) {
         if (params.gtf.endsWith('.gz')) {
-            ch_gtf      = GUNZIP_GTF ( [ [:], ch_gtf ] ).gunzip.map { it[1] }
+            ch_gtf = GUNZIP_GTF([[:], ch_gtf]).gunzip.map { it -> it[1] }
             ch_versions = ch_versions.mix(GUNZIP_GTF.out.versions)
-        } else {
-            ch_gtf = channel.value( ch_gtf )
+        }
+        else {
+            ch_gtf = channel.value(ch_gtf)
         }
     }
 
     // filter gtf
-    ch_filter_gtf = ch_gtf ? GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf : []
+    ch_filter_gtf = ch_gtf ? GTF_GENE_FILTER(ch_genome_fasta, ch_gtf).gtf : []
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
@@ -173,15 +174,15 @@ workflow SCRNASEQ {
             kb_t2c,
             protocol_config['protocol'],
             params.kb_workflow,
-            ch_fastq
+            ch_fastq,
         )
         ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix( KALLISTO_BUSTOOLS.out.counts_raw, KALLISTO_BUSTOOLS.out.counts_filtered )
+        ch_mtx_matrices = ch_mtx_matrices.mix(KALLISTO_BUSTOOLS.out.counts_raw, KALLISTO_BUSTOOLS.out.counts_filtered)
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
     }
 
     // Run simpleaf pipeline
-    if ( params.aligner == "simpleaf" ) {
+    if (params.aligner == "simpleaf") {
 
         SIMPLEAF(
             ch_genome_fasta,
@@ -193,16 +194,15 @@ workflow SCRNASEQ {
             protocol_config['protocol'],
             params.simpleaf_umi_resolution,
             ch_fastq,
-            [] // for existing map dir; not applicable
+            [],
         )
         ch_versions = ch_versions.mix(SIMPLEAF.out.ch_versions)
-        ch_multiqc_files = ch_multiqc_files.mix(SIMPLEAF.out.quant.map{ _meta, it -> it })
+        ch_multiqc_files = ch_multiqc_files.mix(SIMPLEAF.out.quant.map { _meta, it -> it })
         ch_mtx_matrices = ch_mtx_matrices.mix(
-            SIMPLEAF.out.quant.map{
-                meta, files -> [
-                    meta +
-                    [input_type: meta["filtered"] ? "filtered" : "raw" ],
-                    files
+            SIMPLEAF.out.quant.map { meta, files ->
+                [
+                    meta + [input_type: meta["filtered"] ? "filtered" : "raw"],
+                    files,
                 ]
             }
         )
@@ -222,7 +222,7 @@ workflow SCRNASEQ {
         )
         ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
-        ch_mtx_matrices = ch_mtx_matrices.mix( STARSOLO.out.raw_counts, STARSOLO.out.filtered_counts )
+        ch_mtx_matrices = ch_mtx_matrices.mix(STARSOLO.out.raw_counts, STARSOLO.out.filtered_counts)
     }
 
     // Run cellranger pipeline
@@ -232,13 +232,15 @@ workflow SCRNASEQ {
             ch_filter_gtf,
             ch_cellranger_index,
             ch_fastq,
-            protocol_config['protocol']
+            protocol_config['protocol'],
         )
         ch_versions = ch_versions.mix(CELLRANGER_ALIGN.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix( CELLRANGER_ALIGN.out.cellranger_matrices_raw, CELLRANGER_ALIGN.out.cellranger_matrices_filtered )
-        ch_multiqc_files = ch_multiqc_files.mix(CELLRANGER_ALIGN.out.cellranger_out.map {
-            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html"}
-        })
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_ALIGN.out.cellranger_matrices_raw, CELLRANGER_ALIGN.out.cellranger_matrices_filtered)
+        ch_multiqc_files = ch_multiqc_files.mix(
+            CELLRANGER_ALIGN.out.cellranger_out.map { _meta, outs ->
+                outs.findAll { it -> it.name == "web_summary.html" }
+            }
+        )
     }
 
     // Run cellrangerarc pipeline
@@ -249,16 +251,15 @@ workflow SCRNASEQ {
             ch_motifs,
             ch_cellranger_index,
             ch_fastq,
-            ch_cellrangerarc_config
+            ch_cellrangerarc_config,
         )
         ch_versions = ch_versions.mix(CELLRANGERARC_ALIGN.out.ch_versions)
-        ch_mtx_matrices = ch_mtx_matrices.mix( CELLRANGERARC_ALIGN.out.cellrangerarc_mtx_raw, CELLRANGERARC_ALIGN.out.cellrangerarc_mtx_filtered )
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGERARC_ALIGN.out.cellrangerarc_mtx_raw, CELLRANGERARC_ALIGN.out.cellrangerarc_mtx_filtered)
 
 
         // Collect the fragments files and their index
-        ch_fragments =
-            CELLRANGERARC_ALIGN.out.cellrangerarc_out.map { meta, outs ->
-            def desired_files = outs.findAll { it.name == "atac_fragments.tsv.gz" }
+        ch_fragments = CELLRANGERARC_ALIGN.out.cellrangerarc_out.map { meta, outs ->
+            def desired_files = outs.findAll { it -> it.name == "atac_fragments.tsv.gz" }
 
 
             if (desired_files.size() > 0) {
@@ -267,24 +268,25 @@ workflow SCRNASEQ {
             else {
             }
         }
-        ch_fragments_collect =  ch_fragments.collect()
+        ch_fragments_collect = ch_fragments.collect()
 
 
         ch_transformed_fragments_channel = ch_fragments_collect.map { list ->
-        def meta = []
-        def files = []
+            def meta = []
+            def files = []
 
-        list.collate(2).each { pair ->
-            meta << pair[0]
-            files << pair[1]
+            list
+                .collate(2)
+                .each { pair ->
+                    meta << pair[0]
+                    files << pair[1]
+                }
+            return [meta, files.flatten()]
         }
-        return [meta, files.flatten()]
-        }
 
 
-        ch_fragments_index =
-            CELLRANGERARC_ALIGN.out.cellrangerarc_out.map { meta, outs ->
-            def desired_files = outs.findAll { it.name == "atac_fragments.tsv.gz.tbi" }
+        ch_fragments_index = CELLRANGERARC_ALIGN.out.cellrangerarc_out.map { meta, outs ->
+            def desired_files = outs.findAll { it -> it.name == "atac_fragments.tsv.gz.tbi" }
 
 
             if (desired_files.size() > 0) {
@@ -293,18 +295,20 @@ workflow SCRNASEQ {
             else {
             }
         }
-        ch_vdj_fragments_index_collect =  ch_fragments_index.collect()
+        ch_vdj_fragments_index_collect = ch_fragments_index.collect()
 
 
         ch_transformed_fragments_index_channel = ch_vdj_fragments_index_collect.map { list ->
-        def meta = []
-        def files = []
+            def meta = []
+            def files = []
 
-        list.collate(2).each { pair ->
-            meta << pair[0]
-            files << pair[1]
-        }
-        return [meta, files.flatten()]
+            list
+                .collate(2)
+                .each { pair ->
+                    meta << pair[0]
+                    files << pair[1]
+                }
+            return [meta, files.flatten()]
         }
     }
 
@@ -316,83 +320,99 @@ workflow SCRNASEQ {
         // the metadata and data for each data-type of every sample.
         // then, inside the subworkflow, it can be parsed to manage inputs to the module
         ch_fastq
-        .map { meta, fastqs ->
-            def parsed_meta = meta.clone() + [ "${meta.feature_type.toString()}": fastqs ]
-            parsed_meta.options = [:]
+            .map { meta, fastqs ->
+                def parsed_meta = meta.clone() + ["${meta.feature_type.toString()}": fastqs]
+                parsed_meta.options = [:]
 
-            // add an universal key to differentiate from empty channels so that the "&& meta_gex?.options" lines in the module main.nf can work properly
-            parsed_meta.options['data-available'] = true
+                // add an universal key to differentiate from empty channels so that the "&& meta_gex?.options" lines in the module main.nf can work properly
+                parsed_meta.options['data-available'] = true
 
-            // add cellranger options that are currently handled by pipeline, coming from samplesheet
-            // the module parses them from the 'gex' options
-            if (meta.feature_type.toString() == 'gex') {
-                parsed_meta.options['create-bam'] = params.save_align_intermeds  // force bam creation -- param required by cellranger multi
-                if (meta.expected_cells) { parsed_meta.options['expected-cells'] = meta.expected_cells }
+                // add cellranger options that are currently handled by pipeline, coming from samplesheet
+                // the module parses them from the 'gex' options
+                if (meta.feature_type.toString() == 'gex') {
+                    parsed_meta.options['create-bam'] = params.save_align_intermeds
+                    // force bam creation -- param required by cellranger multi
+                    if (meta.expected_cells) {
+                        parsed_meta.options['expected-cells'] = meta.expected_cells
+                    }
+                }
+
+                [parsed_meta.id, parsed_meta]
             }
+            .groupTuple(by: 0)
+            .map { sample_id, map_collection ->
+                // Now we must check if every data possibility taken into account in the .branch() operation
+                // performed inside the CELLRANGER_MULTI_ALIGN subworkflow are initialized, even with empty files
+                // This to ensure that the sizes of each data channel is the same, and the the order and the data types
+                // are used together with its rightful pairs
+                //
+                // data.types: gex, vdj, ab, beam, crispr, cmo
 
-            [ parsed_meta.id , parsed_meta ]
-        }
-        .groupTuple( by: 0 )
-        .map{ sample_id, map_collection ->
-            // Now we must check if every data possibility taken into account in the .branch() operation
-            // performed inside the CELLRANGER_MULTI_ALIGN subworkflow are initialized, even with empty files
-            // This to ensure that the sizes of each data channel is the same, and the the order and the data types
-            // are used together with its rightful pairs
-            //
-            // data.types: gex, vdj, ab, beam, crispr, cmo
+                // clone ArrayBag (received from .groupTuple()) to avoid mutating the input
+                def map_collection_clone = []
+                map_collection_clone.addAll(map_collection)
 
-            // clone ArrayBag (received from .groupTuple()) to avoid mutating the input
-            def map_collection_clone = []
-            map_collection_clone.addAll(map_collection)
+                // generate the expected EMPTY tuple when a data type is not used
+                // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,
+                // allowing to have multiple samples in the sheet, having all the data-type tuples initialized,
+                // either empty or populated. It will be branched inside the subworkflow.
+                if (!map_collection_clone.any { it -> it.feature_type == 'gex' }) {
+                    map_collection_clone.add([id: sample_id, feature_type: 'gex', gex: empty_file, options: [:]])
+                }
+                if (!map_collection_clone.any { it -> it.feature_type == 'vdj' }) {
+                    map_collection_clone.add([id: sample_id, feature_type: 'vdj', vdj: empty_file, options: [:]])
+                }
+                if (!map_collection_clone.any { it -> it.feature_type == 'ab' }) {
+                    map_collection_clone.add([id: sample_id, feature_type: 'ab', ab: empty_file, options: [:]])
+                }
+                if (!map_collection_clone.any { it -> it.feature_type == 'beam' }) {
+                    map_collection_clone.add([id: sample_id, feature_type: 'beam', beam: empty_file, options: [:]])
+                }
+                // currently not implemented, the input samplesheet checking will not allow it.
+                if (!map_collection_clone.any { it -> it.feature_type == 'crispr' }) {
+                    map_collection_clone.add([id: sample_id, feature_type: 'crispr', crispr: empty_file, options: [:]])
+                }
+                if (!map_collection_clone.any { it -> it.feature_type == 'cmo' }) {
+                    map_collection_clone.add([id: sample_id, feature_type: 'cmo', cmo: empty_file, options: [:]])
+                }
 
-            // generate the expected EMPTY tuple when a data type is not used
-            // needs to have a collected map like that, so every sample from the samplesheet is analysed one at a time,
-            // allowing to have multiple samples in the sheet, having all the data-type tuples initialized,
-            // either empty or populated. It will be branched inside the subworkflow.
-            if (!map_collection_clone.any{ it.feature_type == 'gex' })    { map_collection_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
-            if (!map_collection_clone.any{ it.feature_type == 'vdj' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
-            if (!map_collection_clone.any{ it.feature_type == 'ab' })     { map_collection_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
-            if (!map_collection_clone.any{ it.feature_type == 'beam' })   { map_collection_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
-            if (!map_collection_clone.any{ it.feature_type == 'crispr' }) { map_collection_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }
-            if (!map_collection_clone.any{ it.feature_type == 'cmo' })    { map_collection_clone.add( [id: sample_id, feature_type: 'cmo'   , cmo:    empty_file, options:[:] ] ) }
-
-            // return final map
-            map_collection_clone
-        }
-        .set{ ch_cellrangermulti_collected_channel }
+                // return final map
+                map_collection_clone
+            }
+            .set { ch_cellrangermulti_collected_channel }
 
         // Run cellranger multi
         CELLRANGER_MULTI_ALIGN(
             ch_genome_fasta,
             ch_filter_gtf,
             ch_cellrangermulti_collected_channel,
-            //ch_transformed_fragments_index_channel,
             ch_cellranger_index,
             cellranger_vdj_index,
-            ch_multi_samplesheet
+            ch_multi_samplesheet,
         )
         ch_versions = ch_versions.mix(CELLRANGER_MULTI_ALIGN.out.ch_versions)
-        ch_multiqc_files = ch_multiqc_files.mix( CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out.map{
-            meta, outs -> outs.findAll{ it -> it.name == "web_summary.html" }
-        })
-        ch_mtx_matrices = ch_mtx_matrices.mix( CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx_raw, CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx_filtered )
-
+        ch_multiqc_files = ch_multiqc_files.mix(
+            CELLRANGER_MULTI_ALIGN.out.cellrangermulti_out.map { _meta, outs ->
+                outs.findAll { it -> it.name == "web_summary.html" }
+            }
+        )
+        ch_mtx_matrices = ch_mtx_matrices.mix(CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx_raw, CELLRANGER_MULTI_ALIGN.out.cellrangermulti_mtx_filtered)
     }
 
-    ch_count_matrix = Channel.empty()
-    if ( params.counts ) {
-        ch_count_matrix = Channel
-        .fromPath(params.counts, checkIfExists: true)
-        .splitCsv(header: true)
-        .map { row ->
-            def meta = [
-                id         : row.sample,
-                input_type : row.input_type
-            ]
-            def matrix_file = file(row.h5)
-            tuple(meta, matrix_file)
-        }
-    } else {
+    ch_count_matrix = channel.empty()
+    if (params.counts) {
+        ch_count_matrix = channel.fromPath(params.counts, checkIfExists: true)
+            .splitCsv(header: true)
+            .map { row ->
+                def meta = [
+                    id: row.sample,
+                    input_type: row.input_type,
+                ]
+                def matrix_file = file(row.h5)
+                tuple(meta, matrix_file)
+            }
+    }
+    else {
         ch_count_matrix = ch_mtx_matrices
     }
 
@@ -400,11 +420,11 @@ workflow SCRNASEQ {
     //
     // MODULE: Convert mtx matrices to h5ad
     //
-    MTX_TO_H5AD (
+    MTX_TO_H5AD(
         ch_count_matrix,
         ch_txp2gene,
-        star_index ? ch_star_index.map{it[1]} : [],
-        params.aligner
+        star_index ? ch_star_index.map { it -> it[1] } : [],
+        params.aligner,
     )
     ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
     ch_h5ads = MTX_TO_H5AD.out.h5ad
@@ -413,12 +433,10 @@ workflow SCRNASEQ {
     //
     // SUBWORKFLOW: Run cellbender remove background subworkflow
     //
-    if ( !params.skip_cellbender && !(params.aligner in ['cellrangerarc']) ) {
+    if (!params.skip_cellbender && !(params.aligner in ['cellrangerarc'])) {
         // module should only run on the raw matrices thus, filter-out the filtered result of the aligners that can produce it
-        H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA (
-            ch_h5ads
-                .filter { meta, mtx_files -> meta.input_type == 'raw' }
-                .map { meta, mtx_files -> [ meta + [input_type: 'cellbender_filter'], mtx_files ]} // to avoid name collision
+        H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA(
+            ch_h5ads.filter { meta, _mtx_files -> meta.input_type == 'raw' }.map { meta, mtx_files -> [meta + [input_type: 'cellbender_filter'], mtx_files] }
         )
         ch_h5ads = ch_h5ads.mix(
             H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA.out.h5ad
@@ -428,9 +446,9 @@ workflow SCRNASEQ {
     //
     // SUBWORKFLOW: Concat samples and convert h5ad to other formats
     //
-    H5AD_CONVERSION (
+    H5AD_CONVERSION(
         ch_h5ads,
-        ch_input ?: ch_counts
+        ch_input ?: ch_counts,
     )
     ch_versions = ch_versions.mix(H5AD_CONVERSION.out.ch_versions)
 
@@ -439,66 +457,63 @@ workflow SCRNASEQ {
     //
 
     if (params.aligner == "cellrangermulti") {
-        CONCATENATE_VDJ (
+        CONCATENATE_VDJ(
             CELLRANGER_MULTI_ALIGN.out.vdj
         )
         ch_versions = ch_versions.mix(CONCATENATE_VDJ.out.versions)
 
 
-    //
-    // SUBWORKFLOW: Concat GEX, VDJ and CITE data and save as MuData object
-    //
+        //
+        // SUBWORKFLOW: Concat GEX, VDJ and CITE data and save as MuData object
+        //
         ch_vdj = CONCATENATE_VDJ.out.h5ad
             .map { meta, file -> [meta, file] }
             .ifEmpty { [[id: 'dummy'], []] }
-    } else {
+    }
+    else {
         ch_vdj = [[id: 'dummy'], []]
     }
 
     //TODO: modify this part beacuse only one input is present
     if (params.demultiplexing_doublets) {
-    ch_metadata_demuxafy = Channel.fromPath(params.demultiplexing_doublets, checkIfExists: true)
-        .splitCsv(header: true, sep: '\t')
-        .map { row ->
-            def meta = [ id: row.sample ]
-            def metadata_file = file(row.path)
-            tuple(meta, metadata_file)
-        }
-    } else {
-        ch_metadata_demuxafy = Channel.value([ [id: 'dummy'], [] ])
+        ch_metadata_demuxafy = channel.fromPath(params.demultiplexing_doublets, checkIfExists: true)
+            .splitCsv(header: true, sep: '\t')
+            .map { row ->
+                def meta = [id: row.sample]
+                def metadata_file = file(row.path)
+                tuple(meta, metadata_file)
+            }
+    }
+    else {
+        ch_metadata_demuxafy = channel.value([[id: 'dummy'], []])
     }
 
-    ch_metadata = params.metadata ? Channel.value(params.metadata) : Channel.value(file('dummy_metadata.csv'))
+    ch_metadata = params.metadata ? channel.value(params.metadata) : channel.value(file('dummy_metadata.csv'))
 
 
-    if (params.aligner == "cellrangermulti" || params.aligner == "cellrangerarc" || params.aligner == "cellranger" ) {
-        def ch_h5ad_selected = params.counts ?
-            H5AD_CONVERSION.out.h5ad_cellbender :
-            (
-                params.h5ad_matrix ?
-                    Channel
-                        .fromPath(params.h5ad_matrix,checkIfExists: true)
-                        .splitCsv(header: true)
-                        .map { row ->
-                            def meta = [
-                                id         : row.sample,
-                                input_type : row.input_type
-                        ]
-                        def h5ad_file = file(row.h5ad)
-                        tuple(meta, h5ad_file)
-                    }
-                :
-                    H5AD_CONVERSION.out.h5ad_filtered
-            )
+    if (params.aligner == "cellrangermulti" || params.aligner == "cellrangerarc" || params.aligner == "cellranger") {
+        def ch_h5ad_selected = params.counts
+            ? H5AD_CONVERSION.out.h5ad_cellbender
+            : (params.h5ad_matrix
+                ? channel.fromPath(params.h5ad_matrix, checkIfExists: true).splitCsv(header: true).map { row ->
+                    def meta = [
+                        id: row.sample,
+                        input_type: row.input_type,
+                    ]
+                    def h5ad_file = file(row.h5ad)
+                    tuple(meta, h5ad_file)
+                }
+                : H5AD_CONVERSION.out.h5ad_filtered)
         CONVERT_MUDATA(
             ch_h5ad_selected,
             ch_vdj,
             ch_metadata_demuxafy,
-            ch_metadata
+            ch_metadata,
         )
         ch_versions = ch_versions.mix(CONVERT_MUDATA.out.versions)
         ch_mudata = CONVERT_MUDATA.out.h5mu
-    } else {
+    }
+    else {
         ch_mudata = channel.empty()
     }
 
@@ -507,8 +522,8 @@ workflow SCRNASEQ {
     //
     // Da togliere questa cosa ch_rds_selected, se counts, canale vuoto tanto non faro' la parte dei doppietti
     def ch_rds_selected = params.counts ? H5AD_CONVERSION.out.rds_cellbender : H5AD_CONVERSION.out.rds_concat
-    if ( !params.skip_qcfilters ) {
-        DOUBLETS_QUALITYFILTERING (
+    if (!params.skip_qcfilters) {
+        DOUBLETS_QUALITYFILTERING(
             ch_rds_selected,
             CONVERT_MUDATA.out.h5mu,
             params.mt_threshold,
@@ -518,33 +533,34 @@ workflow SCRNASEQ {
             params.max_genes_gex,
             params.min_cells_gex,
             params.min_features_adt,
-            params.min_counts_adt
+            params.min_counts_adt,
         )
         ch_versions = ch_versions.mix(DOUBLETS_QUALITYFILTERING.out.ch_versions)
         ch_h5mu_filtered = DOUBLETS_QUALITYFILTERING.out.h5mu
-    } else {
+    }
+    else {
         ch_h5mu_filtered = CONVERT_MUDATA.out.h5mu
     }
 
     //
     // SUBWORKFLOW: Run normalization on the concatenated h5ad files
     //
-    ch_cellcycle_file = params.cell_cycle_file ?
-        file(params.cell_cycle_file, checkIfExists: true) :
-        channel.empty()
+    ch_cellcycle_file = params.cell_cycle_file
+        ? file(params.cell_cycle_file, checkIfExists: true)
+        : channel.empty()
 
     // Make raw h5ad optional for reclustering workflows
-    ch_h5ad_raw = params.h5ad_matrix ?
-        Channel.fromPath("${projectDir}/assets/EMPTY").map { [[:], it] } :
-        H5AD_CONVERSION.out.h5ad_raw
+    ch_h5ad_raw = params.h5ad_matrix
+        ? channel.fromPath("${projectDir}/assets/EMPTY").map { it -> [[:], it] }
+        : H5AD_CONVERSION.out.h5ad_raw
 
-    NORMALIZATION_AND_HVG (
+    NORMALIZATION_AND_HVG(
         ch_h5mu_filtered,
         ch_h5ad_raw,
         ch_cellcycle_file,
         params.n_pcs,
         params.n_neighbors,
-        params.min_dist
+        params.min_dist,
     )
     ch_versions = ch_versions.mix(NORMALIZATION_AND_HVG.out.ch_versions)
 
@@ -553,15 +569,16 @@ workflow SCRNASEQ {
     //
     ch_input_model = params.input_model ? file(params.input_model, checkIfExists: true) : channel.empty()
 
-    if ( params.input_model ) {
-        CELL_ANNOTATION (
+    if (params.input_model) {
+        CELL_ANNOTATION(
             NORMALIZATION_AND_HVG.out.h5mu,
-            ch_input_model
+            ch_input_model,
         )
         ch_versions = ch_versions.mix(CELL_ANNOTATION.out.versions)
         ch_mu5ad = CELL_ANNOTATION.out.h5mu
         cell_annotation_meta_ch = CELL_ANNOTATION.out.metadata
-    } else {
+    }
+    else {
         ch_mu5ad = NORMALIZATION_AND_HVG.out.h5mu
         cell_annotation_meta_ch = channel.empty()
     }
@@ -569,14 +586,14 @@ workflow SCRNASEQ {
     //
     // SUBWORKFLOW: Run ATAC preprocessing
     //
-    atac_out_h5ad = Channel.empty()
+    atac_out_h5ad = channel.empty()
 
     if (params.aligner == "cellrangerarc") {
-        blacklist_path = params.blacklist_path ? \
-                         channel.value(file(params.blacklist_path, checkIfExists: true)) : \
-                         channel.empty()
+        blacklist_path = params.blacklist_path
+            ? channel.value(file(params.blacklist_path, checkIfExists: true))
+            : channel.empty()
 
-        ATAC_PREPROCESSING (
+        ATAC_PREPROCESSING(
             ch_transformed_fragments_channel,
             ch_transformed_fragments_index_channel,
             params.tss_threshold,
@@ -589,7 +606,7 @@ workflow SCRNASEQ {
             params.n_neighbors_atac,
             params.n_clusters_atac,
             blacklist_path,
-            cell_annotation_meta_ch
+            cell_annotation_meta_ch,
         )
         atac_out_h5ad = ATAC_PREPROCESSING.out.h5ad
         ch_versions = ch_versions.mix(ATAC_PREPROCESSING.out.ch_versions)
@@ -599,51 +616,51 @@ workflow SCRNASEQ {
     // SUBWORKFLOW: Run integration for GEX and ADT indipendently and jointly
     //
 
-    INTEGRATION_MODALITIES (
+    INTEGRATION_MODALITIES(
         ch_mu5ad,
         atac_out_h5ad,
         params.n_neighbors_harmony,
         params.min_dist_harmony,
-        params.integration_var
+        params.integration_var,
     )
     ch_versions = ch_versions.mix(INTEGRATION_MODALITIES.out.ch_versions)
 
     //
     // MODULES: Run clustering for GEX
     //
-    CLUSTERING (
+    CLUSTERING(
         INTEGRATION_MODALITIES.out.h5mu_out,
         params.resolution_min,
         params.resolution_max,
-        params.top_n_markers
+        params.top_n_markers,
     )
     ch_versions = ch_versions.mix(CLUSTERING.out.versions)
 
     //
     // MODULES: Plot clustree graph
     //
-    CLUSTREE (
+    CLUSTREE(
         CLUSTERING.out.metadata_final
     )
     ch_versions = ch_versions.mix(CLUSTREE.out.versions)
 
     // Handling multiple resolutions
-    if ( params.resolution ) {
-        resolution_ch = Channel.fromList(params.resolution.toString().split(',').flatten())
+    if (params.resolution) {
+        resolution_ch = channel.fromList(params.resolution.toString().split(',').flatten())
 
         //
         // MODULES: Enrichment on marker genes for a selected resolution
         //
-        if ( params.enrich_collection ){
-            ch_enrich_collection = Channel.fromList(params.enrich_collection.split(',').flatten())
+        if (params.enrich_collection) {
+            ch_enrich_collection = channel.fromList(params.enrich_collection.split(',').flatten())
             resolution_ch
-                .combine( ch_enrich_collection )
-                .map{ res, coll -> [["res": res, "coll": coll], res, coll] }
+                .combine(ch_enrich_collection)
+                .map { res, coll -> [["res": res, "coll": coll], res, coll] }
                 .set { ch_res_enrich }
 
-            ENRICH_MARKERS (
+            ENRICH_MARKERS(
                 CLUSTERING.out.ranked_genes.collect(),
-                ch_res_enrich
+                ch_res_enrich,
             )
             ch_versions = ch_versions.mix(ENRICH_MARKERS.out.versions)
         }
@@ -652,24 +669,25 @@ workflow SCRNASEQ {
     //
     // MODULES: Plot custom genelist
     //
-    if ( params.custom_geneset ) {
-        ch_custom_geneset = Channel.fromList(params.custom_geneset.split(',').flatten())
+    if (params.custom_geneset) {
+        ch_custom_geneset = channel.fromList(params.custom_geneset.split(',').flatten())
 
-        if ( params.resolution ) {
+        if (params.resolution) {
             resolution_ch
-                .combine( ch_custom_geneset )
-                .map{ res, genes -> [["res": res, "genes": genes], res, genes] }
+                .combine(ch_custom_geneset)
+                .map { res, genes -> [["res": res, "genes": genes], res, genes] }
                 .set { ch_res_geneset }
-        } else {
+        }
+        else {
             // if no resolution is provided, use 100 as fake resolution
             fake_res = 100
             ch_res_geneset = ch_custom_geneset.map { genes ->
                 [["res": fake_res, "genes": genes], fake_res, genes]
             }
         }
-        CUSTOM_GENES (
+        CUSTOM_GENES(
             CLUSTERING.out.h5mu.collect(),
-            ch_res_geneset
+            ch_res_geneset,
         )
         ch_versions = ch_versions.mix(CUSTOM_GENES.out.versions)
     }
@@ -686,22 +704,19 @@ workflow SCRNASEQ {
 
     if (params.resolution) {
 
-        resolution_ch = Channel.fromList(params.resolution.toString().split(',').flatten())
+        resolution_ch = channel.fromList(params.resolution.toString().split(',').flatten())
 
         DIFFERENTIAL_ABUNDANCE(
-            CLUSTERING.out.h5mu
-                .combine(ch_diff_abundance_comparisons)
-                .combine(resolution_ch)
+            CLUSTERING.out.h5mu.combine(ch_diff_abundance_comparisons).combine(resolution_ch)
         )
         if (DIFFERENTIAL_ABUNDANCE.out.versions) {
             ch_versions = ch_versions.mix(DIFFERENTIAL_ABUNDANCE.out.versions)
         }
-
     }
 
-    if ( params.resolution ) {
+    if (params.resolution) {
 
-        ch_resolution = Channel.fromList(params.resolution.toString().split(',').flatten())
+        ch_resolution = channel.fromList(params.resolution.toString().split(',').flatten())
 
         PSEUDOBULK_ANALYSIS(
             CLUSTERING.out.h5mu,
@@ -709,7 +724,7 @@ workflow SCRNASEQ {
             ch_pseudobulk_group,
             ch_pseudobulk_comparisons,
             ch_pseudobulk_formula,
-            ch_pseudobulk_fdr
+            ch_pseudobulk_fdr,
         )
         if (PSEUDOBULK_ANALYSIS.out.versions) {
             ch_versions = ch_versions.mix(PSEUDOBULK_ANALYSIS.out.versions)
@@ -717,9 +732,9 @@ workflow SCRNASEQ {
     }
 
     // Cell to cell interaction
-    if ( params.resolution ) {
+    if (params.resolution) {
 
-        ch_resolution = Channel.fromList(params.resolution.toString().split(',').flatten())
+        ch_resolution = channel.fromList(params.resolution.toString().split(',').flatten())
 
         CLUSTERING.out.h5mu
             .combine(ch_liana_method)
@@ -734,7 +749,6 @@ workflow SCRNASEQ {
         if (CELL_INTERACTION.out.versions) {
             ch_versions = ch_versions.mix(CELL_INTERACTION.out.versions)
         }
-
     }
 
 
@@ -750,9 +764,9 @@ workflow SCRNASEQ {
 
     def topic_versions_string = topic_versions.versions_tuple
         .map { process, tool, version ->
-            [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
+            [process[process.lastIndexOf(':') + 1..-1], "  ${tool}: ${version}"]
         }
-        .groupTuple(by:0)
+        .groupTuple(by: 0)
         .map { process, tool_versions ->
             tool_versions.unique().sort()
             "${process}:\n${tool_versions.join('\n')}"
@@ -762,58 +776,65 @@ workflow SCRNASEQ {
         .mix(topic_versions_string)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
-            name:  'scrnaseq_software_'  + 'mqc_'  + 'versions.yml',
+            name: 'scrnaseq_software_' + 'mqc_' + 'versions.yml',
             sort: true,
-            newLine: true
-        ).set { ch_collated_versions }
+            newLine: true,
+        )
+        .set { ch_collated_versions }
 
     if (!params.skip_multiqc) {
         //
         // MODULE: MultiQC
         //
-        ch_multiqc_config        = channel.fromPath(
-            "$projectDir/assets/multiqc_config.yml", checkIfExists: true)
-        ch_multiqc_custom_config = params.multiqc_config ?
-            channel.fromPath(params.multiqc_config, checkIfExists: true) :
-            channel.empty()
-        ch_multiqc_logo          = params.multiqc_logo ?
-            channel.fromPath(params.multiqc_logo, checkIfExists: true) :
-            channel.empty()
+        ch_multiqc_config = channel.fromPath(
+            "${projectDir}/assets/multiqc_config.yml",
+            checkIfExists: true
+        )
+        ch_multiqc_custom_config = params.multiqc_config
+            ? channel.fromPath(params.multiqc_config, checkIfExists: true)
+            : channel.empty()
+        ch_multiqc_logo = params.multiqc_logo
+            ? channel.fromPath(params.multiqc_logo, checkIfExists: true)
+            : channel.empty()
 
-        summary_params      = paramsSummaryMap(
-            workflow, parameters_schema: "nextflow_schema.json")
+        summary_params = paramsSummaryMap(
+            workflow,
+            parameters_schema: "nextflow_schema.json"
+        )
         ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
         ch_multiqc_files = ch_multiqc_files.mix(
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
-            file(params.multiqc_methods_description, checkIfExists: true) :
-            file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
-        ch_methods_description                = channel.value(
-            methodsDescriptionText(ch_multiqc_custom_methods_description))
+            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
+        )
+        ch_multiqc_custom_methods_description = params.multiqc_methods_description
+            ? file(params.multiqc_methods_description, checkIfExists: true)
+            : file("${projectDir}/assets/methods_description_template.yml", checkIfExists: true)
+        ch_methods_description = channel.value(
+            methodsDescriptionText(ch_multiqc_custom_methods_description)
+        )
 
         ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
         ch_multiqc_files = ch_multiqc_files.mix(
             ch_methods_description.collectFile(
                 name: 'methods_description_mqc.yaml',
-                sort: true
+                sort: true,
             )
         )
 
-        MULTIQC (
+        MULTIQC(
             ch_multiqc_files.collect(),
             ch_multiqc_config.toList(),
             ch_multiqc_custom_config.toList(),
             ch_multiqc_logo.toList(),
             [],
-            []
+            [],
         )
         ch_multiqc_report = MULTIQC.out.report
-    } else {
+    }
+    else {
         ch_multiqc_report = channel.empty()
     }
 
     emit:
-    multiqc_report = ch_multiqc_report           // channel: /path/to/multiqc_report.html
-    versions       = ch_versions                 // channel: [ path(versions.yml) ]
-
+    multiqc_report = ch_multiqc_report // channel: /path/to/multiqc_report.html
+    versions = ch_versions // channel: [ path(versions.yml) ]
 }

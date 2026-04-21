@@ -15,14 +15,9 @@
 
 // Params cannot be changed if they have been set beforehand
 // Thus, manually provided files are not overwritten by the genome attributes
-params.fasta            = getGenomeAttribute('fasta')
-params.gtf              = getGenomeAttribute('gtf')
-params.star_index       = getGenomeAttribute('star')
-if (params.aligner == "cellrangerarc") {
-   params.cellranger_index = getGenomeAttribute('cellranger_atac')
-} else {
-   params.cellranger_index = getGenomeAttribute('cellranger')
-}
+params.fasta = getGenomeAttribute('fasta')
+params.gtf = getGenomeAttribute('gtf')
+params.star_index = getGenomeAttribute('star')
 params.cellranger_vdj_index = getGenomeAttribute('cellranger_vdj')
 
 
@@ -32,9 +27,9 @@ params.cellranger_vdj_index = getGenomeAttribute('cellranger_vdj')
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { SCRNASEQ                } from './workflows/scrnaseq'
+include { SCRNASEQ } from './workflows/scrnaseq'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { PIPELINE_COMPLETION } from './subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,22 +41,24 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrn
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
 workflow NFDATAOMICS_SCRNASEQ {
-
     take:
     samplesheet // channel: samplesheet read in from --input
-    counts      // channel: count matrix file read as --counts
+    counts // channel: count matrix file read as --counts
     h5ad_matrix // channel: h5ad matrix file read as --h5ad_matrix
 
     main:
 
+    initializeParameters()
+
     //
     // WORKFLOW: Run pipeline
     //
-    SCRNASEQ (
+    SCRNASEQ(
         samplesheet,
         counts,
-        h5ad_matrix
+        h5ad_matrix,
     )
+
     emit:
     multiqc_report = SCRNASEQ.out.multiqc_report // channel: /path/to/multiqc_report.html
 }
@@ -72,12 +69,10 @@ workflow NFDATAOMICS_SCRNASEQ {
 */
 
 workflow {
-
-    main:
     //
     // SUBWORKFLOW: Run initialisation tasks
     //
-    PIPELINE_INITIALISATION (
+    PIPELINE_INITIALISATION(
         params.version,
         params.validate_params,
         params.monochrome_logs,
@@ -88,29 +83,40 @@ workflow {
         params.h5ad_matrix,
         params.help,
         params.help_full,
-        params.show_hidden
+        params.show_hidden,
     )
 
     //
     // WORKFLOW: Run main workflow
     //
-    NFDATAOMICS_SCRNASEQ (
+    NFDATAOMICS_SCRNASEQ(
         PIPELINE_INITIALISATION.out.samplesheet,
         PIPELINE_INITIALISATION.out.counts,
-        PIPELINE_INITIALISATION.out.h5ad_matrix
+        PIPELINE_INITIALISATION.out.h5ad_matrix,
     )
     //
     // SUBWORKFLOW: Run completion tasks
     //
-    PIPELINE_COMPLETION (
+    PIPELINE_COMPLETION(
         params.email,
         params.email_on_fail,
         params.plaintext_email,
         params.outdir,
         params.monochrome_logs,
         params.hook_url,
-        NFDATAOMICS_SCRNASEQ.out.multiqc_report
+        NFDATAOMICS_SCRNASEQ.out.multiqc_report,
     )
+}
+//
+// Initialize parameters that depend on other parameters or require some logic
+//
+def initializeParameters() {
+    if (params.aligner == "cellrangerarc") {
+        params.cellranger_index = getGenomeAttribute('cellranger_atac')
+    }
+    else {
+        params.cellranger_index = getGenomeAttribute('cellranger')
+    }
 }
 
 //
@@ -118,18 +124,14 @@ workflow {
 //
 def getGenomeAttribute(attribute) {
     if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
-        if (params.genomes[ params.genome ].containsKey(attribute)) {
-            return params.genomes[ params.genome ][ attribute ]
-        } else {
+        if (params.genomes[params.genome].containsKey(attribute)) {
+            return params.genomes[params.genome][attribute]
+        }
+        else {
             return null
         }
-    } else {
+    }
+    else {
         return null
     }
 }
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    THE END
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/

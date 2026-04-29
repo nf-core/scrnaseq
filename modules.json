@@ -37,8 +37,9 @@
                     },
                     "cellranger/multi": {
                         "branch": "master",
-                        "git_sha": "21e4662ae927fdbc5fc04eec9bde38b0689d4954",
-                        "installed_by": ["modules"]
+                        "git_sha": "80db11d5d10e7319937c674afabc563bb14e3d93",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/cellranger/multi/cellranger-multi.diff"
                     },
                     "cellrangerarc/count": {
                         "branch": "master",

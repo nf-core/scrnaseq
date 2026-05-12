@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Fixes
 
+- Pass `--gex_barcode_sample_assignment` into `cellranger/multi` as the `cmo_barcode_assignment` input (previously omitted) ([#543](https://github.com/nf-core/scrnaseq/pull/543))
 - Fix `modules.config` structure to make sure all ways of providing the `aligner` param work ([514](https://github.com/nf-core/scrnaseq/pull/514))
 - Fix [515](https://github.com/nf-core/scrnaseq/issues/515), failure when running singleplex flex data by updating cellranger multi module ([517](https://github.com/nf-core/scrnaseq/pull/517))
 - Fix [522](https://github.com/nf-core/scrnaseq/issues/522), protocol not being passed correctly when running cellranger multi ([524](https://github.com/nf-core/scrnaseq/pull/524))

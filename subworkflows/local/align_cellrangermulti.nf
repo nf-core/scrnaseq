@@ -214,7 +214,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             ch_beam_control_panel_csv,
             ch_gex_cmo_set,
             ch_cmo_barcode_csv,
-            [],
+            ch_gex_barcodes,
             ch_frna_sample_csv,
             ch_ocm_barcode_csv,
             params.skip_cellranger_renaming

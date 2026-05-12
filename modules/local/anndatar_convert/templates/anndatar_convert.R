@@ -11,14 +11,14 @@ library(SingleCellExperiment)
 adata <- read_h5ad("${h5ad}")
 
 # convert to Seurat
-obj <- adata\$to_Seurat()
+obj <- adata\$as_Seurat()
 
 # save files
 dir.create(file.path("$meta.id"), showWarnings = FALSE)
 saveRDS(obj, file = "${meta.id}_${meta.input_type}_matrix.seurat.rds")
 
 # convert to SingleCellExperiment
-obj <- adata\$to_SingleCellExperiment()
+obj <- adata\$as_SingleCellExperiment()
 
 # save files
 dir.create(file.path("$meta.id"), showWarnings = FALSE)

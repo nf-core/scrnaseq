@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Template update for nf-core/tools v3.5.1 ([#509](https://github.com/nf-core/scrnaseq/pull/509))
 - Template update for nf-core/tools v4.0.2 ([#541](https://github.com/nf-core/scrnaseq/pull/541))
+- Switch `ANNDATAR_CONVERT` to the official Bioconductor **anndataR** package on Bioconda and retire the custom `docker.io/nfcore/anndatar` image. ([#472](https://github.com/nf-core/scrnaseq/pull/472))
 
 ## Fixes
 

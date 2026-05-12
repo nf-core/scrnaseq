@@ -8,7 +8,10 @@ process ANNDATAR_CONVERT {
 
     label 'process_medium'
 
-    container "docker.io/nfcore/anndatar:20241129"
+    conda "${moduleDir}/environment.yml"
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/d8/d8036a262b63ab783572e3cb3120b6b138593e19d93a1059b9bfef80785c7218/data' :
+        'community.wave.seqera.io/library/bioconductor-anndatar_bioconductor-rhdf5_bioconductor-singlecellexperiment_r-seurat:a0f51df063bb9b2a' }"
 
     input:
     tuple val(meta), path(h5ad)

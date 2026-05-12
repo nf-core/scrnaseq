@@ -172,14 +172,14 @@
                 "multiqc_fastqc.txt:md5,12027880857508ce5cedc3904a351730",
                 "multiqc_general_stats.txt:md5,dac8af62b04fd0880801f5d5c503c472",
                 "Sample_X_raw_matrix.h5ad:md5,5fa3cc13dba1ff454f1e88b3961eb9d8",
-                "Sample_X_raw_matrix.sce.rds:md5,e312cb0e713ba1596ac5b3581697d602",
-                "Sample_X_raw_matrix.seurat.rds:md5,1d5489c595afdc3a4ae3ae0625f00e76",
+                "Sample_X_raw_matrix.sce.rds:md5,4aa189a56dfe0aa00e80a059eb81732e",
+                "Sample_X_raw_matrix.seurat.rds:md5,79126b29af3c6c8ff667b6c820ce3469",
                 "Sample_Y_raw_matrix.h5ad:md5,264c714234c81825d6714965f0d9c2a8",
-                "Sample_Y_raw_matrix.sce.rds:md5,4d3e49d703f1b2a4854f76b9b3b74d5e",
-                "Sample_Y_raw_matrix.seurat.rds:md5,cc019c1e315bfd8078681add4880e3b2"
+                "Sample_Y_raw_matrix.sce.rds:md5,f552f4f7c29081ce1ccd47103659f9f0",
+                "Sample_Y_raw_matrix.seurat.rds:md5,67ce29c647359ca4de0d99e618908196"
             ]
         ],
-        "timestamp": "2026-05-12T14:40:23.424206826",
+        "timestamp": "2026-05-12T17:14:40.055073206",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "26.04.0"

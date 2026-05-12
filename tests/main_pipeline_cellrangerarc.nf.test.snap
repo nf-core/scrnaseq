@@ -258,11 +258,11 @@
                 "transcriptInfo.tab:md5,5a6ee447f3efac16042d8c99f653747b",
                 "config:md5,cf23c7cd0f548d751aae94a7ae5ca3f3",
                 "10k_PBMC_filtered_matrix.h5ad:md5,60b9311d46f756cd2b9fb737628713b3",
-                "10k_PBMC_filtered_matrix.sce.rds:md5,359160d80821c5dbf1ebc7a88dbe8400",
-                "10k_PBMC_filtered_matrix.seurat.rds:md5,ca44f68f2ea255bfd556c71a6b91423e",
+                "10k_PBMC_filtered_matrix.sce.rds:md5,8409899c40573213cc0cb3da48dfd99c",
+                "10k_PBMC_filtered_matrix.seurat.rds:md5,a2f61027f631ca0fe62167ad37cf0bfe",
                 "10k_PBMC_raw_matrix.h5ad:md5,4ac50d4109bcccd1d82ed83fc00d7580",
-                "10k_PBMC_raw_matrix.sce.rds:md5,196adfcb230f9ba9bb7d0aba36e7e261",
-                "10k_PBMC_raw_matrix.seurat.rds:md5,8ff4d68d88a6a7e3528147e06aeaa4dd",
+                "10k_PBMC_raw_matrix.sce.rds:md5,862283b4babd1aa9b1ab9c364528639e",
+                "10k_PBMC_raw_matrix.seurat.rds:md5,8aff06e0add005677e484864db5774b9",
                 "fastqc-status-check-heatmap.txt:md5,55b658eef7b63c6f8e3d559be41f5df8",
                 "fastqc_adapter_content_plot.txt:md5,31ca16758049ac46cc84875ddc4ff6d3",
                 "fastqc_overrepresented_sequences_plot.txt:md5,314754adfcfa2977ee4f61c2ec5444f2",
@@ -278,7 +278,7 @@
                 "multiqc_general_stats.txt:md5,fd84f94100989affc666904a2f34c40c"
             ]
         ],
-        "timestamp": "2026-05-12T07:30:40.541197512",
+        "timestamp": "2026-05-12T17:22:39.296468162",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "26.04.0"

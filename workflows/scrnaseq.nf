@@ -47,12 +47,18 @@ workflow SCRNASEQ {
     qcatch_config = params.aligner == "simpleaf" ? Utils.getProtocol(workflow, log, "qcatch", params.protocol) : [:]
     qcatch_chemistry = qcatch_config.containsKey('protocol') ? qcatch_config['protocol'] : null
 
+    genome_txp2gene = getGenomeAttribute('txp2gene')
+    genome_kallisto_index = getGenomeAttribute('kallisto')
+    genome_simpleaf_index = getGenomeAttribute('simpleaf')
+    genome_cellranger_index = params.aligner in ["cellranger", "cellrangermulti"] ? getGenomeAttribute('cellranger') : null
+    genome_cellranger_index = params.aligner == "cellrangerarc" ? getGenomeAttribute('cellrangerarc') : genome_cellranger_index
+
     // general input and params
     ch_genome_fasta         = params.fasta                ? file(params.fasta, checkIfExists: true)    : []
     ch_gtf                  = params.gtf                  ? file(params.gtf, checkIfExists: true)      : []
     ch_transcript_fasta     = params.transcript_fasta     ? file(params.transcript_fasta)              : []
     ch_motifs               = params.motifs               ? file(params.motifs)                        : []
-    ch_txp2gene             = params.txp2gene             ? file(params.txp2gene, checkIfExists: true) : []
+    ch_txp2gene             = params.txp2gene             ? file(params.txp2gene, checkIfExists: true) : genome_txp2gene ? file(genome_txp2gene, checkIfExists: true) : []
 
     if (params.barcode_whitelist) {
         ch_barcode_whitelist = file(params.barcode_whitelist, checkIfExists: true)
@@ -67,19 +73,19 @@ workflow SCRNASEQ {
     ch_input = file(params.input)
 
     //kallisto params
-    ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index, checkIfExists: true) : []
+    ch_kallisto_index = params.kallisto_index ? file(params.kallisto_index, checkIfExists: true) : genome_kallisto_index ? file(genome_kallisto_index, checkIfExists: true) : []
     kb_t1c            = params.kb_t1c         ? file(params.kb_t1c, checkIfExists: true) : []
     kb_t2c            = params.kb_t2c         ? file(params.kb_t2c, checkIfExists: true) : []
 
     //simpleaf params
-    ch_simpleaf_index   = params.simpleaf_index ? file(params.simpleaf_index, checkIfExists: true) : []
+    ch_simpleaf_index   = params.simpleaf_index ? file(params.simpleaf_index, checkIfExists: true) : genome_simpleaf_index ? file(genome_simpleaf_index, checkIfExists: true) : []
 
     //star params
     star_index        = params.star_index ? file(params.star_index, checkIfExists: true) : null
     ch_star_index     = star_index ? channel.value( [[id: star_index.baseName], star_index] ) : []
 
     //cellranger params
-    ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index, checkIfExists: true) : []
+    ch_cellranger_index = params.cellranger_index ? file(params.cellranger_index, checkIfExists: true) : genome_cellranger_index ? file(genome_cellranger_index, checkIfExists: true) : []
 
     //cellrangermulti params
     cellranger_vdj_index = params.cellranger_vdj_index      ? file(params.cellranger_vdj_index, checkIfExists: true)      : []

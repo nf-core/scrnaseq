@@ -294,6 +294,10 @@
                 "skip_cellranger_renaming": {
                     "type": "boolean",
                     "description": "Should it skip the automatic renaming included in cellranger-related modules?"
+                },
+                "run_velocyto": {
+                    "type": "boolean",
+                    "description": "Run velocyto from the bam output."
                 }
             }
         },

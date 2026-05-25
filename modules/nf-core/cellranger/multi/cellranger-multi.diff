@@ -29,7 +29,8 @@ Changes in 'cellranger/multi/main.nf':
 @@ -130,6 +137,9 @@
      // After renaming it gets in 'fastq_all' folder
      fastq_gex      = include_gex                      ? "${meta_gex.id},./fastq_all/gex,,Gene Expression"            : ''
-     fastq_vdj      = include_vdj                      ? "${meta_vdj.id},./fastq_all/vdj,,VDJ"                        : ''
+-    fastq_vdj      = include_vdj                      ? "${meta_vdj.id},./fastq_all/vdj,,VDJ"                        : ''
++    fastq_vdj      = include_vdj && has_vdj           ? "${meta_vdj.id},./fastq_all/vdj,,VDJ"                        : ''
 +    fastq_vdj_t_gd = include_vdj && has_vdj_t_gd      ? "${meta_vdj_t_gd.id},./fastq_all/vdj_t_gd,,VDJ-T-GD"         : ''
 +    fastq_vdj_t    = include_vdj && has_vdj_t         ? "${meta_vdj_t.id},./fastq_all/vdj_t,,VDJ-T"                  : ''
 +    fastq_vdj_b    = include_vdj && has_vdj_b         ? "${meta_vdj_b.id},./fastq_all/vdj_b,,VDJ-B"                  : ''

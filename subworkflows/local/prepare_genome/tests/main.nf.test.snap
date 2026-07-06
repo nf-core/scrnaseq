@@ -1,0 +1,93 @@
+{
+    "Should prepare genome from GTF": {
+        "content": [
+            {
+                "0": [
+                    "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta"
+                ],
+                "1": [
+                    "genome_genes.gtf:md5,50fc877b1c53b36b3b413aff88bda48c"
+                ],
+                "2": [
+                    "versions.yml:md5,3cd90c96c5ddfbeb84348a983a07c602"
+                ],
+                "fasta": [
+                    "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta"
+                ],
+                "gtf": [
+                    "genome_genes.gtf:md5,50fc877b1c53b36b3b413aff88bda48c"
+                ],
+                "versions": [
+                    "versions.yml:md5,3cd90c96c5ddfbeb84348a983a07c602"
+                ]
+            }
+        ],
+        "timestamp": "2026-07-06T19:56:58.531457903",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.3"
+        }
+    },
+    "Should prepare genome from GFF": {
+        "content": [
+            {
+                "0": [
+                    "/nf-core/test-datasets/modules/data/genomics/sarscov2/genome/genome.fasta"
+                ],
+                "1": [
+                    "genome_genes.gtf:md5,37d65092afcd8f97aeea359bbfef407e"
+                ],
+                "2": [
+                    "versions.yml:md5,3cd90c96c5ddfbeb84348a983a07c602"
+                ],
+                "fasta": [
+                    "/nf-core/test-datasets/modules/data/genomics/sarscov2/genome/genome.fasta"
+                ],
+                "gtf": [
+                    "genome_genes.gtf:md5,37d65092afcd8f97aeea359bbfef407e"
+                ],
+                "versions": [
+                    "versions.yml:md5,3cd90c96c5ddfbeb84348a983a07c602"
+                ]
+            }
+        ],
+        "timestamp": "2026-07-06T19:58:32.281829988",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.3"
+        }
+    },
+    "Should prepare GFF annotation without FASTA": {
+        "content": [
+            {
+                "0": [
+                    [
+                        
+                    ]
+                ],
+                "1": [
+                    "null.gtf:md5,37d65092afcd8f97aeea359bbfef407e"
+                ],
+                "2": [
+                    
+                ],
+                "fasta": [
+                    [
+                        
+                    ]
+                ],
+                "gtf": [
+                    "null.gtf:md5,37d65092afcd8f97aeea359bbfef407e"
+                ],
+                "versions": [
+                    
+                ]
+            }
+        ],
+        "timestamp": "2026-07-06T19:59:25.991414024",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.3"
+        }
+    }
+}

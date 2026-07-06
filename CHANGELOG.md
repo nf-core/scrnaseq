@@ -62,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Template update for nf-core/tools v3.2.1 ([#466](https://github.com/nf-core/scrnaseq/pull/466))
 - Template update for nf-core/tools v3.3.2 ([#474](https://github.com/nf-core/scrnaseq/pull/474))
 
-- Add the `--gtf` parameter to allow the user to specify a GFF file as a reference (instead of a GTF file) ([#451](https://github.com/nf-core/scrnaseq/pull/451))
+- Add the `--gff` parameter to allow the user to specify a GFF file as a reference (instead of a GTF file) ([#451](https://github.com/nf-core/scrnaseq/pull/451))
 
 ## v4.0.0 - 2025-03-10
 

@@ -47,7 +47,7 @@ Note that since cellranger v7, it is **not recommended** anymore to supply the `
 
 ## Aligning options
 
-By default (i.e. `--aligner simpleaf`), the pipeline uses [piscem](https://github.com/COMBINE-lab/piscem) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with [AlevinQC](https://github.com/csoneson/alevinQC).
+By default (i.e. `--aligner simpleaf`), the pipeline uses [piscem](https://github.com/COMBINE-lab/piscem) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with [qcatch](https://github.com/COMBINE-lab/qcatch). You can disable qcatch QC with `--skip_qcatch`.
 
 Other aligner options for running the pipeline are:
 
@@ -117,6 +117,10 @@ For more details, please refer to the [Kallisto/bustools documentation](https://
 #### Simpleaf
 
 Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slightly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
+
+When using simpleaf, the same `--protocol` value is also used to select the qcatch chemistry for QC. Set `--skip_qcatch` to skip qcatch report generation.
+
+For protocols without a QCatch chemistry mapping (e.g. `10XV1`, `dropseq`), QCatch omits `--chemistry` and instead infers the chemistry from the quantification metadata. For non-10X / custom assays where inference is not possible, set `--qcatch_n_partitions <int>` to provide the partition count (max number of barcodes) for QCatch's empty-drops step.
 
 For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614) and the [detailed description](https://hackmd.io/@PI7Og0l1ReeBZu_pjQGUQQ/rJMgmvr13).
 
@@ -272,6 +276,14 @@ If you are using cellranger-multi you have to add the column _feature_type_ to i
 - The pipeline will **automatically** generate the cellranger multi config file based on the given data.
 - When working with multiplexed data (FFPE/CMO/OCM), you'll need a **second samplesheet** relating the multiplexed samples to the corresponding "physical" sample (details below). The `sample` column in the main samplesheet refers to the "physical" sample that may contain multiple multiplexed samples.
 
+The `--cellranger_multi_barcodes` samplesheet is validated before Cell Ranger runs. It must follow these rules:
+
+- `sample`, `multiplexed_sample_id`, and `description` are required.
+- `sample` values must match samples in the main input samplesheet.
+- `multiplexed_sample_id` values must be unique.
+- Each row must define exactly one barcode ID field: `probe_barcode_ids`, `cmo_ids`, or `ocm_ids`.
+- Sample names and multiplexed sample IDs cannot contain whitespace.
+
 > Please note that FFPE; CMO and OCM are mutually exclusive in the `cellranger/multi` module. Using more than one for a single sample will cause the module to fail.
 
 #### Additional reference data
@@ -368,6 +380,42 @@ sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
 
 > You must provide the barcodes CSV with the `--cellranger_multi_barcodes` parameter.
 
+## Reference genome options
+
+The pipeline can resolve reference files from `conf/igenomes.config` when you provide `--genome`, for example `--genome GRCh38`. These entries may include pre-built aligner indices such as STAR indices, depending on the selected genome.
+
+Some AWS iGenomes STAR indices were generated with older STAR versions and contain legacy metadata. nf-core/scrnaseq includes a compatibility step for these configured iGenomes entries so that legacy STAR indices can run with the STAR version shipped by the pipeline. This support is intended to keep existing iGenomes usage working, not to make legacy indices the preferred reference for new analyses.
+
+Some AWS iGenomes GTF files, such as the NCBI `GRCh38` annotation, contain spaces in the GTF source column (for example `Curated Genomic`). Cell Ranger 10 `mkref` rejects spaces in that field. When using Cell Ranger aligners (`cellranger`, `cellrangerarc`, or `cellrangermulti`) with a configured iGenomes entry flagged for this issue, nf-core/scrnaseq automatically replaces spaces in the source column before reference building. This keeps existing iGenomes usage working with Cell Ranger 10, but is not intended as the preferred reference for new analyses.
+
+> [!WARNING]
+> For production runs, we recommend building fresh indices from current reference files instead of relying on legacy AWS iGenomes indices. The nf-core [reference genome documentation](https://nf-co.re/docs/running/reference-genomes) warns that AWS iGenomes annotations are significantly outdated, for example human annotations from Ensembl release 75, and that GRCh38 iGenomes uses the NCBI assembly rather than the masked Ensembl assembly.
+
+To generate and keep a STAR index for future runs, provide current FASTA and GTF files and set `--save_reference`:
+
+```bash
+nextflow run nf-core/scrnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --aligner star \
+    --fasta reference.fa.gz \
+    --gtf annotation.gtf.gz \
+    --save_reference \
+    -profile docker
+```
+
+To build a Cell Ranger reference from current annotation files instead of iGenomes, provide FASTA and GTF files directly:
+
+```bash
+nextflow run nf-core/scrnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --aligner cellranger \
+    --fasta reference.fa.gz \
+    --gtf annotation.gtf.gz \
+    -profile docker
+```
+
 ## Running the pipeline
 
 The minimum typical command for running the pipeline is as follows:
@@ -392,7 +440,7 @@ If you wish to repeatedly use the same parameters for multiple runs, rather than
 Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
 
 > [!WARNING]
-> Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
+> Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/running/run-pipelines#configuring-pipelines), other infrastructural tweaks (such as output directories), or module arguments (args).
 
 The above pipeline run specified with a params file in yaml format:
 
@@ -493,19 +541,19 @@ Specify the path to a specific config file (this is a core Nextflow command). Se
 
 Whilst the default requirements set within the pipeline will hopefully work for most people and with most input data, you may find that you want to customise the compute resources that the pipeline requests. Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the pipeline steps, if the job exits with any of the error codes specified [here](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/base.config#L18) it will automatically be resubmitted with higher resources request (2 x original, then 3 x original). If it still fails after the third attempt then the pipeline execution is stopped.
 
-To change the resource requests, please see the [max resources](https://nf-co.re/docs/usage/configuration#max-resources) and [tuning workflow resources](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources) section of the nf-core website.
+To change the resource requests, please see the [max resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#set-max-resources) and [customise process resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#customize-process-resources) section of the nf-core website.
 
 ### Custom Containers
 
 In some cases, you may wish to change the container or conda environment used by a pipeline steps for a particular tool. By default, nf-core pipelines use containers and software from the [biocontainers](https://biocontainers.pro/) or [bioconda](https://bioconda.github.io/) projects. However, in some cases the pipeline specified version maybe out of date.
 
-To use a different container from the default container or conda environment specified in a pipeline, please see the [updating tool versions](https://nf-co.re/docs/usage/configuration#updating-tool-versions) section of the nf-core website.
+To use a different container from the default container or conda environment specified in a pipeline, please see the [updating tool versions](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#update-tool-versions) section of the nf-core website.
 
 ### Custom Tool Arguments
 
 A pipeline might not always support every possible argument or option of a particular tool used in pipeline. Fortunately, nf-core pipelines provide some freedom to users to insert additional parameters that the pipeline does not include by default.
 
-To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/usage/configuration#customising-tool-arguments) section of the nf-core website.
+To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) section of the nf-core website.
 
 ### nf-core/configs
 

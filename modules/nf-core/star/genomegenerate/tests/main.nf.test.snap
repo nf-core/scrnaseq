@@ -2,15 +2,35 @@
     "fasta_gtf": {
         "content": [
             "[Genome, Log.out, SA, SAindex, chrLength.txt, chrName.txt, chrNameLength.txt, chrStart.txt, exonGeTrInfo.tab, exonInfo.tab, geneInfo.tab, genomeParameters.txt, sjdbInfo.txt, sjdbList.fromGTF.out.tab, sjdbList.out.tab, transcriptInfo.tab]",
-            [
-                "versions.yml:md5,46b8f1f34bb7f23892cd1eb249ed4d7f"
-            ]
+            {
+                "versions_gawk": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "gawk",
+                        "5.1.0"
+                    ]
+                ],
+                "versions_samtools": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "samtools",
+                        "1.21"
+                    ]
+                ],
+                "versions_star": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "star",
+                        "2.7.11b"
+                    ]
+                ]
+            }
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.04.3"
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.3"
         },
-        "timestamp": "2024-07-22T14:55:35.478401"
+        "timestamp": "2026-02-02T14:41:49.00863479"
     },
     "fasta_gtf_stub": {
         "content": [
@@ -41,7 +61,25 @@
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,46b8f1f34bb7f23892cd1eb249ed4d7f"
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "star",
+                        "2.7.11b"
+                    ]
+                ],
+                "2": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "samtools",
+                        "1.21"
+                    ]
+                ],
+                "3": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "gawk",
+                        "5.1.0"
+                    ]
                 ],
                 "index": [
                     [
@@ -68,16 +106,34 @@
                         ]
                     ]
                 ],
-                "versions": [
-                    "versions.yml:md5,46b8f1f34bb7f23892cd1eb249ed4d7f"
+                "versions_gawk": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "gawk",
+                        "5.1.0"
+                    ]
+                ],
+                "versions_samtools": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "samtools",
+                        "1.21"
+                    ]
+                ],
+                "versions_star": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "star",
+                        "2.7.11b"
+                    ]
                 ]
             }
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.04.3"
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.3"
         },
-        "timestamp": "2024-07-22T14:55:57.247585"
+        "timestamp": "2026-02-02T14:41:59.662412926"
     },
     "fasta_stub": {
         "content": [
@@ -101,7 +157,25 @@
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,46b8f1f34bb7f23892cd1eb249ed4d7f"
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "star",
+                        "2.7.11b"
+                    ]
+                ],
+                "2": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "samtools",
+                        "1.21"
+                    ]
+                ],
+                "3": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "gawk",
+                        "5.1.0"
+                    ]
                 ],
                 "index": [
                     [
@@ -121,28 +195,66 @@
                         ]
                     ]
                 ],
-                "versions": [
-                    "versions.yml:md5,46b8f1f34bb7f23892cd1eb249ed4d7f"
+                "versions_gawk": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "gawk",
+                        "5.1.0"
+                    ]
+                ],
+                "versions_samtools": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "samtools",
+                        "1.21"
+                    ]
+                ],
+                "versions_star": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "star",
+                        "2.7.11b"
+                    ]
                 ]
             }
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.04.3"
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.3"
         },
-        "timestamp": "2024-07-22T14:56:07.01742"
+        "timestamp": "2026-02-02T14:42:05.002386149"
     },
     "fasta": {
         "content": [
             "[Genome, Log.out, SA, SAindex, chrLength.txt, chrName.txt, chrNameLength.txt, chrStart.txt, genomeParameters.txt]",
-            [
-                "versions.yml:md5,46b8f1f34bb7f23892cd1eb249ed4d7f"
-            ]
+            {
+                "versions_gawk": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "gawk",
+                        "5.1.0"
+                    ]
+                ],
+                "versions_samtools": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "samtools",
+                        "1.21"
+                    ]
+                ],
+                "versions_star": [
+                    [
+                        "STAR_GENOMEGENERATE",
+                        "star",
+                        "2.7.11b"
+                    ]
+                ]
+            }
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.04.3"
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.3"
         },
-        "timestamp": "2024-07-22T14:55:45.48784"
+        "timestamp": "2026-02-02T14:41:54.327031765"
     }
 }

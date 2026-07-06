@@ -15,6 +15,9 @@
                 "FASTQC": {
                     "fastqc": "0.12.1"
                 },
+                "GTF_GENE_FILTER": {
+                    "python": "3.9.5"
+                },
                 "MTX_TO_H5AD": {
                     "anndata": "0.10.8",
                     "pandas": "2.2.2",
@@ -96,9 +99,8 @@
                 "cellrangerarc/count/10k_PBMC/outs/summary.csv",
                 "cellrangerarc/count/10k_PBMC/outs/web_summary.html",
                 "cellrangerarc/count/10k_PBMC_lib.csv",
-                "cellrangerarc/count/versions.yml",
                 "cellrangerarc/mkgtf",
-                "cellrangerarc/mkgtf/genome_genes.filtered.gtf",
+                "cellrangerarc/mkgtf/cellrangerarc.filtered.gtf",
                 "cellrangerarc/mkref",
                 "cellrangerarc/mkref/cellrangerarc_reference",
                 "cellrangerarc/mkref/cellrangerarc_reference/fasta",
@@ -132,7 +134,6 @@
                 "cellrangerarc/mkref/cellrangerarc_reference/star/sjdbList.out.tab",
                 "cellrangerarc/mkref/cellrangerarc_reference/star/transcriptInfo.tab",
                 "cellrangerarc/mkref/config",
-                "cellrangerarc/mkref/versions.yml",
                 "cellrangerarc/mtx_conversions",
                 "cellrangerarc/mtx_conversions/10k_PBMC",
                 "cellrangerarc/mtx_conversions/10k_PBMC/10k_PBMC_filtered_matrix.h5ad",
@@ -233,8 +234,7 @@
                 "barcodes.tsv.gz:md5,dc8ef24c54122529bdb2c7cd5969c805",
                 "features.tsv.gz:md5,456af0e5fa4a7bcb3968400f300d12e9",
                 "matrix.mtx.gz:md5,4b3aa16b720d414f5df50c533052d360",
-                "versions.yml:md5,d345d055b9def0e0d4dd6cf0c1c4058c",
-                "genome_genes.filtered.gtf:md5,4328009f62d38b9220dd941c1a66e480",
+                "cellrangerarc.filtered.gtf:md5,4328009f62d38b9220dd941c1a66e480",
                 "genome.fa:md5,69bd44ef67566a76d6cbb8aa4a25ae35",
                 "genome.fa.amb:md5,fe9a4b4f263654a130bb314e282b00f1",
                 "genome.fa.ann:md5,f8c1d6a2b91d1973a2f13e7221fc7e7a",
@@ -259,14 +259,13 @@
                 "sjdbList.fromGTF.out.tab:md5,0a0674059c3be4ccf69d572c9560f5d7",
                 "sjdbList.out.tab:md5,be8b2978e8ac3a2c8266c798c7c34b90",
                 "transcriptInfo.tab:md5,5a6ee447f3efac16042d8c99f653747b",
-                "config:md5,055bd80c554d66120313c0500ff2f00d",
-                "versions.yml:md5,e9926d37b6e80aa8cb9344ace558b449",
+                "config:md5,cf23c7cd0f548d751aae94a7ae5ca3f3",
                 "10k_PBMC_filtered_matrix.h5ad:md5,60b9311d46f756cd2b9fb737628713b3",
-                "10k_PBMC_filtered_matrix.sce.rds:md5,359160d80821c5dbf1ebc7a88dbe8400",
-                "10k_PBMC_filtered_matrix.seurat.rds:md5,ca44f68f2ea255bfd556c71a6b91423e",
+                "10k_PBMC_filtered_matrix.sce.rds:md5,8409899c40573213cc0cb3da48dfd99c",
+                "10k_PBMC_filtered_matrix.seurat.rds:md5,a2f61027f631ca0fe62167ad37cf0bfe",
                 "10k_PBMC_raw_matrix.h5ad:md5,4ac50d4109bcccd1d82ed83fc00d7580",
-                "10k_PBMC_raw_matrix.sce.rds:md5,196adfcb230f9ba9bb7d0aba36e7e261",
-                "10k_PBMC_raw_matrix.seurat.rds:md5,8ff4d68d88a6a7e3528147e06aeaa4dd",
+                "10k_PBMC_raw_matrix.sce.rds:md5,862283b4babd1aa9b1ab9c364528639e",
+                "10k_PBMC_raw_matrix.seurat.rds:md5,8aff06e0add005677e484864db5774b9",
                 "fastqc-status-check-heatmap.txt:md5,55b658eef7b63c6f8e3d559be41f5df8",
                 "fastqc_adapter_content_plot.txt:md5,31ca16758049ac46cc84875ddc4ff6d3",
                 "fastqc_overrepresented_sequences_plot.txt:md5,314754adfcfa2977ee4f61c2ec5444f2",
@@ -282,10 +281,10 @@
                 "multiqc_general_stats.txt:md5,fd84f94100989affc666904a2f34c40c"
             ]
         ],
+        "timestamp": "2026-05-29T08:55:55.275563341",
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "25.04.6"
-        },
-        "timestamp": "2025-10-23T19:10:33.168539516"
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.0"
+        }
     }
 }

@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
 
-class WorkflowScrnaseq {
+class Utils {
     // Retrieve the aligner-specific protocol based on the specified protocol.
     // Returns a map ["protocol": protocol, "extra_args": <extra args>, "whitelist": <path to whitelist>]
     // extra_args and whitelist are optional.

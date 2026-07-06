@@ -3,11 +3,38 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## v4.2.0 - 2026-07-03
 
 ### Features
 
+- Add `PREPARE_GENOME` subworkflow to bundle reference FASTA/GTF preparation (gunzip, gene filter, optional GTF source-column fix for Cell Ranger 10) ([#554](https://github.com/nf-core/scrnaseq/pull/554))
+- Address [#512](https://github.com/nf-core/scrnaseq/issues/512), adding early validation of the cellranger multi barcode sheet ([#513](https://github.com/nf-core/scrnaseq/pull/513))
+- Update `nf-core/cellranger` modules to Cell Ranger `10.0.0`, including output channel handling for multiplexed experiments ([#508](https://github.com/nf-core/scrnaseq/pull/508))
+- Replace **alevinqc** with **qcatch** for simpleaf QC; add `--skip_qcatch` parameter ([#520](https://github.com/nf-core/scrnaseq/pull/520))
+- Expose `--qcatch_n_partitions` for QCatch's empty-drops partition count, and run QCatch QC for all simpleaf protocols (chemistry omitted/inferred when a protocol has no QCatch mapping) ([#560](https://github.com/nf-core/scrnaseq/pull/560))
+- Add legacy STAR iGenomes index compatibility (rnaseq-style `star_legacy` handling and `STAR_GENOMEPARAMS_UPGRADE` to rewrite STAR 2.6.x `genomeParameters.txt` metadata for modern STAR) ([#552](https://github.com/nf-core/scrnaseq/pull/552))
+
+### Chore
+
+- Clear all `nextflow lint` warnings (use `channel` factory API, explicit closure parameters, unused-parameter prefixes). ([#542](https://github.com/nf-core/scrnaseq/pull/542))
+- Migrate local subworkflows to directory-based layout with `main.nf`, matching the new nf-core standard structure for modules and subworkflows ([#553](https://github.com/nf-core/scrnaseq/pull/553))
+- Template update for nf-core/tools v3.5.1 ([#509](https://github.com/nf-core/scrnaseq/pull/509))
+- Template update for nf-core/tools v4.0.2 ([#541](https://github.com/nf-core/scrnaseq/pull/541))
+- Switch `ANNDATAR_CONVERT` to the official Bioconductor **anndataR** package on Bioconda and retire the custom `docker.io/nfcore/anndatar` image. ([#472](https://github.com/nf-core/scrnaseq/pull/472))
+- Remove duplicate `process_gpu` config section ([#537](https://github.com/nf-core/scrnaseq/pull/537))
+
+### Fixes
+
+- Fix Cell Ranger `mkref` failure with NCBI iGenomes `GRCh38` GTF (`Curated Genomic` in the GTF source column) by replacing spaces in column 2 when using Cell Ranger aligners ([#554](https://github.com/nf-core/scrnaseq/pull/554))
 - Fix [#375](https://github.com/nf-core/scrnaseq/issues/375): mismatch between index and probeset when cellranger multi is used without a prebuilt index and an FFPE probeset is passed ([#502](https://github.com/nf-core/scrnaseq/pull/502))
+- Fix [#510](https://github.com/nf-core/scrnaseq/issues/510): Handle files with BOMs. ([#511](https://github.com/nf-core/scrnaseq/pull/511))
+- Fix [#539](https://github.com/nf-core/scrnaseq/issues/539) and [#393](https://github.com/nf-core/scrnaseq/issues/393): genome and aligner index parameter handling by resolving iGenomes attributes in the entry workflow and passing reference paths explicitly into `SCRNASEQ`, restoring configurable pre-built indexes via custom `igenomes` configs (reverts [#483](https://github.com/nf-core/scrnaseq/pull/483) pipeline-wide params approach) ([#545](https://github.com/nf-core/scrnaseq/pull/545))
+- Fix [#547](https://github.com/nf-core/scrnaseq/issues/547): allow iGenomes values to overwrite params explicitly set to `null` (e.g. on Seqera Platform) ([#548](https://github.com/nf-core/scrnaseq/pull/548))
+- Fix strict syntax errors for Nextflow 26.04 compatibility ([#536](https://github.com/nf-core/scrnaseq/pull/536))
+- Fix `modules.config` structure to make sure all ways of providing the `aligner` param work ([514](https://github.com/nf-core/scrnaseq/pull/514))
+- Fix [515](https://github.com/nf-core/scrnaseq/issues/515), failure when running singleplex flex data by updating cellranger multi module ([517](https://github.com/nf-core/scrnaseq/pull/517))
+- Fix [522](https://github.com/nf-core/scrnaseq/issues/522), protocol not being passed correctly when running cellranger multi ([524](https://github.com/nf-core/scrnaseq/pull/524))
+- Fix [533](https://github.com/nf-core/scrnaseq/issues/533), FASTQC module results in naming collisions if files have same basename ([534](https://github.com/nf-core/scrnaseq/pull/534))
 
 ## v4.1.0 - 2025-08-01
 

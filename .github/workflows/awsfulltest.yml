@@ -33,6 +33,26 @@ jobs:
           compute_env: ${{ vars.TOWER_COMPUTE_ENV }}
           revision: ${{ steps.revision.outputs.revision }}
           workdir: s3://${{ vars.AWS_S3_BUCKET }}/work/scrnaseq/work-${{ steps.revision.outputs.revision }}
+          nextflow_config: |
+            plugins {
+              id 'nf-slack@0.5.0'
+            }
+            slack {
+              enabled = true
+              bot {
+                token = '${{ secrets.NFSLACK_BOT_TOKEN }}'
+                channel = 'scrnaseq-dev'
+              }
+              onStart {
+                enabled = false
+              }
+              onComplete {
+                message = ':white_check_mark: *scrnaseq/test_full* completed successfully! :tada:'
+              }
+              onError {
+                message = ':x: *scrnaseq/test_full* failed :crying_cat_face:'
+              }
+            }
           parameters: |
             {
               "hook_url": "${{ secrets.MEGATESTS_ALERTS_SLACK_HOOK_URL }}",
@@ -41,7 +61,7 @@ jobs:
             }
           profiles: test_full
 
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: seqera_platform_debug_log_${{ matrix.aligner }}
           path: |

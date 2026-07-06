@@ -6,7 +6,7 @@ lint:
     - .github/ISSUE_TEMPLATE/bug_report.yml
   schema_params: false
   template_strings: false
-nf_core_version: 3.4.1
+nf_core_version: 4.0.2
 repository_type: pipeline
 template:
   author: Bailey PJ, Botvinnik O, Marques de Almeida F, Peltzer A, Sturm G, Dongze H
@@ -16,4 +16,4 @@ template:
   name: scrnaseq
   org: nf-core
   outdir: .
-  version: 4.1.0
+  version: 4.2.0

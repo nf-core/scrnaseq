@@ -17,7 +17,7 @@ def parse_samplesheet(samplesheet_path):
     os.makedirs(ocm_output_dir, exist_ok=True)
     os.makedirs(frna_output_dir, exist_ok=True)
 
-    with open(samplesheet_path) as csvfile:
+    with open(samplesheet_path, encoding="utf-8-sig") as csvfile:
         reader = csv.DictReader(csvfile)
         headers = reader.fieldnames
 

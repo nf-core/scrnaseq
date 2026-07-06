@@ -1,13 +1,13 @@
 {
     "test-dataset_simpleaf_aligner": {
         "content": [
-            15,
+            13,
             {
-                "ALEVINQC": {
-                    "alevinqc": "1.18.0"
-                },
                 "FASTQC": {
                     "fastqc": "0.12.1"
+                },
+                "GTF_GENE_FILTER": {
+                    "python": "3.9.5"
                 },
                 "MTX_TO_H5AD": {
                     "anndata": "0.10.8",
@@ -19,13 +19,13 @@
                     "alevin-fry": "0.11.2",
                     "piscem": "0.12.2",
                     "salmon": "1.10.3",
-                    "simpleaf": "0.19.4"
+                    "simpleaf": "0.19.5"
                 },
                 "SIMPLEAF_QUANT": {
                     "alevin-fry": "0.11.2",
                     "piscem": "0.12.2",
                     "salmon": "1.10.3",
-                    "simpleaf": "0.19.4"
+                    "simpleaf": "0.19.5"
                 }
             },
             [
@@ -105,7 +105,6 @@
                 "pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml",
                 "simpleaf",
                 "simpleaf/Sample_X",
-                "simpleaf/Sample_X/simpleaf_qc_report_Sample_X.html",
                 "simpleaf/Sample_X/simpleaf_quant",
                 "simpleaf/Sample_X/simpleaf_quant/af_map",
                 "simpleaf/Sample_X/simpleaf_quant/af_map/map.rad",
@@ -125,9 +124,9 @@
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/permit_freq.bin",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/permit_map.bin",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/quant.json",
+                "simpleaf/Sample_X/simpleaf_quant/af_quant/simpleaf_map_info.json",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/unmapped_bc_count_collated.bin",
                 "simpleaf/Sample_Y",
-                "simpleaf/Sample_Y/simpleaf_qc_report_Sample_Y.html",
                 "simpleaf/Sample_Y/simpleaf_quant",
                 "simpleaf/Sample_Y/simpleaf_quant/af_map",
                 "simpleaf/Sample_Y/simpleaf_quant/af_map/map.rad",
@@ -147,6 +146,7 @@
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/permit_freq.bin",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/permit_map.bin",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/quant.json",
+                "simpleaf/Sample_Y/simpleaf_quant/af_quant/simpleaf_map_info.json",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/unmapped_bc_count_collated.bin",
                 "simpleaf/mtx_conversions",
                 "simpleaf/mtx_conversions/Sample_X",
@@ -174,18 +174,18 @@
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "multiqc_fastqc.txt:md5,12027880857508ce5cedc3904a351730",
                 "multiqc_general_stats.txt:md5,dac8af62b04fd0880801f5d5c503c472",
-                "Sample_X_raw_matrix.h5ad:md5,d9c56aa71ade55f2b218db21efbce57f",
-                "Sample_X_raw_matrix.sce.rds:md5,6e9e0d6067fdca27645b66df47c6cdc1",
-                "Sample_X_raw_matrix.seurat.rds:md5,e1003985cc53b3538436a4726e3843a3",
-                "Sample_Y_raw_matrix.h5ad:md5,7a9899fed9301f3f6f4e6d7b1ada226d",
-                "Sample_Y_raw_matrix.sce.rds:md5,010c137155f5b8feed6ea4b853dc12c3",
-                "Sample_Y_raw_matrix.seurat.rds:md5,bae61b4d15df485464f6448a3b91f28c"
+                "Sample_X_raw_matrix.h5ad:md5,5fa3cc13dba1ff454f1e88b3961eb9d8",
+                "Sample_X_raw_matrix.sce.rds:md5,4aa189a56dfe0aa00e80a059eb81732e",
+                "Sample_X_raw_matrix.seurat.rds:md5,79126b29af3c6c8ff667b6c820ce3469",
+                "Sample_Y_raw_matrix.h5ad:md5,264c714234c81825d6714965f0d9c2a8",
+                "Sample_Y_raw_matrix.sce.rds:md5,f552f4f7c29081ce1ccd47103659f9f0",
+                "Sample_Y_raw_matrix.seurat.rds:md5,67ce29c647359ca4de0d99e618908196"
             ]
         ],
+        "timestamp": "2026-05-29T10:25:49.319072824",
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "25.04.6"
-        },
-        "timestamp": "2025-10-23T19:08:45.556388689"
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.0"
+        }
     }
 }

@@ -5,7 +5,7 @@
                 "FASTQC": {
                     "fastqc": "0.12.1"
                 },
-                "CUSTOM_GTFFILTER": {
+                "GTF_GENE_FILTER": {
                     "python": "3.9.5"
                 },
                 "MTX_TO_H5AD": {

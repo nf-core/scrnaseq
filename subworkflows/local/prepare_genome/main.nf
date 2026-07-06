@@ -19,24 +19,18 @@ workflow PREPARE_GENOME {
     ch_gtf      = []
 
     if (fasta) {
-        def fasta_file = file(fasta, checkIfExists: true)
-        def meta = [id: fasta_file.baseName]
+        ch_fasta = channel.value([[id: fasta.baseName], file(fasta, checkIfExists: true)])
+
         if (fasta.endsWith('.gz')) {
-            ch_fasta = GUNZIP_FASTA([meta, fasta_file]).gunzip.first()
-        }
-        else {
-            ch_fasta = channel.value([meta, fasta_file])
+            ch_fasta = GUNZIP_FASTA(ch_fasta).gunzip
         }
     }
 
     if (gtf) {
-        def gtf_file = file(gtf, checkIfExists: true)
-        def meta = [id: gtf_file.baseName]
+        ch_gtf = channel.value([[id: gtf.baseName], file(gtf, checkIfExists: true)])
+
         if (gtf.endsWith('.gz')) {
-            ch_gtf = GUNZIP_GTF([meta, gtf_file]).gunzip.first()
-        }
-        else {
-            ch_gtf = channel.value([meta, gtf_file])
+            ch_gtf = GUNZIP_GTF(ch_gtf).gunzip
         }
 
         if (fasta) {
@@ -64,7 +58,7 @@ workflow PREPARE_GENOME {
     }
 
     emit:
-    fasta      = ch_fasta.map { _meta, f -> f }
-    gtf        = ch_gtf.map { _meta, f -> f }
+    fasta      = ch_fasta.map { _meta, f -> f }.collect()
+    gtf        = ch_gtf.map { _meta, f -> f }.collect()
     versions   = ch_versions
 }

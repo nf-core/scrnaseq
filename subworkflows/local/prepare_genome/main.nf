@@ -2,10 +2,10 @@
  * Prepare reference FASTA and GTF for alignment (gunzip, filter to genome sequences, optional GTF source fix)
  */
 
-include { GUNZIP as GUNZIP_FASTA } from '../../../modules/nf-core/gunzip/main'
-include { GUNZIP as GUNZIP_GTF   } from '../../../modules/nf-core/gunzip/main'
-include { CUSTOM_GTFFILTER         } from '../../../modules/nf-core/custom/gtffilter/main'
-include { GAWK as GTF_SOURCE_FIX   } from '../../../modules/nf-core/gawk/main'
+include { GUNZIP as GUNZIP_FASTA              } from '../../../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_GTF                } from '../../../modules/nf-core/gunzip/main'
+include { CUSTOM_GTFFILTER as GTF_GENE_FILTER } from '../../../modules/nf-core/custom/gtffilter/main'
+include { GAWK as GTF_SOURCE_FIX              } from '../../../modules/nf-core/gawk/main'
 
 workflow PREPARE_GENOME {
     take:
@@ -40,11 +40,11 @@ workflow PREPARE_GENOME {
         }
 
         if (fasta) {
-            CUSTOM_GTFFILTER(
+            GTF_GENE_FILTER(
                 ch_gtf,
                 ch_fasta
             )
-            ch_gtf = CUSTOM_GTFFILTER.out.gtf
+            ch_gtf = GTF_GENE_FILTER.out.gtf
         }
 
 

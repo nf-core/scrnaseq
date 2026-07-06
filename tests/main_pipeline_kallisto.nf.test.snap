@@ -3,11 +3,11 @@
         "content": [
             19,
             {
-                "CUSTOM_GTFFILTER": {
-                    "python": "3.9.5"
-                },
                 "FASTQC": {
                     "fastqc": "0.12.1"
+                },
+                "GTF_GENE_FILTER": {
+                    "python": "3.9.5"
                 },
                 "KALLISTOBUSTOOLS_COUNT": {
                     "kallistobustools": "0.28.2"

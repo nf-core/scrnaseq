@@ -12,11 +12,11 @@
                 "CELLRANGERARC_MKREF": {
                     "cellrangerarc": "2.0.2"
                 },
-                "CUSTOM_GTFFILTER": {
-                    "python": "3.9.5"
-                },
                 "FASTQC": {
                     "fastqc": "0.12.1"
+                },
+                "GTF_GENE_FILTER": {
+                    "python": "3.9.5"
                 },
                 "MTX_TO_H5AD": {
                     "anndata": "0.10.8",

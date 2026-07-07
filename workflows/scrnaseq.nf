@@ -110,14 +110,14 @@ workflow SCRNASEQ {
         gtfSourceFixNeeded(params.aligner, params.genome, params.genomes, gtf)
     )
     ch_genome_fasta = PREPARE_GENOME.out.fasta
-    ch_filter_gtf   = PREPARE_GENOME.out.gtf
+    ch_genome_gtf   = PREPARE_GENOME.out.gtf
     ch_versions     = ch_versions.mix(PREPARE_GENOME.out.versions)
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
         KALLISTO_BUSTOOLS(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_kallisto_index,
             ch_txp2gene,
             kb_t1c,
@@ -136,7 +136,7 @@ workflow SCRNASEQ {
 
         SIMPLEAF(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_transcript_fasta,
             ch_simpleaf_index,
             ch_txp2gene,
@@ -165,7 +165,7 @@ workflow SCRNASEQ {
     if (params.aligner == "star") {
         STARSOLO(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             star_index,
             star_index_legacy,
             protocol_config['protocol'],
@@ -183,7 +183,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellranger") {
         CELLRANGER_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_cellranger_index,
             ch_fastq,
             protocol_config['protocol']
@@ -198,7 +198,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellrangerarc") {
         CELLRANGERARC_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_motifs,
             ch_cellranger_index,
             ch_fastq,
@@ -263,7 +263,7 @@ workflow SCRNASEQ {
         // Run cellranger multi
         CELLRANGER_MULTI_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_cellrangermulti_collected_channel,
             ch_cellranger_index,
             cellranger_vdj_index,

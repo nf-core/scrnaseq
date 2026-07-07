@@ -12,7 +12,7 @@
                     },
                     "cellbender/removebackground": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "ffbf6a031bcef2f2bc6b55009e177c814e2faa01",
                         "installed_by": ["h5ad_removebackground_barcodes_cellbender_anndata", "modules"]
                     },
                     "cellranger/count": {

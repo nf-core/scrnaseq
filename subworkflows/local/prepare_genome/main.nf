@@ -14,7 +14,6 @@ workflow PREPARE_GENOME {
     gtf_source_fix
 
     main:
-    ch_versions = channel.empty()
     ch_fasta    = []
     ch_gtf      = []
 
@@ -62,5 +61,4 @@ workflow PREPARE_GENOME {
     emit:
     fasta      = ch_fasta.collect()
     gtf        = ch_gtf.collect()
-    versions   = ch_versions
 }

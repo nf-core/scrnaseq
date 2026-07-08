@@ -20,8 +20,6 @@ workflow SIMPLEAF {
     map_dir
 
     main:
-    ch_versions = channel.empty()
-
     /*
     * Build simpleaf index if needed
     * If simpleaf_index is provided, we skip this step
@@ -53,8 +51,6 @@ workflow SIMPLEAF {
             )
             // Channel of tuple(meta, index dir)
             simpleaf_index = SIMPLEAF_INDEX.out.index.collect()
-            // Channel of version
-            ch_versions = ch_versions.mix( SIMPLEAF_INDEX.out.versions )
 
             // ensure txp2gene is a Channel
             if (!txp2gene) {
@@ -111,8 +107,6 @@ workflow SIMPLEAF {
         resolution,
         ch_map_dir
     )
-    ch_versions = ch_versions.mix(SIMPLEAF_QUANT.out.versions)
-
     ch_af_map = map_dir ? ch_map_dir : SIMPLEAF_QUANT.out.map
     ch_af_quant = SIMPLEAF_QUANT.out.quant
 
@@ -133,7 +127,6 @@ workflow SIMPLEAF {
 
 
     emit:
-    ch_versions
     txp2gene
     index       = simpleaf_index
     map         = ch_af_map

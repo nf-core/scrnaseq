@@ -111,7 +111,6 @@ workflow SCRNASEQ {
     )
     ch_genome_fasta = PREPARE_GENOME.out.fasta
     ch_genome_gtf   = PREPARE_GENOME.out.gtf
-    ch_versions     = ch_versions.mix(PREPARE_GENOME.out.versions)
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
@@ -128,7 +127,6 @@ workflow SCRNASEQ {
         )
         ch_mtx_matrices = ch_mtx_matrices.mix( KALLISTO_BUSTOOLS.out.counts_raw, KALLISTO_BUSTOOLS.out.counts_filtered )
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
-        ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
     }
 
     // Run simpleaf pipeline
@@ -148,7 +146,6 @@ workflow SCRNASEQ {
             ch_fastq,
             [] // for existing map dir; not applicable
         )
-        ch_versions = ch_versions.mix(SIMPLEAF.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(SIMPLEAF.out.quant.map{ _meta, it -> it })
         ch_mtx_matrices = ch_mtx_matrices.mix(
             SIMPLEAF.out.quant.map{

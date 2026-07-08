@@ -60,7 +60,7 @@ workflow PREPARE_GENOME {
     }
 
     emit:
-    fasta      = ch_fasta.map { _meta, f -> f }.collect()
-    gtf        = ch_gtf.map { _meta, f -> f }.collect()
+    fasta      = ch_fasta.collect()
+    gtf        = ch_gtf.collect()
     versions   = ch_versions
 }

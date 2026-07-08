@@ -41,7 +41,7 @@ workflow SIMPLEAF {
                     error "txp2gene file is required when using `transcript_fasta` to build the index"
                 }
             } else {
-                ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ fasta, gtf -> [[id: "${fasta.getName()}"], fasta, gtf] }
+                ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ meta1, fasta, _meta2, gtf -> [meta1, fasta, gtf] }
                 ch_transcript_fasta = [ [:], [] ] // meta, transcript fasta
             }
 

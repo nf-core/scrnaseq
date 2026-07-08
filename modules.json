@@ -57,7 +57,7 @@
                     },
                     "custom/gtffilter": {
                         "branch": "master",
-                        "git_sha": "1a6066c338c5b345115b953d3c03e8de2cb63f78",
+                        "git_sha": "d95d53e0355903a16d2d7c2d54134591c5aa4467",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {

@@ -16,7 +16,7 @@
                     "fastqc": "0.12.1"
                 },
                 "GTF_GENE_FILTER": {
-                    "python": "3.9.5"
+                    "python": "3.14.5"
                 },
                 "MTX_TO_H5AD": {
                     "anndata": "0.10.8",
@@ -177,7 +177,7 @@
                 "cellranger/count/Sample_Y/outs/raw_feature_bc_matrix/matrix.mtx.gz",
                 "cellranger/count/Sample_Y/outs/web_summary.html",
                 "cellranger/mkgtf",
-                "cellranger/mkgtf/GRCm38.p6.genome.chr19_genes.filtered.gtf",
+                "cellranger/mkgtf/gencode.vM19.annotation.chr19.filtered.gtf",
                 "cellranger/mkref",
                 "cellranger/mkref/cellranger_reference",
                 "cellranger/mkref/cellranger_reference/fasta",
@@ -332,10 +332,10 @@
                 "barcodes.tsv.gz:md5,081f72b5252ccaf5ffd535ffbd235c4c",
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
                 "matrix.mtx.gz:md5,0d57e727d649efcd3fc6b4cd0067bfe0",
-                "GRCm38.p6.genome.chr19_genes.filtered.gtf:md5,956caa7c851df640ded6c3f5f1a7cd41",
+                "gencode.vM19.annotation.chr19.filtered.gtf:md5,9930211c09f2de7f4491057b6f7fab0c",
                 "genome.fa:md5,ef1ae316990b7c77fd0baa0a89b75a6d",
                 "genome.fa.fai:md5,729bb811dc9ababd5ee35029b8140f36",
-                "genes.gtf.gz:md5,956caa7c851df640ded6c3f5f1a7cd41",
+                "genes.gtf.gz:md5,9930211c09f2de7f4491057b6f7fab0c",
                 "Genome:md5,638a41718215663f07fec2bf13fc9b0f",
                 "SA:md5,965121db041500098de4325ad719f5df",
                 "SAindex:md5,1d4c33e718f498c61083aa47aa9ace2c",

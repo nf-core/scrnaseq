@@ -16,7 +16,7 @@
                     "fastqc": "0.12.1"
                 },
                 "GTF_GENE_FILTER": {
-                    "python": "3.9.5"
+                    "python": "3.14.5"
                 },
                 "MTX_TO_H5AD": {
                     "anndata": "0.10.8",
@@ -100,7 +100,7 @@
                 "cellrangerarc/count/10k_PBMC/outs/web_summary.html",
                 "cellrangerarc/count/10k_PBMC_lib.csv",
                 "cellrangerarc/mkgtf",
-                "cellrangerarc/mkgtf/cellrangerarc.filtered.gtf",
+                "cellrangerarc/mkgtf/chr21_gencode.filtered.gtf",
                 "cellrangerarc/mkref",
                 "cellrangerarc/mkref/cellrangerarc_reference",
                 "cellrangerarc/mkref/cellrangerarc_reference/fasta",
@@ -227,14 +227,14 @@
             ],
             [
                 "atac_cut_sites.bigwig:md5,7114cf85657c09f92d5c3dbd32432759",
-                "atac_peak_annotation.tsv:md5,bd800e4d0321a50f340a801ae18dafe8",
+                "atac_peak_annotation.tsv:md5,1921be4ba8f9005f76b5fbbad5729e0f",
                 "barcodes.tsv.gz:md5,b5499384bbd9ecbd448c90dd73d9e84c",
                 "features.tsv.gz:md5,456af0e5fa4a7bcb3968400f300d12e9",
                 "matrix.mtx.gz:md5,83c4b3e84668282fbe55d02d84256b3f",
                 "barcodes.tsv.gz:md5,dc8ef24c54122529bdb2c7cd5969c805",
                 "features.tsv.gz:md5,456af0e5fa4a7bcb3968400f300d12e9",
                 "matrix.mtx.gz:md5,4b3aa16b720d414f5df50c533052d360",
-                "cellrangerarc.filtered.gtf:md5,4328009f62d38b9220dd941c1a66e480",
+                "chr21_gencode.filtered.gtf:md5,92715689caf0f574962df87ab577d04b",
                 "genome.fa:md5,69bd44ef67566a76d6cbb8aa4a25ae35",
                 "genome.fa.amb:md5,fe9a4b4f263654a130bb314e282b00f1",
                 "genome.fa.ann:md5,f8c1d6a2b91d1973a2f13e7221fc7e7a",
@@ -242,7 +242,7 @@
                 "genome.fa.fai:md5,74184d265bc96cb92ddfb71c3ce85c09",
                 "genome.fa.pac:md5,cf76a4dbc5b8ae64fc890d6a95067b4f",
                 "genome.fa.sa:md5,92f0b3e443220a57c2bd09f737e7dbc4",
-                "genes.gtf.gz:md5,4328009f62d38b9220dd941c1a66e480",
+                "genes.gtf.gz:md5,92715689caf0f574962df87ab577d04b",
                 "transcripts.bed:md5,f9840436821172d8cef086cb6f3c27eb",
                 "tss.bed:md5,d637f9650dc3862c932cd9996ace49f5",
                 "Genome:md5,0aaebdafd448aeec403253cc47e15176",
@@ -259,7 +259,7 @@
                 "sjdbList.fromGTF.out.tab:md5,0a0674059c3be4ccf69d572c9560f5d7",
                 "sjdbList.out.tab:md5,be8b2978e8ac3a2c8266c798c7c34b90",
                 "transcriptInfo.tab:md5,5a6ee447f3efac16042d8c99f653747b",
-                "config:md5,cf23c7cd0f548d751aae94a7ae5ca3f3",
+                "config:md5,c05a6c4276e54a19a7149b700cf6fbd9",
                 "10k_PBMC_filtered_matrix.h5ad:md5,60b9311d46f756cd2b9fb737628713b3",
                 "10k_PBMC_filtered_matrix.sce.rds:md5,8409899c40573213cc0cb3da48dfd99c",
                 "10k_PBMC_filtered_matrix.seurat.rds:md5,a2f61027f631ca0fe62167ad37cf0bfe",

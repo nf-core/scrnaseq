@@ -12,22 +12,22 @@
                     },
                     "cellbender/removebackground": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "ffbf6a031bcef2f2bc6b55009e177c814e2faa01",
                         "installed_by": ["h5ad_removebackground_barcodes_cellbender_anndata", "modules"]
                     },
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "21e4662ae927fdbc5fc04eec9bde38b0689d4954",
+                        "git_sha": "c8dedc22e3d32b7213aac563e04c969b34b496fc",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
-                        "git_sha": "21e4662ae927fdbc5fc04eec9bde38b0689d4954",
+                        "git_sha": "c8dedc22e3d32b7213aac563e04c969b34b496fc",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
                         "branch": "master",
-                        "git_sha": "21e4662ae927fdbc5fc04eec9bde38b0689d4954",
+                        "git_sha": "c8dedc22e3d32b7213aac563e04c969b34b496fc",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkvdjref": {
@@ -37,7 +37,7 @@
                     },
                     "cellranger/multi": {
                         "branch": "master",
-                        "git_sha": "21e4662ae927fdbc5fc04eec9bde38b0689d4954",
+                        "git_sha": "c8dedc22e3d32b7213aac563e04c969b34b496fc",
                         "installed_by": ["modules"]
                     },
                     "cellrangerarc/count": {
@@ -53,6 +53,11 @@
                     "cellrangerarc/mkref": {
                         "branch": "master",
                         "git_sha": "21e4662ae927fdbc5fc04eec9bde38b0689d4954",
+                        "installed_by": ["modules"]
+                    },
+                    "custom/gtffilter": {
+                        "branch": "master",
+                        "git_sha": "d95d53e0355903a16d2d7c2d54134591c5aa4467",
                         "installed_by": ["modules"]
                     },
                     "fastqc": {
@@ -77,17 +82,17 @@
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "aa2fa2262e7ffef3035f2a991424d0d4af331627",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/ref": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "aa2fa2262e7ffef3035f2a991424d0d4af331627",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "008f9d3e61209bf995edac3ba531f54e269e1215",
+                        "git_sha": "98403d15b0e50edae1f3fec5eae5e24982f1fade",
                         "installed_by": ["modules"]
                     },
                     "qcatch": {
@@ -97,12 +102,12 @@
                     },
                     "simpleaf/index": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "0863c5e1224f2e5d62a43fe68f8a16a0e8255ad2",
                         "installed_by": ["modules"]
                     },
                     "simpleaf/quant": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "0863c5e1224f2e5d62a43fe68f8a16a0e8255ad2",
                         "installed_by": ["modules"]
                     },
                     "star/genomegenerate": {
@@ -112,7 +117,7 @@
                     },
                     "unzip": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "1c43a7e22f04cf19c9f9d3de7e7e5a3addd9382a",
                         "installed_by": ["modules"]
                     }
                 }

@@ -259,7 +259,7 @@
                 "sjdbList.fromGTF.out.tab:md5,0a0674059c3be4ccf69d572c9560f5d7",
                 "sjdbList.out.tab:md5,be8b2978e8ac3a2c8266c798c7c34b90",
                 "transcriptInfo.tab:md5,5a6ee447f3efac16042d8c99f653747b",
-                "config:md5,cf23c7cd0f548d751aae94a7ae5ca3f3",
+                "config:md5,c05a6c4276e54a19a7149b700cf6fbd9",
                 "10k_PBMC_filtered_matrix.h5ad:md5,60b9311d46f756cd2b9fb737628713b3",
                 "10k_PBMC_filtered_matrix.sce.rds:md5,8409899c40573213cc0cb3da48dfd99c",
                 "10k_PBMC_filtered_matrix.seurat.rds:md5,a2f61027f631ca0fe62167ad37cf0bfe",

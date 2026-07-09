@@ -6,7 +6,7 @@
                     "fastqc": "0.12.1"
                 },
                 "GTF_GENE_FILTER": {
-                    "python": "3.9.5"
+                    "python": "3.14.5"
                 },
                 "MTX_TO_H5AD": {
                     "anndata": "0.10.8",

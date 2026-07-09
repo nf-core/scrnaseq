@@ -147,6 +147,13 @@
                     "format": "file-path",
                     "exists": true
                 },
+                "gff": {
+                    "type": "string",
+                    "description": "Reference GFF annotation file. Can be used as an alternative to the GTF file. If both are provided, the GTF file will be used.",
+                    "fa_icon": "fas fa-code-branch",
+                    "format": "file-path",
+                    "exists": true
+                },
                 "save_reference": {
                     "type": "boolean",
                     "description": "Specify this parameter to save the indices created (STAR, Kallisto, Simpleaf) to the results.",

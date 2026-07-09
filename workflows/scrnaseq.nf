@@ -29,6 +29,7 @@ workflow SCRNASEQ {
     ch_fastq                    // channel: [ meta, fastq ] from samplesheet
     fasta                       // val: path-like string (or null)
     gtf                         // val: path-like string (or null)
+    gff                         // val: path-like string (or null)
     star_index                  // val: path-like string (or null)
     simpleaf_index              // val: path-like string (or null)
     kallisto_index              // val: path-like string (or null)
@@ -66,6 +67,11 @@ workflow SCRNASEQ {
         ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
     } else {
         ch_barcode_whitelist = []
+    }
+
+    // Warn if both GTF and GFF files are provided
+    if (gtf && gff) {
+        log.warn("Both GTF and GFF files are provided. GTF file will be used.")
     }
 
     // samplesheet - this is passed to the MTX conversion functions to add metadata to the
@@ -107,6 +113,7 @@ workflow SCRNASEQ {
     PREPARE_GENOME(
         fasta,
         gtf,
+        gff,
         gtfSourceFixNeeded(params.aligner, params.genome, params.genomes, gtf)
     )
     ch_genome_fasta = PREPARE_GENOME.out.fasta

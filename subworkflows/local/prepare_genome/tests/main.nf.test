@@ -1,0 +1,77 @@
+nextflow_workflow {
+
+    name "Test Workflow PREPARE_GENOME"
+    script "../main.nf"
+    workflow "PREPARE_GENOME"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "prepare_genome"
+
+    test("Should prepare genome from GTF") {
+
+        when {
+            workflow {
+                """
+                input[0] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.gtf', checkIfExists: true)
+                input[2] = null
+                input[3] = false
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fasta },
+                { assert workflow.out.gtf },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Should prepare genome from GFF") {
+
+        when {
+            workflow {
+                """
+                input[0] = file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                input[1] = null
+                input[2] = file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.gff3', checkIfExists: true)
+                input[3] = false
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fasta },
+                { assert workflow.out.gtf },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Should prepare GFF annotation without FASTA") {
+
+        when {
+            workflow {
+                """
+                input[0] = null
+                input[1] = null
+                input[2] = file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.gff3', checkIfExists: true)
+                input[3] = false
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.gtf },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}

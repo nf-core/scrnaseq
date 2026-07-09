@@ -108,4 +108,26 @@ process STAR_ALIGN {
         star: \$(STAR --version | sed -e "s/STAR_//g")
     END_VERSIONS
     """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    def feature_dir = star_feature == 'GeneFull' ? 'GeneFull' : 'Gene'
+    def velocyto = star_feature == 'Gene Velocyto'
+    """
+    mkdir -p ${prefix}.Solo.out/${feature_dir}/raw
+    mkdir -p ${prefix}.Solo.out/${feature_dir}/filtered
+    touch ${prefix}.Aligned.sortedByCoord.out.bam
+    touch ${prefix}.Log.final.out
+    touch ${prefix}.Log.out
+    touch ${prefix}.Log.progress.out
+    ${velocyto ? """
+    mkdir -p ${prefix}.Solo.out/Velocyto
+    touch ${prefix}.Solo.out/Velocyto/velocyto_raw
+    touch ${prefix}.Solo.out/Velocyto/velocyto_filtered
+    """ : ''}
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        star: \$(STAR --version | sed -e "s/STAR_//g")
+    END_VERSIONS
+    """
 }

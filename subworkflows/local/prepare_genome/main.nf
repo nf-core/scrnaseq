@@ -59,6 +59,6 @@ workflow PREPARE_GENOME {
     }
 
     emit:
-    fasta      = ch_fasta
-    gtf        = ch_gtf
+    fasta = ch_fasta.collect()
+    gtf   = ch_gtf.collect()
 }

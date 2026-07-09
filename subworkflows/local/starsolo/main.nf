@@ -63,7 +63,7 @@ workflow STARSOLO {
     STAR_ALIGN(
         ch_fastq,
         ch_star_index,
-        gtf.map { _meta, gtf_path -> gtf_path },
+        gtf,
         barcode_whitelist,
         protocol,
         star_feature,

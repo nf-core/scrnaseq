@@ -31,8 +31,8 @@ workflow STARSOLO {
     */
     if (!star_index) {
         STAR_GENOMEGENERATE(
-            genome_fasta.map{ f -> [[id: f.baseName], f]},
-            gtf.map{ g -> [[id: g.baseName], g]}
+            genome_fasta,
+            gtf
         )
         ch_star_index = STAR_GENOMEGENERATE.out.index.collect()
     }

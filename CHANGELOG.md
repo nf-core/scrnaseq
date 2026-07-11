@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
 
 ## v4.2.0 - 2026-07-03

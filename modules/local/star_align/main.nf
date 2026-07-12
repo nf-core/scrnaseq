@@ -60,38 +60,39 @@ process STAR_ALIGN {
 
     // separate forward from reverse pairs
     def (forward, reverse) = reads.collate(2).transpose()
-    """
-    # If the whitelist was not provided
-    if [[ -z "$whitelist" ]]; then
-        echo "Whitelist file not provided." >&2
-        soloCBwhitelistArg=""
-    else
-        if [[ "$whitelist" == *.gz ]]; then
-            gzip -cdf "$whitelist" > whitelist.uncompressed.txt
-        else
-            cp "$whitelist" whitelist.uncompressed.txt
-        fi
-        soloCBwhitelistArg="--soloCBwhitelist whitelist.uncompressed.txt"
-        echo "Whitelist file provided - $whitelist." >&2
-    fi
 
-    # If the SmartSeq protocol is used,  set soloUMIdedup to NoDedup
-    if [[ "$protocol" == "SmartSeq" ]]; then
-        echo "SmartSeq protocol detected, setting --soloUMIdedup to NoDedup." >&2
-        soloUMIdedupArg="--soloUMIdedup NoDedup"
-    else
-        soloUMIdedupArg=""
-    fi
+    // Support zero, one, or multiple barcode whitelist files.
+    def whitelist_files = whitelist ? (whitelist instanceof List ? whitelist : [whitelist]) : []
+    def whitelist_arguments = []
+    def decompress_commands = []
+    whitelist_files.eachWithIndex { whitelist_file, whitelist_index ->
+        def whitelist_path = whitelist_file.toString()
+        if (whitelist_path.endsWith('.gz')) {
+            def decompressed_whitelist = "whitelist_${whitelist_index}.txt"
+            decompress_commands << "gzip -cdf '${whitelist_file}' > '${decompressed_whitelist}'"
+            whitelist_arguments << decompressed_whitelist
+        } else {
+            whitelist_arguments << whitelist_path
+        }
+    }
+    def whitelist_arg = whitelist_arguments ? "--soloCBwhitelist ${whitelist_arguments.join(' ')}" : ''
+
+    // SmartSeq has no UMIs by default; a protocol-specific override takes precedence.
+    def umi_dedup_arg = protocol == 'SmartSeq' && !other_10x_parameters.contains('--soloUMIdedup') ?
+        '--soloUMIdedup NoDedup' :
+        ''
+    """
+    ${decompress_commands.join('\n    ')}
 
     STAR \\
         --genomeDir $index \\
         --readFilesIn ${reverse.join( "," )} ${forward.join( "," )} \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
-        \$soloCBwhitelistArg \\
+        $whitelist_arg \\
         --soloType $protocol \\
         --soloFeatures $star_feature \\
-        \$soloUMIdedupArg \\
+        $umi_dedup_arg \\
         $other_10x_parameters \\
         $out_sam_type \\
         $ignore_gtf \\

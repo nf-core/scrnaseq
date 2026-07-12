@@ -52,8 +52,7 @@
                     "type": "string",
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
                     "fa_icon": "fas fa-barcode",
-                    "format": "file-path",
-                    "exists": true
+                    "format": "file-path"
                 },
                 "aligner": {
                     "type": "string",

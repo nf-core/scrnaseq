@@ -29,7 +29,7 @@ process STAR_ALIGN {
     tuple val(meta), path('*d.out.bam')                            , emit: bam
     tuple val(meta), path('*.Solo.out')                            , emit: counts
     tuple val(meta), path ("*.Solo.out/Gene*/raw")                 , emit: raw_counts
-    tuple val(meta), path ("*.Solo.out/Gene*/filtered")            , emit: filtered_counts
+    tuple val(meta), path ("*.Solo.out/Gene*/filtered")            , emit: filtered_counts, optional: true
     tuple val(meta), path ("*.Solo.out/Velocyto/velocyto_raw")     , emit: raw_velocyto, optional:true
     tuple val(meta), path ("*.Solo.out/Velocyto/velocyto_filtered"), emit: filtered_velocyto, optional:true
     tuple val(meta), path('*Log.final.out')                        , emit: log_final
@@ -61,37 +61,38 @@ process STAR_ALIGN {
     // separate forward from reverse pairs
     def (forward, reverse) = reads.collate(2).transpose()
 
-    // parse whitelist file(s)
-    arg_whitelist = ""
-    decompress_cmd = ""
-    def whitelistList = whitelist ? (whitelist instanceof List ? whitelist : [whitelist]) : []
-
-    if (whitelistList) {
-        if (whitelistList.size() == 1) {
-            def file = whitelistList[0]
-            def fileStr = file.toString()
-            if (fileStr.endsWith('.gz')) {
-                def uncompressed = file.getBaseName() // strips .gz
-                decompress_cmd = "gzip -cdf ${file} > ${uncompressed}"
-                arg_whitelist = "--soloCBwhitelist ${uncompressed}"
-            } else {
-                arg_whitelist = "--soloCBwhitelist ${fileStr}"
-            }
+    // Support zero, one, or multiple barcode whitelist files.
+    def whitelist_files = whitelist ? (whitelist instanceof List ? whitelist : [whitelist]) : []
+    def whitelist_arguments = []
+    def decompress_commands = []
+    whitelist_files.eachWithIndex { whitelist_file, whitelist_index ->
+        def whitelist_path = whitelist_file.toString()
+        if (whitelist_path.endsWith('.gz')) {
+            def decompressed_whitelist = "whitelist_${whitelist_index}.txt"
+            decompress_commands << "gzip -cdf '${whitelist_file}' > '${decompressed_whitelist}'"
+            whitelist_arguments << decompressed_whitelist
         } else {
-            arg_whitelist = "--soloCBwhitelist ${whitelistList.join(' ')}"
+            whitelist_arguments << whitelist_path
         }
     }
+    def whitelist_arg = whitelist_arguments ? "--soloCBwhitelist ${whitelist_arguments.join(' ')}" : ''
+
+    // SmartSeq has no UMIs by default; a protocol-specific override takes precedence.
+    def umi_dedup_arg = protocol == 'SmartSeq' && !other_10x_parameters.contains('--soloUMIdedup') ?
+        '--soloUMIdedup NoDedup' :
+        ''
     """
-    ${decompress_cmd}
+    ${decompress_commands.join('\n    ')}
 
     STAR \\
         --genomeDir $index \\
         --readFilesIn ${reverse.join( "," )} ${forward.join( "," )} \\
         --runThreadN $task.cpus \\
         --outFileNamePrefix $prefix. \\
-        $arg_whitelist \\
+        $whitelist_arg \\
         --soloType $protocol \\
         --soloFeatures $star_feature \\
+        $umi_dedup_arg \\
         $other_10x_parameters \\
         $out_sam_type \\
         $ignore_gtf \\

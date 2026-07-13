@@ -62,10 +62,20 @@ workflow SCRNASEQ {
     ch_txp2gene             = txp2gene         ? file(txp2gene, checkIfExists: true)         : []
 
     if (params.barcode_whitelist) {
-        // if multiple files -> create channel with single list that keeps the order of the whitelist files preserved
-        ch_barcode_whitelist = params.barcode_whitelist.contains(',') ?
-            params.barcode_whitelist.split(',').collect { file(it.trim(), exists: true) } :
-            file(params.barcode_whitelist, checkIfExists: true)
+        def whitelist_paths = params.barcode_whitelist
+            .split(',', -1)
+            .collect { path -> path.trim() }
+
+        if (whitelist_paths.any { path -> path.isEmpty() }) {
+            error "Barcode whitelist entries must be non-empty comma-separated file paths."
+        }
+        if (whitelist_paths.size() > 1 && params.aligner != 'star') {
+            error "Multiple barcode whitelist files are only supported with --aligner star."
+        }
+
+        ch_barcode_whitelist = whitelist_paths.size() == 1
+            ? file(whitelist_paths[0], checkIfExists: true)
+            : whitelist_paths.collect { path -> file(path, checkIfExists: true) }
     } else if (protocol_config.containsKey("whitelist")) {
         ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
     } else {

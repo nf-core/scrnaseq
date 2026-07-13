@@ -51,6 +51,7 @@
                 "barcode_whitelist": {
                     "type": "string",
                     "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
+                    "help_text": "Omit this parameter to let STARsolo omit `--soloCBwhitelist` (for example when no barcode whitelist is required). Provide one file path for the existing single-whitelist behavior. For STARsolo only, provide comma-separated file paths in order; each path is passed as a separate `--soloCBwhitelist` argument (intended for multi-segment barcodes such as STAR `CB_UMI_Complex`). Multiple whitelist files are not supported for other aligners. Commas in file paths are not supported.",
                     "fa_icon": "fas fa-barcode",
                     "format": "file-path"
                 },

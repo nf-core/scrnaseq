@@ -76,11 +76,6 @@ process STAR_ALIGN {
         }
     }
     def whitelist_arg = whitelist_arguments ? "--soloCBwhitelist ${whitelist_arguments.join(' ')}" : ''
-
-    // SmartSeq has no UMIs by default; a protocol-specific override takes precedence.
-    def umi_dedup_arg = protocol == 'SmartSeq' && !other_10x_parameters.contains('--soloUMIdedup') ?
-        '--soloUMIdedup NoDedup' :
-        ''
     """
     ${decompress_commands.join('\n    ')}
 
@@ -92,7 +87,6 @@ process STAR_ALIGN {
         $whitelist_arg \\
         --soloType $protocol \\
         --soloFeatures $star_feature \\
-        $umi_dedup_arg \\
         $other_10x_parameters \\
         $out_sam_type \\
         $ignore_gtf \\

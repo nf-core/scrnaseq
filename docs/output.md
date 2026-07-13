@@ -154,9 +154,11 @@ The pipeline also possess a subworkflow imported from scdownstream to perform fi
 - `*_matrix.h5ad`
   - `.mtx` files converted to [AnnData](https://anndata.readthedocs.io/en/latest/) in `.h5ad` format, using [scanpy package](https://scanpy.readthedocs.io/en/stable/).
   - One per sample and a single one with all samples concatenated together `combined_matrix.h5ad`
-- `*_matrix.rds`
-  - `.mtx` files converted to R native data format, rds, using the [Seurat package](https://github.com/satijalab/seurat)
-  - One per sample
+- `*_matrix.seurat.rds` and `*_matrix.sce.rds`
+  - `.mtx` files converted to R native data format using [anndataR](https://bioconductor.org/packages/anndataR/)
+  - One Seurat and one SingleCellExperiment RDS per sample
+  - For STARsolo, the filtered matrix directory may be absent when no cells pass filtering; only available conversions are published
+  - The Seurat RDS is omitted when the AnnData object has fewer than two cells; SCE conversion is still attempted
 
 Because the pipeline has both the data directly from the aligners, and from the cellbender empty-drops filtering module, the conversion modules were
 modified to understand the difference between raw/filtered from the aligners itself and filtered from the empty-drops module.

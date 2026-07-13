@@ -9,26 +9,16 @@ library(SingleCellExperiment)
 
 # read input
 adata <- read_h5ad("${h5ad}")
-print("Read in ${h5ad} successfully.")
-print(adata)
+n_cells <- adata\$shape()[1]
 
-# If there is only 1 cell
-if(adata\$shape()[1] == 1) {
-    print("The input file contains only one cell. Cannot create Seurat object.")
+obj_sce <- adata\$as_SingleCellExperiment()
+saveRDS(obj_sce, file = "${meta.id}_${meta.input_type}_matrix.sce.rds")
+
+if (n_cells < 2) {
+    message("Skipping Seurat RDS: input has ", n_cells, " cell(s); Seurat requires at least 2 cells.")
 } else {
-    # convert to Seurat
-    obj <- adata\$as_Seurat()
-
-    # save files
-    dir.create(file.path("$meta.id"), showWarnings = FALSE)
-    saveRDS(obj, file = "${meta.id}_${meta.input_type}_matrix.seurat.rds")
-
-    # convert to SingleCellExperiment
-    obj <- adata\$as_SingleCellExperiment()
-
-    # save files
-    dir.create(file.path("$meta.id"), showWarnings = FALSE)
-    saveRDS(obj, file = "${meta.id}_${meta.input_type}_matrix.sce.rds")
+    obj_seurat <- adata\$as_Seurat()
+    saveRDS(obj_seurat, file = "${meta.id}_${meta.input_type}_matrix.seurat.rds")
 }
 
 #

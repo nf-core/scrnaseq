@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
 
+### Fixes
+
+- Allow STARsolo runs without a barcode whitelist and support multiple ordered whitelist files for STAR ([#488](https://github.com/nf-core/scrnaseq/pull/488), @LeonHafner)
+- Mark STARsolo filtered count matrices optional when STAR omits the filtered output directory ([#486](https://github.com/nf-core/scrnaseq/pull/486), @sminot)
+- Skip Seurat RDS conversion for inputs with fewer than two cells while retaining SCE conversion ([#486](https://github.com/nf-core/scrnaseq/pull/486), @sminot)
+
 ## v4.2.0 - 2026-07-03
 
 ### Features

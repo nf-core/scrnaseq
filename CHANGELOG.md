@@ -14,10 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
 
-### Fixes 
+### Fixes
 
 - Fix pipeline attempts to access igenomes buckets even with `--igenomes_ignore=true` [#568](https://github.com/nf-core/scrnaseq/issues/568)
-
 
 ## v4.2.0 - 2026-07-03
 

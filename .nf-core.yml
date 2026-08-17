@@ -2,8 +2,11 @@ lint:
   files_exist:
     - lib/Utils.groovy
     - tests/default.nf.test
+    - .github/workflows/linting_comment.yml
   files_unchanged:
     - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/workflows/branch.yml
+    - .github/workflows/linting.yml
   schema_params: false
   template_strings: false
 nf_core_version: 4.0.2

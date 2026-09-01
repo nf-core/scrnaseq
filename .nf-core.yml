@@ -6,7 +6,7 @@ lint:
     - .github/ISSUE_TEMPLATE/bug_report.yml
   schema_params: false
   template_strings: false
-nf_core_version: 4.0.3
+nf_core_version: 4.1.0
 repository_type: pipeline
 template:
   author: Bailey PJ, Botvinnik O, Marques de Almeida F, Peltzer A, Sturm G, Dongze

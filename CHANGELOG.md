@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixes
 
 - Fix pipeline attempts to access igenomes buckets even with `--igenomes_ignore=true` [#568](https://github.com/nf-core/scrnaseq/issues/568)
+- Fix `--aligner cellrangerarc` with a pre-built `--cellranger_index`, which failed in `CELLRANGERARC_COUNT` with `Path value cannot be null` ([#576](https://github.com/nf-core/scrnaseq/issues/576))
 
 ## v4.2.0 - 2026-07-03
 

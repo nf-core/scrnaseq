@@ -1,0 +1,42 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/scrnaseq/master/assets/schema_cellranger_multi_barcodes.json",
+    "title": "nf-core/scrnaseq pipeline - params.cellranger_multi_barcodes schema",
+    "description": "Schema for the file provided with params.cellranger_multi_barcodes",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Sample name must be provided and cannot contain spaces"
+            },
+            "multiplexed_sample_id": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Multiplexed sample ID must be provided and cannot contain spaces"
+            },
+            "probe_barcode_ids": {
+                "type": "string",
+                "errorMessage": "Probe barcode IDs not identified"
+            },
+            "cmo_ids": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_|-]*$",
+                "errorMessage": "CMO IDs may only contain alphanumeric, underscore, hyphen, and pipe characters"
+            },
+            "ocm_ids": {
+                "type": "string",
+                "pattern": "^(OB[1-4](\\|OB[1-4])*)?$",
+                "errorMessage": "OCM IDs must be OB1, OB2, OB3, or OB4 (or pipe-separated combinations)"
+            },
+            "description": {
+                "type": "string",
+                "errorMessage": "Description must be provided"
+            }
+        },
+        "required": ["sample", "multiplexed_sample_id", "description"]
+    },
+    "uniqueEntries": ["multiplexed_sample_id"]
+}

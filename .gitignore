@@ -8,3 +8,8 @@ testing*
 *.pyc
 null/
 .lineage/
+log/
+reports/
+testme.sh
+.nf-test*
+.vscode

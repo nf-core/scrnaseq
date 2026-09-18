@@ -9,8 +9,7 @@ lint:
 nf_core_version: 4.0.3
 repository_type: pipeline
 template:
-  author: Bailey PJ, Botvinnik O, Marques de Almeida F, Peltzer A, Sturm G, Dongze
-    H
+  author: Bailey PJ, Botvinnik O, Marques de Almeida F, Peltzer A, Sturm G, Dongze H
   description: Pipeline for processing 10x Genomics single cell rnaseq data
   force: false
   is_nfcore: true

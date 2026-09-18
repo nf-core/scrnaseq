@@ -1,0 +1,458 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_cellrangermulti_aligner_human") {
+
+        tag 'human'
+
+        when {
+            // the rest is taken from shared config
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "$outputDir"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_samplesheet.csv"
+                gex_frna_probe_set        = "${baseDir}/assets/frna_probeset_subset.csv"
+                gex_reference_version     = "GRCh38"
+                fb_reference              = "${baseDir}/assets/fb_reference.csv"
+                fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
+                gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                aligner                   = 'cellrangermulti'
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success},
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeFromYamlMap("$params.outdir/pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml", "Workflow"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path
+                ).match() }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_aligner_rat") {
+
+        tag 'rat'
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "$outputDir"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet_rat.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_samplesheet_rat.csv"
+                fasta                     = 'https://ftp.ensembl.org/pub/release-114/fasta/rattus_norvegicus/dna/Rattus_norvegicus.GRCr8.dna.primary_assembly.6.fa.gz'
+                gtf                       = 'https://ftp.ensembl.org/pub/release-114/gtf/rattus_norvegicus/Rattus_norvegicus.GRCr8.114.chr.gtf.gz'
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+        }
+
+        then {
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success},
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeFromYamlMap("$params.outdir/pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml", "Workflow"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path
+                ).match() }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_missing_gex_reference") {
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_missing_ref"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_samplesheet.csv"
+                gex_frna_probe_set        = "${baseDir}/assets/frna_probeset_subset.csv"
+                fb_reference              = "${baseDir}/assets/fb_reference.csv"
+                fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
+                gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                protocol                  = 'auto'
+                skip_cellbender           = true
+                // Note: gex_reference_version is intentionally NOT provided to test validation
+            }
+        }
+
+        then {
+            // Should fail with validation error
+            assertAll(
+                {assert !workflow.success},
+                {assert workflow.failed},
+                {assert workflow.stdout.any { it.contains("Parameter 'gex_reference_version' is required when 'gex_frna_probe_set' is provided and 'cellranger_index' is not provided") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_mismatched_gex_reference") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "human"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_mismatch"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_samplesheet.csv"
+                gex_frna_probe_set        = "${baseDir}/assets/frna_probeset_subset.csv"
+                gex_reference_version     = "GRCm39" // Intentionally wrong - probeset is GRCh38
+                fb_reference              = "${baseDir}/assets/fb_reference.csv"
+                fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
+                gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+        }
+
+        then {
+            // Should fail with validation error
+            assertAll(
+                {assert !workflow.success},
+                {assert workflow.failed},
+                {assert workflow.stdout.any { it.contains("Parameter 'gex_reference_version' (GRCm39) does not match the probeset reference genome (GRCh38)") } }
+            )
+        }
+    }
+}
+
+nextflow_workflow {
+
+    name "Test PIPELINE_INITIALISATION for cellranger multi"
+    script "subworkflows/local/utils_nfcore_scrnaseq_pipeline/main.nf"
+    workflow "PIPELINE_INITIALISATION"
+
+    test("test-dataset_cellrangermulti_barcodes_missing_barcode") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_missing_barcode"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_missing_barcode.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stdout.any { it.contains("The following rows have no barcode identifiers") } },
+                { assert workflow.stdout.any { it.contains("row 3 (sample_2)") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_barcodes_mixed_types") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_mixed_types"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_mixed_types.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stdout.any { it.contains("Each multiplexed_sample_id should use only one type of barcode identifier") } },
+                { assert workflow.stdout.any { it.contains("sample_1") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_barcodes_duplicate_id") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_duplicate_id"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_duplicate_id.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stderr.any { it.contains("Entry 2") && it.contains("Detected duplicate entries") && it.contains("multiplexed_sample_id:duplicate_id") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_barcodes_sample_with_spaces") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_sample_spaces"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_sample_with_spaces.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stderr.any { it.contains("sample") && it.contains("cannot contain spaces") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_barcodes_multiplexed_id_with_spaces") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_multiplexed_id_spaces"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_multiplexed_id_with_spaces.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stderr.any { it.contains("multiplexed_sample_id") && it.contains("cannot contain spaces") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_barcodes_invalid_cmo") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_invalid_cmo"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_invalid_cmo.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stderr.any { it.contains("cmo_ids") && it.contains("alphanumeric") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_barcodes_invalid_ocm") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_invalid_ocm"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_invalid_ocm.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stderr.any { it.contains("ocm_ids") && it.contains("OB1") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_barcodes_unknown_sample") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_unknown_sample"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
+                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_unknown_sample.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stdout.any { it.contains("do not exist in the input samplesheet") && it.contains("NONEXISTENT_SAMPLE") } }
+            )
+        }
+    }
+}

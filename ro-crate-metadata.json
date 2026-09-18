@@ -32,6 +32,9 @@
                     "@id": "assets/"
                 },
                 {
+                    "@id": "bin/"
+                },
+                {
                     "@id": "conf/"
                 },
                 {
@@ -41,7 +44,13 @@
                     "@id": "docs/images/"
                 },
                 {
+                    "@id": "lib/"
+                },
+                {
                     "@id": "modules/"
+                },
+                {
+                    "@id": "modules/local/"
                 },
                 {
                     "@id": "modules/nf-core/"
@@ -121,8 +130,15 @@
         },
         {
             "@id": "main.nf",
-            "@type": ["File", "SoftwareSourceCode", "ComputationalWorkflow"],
-            "contributor": [
+            "@type": [
+                "File",
+                "SoftwareSourceCode",
+                "ComputationalWorkflow"
+            ],
+            "creator": [
+                {
+                    "@id": "https://orcid.org/0000-0001-9584-7842"
+                },
                 {
                     "@id": "#91edc9c1-84a4-42b0-b6bd-22dbf5f0d6d6"
                 },
@@ -130,7 +146,7 @@
                     "@id": "#9a987287-0ada-494f-b89a-3df0b42a46bf"
                 },
                 {
-                    "@id": "https://orcid.org/0000-0002-2956-9060"
+                    "@id": "#rob.syme@gmail.com"
                 },
                 {
                     "@id": "#3fead506-bff7-406f-848a-865e4f4f58b4"
@@ -158,8 +174,12 @@
                 "single-cell",
                 "star-solo"
             ],
-            "license": ["MIT"],
-            "name": ["nf-core/scrnaseq"],
+            "license": [
+                "MIT"
+            ],
+            "name": [
+                "nf-core/scrnaseq"
+            ],
             "programmingLanguage": {
                 "@id": "https://w3id.org/workflowhub/workflow-ro-crate#nextflow"
             },
@@ -218,6 +238,11 @@
             "description": "Additional files"
         },
         {
+            "@id": "bin/",
+            "@type": "Dataset",
+            "description": "Scripts that must be callable from a pipeline process"
+        },
+        {
             "@id": "conf/",
             "@type": "Dataset",
             "description": "Configuration files"
@@ -233,9 +258,19 @@
             "description": "Images for the documentation files"
         },
         {
+            "@id": "lib/",
+            "@type": "Dataset",
+            "description": "Groovy utility functions"
+        },
+        {
             "@id": "modules/",
             "@type": "Dataset",
             "description": "Modules used by the pipeline"
+        },
+        {
+            "@id": "modules/local/",
+            "@type": "Dataset",
+            "description": "Pipeline-specific modules"
         },
         {
             "@id": "modules/nf-core/",
@@ -326,32 +361,38 @@
         {
             "@id": "#91edc9c1-84a4-42b0-b6bd-22dbf5f0d6d6",
             "@type": "Person",
-            "name": "Bailey PJ"
+            "email": "rob.syme@gmail.com",
+            "name": "Rob Syme"
         },
         {
             "@id": "#9a987287-0ada-494f-b89a-3df0b42a46bf",
             "@type": "Person",
-            "name": "Botvinnik O"
+            "email": "nictru32@gmail.com",
+            "name": "Nico Trummer"
         },
         {
-            "@id": "https://orcid.org/0000-0002-2956-9060",
+            "@id": "https://orcid.org/0000-0001-5010-9539",
             "@type": "Person",
-            "name": "Marques de Almeida F"
+            "email": "sangramsahu15@gmail.com",
+            "name": "Sangram Keshari Sahu"
         },
         {
             "@id": "#3fead506-bff7-406f-848a-865e4f4f58b4",
             "@type": "Person",
-            "name": "Peltzer A"
+            "email": "drpatelhh@gmail.com",
+            "name": "Harshil Patel"
         },
         {
             "@id": "#69cf178a-17ee-4f09-9b05-eb1f2bd7c3fc",
             "@type": "Person",
-            "name": "Sturm G"
+            "email": "felipemarques89@gmail.com",
+            "name": "Felipe Marques de Almeida"
         },
         {
             "@id": "#1a34cf4b-cc98-4347-94c3-55d499139e2d",
             "@type": "Person",
-            "name": "Dongze H"
+            "email": "olga.botvinnik@gmail.com",
+            "name": "Olga Botvinnik"
         }
     ]
 }

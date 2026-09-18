@@ -10,3 +10,13 @@ multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}
 multiqc/multiqc_report.html
 fastqc/*_fastqc.{html,zip}
 pipeline_info/*.{html,json,txt,yml}
+**/simpleaf_quant/**
+**/**.{html,json,bus,ec}
+**/**.Log.*
+**/*.Aligned.sortedByCoord.out.bam
+**/outs/**.{json,txt,yml,csv,tab,bam,bai,h5,fai,cloupe,pb}
+**/analysis/**
+**/genomeParameters.txt
+**/atac_*.{gz,tbi,bed}
+**/10k_PBMC_lib.csv
+**/**combined_*

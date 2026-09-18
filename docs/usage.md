@@ -1,16 +1,10 @@
 # nf-core/scrnaseq: Usage
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/scrnaseq/usage](https://nf-co.re/scrnaseq/usage)
-
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
-
-## Introduction
-
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
 
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with at least 3 columns, and a header row as shown in the examples below.
 
 ```bash
 --input '[path to samplesheet file]'
@@ -29,38 +23,408 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
+There is a strict requirement for the first 3 columns to match those defined in the table below.
 
-A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
-
-```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
-```
-
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| Column           | Description                                                                                                                                                                                                                                                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`         | Required. Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`).                                                                                                                          |
+| `fastq_1`        | Required. Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                                                                                                                                                      |
+| `fastq_2`        | Required. Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                                                                                                                                                      |
+| `expected_cells` | Optional. Number of cells expected for a sample. Must be an integer. If multiple rows are provided for the same sample, this must be the same number for all rows, i.e. the total number of expected cells for the sample.                                                                                                |
+| `seq_center`     | Optional. Sequencing center for the sample. If multiple rows are provided for the same sample, this must be the same string for all rows. Samples sequenced at different centers are considered different samples and must have different identifiers. Used for STARsolo BAM outputs only. Overrides `params.seq_center`. |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
-## Running the pipeline
+### Expected cells
 
-The typical command for running the pipeline is as follows:
+This parameter is currently supported by
 
-```bash
-nextflow run nf-core/scrnaseq --input ./samplesheet.csv --outdir ./results --genome GRCh37 -profile docker
+- [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/generate_permit_list.html#:~:text=procedure%20described%20above.-,%2D%2Dexpect%2Dcells,-%3Cncells%3E%3A%20This)
+- [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md)
+- [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger)
+
+Note that since cellranger v7, it is **not recommended** anymore to supply the `--expected-cells` parameter.
+
+## Aligning options
+
+By default (i.e. `--aligner simpleaf`), the pipeline uses [piscem](https://github.com/COMBINE-lab/piscem) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with [qcatch](https://github.com/COMBINE-lab/qcatch). You can disable qcatch QC with `--skip_qcatch`.
+
+Other aligner options for running the pipeline are:
+
+- [Kallisto](https://pachterlab.github.io/kallisto/about) & [Bustools](https://bustools.github.io/), where kallisto is used for alignment and bustools is used for downstream analysis
+  - `--aligner kallisto`
+- [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md) to perform both alignment and downstream analysis.
+  - `--aligner star`
+- [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
+  - `--aligner cellranger`
+- [Cellranger Multi](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-5p-multi#what) to perform the alignment and downstream analysis of samples with multiple libraries at the same time using Feature Barcode technology that enables simultaneous profiling of the V(D)J repertoire, cell surface protein, antigen, and gene expression (GEX) data.
+
+### If using cellranger
+
+This pipeline automatically renames input FASTQ files to follow the
+[naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
+
+```
+[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz
 ```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+For more details, see
+
+- [this issue](https://github.com/nf-core/scrnaseq/issues/241), discussing various mechanisms to deal with non-conformant filenames
+- [the README of the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/README.md) which demonstrates that renaming files does not affect the results.
+- [the code for renaming files in the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/templates/cellranger_count.py)
+
+As a sanity check, we verify that filenames of a pair of FASTQ files only differ by `R1`/`R2`.
+
+### Support for different scRNA-seq protocols
+
+The single-cell protocol used in the experiment can be specified using the `--protocol` flag.
+Note that the nf-core/scrnaseq pipeline is designed to support only barcode-based protocols.
+An overview of unsupported protocols can be found in the [unsupported protocols](#unsupported-protocols) section.
+
+The four 10x Genomics protocols 3' v1, 3' v2, 3' v3, and 3' v4 are universally supported
+by all aligners in the pipeline and mapped to the correct options automatically.
+A full overview of the protocols supported by each aligner is given below.
+If the protocol is unknown to the pipeline, the value specified to `--protocol` is passed to the aligner _in verbatim_ to support additional protocols.
+
+| Protocol   | Accession     | Cellranger | Simpleaf | STARsolo | Kallisto/bustools | Cellranger-arc |
+| ---------- | ------------- | ---------- | -------- | -------- | ----------------- | -------------- |
+| 10x V1     | `10XV1`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V2     | `10XV2`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V3     | `10XV3`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| 10x V4     | `10XV4`       | ✅         | ✅       | ✅       | ✅                | ❌             |
+| Drop-seq   | `dropseq`     | ❌         | ✅       | ✅       | ✅                | ❌             |
+| Smart-seq3 | `smartseq`    | ❌         | ❌       | ✅       | ✅                | ❌             |
+| auto       | `auto`        | ✅         | ❌       | ❌       | ❌                | ✅             |
+| custom     | custom string | ❌         | ✅       | ✅       | ✅                | ❌             |
+
+Here are some hints on running the various aligners with different protocols:
+
+#### Cell Ranger
+
+Cell Ranger only supports the processing of 10x Genomics protocols.
+It is recommended to stick with the default value `'auto'` for the `--protocol` flag for automatic detection of the protocol.
+
+#### Kallisto/bustools
+
+The command `kb --list` shows all supported, preconfigured protocols. All of these can be used with the `--protocol` flag and will be directly passed to the aligner. Additionally, a custom technology string such as
+`0,0,16:0,16,26:1,0,0` can be speficied:
+
+> Additionally kallisto bus will accept a string specifying a new technology in the format of bc:umi:seq where each of bc,umi and seq are a triplet of integers separated by a comma, denoting the file index, start and stop of the sequence used. For example to specify the 10xV2 technology we would use 0,0,16:0,16,26:1,0,0
+
+For more details, please refer to the [Kallisto/bustools documentation](https://pachterlab.github.io/kallisto/manual#bus).
+
+#### Simpleaf
+
+Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slightly different format, e.g. `1{b[16]u[12]x:}2{r:}`.
+
+When using simpleaf, the same `--protocol` value is also used to select the qcatch chemistry for QC. Set `--skip_qcatch` to skip qcatch report generation.
+
+For protocols without a QCatch chemistry mapping (e.g. `10XV1`, `dropseq`), QCatch omits `--chemistry` and instead infers the chemistry from the quantification metadata. For non-10X / custom assays where inference is not possible, set `--qcatch_n_partitions <int>` to provide the partition count (max number of barcodes) for QCatch's empty-drops step.
+
+For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614) and the [detailed description](https://hackmd.io/@PI7Og0l1ReeBZu_pjQGUQQ/rJMgmvr13).
+
+#### Cell Ranger ARC
+
+##### Automatic file name detection
+
+This pipeline currently **does not** automatically rename input FASTQ files to follow the
+[naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
+
+```
+[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz
+```
+
+Thus please make sure your files follow this naming convention.
+
+##### Sample sheet definition
+
+If you are using cellranger-arc you have to add the column _sample_type_ (atac for scATAC or gex for scRNA) and _fastq_barcode_ (part of the scATAC data) to your samplesheet as an input.
+
+**Beware of the following points:**
+
+- It is important that you give your scRNA and scATAC different [Sample Name]s.
+- Check first which file is your barcode fastq file for your scATAC data ([see](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/using/using/fastq-input)).
+- If you have more than one sequencing run then you have to give them another suffix (e.g., rep\*) to your [Sample Name] ([see](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/using/fastq-input#atac_quick_start)).
+
+An example samplesheet for a dataset called test_scARC that has two sequencing runs for the scATAC and one seqeuncing run
+from two lanes for the scRNA could look like this:
+
+```csv
+sample,fastq_1,fastq_2,fastq_barcode,sample_type
+test_scARC,path/test_scARC_atac_rep1_S1_L001_R1_001.fastq.gz,path/test_scARC_atac_rep1_S1_L001_R2_001.fastq.gz,path/test_scARC_atac_rep1_S1_L001_I2_001.fastq.gz,atac
+test_scARC,path/test_scARC_atac_rep2_S2_L001_R1_001.fastq.gz,path/test_scARC_atac_rep2_S2_L001_R2_001.fastq.gz,path/test_scARC_atac_rep2_S2_L001_I2_001.fastq.gz,atac
+test_scARC,path/test_scARC_gex_S1_L001_R1_001.fastq.gz,path/test_scARC_gex_S1_L001_R2_001.fastq.gz,,gex
+test_scARC,path/test_scARC_gex_S1_L002_R1_001.fastq.gz,path/test_scARC_gex_S1_L002_R2_001.fastq.gz,,gex
+```
+
+##### Config file and index
+
+Cellranger-arc needs a reference index directory that you can provide with `--cellranger_index`.
+Besure to provide the base path of the index (e.g., `--cellranger_index /PATH/TO/10X_REF/refdata-gex-GRCh38-2024-A/`).
+Be aware, you can use for cellranger-arc the same index you use for cellranger ([see](https://kb.10xgenomics.com/hc/en-us/articles/4408281606797-Are-the-references-interchangeable-between-pipelines)).
+Yet, a cellranger-arc index might include additional data (e.g., TF binding motifs). Therefore, please first check if
+you have to create a new cellranger-arc index ([see here](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/advanced/references) for
+more information)
+
+If you decide to create a cellranger-arc index, then you need to create a config file to generate the index. The pipeline
+can do this autmatically for you if you provide a `--fasta`, `--gtf` or `--gff`, and an optional `--motif` file. However, you can
+also decide to provide your own config file with `--cellrangerarc_config`, then you also have to specify with `--cellrangerarc_reference`
+the reference genome name that you have used and stated as _genome:_ in your config file.
+
+#### Unsupported protocols
+
+nf-core/scrnaseq is designed specifically for barcode-based single-cell RNA sequencing protocols. Several types of protocols are currently not supported:
+
+##### Smart-seq2
+
+Smart-seq2 data should be processed with [nf-core/rnaseq](https://nf-co.re/rnaseq) pipeline instead, as it is better suited for plate-based full-length transcript sequencing without UMIs.
+
+##### Cell hashing and genotype-based demultiplexing
+
+For cell hashing or genetic demultiplexing of pooled samples, we recommend using the [hadge pipeline](https://hadge.readthedocs.io/en/latest/). While not currently part of nf-core, hadge is being prepared for integration. You can follow its development progress [in the nf-core Slack](https://nfcore.slack.com/archives/C067K2P6GUV).
+
+## Running the pipeline
+
+The minimum typical command for running the pipeline is as follows:
+
+```bash
+nextflow run nf-core/scrnaseq --input ./samplesheet.csv --outdir ./results --genome GRCh38 -profile docker
+```
+
+This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.
+
+Note that the pipeline will create the following files in your working directory:
+
+```bash
+work                # Directory containing the nextflow working files
+<OUTDIR>            # Finished results in specified location (defined with --outdir)
+.nextflow_log       # Log file from Nextflow
+# Other nextflow hidden files, eg. history of pipeline runs and old logs.
+```
+
+If you wish to repeatedly use the same parameters for multiple runs, rather than specifying each flag in the command, you can specify these in a params file.
+
+Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
+
+:::warning
+Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
+:::
+
+The above pipeline run specified with a params file in yaml format:
+
+```bash
+nextflow run nf-core/scrnaseq -profile docker -params-file params.yaml
+```
+
+with `params.yaml` containing:
+
+```yaml
+input: './samplesheet.csv'
+outdir: './results/'
+genome: 'GRCh37'
+<...>
+```
+
+You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-co.re/launch).
+
+### If using Simpleaf
+
+When building reference index, the underlying mapper of Simpleaf operates on a large number of temporary files on disk simutaneously. Therefore, for environments where CPUs and disk I/O are limited, such as on AWS, specifying `scratch=true` for the `SIMPLEAF_INDEX` module in the `conf/modules.config` file is necessary to avoid slowdowns and potential failures.
+
+Example:
+
+```nextflow title="conf/modules.config"
+process {
+  withName: SIMPLEAF_INDEX {
+    scratch=true
+  }
+}
+```
+
+### If using cellranger-multi
+
+#### Automatic file name detection
+
+The pipeline is able to automatically rename input FASTQ files to follow the
+[naming convention by 10x](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/fastq-input):
+
+```
+[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz
+```
+
+If your data already follows the expected naming convention, you can deactivate this behavior with `skip_cellranger_renaming`.
+
+#### Sample sheet definition
+
+If you are using cellranger-multi you have to add the column _feature_type_ to indicate which of the Feature Barcode Technology your data corresponds to:
+
+| feature_type | description                            |
+| ------------ | -------------------------------------- |
+| `gex`        | Gene expression                        |
+| `vdj`        | TCR/BCR profiling                      |
+| `ab`         | Antibody profiling (feature barcoding) |
+| `crispr`     | CRISPR capture                         |
+| `cmo`        | Cell multiplexing oligos (CMO) tags    |
+| `beam`       | _Currently not supported_              |
+
+> More information on the Feature Barcode Technologies can be found here: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi
+
+**Beware of the following points:**
+
+- It is important that you give the same sample name for the different feature barcode technologies data that correspond to the same and should be analysed together.
+- The pipeline will **automatically** generate the cellranger multi config file based on the given data.
+- When working with multiplexed data (FFPE/CMO/OCM), you'll need a **second samplesheet** relating the multiplexed samples to the corresponding "physical" sample (details below). The `sample` column in the main samplesheet refers to the "physical" sample that may contain multiple multiplexed samples.
+
+The `--cellranger_multi_barcodes` samplesheet is validated before Cell Ranger runs. It must follow these rules:
+
+- `sample`, `multiplexed_sample_id`, and `description` are required.
+- `sample` values must match samples in the main input samplesheet.
+- `multiplexed_sample_id` values must be unique.
+- Each row must define exactly one barcode ID field: `probe_barcode_ids`, `cmo_ids`, or `ocm_ids`.
+- Sample names and multiplexed sample IDs cannot contain whitespace.
+
+> Please note that FFPE; CMO and OCM are mutually exclusive in the `cellranger/multi` module. Using more than one for a single sample will cause the module to fail.
+
+#### Additional reference data
+
+- Cellranger multi needs a reference for **GEX and VDJ analysis**. They are calculated on the fly given the reference
+  files (`--fasta`, and `--gtf` or `--gff`) provided, but users can also provide their own with: `--cellranger_index`
+  and `--cellranger_vdj_index`, for GEX and VDJ, respectively.
+
+  > When running cellranger multi, without any VDJ data, users can also skip VDJ automated ref building with: `--skip_cellrangermulti_vdjref`.
+
+- When working with **FFPE data**:
+  - a probe set needs to be specified via `--gex_frna_probe_set`. This file is typically
+    [provided by 10x](https://www.10xgenomics.com/support/software/cell-ranger/downloads#probe-set-downloads). E.g. [testing ffpe probe set](../assets/frna_probeset_subset.csv).
+  - a GEX reference genome version (e.g. GRCh38, GRCm39) via `--gex_reference_version` must be specified unless a pre-built index is provided via `--cellranger_index`. This **must** match the reference in the probe set, which can be found in the header.
+
+- When working with **Cell Multiplexing Oligos (CMOs)**, a reference file can to be provided via `--gex_cmo_set`. The
+  default reference file, as well as a description how to write a custom one, are [available from the 10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#cmo-ref). By default, the Cell Ranger's default CMO-set.
+
+- When working with **Feature barcoding (antibody capture)**, a reference file needs to be provided via `--fb_reference`.
+  It relates each "feature" to the corresponding barcode sequence. The structure of this file is described in
+  the [cellranger documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-feature-bc-analysis#feature-ref). E.g. [testing fb reference](../assets/fb_reference.csv)
+
+#### Examples
+
+You can find the **complete** testing files used in the testing profiles here:
+
+- [input samplesheet](../assets/cellrangermulti_samplesheet.csv)
+- [barcodes samplesheet](../assets/cellranger_barcodes_samplesheet.csv)
+
+In the sub-sections below we collect specific examples of CMO/FFPE/OCM samples for quicker visualisation.
+
+##### with CMOs
+
+Input samplesheet:
+
+```csv
+sample,fastq_1,fastq_2,feature_type,expected_cells
+PBMC_10K_CMO,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/gex_1/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_gex_S2_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/gex_1/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_gex_S2_L001_R2_001.fastq.gz,gex,1000
+PBMC_10K_CMO,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/cmo/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_multiplexing_capture_S1_L001_R1_001.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/10k_pbmc_cmo/fastqs/cmo/subsampled_SC3_v3_NextGem_DI_CellPlex_Human_PBMC_10K_1_multiplexing_capture_S1_L001_R2_001.fastq.gz,cmo,1000
+```
+
+Barcode samplesheet:
+
+```csv
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_1,,CMO301,,PBMCs_human_1
+PBMC_10K_CMO,PBMC_10K_CMO_PBMCs_human_2,,CMO302,,PBMCs_human_2
+```
+
+> You must provide the barcodes CSV with the `--cellranger_multi_barcodes` parameter.
+
+##### with FFPE
+
+Input samplesheet:
+
+```csv
+sample,fastq_1,fastq_2,feature_type,expected_cells
+4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L001_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L001_R2_001.subsampled.fastq.gz,gex,
+4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L002_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L002_R2_001.subsampled.fastq.gz,gex,
+4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L003_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L003_R2_001.subsampled.fastq.gz,gex,
+4PLEX_HUMAN,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L004_R1_001.subsampled.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/4plex_scFFPE/4plex_human_liver_colorectal_ovarian_panc_scFFPE_multiplex_S1_L004_R2_001.subsampled.fastq.gz,gex,
+```
+
+Barcode samplesheet:
+
+```csv
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+4PLEX_HUMAN,Liver_BC1,BC001,,,Healthy liver dissociated using the Miltenyi FFPE Tissue Dissociation Kit
+4PLEX_HUMAN,Ovarian_BC2,BC002,,,Ovarian cancer dissociated using the Miltenyi FFPE Dissociation Kit
+4PLEX_HUMAN,Colorectal_BC3,BC003,,,Colorectal cancer dissociated using the Miltenyi FFPE Dissociation Kit
+4PLEX_HUMAN,Pancreas_BC4,BC004,,,Healthy pancreas dissociated using the Miltenyi FFPE Tissue Dissociation Kit
+```
+
+> You must provide the barcodes CSV with the `--cellranger_multi_barcodes` parameter.
+
+##### with OCMs
+
+Input samplesheet:
+
+```csv
+sample,fastq_1,fastq_2,feature_type,expected_cells
+10k_Wistar_Rat,/path to data/10k_Wistar_Rat_PBMCs_Multiplex_3p_gem-x_Universal_OCM_fastqs/10k_Wistar_Rat_PBMCs_Multiplex_3p_gem-x_Universal_OCM_S1_L002_R1_001.fastq.gz,/data/gcbds/externals/almeifel/NFCORE_PIPELINES/scrnaseq/testing/OCM_MULTI/10k_Wistar_Rat_PBMCs_Multiplex_3p_gem-x_Universal_OCM_fastqs/10k_Wistar_Rat_PBMCs_Multiplex_3p_gem-x_Universal_OCM_S1_L002_R2_001.fastq.gz,gex,
+```
+
+Barcode samplesheet:
+
+```csv
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB1,,,OB1,2.5k_Wistar_Rat_PBMCs_gem-x_OB1
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB2,,,OB2,2.5k_Wistar_Rat_PBMCs_gem-x_OB2
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB3,,,OB3,2.5k_Wistar_Rat_PBMCs_gem-x_OB3
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB4,,,OB4,2.5k_Wistar_Rat_PBMCs_gem-x_OB4
+```
+
+> You must provide the barcodes CSV with the `--cellranger_multi_barcodes` parameter.
+
+## Reference genome options
+
+The pipeline can resolve reference files from `conf/igenomes.config` when you provide `--genome`, for example `--genome GRCh38`. These entries may include pre-built aligner indices such as STAR indices, depending on the selected genome.
+
+Some AWS iGenomes STAR indices were generated with older STAR versions and contain legacy metadata. nf-core/scrnaseq includes a compatibility step for these configured iGenomes entries so that legacy STAR indices can run with the STAR version shipped by the pipeline. This support is intended to keep existing iGenomes usage working, not to make legacy indices the preferred reference for new analyses.
+
+Some AWS iGenomes GTF files, such as the NCBI `GRCh38` annotation, contain spaces in the GTF source column (for example `Curated Genomic`). Cell Ranger 10 `mkref` rejects spaces in that field. When using Cell Ranger aligners (`cellranger`, `cellrangerarc`, or `cellrangermulti`) with a configured iGenomes entry flagged for this issue, nf-core/scrnaseq automatically replaces spaces in the source column before reference building. This keeps existing iGenomes usage working with Cell Ranger 10, but is not intended as the preferred reference for new analyses.
+
+> [!WARNING]
+> For production runs, we recommend building fresh indices from current reference files instead of relying on legacy AWS iGenomes indices. The nf-core [reference genome documentation](https://nf-co.re/docs/running/reference-genomes) warns that AWS iGenomes annotations are significantly outdated, for example human annotations from Ensembl release 75, and that GRCh38 iGenomes uses the NCBI assembly rather than the masked Ensembl assembly.
+
+To generate and keep a STAR index for future runs, provide current FASTA and GTF files and set `--save_reference`:
+
+```bash
+nextflow run nf-core/scrnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --aligner star \
+    --fasta reference.fa.gz \
+    --gtf annotation.gtf.gz \
+    --save_reference \
+    -profile docker
+```
+
+To build a Cell Ranger reference from current annotation files instead of iGenomes, provide FASTA and GTF files directly:
+
+```bash
+nextflow run nf-core/scrnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --aligner cellranger \
+    --fasta reference.fa.gz \
+    --gtf annotation.gtf.gz \
+    -profile docker
+```
+
+## Running the pipeline
+
+The minimum typical command for running the pipeline is as follows:
+
+```bash
+nextflow run nf-core/scrnaseq --input ./samplesheet.csv --outdir ./results --genome GRCh38 -profile docker
+```
+
+This will launch the pipeline with the `docker` configuration profile and default `--type` and `--barcode_whitelist`. See below for more information about profiles and these options.
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -107,7 +471,7 @@ nextflow pull nf-core/scrnaseq
 
 It is a good idea to specify the pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
 
-First, go to the [nf-core/scrnaseq releases page](https://github.com/nf-core/scrnaseq/releases) and find the latest pipeline version - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`. Of course, you can switch to another version by changing the number after the `-r` flag.
+First, go to the [nf-core/scrnaseq releases page](https://github.com/nf-core/scrnaseq/releases) and find the latest version number - numeric only (eg. `1.0.0`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.0.0`.
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
 
@@ -122,6 +486,8 @@ To further assist in reproducibility, you can use share and reuse [parameter fil
 > These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen)
 
 ### `-profile`
+
+Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments. Note that multiple profiles can be loaded, for example: `-profile docker` - the order of arguments is important!
 
 Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments.
 
@@ -156,6 +522,8 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
   - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow `24.03.0-edge` or later).
 - `conda`
   - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
+- `gpu`
+  - A generic configuration profile for enabling GPU execution for modules that have `process_gpu` label.
 
 ### `-resume`
 

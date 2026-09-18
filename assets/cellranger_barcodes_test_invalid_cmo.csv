@@ -1,0 +1,2 @@
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+POOL_A,sample_1,,CMO@301,,CMO ID with invalid character - invalid

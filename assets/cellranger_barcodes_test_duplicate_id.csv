@@ -1,0 +1,3 @@
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+POOL_A,duplicate_id,BC001,,,First occurrence
+POOL_B,duplicate_id,BC002,,,Duplicate multiplexed_sample_id

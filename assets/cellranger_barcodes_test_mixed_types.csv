@@ -1,0 +1,2 @@
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+POOL_A,sample_1,BC001,CMO301,,Row with both probe barcode AND CMO - invalid

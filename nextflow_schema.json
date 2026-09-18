@@ -20,8 +20,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/scrnaseq/usage#samplesheet-input).",
-                    "fa_icon": "fas fa-file-csv"
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/scrnaseq/usage#samplesheet-input)."
                 },
                 "outdir": {
                     "type": "string",
@@ -33,13 +32,74 @@
                     "type": "string",
                     "description": "Email address for completion summary.",
                     "fa_icon": "fas fa-envelope",
-                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
+                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`), then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
                 },
                 "multiqc_title": {
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                }
+            }
+        },
+        "mandatory_arguments": {
+            "title": "Mandatory arguments",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "barcode_whitelist": {
+                    "type": "string",
+                    "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
+                    "fa_icon": "fas fa-barcode",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "aligner": {
+                    "type": "string",
+                    "description": "Name of the tool to use for scRNA (pseudo-) alignment.",
+                    "default": "simpleaf",
+                    "help_text": "The workflow can handle three types of methods:\n\n- Kallisto/Bustools\n- SimpleAF \n- STARsolo\n\nTo choose which one to use, please specify either `simpleaf`, `star` or `kallisto` as a parameter option for `--aligner`. By default, the pipeline runs the `simpleaf` option. Note that specifying another aligner option also requires choosing appropriate parameters (see below) for the selected option.",
+                    "fa_icon": "fas fa-align-center",
+                    "enum": ["kallisto", "star", "simpleaf", "cellranger", "cellrangerarc", "cellrangermulti"]
+                },
+                "protocol": {
+                    "type": "string",
+                    "description": "The protocol that was used to generate the single cell data, e.g. 10x Genomics v2 Chemistry.\n\n Can be 'auto' (cellranger only), '10XV1', '10XV2', '10XV3', '10XV4', or any other protocol string that will get directly passed the respective aligner.",
+                    "help_text": "The default is to auto-detect the protocol when running cellranger. For all other aligners, the protocol MUST be manually specified. \n\n The following protocols are recognized by the pipeline and mapped to the corresponding protocol name of the respective aligner: '10XV1', '10XV2', '10XV3', '10XV4'. \n\nAny other protocol value is passed to the aligner verbatim to support other sequencing platforms. See the [kallisto](https://pachterlab.github.io/kallisto/manual#bus), [simpleaf](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag), [starsolo](https://gensoft.pasteur.fr/docs/STAR/2.7.9a/STARsolo.html)",
+                    "default": "auto",
+                    "fa_icon": "fas fa-cogs"
+                }
+            },
+            "fa_icon": "fas fa-terminal"
+        },
+        "skip_tools": {
+            "title": "Skip Tools",
+            "type": "object",
+            "description": "This section can be used to disable certain tools in the pipeline",
+            "default": "",
+            "fa_icon": "fas fa-forward",
+            "properties": {
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "description": "Skip MultiQC Report"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC"
+                },
+                "skip_cellbender": {
+                    "type": "boolean",
+                    "description": "Skip cellbender empty drops filter subworkflow"
+                },
+                "skip_qcatch": {
+                    "type": "boolean",
+                    "description": "Skip qcatch QC for simpleaf aligner"
+                },
+                "skip_emptydrops": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "errorMessage": "Parameter has been deprecated in favour of --skip_cellbender to properly match name of workflow."
                 }
             }
         },
@@ -62,7 +122,7 @@
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available, this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
                     "fa_icon": "far fa-file-code"
                 },
                 "igenomes_ignore": {
@@ -72,12 +132,267 @@
                     "hidden": true,
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
                 },
+                "transcript_fasta": {
+                    "type": "string",
+                    "description": "A cDNA FASTA file",
+                    "fa_icon": "fas fa-dna",
+                    "format": "file-path",
+                    "exists": true,
+                    "help_text": "If simpleaf is used as the aligner, this must be provided together with a transcript-to-gene ID mapping file (`txp2gene`)."
+                },
+                "gtf": {
+                    "type": "string",
+                    "description": "Reference GTF annotation file",
+                    "fa_icon": "fas fa-code-branch",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "gff": {
+                    "type": "string",
+                    "description": "Reference GFF annotation file. Can be used as an alternative to the GTF file. If both are provided, the GTF file will be used.",
+                    "fa_icon": "fas fa-code-branch",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "save_reference": {
+                    "type": "boolean",
+                    "description": "Specify this parameter to save the indices created (STAR, Kallisto, Simpleaf) to the results.",
+                    "fa_icon": "fas fa-bookmark"
+                },
+                "save_align_intermeds": {
+                    "type": "boolean",
+                    "description": "Specify this parameter to save the intermediate alignment files (STAR, CellRanger) to the results.",
+                    "fa_icon": "fas fa-bookmark"
+                },
                 "igenomes_base": {
                     "type": "string",
-                    "description": "The base path to the igenomes reference files",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "default": "s3://ngi-igenomes/igenomes/"
+                    "format": "directory-path",
+                    "description": "Directory / URL base for iGenomes references.",
+                    "default": "s3://ngi-igenomes/igenomes/",
+                    "fa_icon": "fas fa-cloud-download-alt",
+                    "hidden": true
+                },
+                "txp2gene": {
+                    "type": "string",
+                    "description": "Path to transcript to gene mapping file. This allows the specification of a transcript to gene mapping file for Kallisto/BUS and Alevin-fry.",
+                    "fa_icon": "fas fa-map-marked-alt",
+                    "format": "file-path",
+                    "exists": true
+                }
+            }
+        },
+        "simpleaf_options": {
+            "title": "Simpleaf Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "simpleaf_index": {
+                    "type": "string",
+                    "help_text": "This can be used to specify a precomputed Simpleaf index in the pipeline, in order to skip the generation of required indices by Simpleaf itself.",
+                    "description": "Path to pre-built Simpleaf index.",
+                    "fa_icon": "fas fa-fish",
+                    "format": "path",
+                    "exists": true
+                },
+                "simpleaf_umi_resolution": {
+                    "type": "string",
+                    "default": "cr-like",
+                    "enum": [
+                        "cr-like",
+                        "cr-like-em",
+                        "parsimony",
+                        "parsimony-em",
+                        "parsimony-gene",
+                        "parsimony-gene-em"
+                    ],
+                    "description": "UMI resolution strategy to deduplicate UMIs.",
+                    "help_text": "This parameter specifies the [UMI resolution strategy](https://simpleaf.readthedocs.io/en/latest/quant-command.html) to use for deduplicating UMIs. The default is `cr-like`, which mimics the behavior of Cell Ranger, i.e., discarding UMIs equally compatible to multiple genes. Strategies that resolve multi-mapped UMIs by expectation maximization are available, like `cr-like-em`, `parsimony-em`, and `parsimony-gene-em`.",
+                    "fa_icon": "fas fa-map-marked-alt"
+                },
+                "remove_doublets": {
+                    "type": "boolean",
+                    "description": "Enable doublet detection and removal using Scrublet via QCatch.",
+                    "help_text": "When enabled, QCatch will run Scrublet-based doublet detection and removal on the filtered count matrix, and include doublet visualizations in the QC report. Only applies when using the simpleaf aligner with QCatch enabled."
+                },
+                "qcatch_n_partitions": {
+                    "type": "integer",
+                    "description": "Number of partitions (max barcodes) for QCatch's empty_drops step.",
+                    "help_text": "Passed to QCatch as `--n_partitions`. Use for non-10X / custom assays (e.g. drop-seq) where QCatch has no chemistry mapping and cannot reliably auto-infer the partition range. Only applies when using the simpleaf aligner with QCatch enabled."
+                }
+            }
+        },
+        "starsolo_options": {
+            "title": "STARSolo Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "star_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed STAR index.",
+                    "help_text": "> NB: This has to be computed with STAR Version 2.7 or later, as STARsolo was only first supported by STAR Version 2.7.",
+                    "fa_icon": "fas fa-asterisk",
+                    "format": "path",
+                    "exists": true
+                },
+                "star_ignore_sjdbgtf": {
+                    "type": "string",
+                    "description": "Ignore the SJDB GTF file."
+                },
+                "seq_center": {
+                    "type": "string",
+                    "description": "Name of sequencing center for BAM read group tag."
+                },
+                "star_feature": {
+                    "type": "string",
+                    "default": "Gene",
+                    "enum": ["Gene", "GeneFull", "Gene Velocyto"],
+                    "description": "Quantification type of different transcriptomic feature. Use `GeneFull` on pre-mRNA count for single-nucleus RNA-seq reads. Use `Gene Velocyto` to generate RNA velocity matrix.",
+                    "fa_icon": "fas fa-asterisk"
+                }
+            },
+            "fa_icon": "fas fa-star"
+        },
+        "kallisto_bus_options": {
+            "title": "Kallisto/BUS Options",
+            "type": "object",
+            "description": "Params related to Kallisto/BUS tool",
+            "default": "",
+            "fa_icon": "fas fa-rainbow",
+            "properties": {
+                "kallisto_index": {
+                    "type": "string",
+                    "description": "Specify a path to the precomputed Kallisto index.",
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "path",
+                    "exists": true
+                },
+                "kb_t1c": {
+                    "type": "string",
+                    "description": "Specify a path to the cDNA transcripts-to-capture.",
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "kb_t2c": {
+                    "type": "string",
+                    "description": "Specify a path to the intron transcripts-to-capture.",
+                    "fa_icon": "fas fa-rainbow",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "kb_workflow": {
+                    "type": "string",
+                    "default": "standard",
+                    "description": "Type of workflow. Use `nac` for an index type that can quantify nascent and mature RNA. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic. (default: standard)",
+                    "fa_icon": "fas fa-rainbow",
+                    "enum": ["standard", "lamanno", "nac"]
+                }
+            }
+        },
+        "cellranger_options": {
+            "title": "Cellranger Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "cellranger_index": {
+                    "type": "string",
+                    "description": "Specify a pre-calculated cellranger index. Readily prepared indexes can be obtained from the 10x Genomics website. Provide the base directory of the index (e.g., '/PATH/TO/10X_REF/refdata-gex-GRCh38-2024-A/')",
+                    "format": "path",
+                    "exists": true
+                },
+                "skip_cellranger_renaming": {
+                    "type": "boolean",
+                    "description": "Should it skip the automatic renaming included in cellranger-related modules?"
+                }
+            }
+        },
+        "cellrangerarc_options": {
+            "title": "Cellranger ARC Options",
+            "type": "object",
+            "description": "Params related to the Cellranger pipeline",
+            "default": "",
+            "properties": {
+                "motifs": {
+                    "type": "string",
+                    "description": "Specify a motif file to create a cellranger-arc index. Can be taken, e.g., from the JASPAR database."
+                },
+                "cellrangerarc_config": {
+                    "type": "string",
+                    "description": "Specify a config file to create the cellranger-arc index."
+                },
+                "cellrangerarc_reference": {
+                    "type": "string",
+                    "description": "Specify the genome reference name used in the config file to create a cellranger-arc index."
+                }
+            }
+        },
+        "cellranger_multi_options": {
+            "title": "Cellranger Multi options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "cellranger_vdj_index": {
+                    "type": "string",
+                    "format": "path",
+                    "exists": true,
+                    "description": "Specify a pre-built Cell Ranger index for VDJ analysis."
+                },
+                "skip_cellrangermulti_vdjref": {
+                    "type": "boolean",
+                    "description": "Skip mkvdjref if not using VDJ data with cellranger/multi"
+                },
+                "gex_frna_probe_set": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "Provide a probe set for fixed RNA-seq profiling (used with FFPE samples). Please refer to the [10x documentation about probesets](https://www.10xgenomics.com/support/single-cell-gene-expression-flex/documentation/steps/probe-sets/chromium-frp-probe-set-files) for more details."
+                },
+                "gex_reference_version": {
+                    "type": "string",
+                    "description": "Reference version (e.g. GRCh38, GRCm39). Required if `gex_frna_probe_set` is used and `cellranger_index` is not set. Must match the genome version in the `gex_frna_probe_set` file."
+                },
+                "gex_target_panel": {
+                    "type": "string",
+                    "description": "Provide a panel description for targeted sequencing.",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "gex_cmo_set": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "Provide a Cell Multiplexing Oligo (CMO) description file when working with multiplexed samples. This is only necessary if you with to override Cell Ranger's default CMO-set. Please refer to the [10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#cmo-ref) about CMO references for more details."
+                },
+                "fb_reference": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "Provide a reference file for feature barcoding (e.g. antibody measurements). Please refer to the [Cell Ranger Feature Reference documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv) for more details."
+                },
+                "vdj_inner_enrichment_primers": {
+                    "type": "string",
+                    "description": "This argument takes a .txt file containing primer sequences that were used to enrich cDNA for V(D)J sequences. This is only necessary if you with to override Cell Ranger's defaults.",
+                    "format": "file-path",
+                    "exists": true
+                },
+                "gex_barcode_sample_assignment": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/csv",
+                    "exists": true,
+                    "description": "This is only necessary to override Cell Ranger's default cell calling and tag calling steps. In most cases, you need to only use the `cellranger_multi_barcodes` parameter. Please refer to the [10x documentation](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#barcode-asst) for more information about this file."
+                },
+                "cellranger_multi_barcodes": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "schema": "assets/schema_cellranger_multi_barcodes.json",
+                    "mimetype": "text/csv",
+                    "description": "Additional samplesheet to provide information about multiplexed samples. See the 'Usage' section for more details."
                 }
             }
         },
@@ -183,6 +498,7 @@
                     "type": "string",
                     "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
+                    "exists": true,
                     "fa_icon": "fas fa-cog",
                     "hidden": true
                 },
@@ -237,7 +553,31 @@
             "$ref": "#/$defs/input_output_options"
         },
         {
+            "$ref": "#/$defs/mandatory_arguments"
+        },
+        {
+            "$ref": "#/$defs/skip_tools"
+        },
+        {
             "$ref": "#/$defs/reference_genome_options"
+        },
+        {
+            "$ref": "#/$defs/simpleaf_options"
+        },
+        {
+            "$ref": "#/$defs/starsolo_options"
+        },
+        {
+            "$ref": "#/$defs/kallisto_bus_options"
+        },
+        {
+            "$ref": "#/$defs/cellranger_options"
+        },
+        {
+            "$ref": "#/$defs/cellrangerarc_options"
+        },
+        {
+            "$ref": "#/$defs/cellranger_multi_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

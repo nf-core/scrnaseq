@@ -149,7 +149,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Template update to v2.12 ([#298](https://github.com/nf-core/scrnaseq/pull/298)).
 - Fix that cellranger workflow couldn't be run and enable CI for this workflow ([#288](https://github.com/nf-core/scrnaseq/pull/288)).
-- Update modules ([#288]()https://github.com/nf-core/scrnaseq/pull/288).
+- Update modules ([#288](<>)https://github.com/nf-core/scrnaseq/pull/288).
 
 ## v2.5.0 - 2024-01-02
 

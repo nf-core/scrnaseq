@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
+- Increase runtime limits for cellbender and cellranger in `conf/modules.config` to avoid template updates resetting these limits ([#275](https://github.com/nf-core/scrnaseq/issues/275))
 - Fix pipeline attempts to access igenomes buckets even with `--igenomes_ignore=true` [#568](https://github.com/nf-core/scrnaseq/issues/568)
 
 ## v4.2.0 - 2026-07-03

@@ -1,11 +1,5 @@
-process ANNDATAR_CONVERT {
-
-    //
-    // This module uses the anndata R package to convert h5ad files in different formats
-    //
-
+process ANNDATA_CONVERT {
     tag "${meta.id}"
-
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
@@ -17,18 +11,22 @@ process ANNDATAR_CONVERT {
     tuple val(meta), path(h5ad)
 
     output:
-    tuple val(meta), path("${meta.id}_${meta.input_type}_matrix*.rds"), emit: rds
-    path  "versions.yml"                                              , emit: versions
+    tuple val(meta), path("${prefix}.seurat.rds"), emit: seurat
+    tuple val(meta), path("${prefix}.sce.rds"), emit: sce
+    path "versions.yml", emit: versions, topic: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    template 'anndatar_convert.R'
+    prefix = task.ext.prefix ?: meta.id
+    template 'convert.R'
 
     stub:
+    prefix = task.ext.prefix ?: meta.id
     """
-    touch ${meta.id}_${meta.input_type}_matrix.Rds
+    touch ${prefix}.seurat.rds
+    touch ${prefix}.sce.rds
     touch versions.yml
     """
 }

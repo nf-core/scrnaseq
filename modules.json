@@ -10,6 +10,11 @@
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["h5ad_removebackground_barcodes_cellbender_anndata"]
                     },
+                    "anndata/convert": {
+                        "branch": "master",
+                        "git_sha": "1fcb7c7e29750bd6d1e67663a4bd035d51e92777",
+                        "installed_by": ["modules"]
+                    },
                     "cellbender/removebackground": {
                         "branch": "master",
                         "git_sha": "ffbf6a031bcef2f2bc6b55009e177c814e2faa01",

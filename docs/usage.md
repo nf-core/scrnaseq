@@ -120,6 +120,8 @@ Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slightly
 
 When using simpleaf, the same `--protocol` value is also used to select the qcatch chemistry for QC. Set `--skip_qcatch` to skip qcatch report generation.
 
+For protocols without a QCatch chemistry mapping (e.g. `10XV1`, `dropseq`), QCatch omits `--chemistry` and instead infers the chemistry from the quantification metadata. For non-10X / custom assays where inference is not possible, set `--qcatch_n_partitions <int>` to provide the partition count (max number of barcodes) for QCatch's empty-drops step.
+
 For more details, see Simpleaf's paper, [He _et al._ 2023](https://doi.org/10.1093/bioinformatics/btad614) and the [detailed description](https://hackmd.io/@PI7Og0l1ReeBZu_pjQGUQQ/rJMgmvr13).
 
 #### Cell Ranger ARC
@@ -166,7 +168,7 @@ you have to create a new cellranger-arc index ([see here](https://support.10xgen
 more information)
 
 If you decide to create a cellranger-arc index, then you need to create a config file to generate the index. The pipeline
-can do this autmatically for you if you provide a `--fasta`, `--gtf`, and an optional `--motif` file. However, you can
+can do this autmatically for you if you provide a `--fasta`, `--gtf` or `--gff`, and an optional `--motif` file. However, you can
 also decide to provide your own config file with `--cellrangerarc_config`, then you also have to specify with `--cellrangerarc_reference`
 the reference genome name that you have used and stated as _genome:_ in your config file.
 
@@ -287,7 +289,7 @@ The `--cellranger_multi_barcodes` samplesheet is validated before Cell Ranger ru
 #### Additional reference data
 
 - Cellranger multi needs a reference for **GEX and VDJ analysis**. They are calculated on the fly given the reference
-  files (`--fasta` and `--gtf`) provided, but users can also provide their own with: `--cellranger_index`
+  files (`--fasta`, and `--gtf` or `--gff`) provided, but users can also provide their own with: `--cellranger_index`
   and `--cellranger_vdj_index`, for GEX and VDJ, respectively.
 
   > When running cellranger multi, without any VDJ data, users can also skip VDJ automated ref building with: `--skip_cellrangermulti_vdjref`.
@@ -377,6 +379,42 @@ sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
 ```
 
 > You must provide the barcodes CSV with the `--cellranger_multi_barcodes` parameter.
+
+## Reference genome options
+
+The pipeline can resolve reference files from `conf/igenomes.config` when you provide `--genome`, for example `--genome GRCh38`. These entries may include pre-built aligner indices such as STAR indices, depending on the selected genome.
+
+Some AWS iGenomes STAR indices were generated with older STAR versions and contain legacy metadata. nf-core/scrnaseq includes a compatibility step for these configured iGenomes entries so that legacy STAR indices can run with the STAR version shipped by the pipeline. This support is intended to keep existing iGenomes usage working, not to make legacy indices the preferred reference for new analyses.
+
+Some AWS iGenomes GTF files, such as the NCBI `GRCh38` annotation, contain spaces in the GTF source column (for example `Curated Genomic`). Cell Ranger 10 `mkref` rejects spaces in that field. When using Cell Ranger aligners (`cellranger`, `cellrangerarc`, or `cellrangermulti`) with a configured iGenomes entry flagged for this issue, nf-core/scrnaseq automatically replaces spaces in the source column before reference building. This keeps existing iGenomes usage working with Cell Ranger 10, but is not intended as the preferred reference for new analyses.
+
+> [!WARNING]
+> For production runs, we recommend building fresh indices from current reference files instead of relying on legacy AWS iGenomes indices. The nf-core [reference genome documentation](https://nf-co.re/docs/running/reference-genomes) warns that AWS iGenomes annotations are significantly outdated, for example human annotations from Ensembl release 75, and that GRCh38 iGenomes uses the NCBI assembly rather than the masked Ensembl assembly.
+
+To generate and keep a STAR index for future runs, provide current FASTA and GTF files and set `--save_reference`:
+
+```bash
+nextflow run nf-core/scrnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --aligner star \
+    --fasta reference.fa.gz \
+    --gtf annotation.gtf.gz \
+    --save_reference \
+    -profile docker
+```
+
+To build a Cell Ranger reference from current annotation files instead of iGenomes, provide FASTA and GTF files directly:
+
+```bash
+nextflow run nf-core/scrnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --aligner cellranger \
+    --fasta reference.fa.gz \
+    --gtf annotation.gtf.gz \
+    -profile docker
+```
 
 ## Running the pipeline
 
@@ -481,7 +519,7 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 - `apptainer`
   - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
 - `wave`
-  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow ` 24.03.0-edge` or later).
+  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow `24.03.0-edge` or later).
 - `conda`
   - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
 - `gpu`

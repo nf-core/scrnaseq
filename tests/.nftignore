@@ -13,6 +13,7 @@ pipeline_info/*.{html,json,txt,yml}
 **/simpleaf_quant/**
 **/**.{html,json,bus,ec}
 **/**.Log.*
+**/*.Aligned.sortedByCoord.out.bam
 **/outs/**.{json,txt,yml,csv,tab,bam,bai,h5,fai,cloupe,pb}
 **/analysis/**
 **/genomeParameters.txt

@@ -28,13 +28,13 @@ workflow CELLRANGERARC_ALIGN {
             def cellrangerarc_reference = params.cellrangerarc_reference ?: 'cellrangerarc'
 
             // Filter GTF based on gene biotypes passed in params.modules
-            CELLRANGERARC_MKGTF( gtf.map { g -> [ [ id: cellrangerarc_reference ], g ] } )
+            CELLRANGERARC_MKGTF( gtf )
             filtered_gtf = CELLRANGERARC_MKGTF.out.gtf
 
             // Make reference genome (single tuple channel: meta, fasta, gtf, motifs, reference_config)
             ch_cellrangerarc_mkref = filtered_gtf
                 .combine(fasta)
-                .map { _mkgtf_meta, gtf_path, fasta_path ->
+                .map { _mkgtf_meta, gtf_path, _fasta_meta, fasta_path ->
                     [ [ id: cellrangerarc_reference ], fasta_path, gtf_path, motifs, cellrangerarc_config ]
                 }
 

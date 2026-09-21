@@ -5,6 +5,9 @@
                 "FASTQC": {
                     "fastqc": "0.12.1"
                 },
+                "GTF_GENE_FILTER": {
+                    "python": "3.14.5"
+                },
                 "MTX_TO_H5AD": {
                     "anndata": "0.10.8",
                     "pandas": "2.2.2",
@@ -188,7 +191,6 @@
                 "multiqc_star.txt:md5,1e52e11f0473601f8b956bb921a70c1c",
                 "star_alignment_plot.txt:md5,d85d7f79d8c6fbd837b3f3261d133358",
                 "star_summary_table.txt:md5,e202a71aeee9dd1681343240d17bb4eb",
-                "Sample_X.Aligned.sortedByCoord.out.bam:md5,26c9d2dce827bba30f0f50c2dde1cc90",
                 "Sample_X.SJ.out.tab:md5,d2d7f0abe38029012571bdf6622fc6eb",
                 "Barcodes.stats:md5,7f99dc8aa5e074fbe5779ea7712c0886",
                 "Features.stats:md5,2742caa3c120d7fd36284b7f34f0a3e4",
@@ -201,7 +203,6 @@
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
                 "matrix.mtx.gz:md5,a1721c240079a651870cbb2e76720dc8",
                 "versions.yml:md5,f05605942a23ee8ef331f12a523cbf1e",
-                "Sample_Y.Aligned.sortedByCoord.out.bam:md5,40d6983063ed34585f9da32f69bd423d",
                 "Sample_Y.SJ.out.tab:md5,98bd31104a860cf80119dc30d938d163",
                 "Barcodes.stats:md5,2dbf1ae426c1afd97903ee001f0db5ce",
                 "Features.stats:md5,f0d82a316413d3c920c8487b67ee4f40",
@@ -228,10 +229,10 @@
                 "Sample_Y_raw_matrix.seurat.rds:md5,1e366fa8c2ae00e91dc5b1f5101414ce"
             ]
         ],
-        "timestamp": "2026-05-12T17:20:00.200180498",
+        "timestamp": "2026-07-02T15:51:59.993717274",
         "meta": {
-            "nf-test": "0.9.4",
-            "nextflow": "26.04.0"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.4"
         }
     }
 }

@@ -8,6 +8,9 @@ include { paramsSummaryMap                                  } from 'plugin/nf-sc
 include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText                            } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { gtfSourceFixNeeded                                } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { isStarIndexLegacy                                 } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
+include { PREPARE_GENOME                                    } from '../subworkflows/local/prepare_genome'
 include { FASTQC_CHECK                                      } from '../subworkflows/local/fastqc'
 include { KALLISTO_BUSTOOLS                                 } from '../subworkflows/local/kallisto_bustools'
 include { SIMPLEAF                                          } from '../subworkflows/local/simpleaf'
@@ -17,9 +20,6 @@ include { CELLRANGER_MULTI_ALIGN                            } from "../subworkfl
 include { CELLRANGERARC_ALIGN                               } from "../subworkflows/local/align_cellrangerarc"
 include { MTX_TO_H5AD                                       } from '../modules/local/mtx_to_h5ad'
 include { H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA } from '../subworkflows/nf-core/h5ad_removebackground_barcodes_cellbender_anndata'
-include { GTF_GENE_FILTER                                   } from '../modules/local/gtf_gene_filter'
-include { GUNZIP as GUNZIP_FASTA                            } from '../modules/nf-core/gunzip/main'
-include { GUNZIP as GUNZIP_GTF                              } from '../modules/nf-core/gunzip/main'
 include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
 
 
@@ -29,6 +29,7 @@ workflow SCRNASEQ {
     ch_fastq                    // channel: [ meta, fastq ] from samplesheet
     fasta                       // val: path-like string (or null)
     gtf                         // val: path-like string (or null)
+    gff                         // val: path-like string (or null)
     star_index                  // val: path-like string (or null)
     simpleaf_index              // val: path-like string (or null)
     kallisto_index              // val: path-like string (or null)
@@ -52,13 +53,10 @@ workflow SCRNASEQ {
         error "Only cellranger supports `protocol = 'auto'`. Please specify the protocol manually!"
     }
 
-    // Get qcatch chemistry for simpleaf QC (if using simpleaf aligner)
-    qcatch_config = params.aligner == "simpleaf" ? Utils.getProtocol(workflow, log, "qcatch", params.protocol) : [:]
-    qcatch_chemistry = qcatch_config.containsKey('protocol') ? qcatch_config['protocol'] : null
+    // Get qcatch chemistry for simpleaf QC (derived from the simpleaf protocol; null if unmapped)
+    qcatch_chemistry = params.aligner == "simpleaf" ? protocol_config['qcatch_protocol'] : null
 
     // general input and params
-    ch_genome_fasta         = fasta            ? file(fasta, checkIfExists: true)            : []
-    ch_gtf                  = gtf              ? file(gtf, checkIfExists: true)              : []
     ch_transcript_fasta     = transcript_fasta ? file(transcript_fasta, checkIfExists: true) : []
     ch_motifs               = motifs           ? file(motifs, checkIfExists: true)           : []
     ch_txp2gene             = txp2gene         ? file(txp2gene, checkIfExists: true)         : []
@@ -69,6 +67,11 @@ workflow SCRNASEQ {
         ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
     } else {
         ch_barcode_whitelist = []
+    }
+
+    // Warn if both GTF and GFF files are provided
+    if (gtf && gff) {
+        log.warn("Both GTF and GFF files are provided. GTF file will be used.")
     }
 
     // samplesheet - this is passed to the MTX conversion functions to add metadata to the
@@ -84,8 +87,8 @@ workflow SCRNASEQ {
     ch_simpleaf_index   = simpleaf_index ? file(simpleaf_index, checkIfExists: true) : []
 
     //star params
+    star_index_legacy = isStarIndexLegacy(params.genome, params.genomes, star_index) ?: false
     star_index        = star_index ? file(star_index, checkIfExists: true) : null
-    ch_star_index     = star_index ? channel.value( [[id: star_index.baseName], star_index] ) : []
 
     //cellranger params
     ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
@@ -105,35 +108,22 @@ workflow SCRNASEQ {
     }
 
     //
-    // Uncompress genome fasta file if required
+    // Prepare reference FASTA and GTF (gunzip, filter, optional Cell Ranger GTF source fix)
     //
-    if (fasta) {
-        if (fasta.endsWith('.gz')) {
-            ch_genome_fasta    = GUNZIP_FASTA ( [ [:], ch_genome_fasta ] ).gunzip.map { tuple -> tuple[1] }
-        } else {
-            ch_genome_fasta = channel.value( ch_genome_fasta )
-        }
-    }
-
-    //
-    // Uncompress GTF annotation file or create from GFF3 if required
-    //
-    if (gtf) {
-        if (gtf.endsWith('.gz')) {
-            ch_gtf      = GUNZIP_GTF ( [ [:], ch_gtf ] ).gunzip.map { tuple -> tuple[1] }
-        } else {
-            ch_gtf = channel.value( ch_gtf )
-        }
-    }
-
-    // filter gtf
-    ch_filter_gtf = ch_gtf ? GTF_GENE_FILTER ( ch_genome_fasta, ch_gtf ).gtf : []
+    PREPARE_GENOME(
+        fasta,
+        gtf,
+        gff,
+        gtfSourceFixNeeded(params.aligner, params.genome, params.genomes, gtf)
+    )
+    ch_genome_fasta = PREPARE_GENOME.out.fasta
+    ch_genome_gtf   = PREPARE_GENOME.out.gtf
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
         KALLISTO_BUSTOOLS(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_kallisto_index,
             ch_txp2gene,
             kb_t1c,
@@ -144,7 +134,6 @@ workflow SCRNASEQ {
         )
         ch_mtx_matrices = ch_mtx_matrices.mix( KALLISTO_BUSTOOLS.out.counts_raw, KALLISTO_BUSTOOLS.out.counts_filtered )
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
-        ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
     }
 
     // Run simpleaf pipeline
@@ -152,7 +141,7 @@ workflow SCRNASEQ {
 
         SIMPLEAF(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_transcript_fasta,
             ch_simpleaf_index,
             ch_txp2gene,
@@ -164,7 +153,6 @@ workflow SCRNASEQ {
             ch_fastq,
             [] // for existing map dir; not applicable
         )
-        ch_versions = ch_versions.mix(SIMPLEAF.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(SIMPLEAF.out.quant.map{ _meta, it -> it })
         ch_mtx_matrices = ch_mtx_matrices.mix(
             SIMPLEAF.out.quant.map{
@@ -181,8 +169,9 @@ workflow SCRNASEQ {
     if (params.aligner == "star") {
         STARSOLO(
             ch_genome_fasta,
-            ch_filter_gtf,
-            ch_star_index,
+            ch_genome_gtf,
+            star_index,
+            star_index_legacy,
             protocol_config['protocol'],
             ch_barcode_whitelist,
             ch_fastq,
@@ -198,7 +187,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellranger") {
         CELLRANGER_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_cellranger_index,
             ch_fastq,
             protocol_config['protocol']
@@ -213,7 +202,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellrangerarc") {
         CELLRANGERARC_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_motifs,
             ch_cellranger_index,
             ch_fastq,
@@ -281,7 +270,7 @@ workflow SCRNASEQ {
         // Run cellranger multi
         CELLRANGER_MULTI_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_cellrangermulti_collected_channel,
             ch_cellranger_index,
             cellranger_vdj_index,
@@ -300,7 +289,7 @@ workflow SCRNASEQ {
     MTX_TO_H5AD (
         ch_mtx_matrices,
         ch_txp2gene,
-        star_index ? ch_star_index.map{index -> index[1]} : [],
+        star_index ?: [],
         params.aligner
     )
     ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())

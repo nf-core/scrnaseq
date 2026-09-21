@@ -1,5 +1,6 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 include { STAR_ALIGN  } from '../../../modules/local/star_align'
+include { STAR_GENOMEPARAMS_UPGRADE } from '../../../modules/local/star_genomeparams_upgrade'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { STAR_GENOMEGENERATE }         from '../../../modules/nf-core/star/genomegenerate/main'
@@ -9,7 +10,8 @@ workflow STARSOLO {
     take:
     genome_fasta
     gtf
-    star_index
+    star_index               // path: /path/to/star/index/ (or null)
+    star_index_legacy        // boolean: upgrade STAR 2.6.x genomeParameters.txt to 2.7.4a schema
     protocol
     barcode_whitelist
     ch_fastq
@@ -25,14 +27,34 @@ workflow STARSOLO {
     assert gtf: "Must provide a gtf file ('--gtf') for STARSOLO"
 
     /*
-    * Build STAR index if not supplied
+    * Build STAR index if not supplied, or upgrade legacy iGenomes metadata when requested
     */
     if (!star_index) {
         STAR_GENOMEGENERATE(
-            genome_fasta.map{ f -> [[id: f.baseName], f]},
-            gtf.map{ g -> [[id: g.baseName], g]}
+            genome_fasta,
+            gtf
         )
-        star_index = STAR_GENOMEGENERATE.out.index.collect()
+        ch_star_index = STAR_GENOMEGENERATE.out.index.collect()
+    }
+    else {
+        // Pre-built STAR index supplied by the user. When star_index_legacy is set
+        // (genomes-map opt-in for indices built with STAR 2.6.x, e.g. AWS iGenomes),
+        // route through STAR_GENOMEPARAMS_UPGRADE to rewrite `versionGenome 20201` and
+        // add the genomeType / genomeTransformType / genomeTransformVCF fields that
+        // STAR 2.7.4a+ requires. Modern indices skip the adapter entirely.
+        def ch_star_raw = channel.value([ [:], file(star_index, checkIfExists: true) ])
+        if (star_index_legacy) {
+            log.warn(
+                "Using a legacy AWS iGenomes STAR index. nf-core/scrnaseq will update the STAR metadata for " +
+                "compatibility, but we recommend regenerating the index for production runs. See " +
+                "https://nf-co.re/scrnaseq/dev/docs/usage#reference-genome-options"
+            )
+            STAR_GENOMEPARAMS_UPGRADE(ch_star_raw)
+            ch_star_index = STAR_GENOMEPARAMS_UPGRADE.out.index
+        }
+        else {
+            ch_star_index = ch_star_raw
+        }
     }
 
     /*
@@ -40,7 +62,7 @@ workflow STARSOLO {
     */
     STAR_ALIGN(
         ch_fastq,
-        star_index,
+        ch_star_index,
         gtf,
         barcode_whitelist,
         protocol,

@@ -33,6 +33,7 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_scrn
 // custom igenomes configs in addition to being able to provide them via params directly
 params.fasta                = getGenomeAttribute('fasta')
 params.gtf                  = getGenomeAttribute('gtf')
+params.gff                  = getGenomeAttribute('gff')
 params.star_index           = getGenomeAttribute('star')
 params.simpleaf_index       = getGenomeAttribute('simpleaf')
 params.kallisto_index       = getGenomeAttribute('kallisto')
@@ -57,6 +58,7 @@ workflow NFCORE_SCRNASEQ {
     samplesheet                  // channel: samplesheet read in from --input
     fasta                        // val: path-like string (or null)
     gtf                          // val: path-like string (or null)
+    gff                          // val: path-like string (or null)
     star_index                   // val: path-like string (or null)
     simpleaf_index               // val: path-like string (or null)
     kallisto_index               // val: path-like string (or null)
@@ -79,6 +81,7 @@ workflow NFCORE_SCRNASEQ {
         samplesheet,
         fasta,
         gtf,
+        gff,
         star_index,
         simpleaf_index,
         kallisto_index,
@@ -126,6 +129,7 @@ workflow {
         PIPELINE_INITIALISATION.out.samplesheet,
         params.fasta,
         params.gtf,
+        params.gff,
         params.star_index,
         params.simpleaf_index,
         params.kallisto_index,

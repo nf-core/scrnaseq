@@ -20,8 +20,6 @@ workflow SIMPLEAF {
     map_dir
 
     main:
-    ch_versions = channel.empty()
-
     /*
     * Build simpleaf index if needed
     * If simpleaf_index is provided, we skip this step
@@ -41,7 +39,7 @@ workflow SIMPLEAF {
                     error "txp2gene file is required when using `transcript_fasta` to build the index"
                 }
             } else {
-                ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ fasta, gtf -> [[id: "${fasta.getName()}"], fasta, gtf] }
+                ch_genome_fasta_gtf = ch_genome_fasta.combine( ch_genome_gtf ).map{ meta1, fasta, _meta2, gtf -> [meta1, fasta, gtf] }
                 ch_transcript_fasta = [ [:], [] ] // meta, transcript fasta
             }
 
@@ -53,8 +51,6 @@ workflow SIMPLEAF {
             )
             // Channel of tuple(meta, index dir)
             simpleaf_index = SIMPLEAF_INDEX.out.index.collect()
-            // Channel of version
-            ch_versions = ch_versions.mix( SIMPLEAF_INDEX.out.versions )
 
             // ensure txp2gene is a Channel
             if (!txp2gene) {
@@ -111,26 +107,26 @@ workflow SIMPLEAF {
         resolution,
         ch_map_dir
     )
-    ch_versions = ch_versions.mix(SIMPLEAF_QUANT.out.versions)
-
     ch_af_map = map_dir ? ch_map_dir : SIMPLEAF_QUANT.out.map
     ch_af_quant = SIMPLEAF_QUANT.out.quant
 
     /*
     * Run qcatch QC (optional)
+    * qcatch_chemistry may be null for protocols without a QCatch chemistry mapping
+    * (e.g. 10XV1 and dropseq); the module then omits --chemistry and QCatch infers
+    * it from metadata or uses --n_partitions (set via --qcatch_n_partitions).
     */
     ch_qcatch_report = channel.empty()
     if ( !skip_qcatch ) {
         // Map quant channel to include chemistry for qcatch: tuple(meta, chemistry, quant_dir)
         ch_qcatch_input = ch_af_quant.map { meta, quant_dir -> [meta, qcatch_chemistry, quant_dir] }
         QCATCH( ch_qcatch_input )
-        ch_versions = ch_versions.mix(QCATCH.out.versions)
+        // QCATCH emits versions via the `versions` topic (collected in the main workflow)
         ch_qcatch_report = QCATCH.out.report
     }
 
 
     emit:
-    ch_versions
     txp2gene
     index       = simpleaf_index
     map         = ch_af_map

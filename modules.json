@@ -87,12 +87,12 @@
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "aa2fa2262e7ffef3035f2a991424d0d4af331627",
+                        "git_sha": "6ef220fd9252b42fb3c50348bbdbcb6246730686",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/ref": {
                         "branch": "master",
-                        "git_sha": "aa2fa2262e7ffef3035f2a991424d0d4af331627",
+                        "git_sha": "6ef220fd9252b42fb3c50348bbdbcb6246730686",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {

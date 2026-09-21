@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- Bump the `nf-schema` plugin from `2.5.1` to `2.8.0`, so that `pattern` validation of samplesheet paths on proxy filesystems (e.g. `lamin://`) is retried against the resolved real path (see [nf-schema#217](https://github.com/nextflow-io/nf-schema/issues/217); [#xxx](https://github.com/nf-core/scrnaseq/pull/xxx))
 - Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
 

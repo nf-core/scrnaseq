@@ -3,6 +3,12 @@
         "content": [
             14,
             {
+                "ANNDATA_CONVERT": {
+                    "SeuratObject": "5.4.0",
+                    "SingleCellExperiment": "1.32.0",
+                    "anndataR": "1.0.2",
+                    "r-base": "R version 4.5.3 (2026-03-11)"
+                },
                 "CELLRANGERARC_COUNT": {
                     "cellrangerarc": "2.0.2"
                 },
@@ -281,10 +287,10 @@
                 "multiqc_general_stats.txt:md5,fd84f94100989affc666904a2f34c40c"
             ]
         ],
-        "timestamp": "2026-05-29T08:55:55.275563341",
+        "timestamp": "2026-09-21T17:48:29.652354431",
         "meta": {
-            "nf-test": "0.9.4",
-            "nextflow": "26.04.0"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
         }
     }
 }

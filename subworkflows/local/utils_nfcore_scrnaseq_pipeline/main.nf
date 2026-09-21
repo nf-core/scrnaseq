@@ -107,9 +107,11 @@ workflow PIPELINE_INITIALISATION {
     //
     // Create channel from input file provided through params.input
     //
+    def samplesheet_schema = params.aligner == 'cellrangerarc' ? "${projectDir}/assets/schema_input_cellrangerarc.json" : "${projectDir}/assets/schema_input.json"
+
     if (params.aligner == 'cellrangermulti') { // the cellrangermulti sub-workflow logic needs that channels have reads separated by feature_type. Cannot merge all.
         channel
-            .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
+            .fromList(samplesheetToList(params.input, samplesheet_schema))
             .map {
                 meta, fastq_1, fastq_2 ->
                     if (!fastq_2) {
@@ -130,13 +132,10 @@ workflow PIPELINE_INITIALISATION {
             .set { ch_samplesheet }
     } else if (params.aligner == 'cellrangerarc') { // the cellrangerarc sub-workflow logic needs that channels have a meta, type, subsample, fastqs structure.
         channel
-            .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
+            .fromList(samplesheetToList(params.input, samplesheet_schema))
             .map { meta, fastq_1, fastq_2 ->
-                if (!fastq_2 || (meta.sample_type == "atac" && !meta.fastq_barcode)) {
-                    error("Please check input samplesheet -> cellrangerarc requires both paired-end reads and barcode fastq files: ${meta.id}")
-                }
                 if (meta.sample_type == "atac") {
-                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2, file(meta.fastq_barcode, checkIfExists: true) ] ]
+                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2, meta.fastq_barcode ] ]
                 } else {
                     return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
                 }
@@ -148,7 +147,7 @@ workflow PIPELINE_INITIALISATION {
             .set { ch_samplesheet }
     } else {
         channel
-            .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
+            .fromList(samplesheetToList(params.input, samplesheet_schema))
             .map {
                 meta, fastq_1, fastq_2 ->
                     if (!fastq_2) {
@@ -314,19 +313,6 @@ def validateInputSamplesheet(input) {
 def cellrangerarcStructure(input) {
     def (metas, fastqs) = input[1..2]
 
-    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
-    def endedness_ok = metas.collect{ meta -> meta.single_end }.unique().size == 1
-    if (!endedness_ok) {
-        error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
-    }
-
-    // Validate that the property "sample_type" is present and has valid values
-    def valid_sample_types = ["gex", "atac"]
-    def sample_type_ok = metas.collect { meta -> meta.sample_type }.unique().every { st -> st in valid_sample_types }
-    if (!sample_type_ok) {
-        error("Please check input samplesheet -> The property 'sample_type' is required and can only be 'gex' or 'atac'.")
-    }
-
     // Define a new common meta for all the fastqs in this channel instance
     def sampleMeta = metas[0].clone()
     sampleMeta.remove("sample_type")
@@ -337,11 +323,7 @@ def cellrangerarcStructure(input) {
 
     // Create a list with all the base name of the fastq files
     def subsamples = fastqs.collect { fastq ->
-        def match = (fastq[0].baseName =~ /^(.*?)_S\d+_L\d+_R\d+_\d+\.fastq(\.gz)?$/)
-        if (!match) {
-            error("Filename does not follow the expected FASTQ filename convention (SampleName_S1_L001_R1_001.fastq.gz): ${fastq[0]}")
-        }
-        return match[0][1]
+        fastq[0].baseName.replaceFirst(/_S\d+_L\d+_R\d+_\d+\.fastq(\.gz)?$/, '')
     }
 
     return [ sampleMeta, sampletypes, subsamples, fastqs.flatten() ]

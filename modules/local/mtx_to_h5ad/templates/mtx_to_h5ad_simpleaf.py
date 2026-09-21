@@ -8,6 +8,7 @@ os.environ["NUMBA_CACHE_DIR"] = "."
 import platform
 import json
 
+import hdf5plugin
 import anndata
 import hdf5plugin
 import pandas as pd

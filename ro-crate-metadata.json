@@ -186,13 +186,8 @@
             "sdPublisher": {
                 "@id": "https://nf-co.re/"
             },
-            "url": [
-                "https://github.com/nf-core/scrnaseq",
-                "https://nf-co.re/scrnaseq/4.2.0/"
-            ],
-            "version": [
-                "4.2.0"
-            ]
+            "url": ["https://github.com/nf-core/scrnaseq", "https://nf-co.re/scrnaseq/4.2.0/"],
+            "version": ["4.2.0"]
         },
         {
             "@id": "https://w3id.org/workflowhub/workflow-ro-crate#nextflow",
@@ -364,31 +359,13 @@
             "url": "https://nf-co.re/"
         },
         {
-            "@id": "https://orcid.org/0000-0001-9584-7842",
-            "@type": "Person",
-            "email": "mail@gregor-sturm.de",
-            "name": "Gregor Sturm"
-        },
-        {
-            "@id": "https://orcid.org/0000-0002-6503-2180",
-            "@type": "Person",
-            "email": "apeltzer@users.noreply.github.com",
-            "name": "Alexander Peltzer"
-        },
-        {
-            "@id": "https://orcid.org/0000-0002-2705-1727",
-            "@type": "Person",
-            "email": "60394289+LeonHafner@users.noreply.github.com",
-            "name": "Leon Hafner"
-        },
-        {
-            "@id": "#rob.syme@gmail.com",
+            "@id": "#91edc9c1-84a4-42b0-b6bd-22dbf5f0d6d6",
             "@type": "Person",
             "email": "rob.syme@gmail.com",
             "name": "Rob Syme"
         },
         {
-            "@id": "https://orcid.org/0000-0002-4639-0935",
+            "@id": "#9a987287-0ada-494f-b89a-3df0b42a46bf",
             "@type": "Person",
             "email": "nictru32@gmail.com",
             "name": "Nico Trummer"

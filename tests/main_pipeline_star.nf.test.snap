@@ -15,9 +15,9 @@
                     "python": "3.14.5"
                 },
                 "MTX_TO_H5AD": {
-                    "anndata": "0.10.8",
-                    "pandas": "2.2.2",
-                    "python": "3.12.5",
+                    "anndata": "0.12.19",
+                    "pandas": "2.3.3",
+                    "python": "3.12.14",
                     "scanpy": "1.10.2"
                 },
                 "STAR_ALIGN": {
@@ -221,21 +221,21 @@
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
                 "matrix.mtx.gz:md5,901ccd41c658cc6485863afff775ea98",
                 "versions.yml:md5,f05605942a23ee8ef331f12a523cbf1e",
-                "Sample_X_filtered_matrix.h5ad:md5,21a89f2dff1a2203f846c4884dbd624f",
+                "Sample_X_filtered_matrix.h5ad:md5,bba8c853168895aabadd0d25ff8abce1",
                 "Sample_X_filtered_matrix.sce.rds:md5,5327486116b6213edad975d7f820c81b",
                 "Sample_X_filtered_matrix.seurat.rds:md5,6d90ae68ae69a527a481836c85d664ea",
-                "Sample_X_raw_matrix.h5ad:md5,ef55859b811d8cdb318aa5b2e857cfa3",
+                "Sample_X_raw_matrix.h5ad:md5,22c2d2224dedf17c55e23861738288fa",
                 "Sample_X_raw_matrix.sce.rds:md5,fc03271f5740d4a82a33b63774c314f5",
                 "Sample_X_raw_matrix.seurat.rds:md5,d30383178543c425fac6757e60f5b4c5",
-                "Sample_Y_filtered_matrix.h5ad:md5,57ded9e27f5164ad6b1d888d553737c1",
+                "Sample_Y_filtered_matrix.h5ad:md5,14715a799f22b6060469a4134816f91c",
                 "Sample_Y_filtered_matrix.sce.rds:md5,d1b4490ed51ba4bfbe5d925e97f3ecb2",
                 "Sample_Y_filtered_matrix.seurat.rds:md5,48d2ae65b0021b834ab1f8bd2bd68399",
-                "Sample_Y_raw_matrix.h5ad:md5,25329b6d44ae0f7f885e6513e05fb840",
+                "Sample_Y_raw_matrix.h5ad:md5,c48771c75efa814e1ebcdf32e71cbbe4",
                 "Sample_Y_raw_matrix.sce.rds:md5,d979788ee6ff315c743d2cb44f6b82ca",
                 "Sample_Y_raw_matrix.seurat.rds:md5,1e366fa8c2ae00e91dc5b1f5101414ce"
             ]
         ],
-        "timestamp": "2026-09-20T20:52:54.7256298",
+        "timestamp": "2026-09-22T16:41:49.527812476",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"

@@ -3,6 +3,12 @@
         "content": [
             19,
             {
+                "ANNDATA_CONVERT": {
+                    "SeuratObject": "5.4.0",
+                    "SingleCellExperiment": "1.32.0",
+                    "anndataR": "1.0.2",
+                    "r-base": "R version 4.5.3 (2026-03-11)"
+                },
                 "FASTQC": {
                     "fastqc": "0.12.1"
                 },
@@ -16,9 +22,9 @@
                     "kallistobustools": "0.28.2"
                 },
                 "MTX_TO_H5AD": {
-                    "anndata": "0.10.8",
-                    "pandas": "2.2.2",
-                    "python": "3.12.5",
+                    "anndata": "0.12.19",
+                    "pandas": "2.3.3",
+                    "python": "3.12.14",
                     "scanpy": "1.10.2"
                 }
             },
@@ -185,16 +191,16 @@
                 "cells_x_genes.mtx:md5,abd83de117204d0a77df3c92d00cc025",
                 "filter_barcodes.txt:md5,080dd405987d2e1bd238ba94b821d487",
                 "transcripts.txt:md5,da62746af800837deb91b829ea67c05d",
-                "Sample_X_filtered_matrix.h5ad:md5,a2bcc30ea32f510555d82250b37f1ff1",
+                "Sample_X_filtered_matrix.h5ad:md5,08d4a12c22922e02a4b6a50242eb518a",
                 "Sample_X_filtered_matrix.sce.rds:md5,bc5249728bded19718e39a3275e2af65",
                 "Sample_X_filtered_matrix.seurat.rds:md5,c6733349c36664c30912714458d27ae6",
-                "Sample_X_raw_matrix.h5ad:md5,640b724124545f5fbc861b6bc6d264d5",
+                "Sample_X_raw_matrix.h5ad:md5,eaf8a2a774cd6031cd00d973fae022e8",
                 "Sample_X_raw_matrix.sce.rds:md5,1583040f51aab5bcf312f8010e2208a8",
                 "Sample_X_raw_matrix.seurat.rds:md5,1cac465d8e6855ddf90145c1bcb6f6b4",
-                "Sample_Y_filtered_matrix.h5ad:md5,ba2f3755c0624f24ea8c07aaaf457574",
+                "Sample_Y_filtered_matrix.h5ad:md5,fda3d2cbfaa1201949906e9fa68ae8d3",
                 "Sample_Y_filtered_matrix.sce.rds:md5,6fef4f6d33c5168e8bcbc678b2e1df93",
                 "Sample_Y_filtered_matrix.seurat.rds:md5,89675084e905417ffbaa798a8f236f48",
-                "Sample_Y_raw_matrix.h5ad:md5,495f376a2042dc69b792984053dffc5d",
+                "Sample_Y_raw_matrix.h5ad:md5,8b710f02cb3ceec62dca1ea5d19e8658",
                 "Sample_Y_raw_matrix.sce.rds:md5,fa4a9dd10a388f5ee9f298b79810cc99",
                 "Sample_Y_raw_matrix.seurat.rds:md5,ee2b13d7835bc3a78db7f1c09a105ad3",
                 "fastqc-status-check-heatmap.txt:md5,d122badcaa647409c35a809e8a127f99",
@@ -211,10 +217,10 @@
                 "multiqc_general_stats.txt:md5,dac8af62b04fd0880801f5d5c503c472"
             ]
         ],
-        "timestamp": "2026-07-02T16:14:08.824051544",
+        "timestamp": "2026-09-22T16:33:15.542599392",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.4"
+            "nextflow": "26.04.0"
         }
     }
 }

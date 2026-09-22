@@ -182,15 +182,15 @@
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "multiqc_fastqc.txt:md5,12027880857508ce5cedc3904a351730",
                 "multiqc_general_stats.txt:md5,dac8af62b04fd0880801f5d5c503c472",
-                "Sample_X_raw_matrix.h5ad:md5,3933f643e1ba8c2bebb406c793b00eb7",
-                "Sample_X_raw_matrix.sce.rds:md5,14f85c8e769cda7c732f80ea7021abc4",
-                "Sample_X_raw_matrix.seurat.rds:md5,77d299c1da79c74b33ffb66fe7157f8f",
-                "Sample_Y_raw_matrix.h5ad:md5,f56cdb383eb74f33e6397c60d62a6caf",
-                "Sample_Y_raw_matrix.sce.rds:md5,9d5e031e21ef7f568efdda4e1f0d75d3",
-                "Sample_Y_raw_matrix.seurat.rds:md5,be51af0dc253eede90ec945794afbfb8"
+                "Sample_X_raw_matrix.h5ad:md5,be0e3f90994f7c8cd36515acddb02fdd",
+                "Sample_X_raw_matrix.sce.rds:md5,83e298351f93b76eefe90c5c21ff0cfa",
+                "Sample_X_raw_matrix.seurat.rds:md5,f90f95cd3bc556142911a57d49736d41",
+                "Sample_Y_raw_matrix.h5ad:md5,2266fb49cfac6060fbdbe20636565241",
+                "Sample_Y_raw_matrix.sce.rds:md5,b8019e2e319e3275d8acaef8b8d0e046",
+                "Sample_Y_raw_matrix.seurat.rds:md5,a01d355db6e25c29f60698d6f08913c1"
             ]
         ],
-        "timestamp": "2026-09-22T15:50:05.212182063",
+        "timestamp": "2026-09-22T16:13:07.386522914",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"

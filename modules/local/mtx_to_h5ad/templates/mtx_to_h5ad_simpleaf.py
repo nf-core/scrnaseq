@@ -9,6 +9,7 @@ import platform
 import json
 
 import anndata
+import hdf5plugin
 import pandas as pd
 import scanpy as sc
 

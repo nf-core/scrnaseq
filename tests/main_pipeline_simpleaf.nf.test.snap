@@ -3,6 +3,12 @@
         "content": [
             13,
             {
+                "ANNDATA_CONVERT": {
+                    "SeuratObject": "5.4.0",
+                    "SingleCellExperiment": "1.32.0",
+                    "anndataR": "1.0.2",
+                    "r-base": "R version 4.5.3 (2026-03-11)"
+                },
                 "FASTQC": {
                     "fastqc": "0.12.1"
                 },
@@ -10,20 +16,20 @@
                     "python": "3.14.5"
                 },
                 "MTX_TO_H5AD": {
-                    "anndata": "0.10.8",
-                    "pandas": "2.2.2",
-                    "python": "3.12.5",
+                    "anndata": "0.12.19",
+                    "pandas": "2.3.3",
+                    "python": "3.12.14",
                     "scanpy": "1.10.2"
                 },
                 "SIMPLEAF_INDEX": {
-                    "alevin-fry": "0.15.0",
-                    "piscem": "0.20.0",
-                    "simpleaf": "0.25.0"
+                    "alevin-fry": "0.18.3",
+                    "piscem": "0.23.0",
+                    "simpleaf": "0.30.0"
                 },
                 "SIMPLEAF_QUANT": {
-                    "alevin-fry": "0.15.0",
-                    "piscem": "0.20.0",
-                    "simpleaf": "0.25.0"
+                    "alevin-fry": "0.18.3",
+                    "piscem": "0.23.0",
+                    "simpleaf": "0.30.0"
                 }
             },
             [
@@ -115,10 +121,12 @@
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/alevin/quants_mat_cols.txt",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/alevin/quants_mat_rows.txt",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/collate.json",
+                "simpleaf/Sample_X/simpleaf_quant/af_quant/correction_plan.bin",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/featureDump.txt",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/gene_id_to_name.tsv",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/generate_permit_list.json",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/map.collated.rad",
+                "simpleaf/Sample_X/simpleaf_quant/af_quant/map.collated.rad.chunkidx",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/permit_freq.bin",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/permit_map.bin",
                 "simpleaf/Sample_X/simpleaf_quant/af_quant/quant.json",
@@ -137,10 +145,12 @@
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/alevin/quants_mat_cols.txt",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/alevin/quants_mat_rows.txt",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/collate.json",
+                "simpleaf/Sample_Y/simpleaf_quant/af_quant/correction_plan.bin",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/featureDump.txt",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/gene_id_to_name.tsv",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/generate_permit_list.json",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/map.collated.rad",
+                "simpleaf/Sample_Y/simpleaf_quant/af_quant/map.collated.rad.chunkidx",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/permit_freq.bin",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/permit_map.bin",
                 "simpleaf/Sample_Y/simpleaf_quant/af_quant/quant.json",
@@ -172,17 +182,17 @@
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "multiqc_fastqc.txt:md5,12027880857508ce5cedc3904a351730",
                 "multiqc_general_stats.txt:md5,dac8af62b04fd0880801f5d5c503c472",
-                "Sample_X_raw_matrix.h5ad:md5,a2f6b8820d76d5a50267c1ec60f94722",
-                "Sample_X_raw_matrix.sce.rds:md5,7ebef58dd0a90a21216dabbc9bfd20d8",
-                "Sample_X_raw_matrix.seurat.rds:md5,8978484606335057b28ed605208d218c",
-                "Sample_Y_raw_matrix.h5ad:md5,3ce0cc50ddb8cad2d75d68bb57c47b43",
-                "Sample_Y_raw_matrix.sce.rds:md5,f743addeb6dc84bc991a66ea3d8a922b",
-                "Sample_Y_raw_matrix.seurat.rds:md5,e37cd715e04bed75617d76ddd846b993"
+                "Sample_X_raw_matrix.h5ad:md5,3933f643e1ba8c2bebb406c793b00eb7",
+                "Sample_X_raw_matrix.sce.rds:md5,14f85c8e769cda7c732f80ea7021abc4",
+                "Sample_X_raw_matrix.seurat.rds:md5,77d299c1da79c74b33ffb66fe7157f8f",
+                "Sample_Y_raw_matrix.h5ad:md5,f56cdb383eb74f33e6397c60d62a6caf",
+                "Sample_Y_raw_matrix.sce.rds:md5,9d5e031e21ef7f568efdda4e1f0d75d3",
+                "Sample_Y_raw_matrix.seurat.rds:md5,be51af0dc253eede90ec945794afbfb8"
             ]
         ],
-        "timestamp": "2026-05-29T10:25:49.319072824",
+        "timestamp": "2026-09-22T15:50:05.212182063",
         "meta": {
-            "nf-test": "0.9.4",
+            "nf-test": "0.9.5",
             "nextflow": "26.04.0"
         }
     }

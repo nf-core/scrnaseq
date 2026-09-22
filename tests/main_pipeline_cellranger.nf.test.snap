@@ -25,9 +25,9 @@
                     "python": "3.14.5"
                 },
                 "MTX_TO_H5AD": {
-                    "anndata": "0.10.8",
-                    "pandas": "2.2.2",
-                    "python": "3.12.5",
+                    "anndata": "0.12.19",
+                    "pandas": "2.3.3",
+                    "python": "3.12.14",
                     "scanpy": "1.10.2"
                 }
             },
@@ -356,16 +356,16 @@
                 "sjdbList.fromGTF.out.tab:md5,dffb9114a4b7dad0fa59bdf6c42b67e5",
                 "sjdbList.out.tab:md5,f6228b2eb4d72dd461543af46d67c602",
                 "transcriptInfo.tab:md5,7ac30e5301e5f3b98e9cfc51bff79b69",
-                "Sample_X_filtered_matrix.h5ad:md5,6d96854e22cbcf8238b61e25d47d3bde",
+                "Sample_X_filtered_matrix.h5ad:md5,c928bc44aabc135d81fe0ec08858562b",
                 "Sample_X_filtered_matrix.sce.rds:md5,e1ebff2cb07b1d9aa191d7ce17031f27",
                 "Sample_X_filtered_matrix.seurat.rds:md5,834fac3d371e66568cdfc8c56d6c9a75",
-                "Sample_X_raw_matrix.h5ad:md5,90727c59c741540a67eb286a96c07f05",
+                "Sample_X_raw_matrix.h5ad:md5,7ebbecb9ec6bba386c35902029729096",
                 "Sample_X_raw_matrix.sce.rds:md5,3c23e00d58f02a567fcd86b6e6107479",
                 "Sample_X_raw_matrix.seurat.rds:md5,b48a6a6afcc2287872878cbf7422a8d4",
-                "Sample_Y_filtered_matrix.h5ad:md5,b3bba7418b125baedc4e34a3f7b55597",
+                "Sample_Y_filtered_matrix.h5ad:md5,755a03158836bfcabe63c587659a29bf",
                 "Sample_Y_filtered_matrix.sce.rds:md5,81c16fdbdd2bd9d602b0da034823872f",
                 "Sample_Y_filtered_matrix.seurat.rds:md5,a265ed88a4bc890f1cf206310dd02993",
-                "Sample_Y_raw_matrix.h5ad:md5,d5c3a30bcd4d8011eb5aa39ad0f1c286",
+                "Sample_Y_raw_matrix.h5ad:md5,83031520e2b6c8ff17e89ee478204d8a",
                 "Sample_Y_raw_matrix.sce.rds:md5,21b5ade2f0afee63f77d315d5dbe543c",
                 "Sample_Y_raw_matrix.seurat.rds:md5,618412262af4738ee5073e7d10af8e45",
                 "cellranger-count-stats-table.txt:md5,b596a1ed25c8dba1ff3026db56dc5f5d",
@@ -388,7 +388,7 @@
                 "multiqc_general_stats.txt:md5,92a7a66e313e6ce2d13da53b501b5c0c"
             ]
         ],
-        "timestamp": "2026-09-20T20:13:28.987903387",
+        "timestamp": "2026-09-22T16:22:19.108637365",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"

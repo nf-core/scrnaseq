@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Features
 
 - Add the `--gff` parameter to allow the user to specify a GFF file as a reference (instead of a GTF file) ([#451](https://github.com/nf-core/scrnaseq/pull/451))
+- Add json schema validation for `cellrangerarc` aligner ([#584](https://github.com/nf-core/scrnaseq/pull/584)).
 
 ### Chore
 

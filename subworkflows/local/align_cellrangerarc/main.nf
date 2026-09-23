@@ -20,7 +20,12 @@ workflow CELLRANGERARC_ALIGN {
         assert cellranger_index || (fasta && gtf):
             "Must provide either a cellranger index or a bundle of a fasta file ('--fasta') + gtf file ('--gtf')."
 
-        if (!cellranger_index) {
+        if (cellranger_index) {
+            // CELLRANGERARC_COUNT takes the reference as a [ meta, reference ] tuple, the
+            // same shape CELLRANGERARC_MKREF emits, so wrap the user-supplied index to match.
+            ch_reference = channel.value([ [ id: cellranger_index.name ], cellranger_index ])
+        }
+        else {
             assert (( !params.cellrangerarc_reference && !cellrangerarc_config ) ||
                     ( params.cellrangerarc_reference && cellrangerarc_config ) ) :
                 "If you provide a config file you also have to specific the reference name and vice versa."
@@ -39,13 +44,13 @@ workflow CELLRANGERARC_ALIGN {
                 }
 
             CELLRANGERARC_MKREF( ch_cellrangerarc_mkref )
-            cellranger_index = CELLRANGERARC_MKREF.out.reference
+            ch_reference = CELLRANGERARC_MKREF.out.reference
         }
 
         // Obtain read counts
         CELLRANGERARC_COUNT (
             ch_fastq,
-            cellranger_index
+            ch_reference
         )
 
         // Parse the output channels to obtain filtered and raw matrices

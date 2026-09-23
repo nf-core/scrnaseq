@@ -1,0 +1,144 @@
+{
+    "Should accept a pre-built reference passed with --cellranger_index": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "fake_file.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "input_type": "filtered"
+                        },
+                        [
+                            
+                        ]
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test",
+                            "input_type": "raw"
+                        },
+                        [
+                            
+                        ]
+                    ]
+                ],
+                "cellrangerarc_mtx_filtered": [
+                    [
+                        {
+                            "id": "test",
+                            "input_type": "filtered"
+                        },
+                        [
+                            
+                        ]
+                    ]
+                ],
+                "cellrangerarc_mtx_raw": [
+                    [
+                        {
+                            "id": "test",
+                            "input_type": "raw"
+                        },
+                        [
+                            
+                        ]
+                    ]
+                ],
+                "cellrangerarc_out": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "fake_file.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.10.4"
+        },
+        "timestamp": "2026-09-06T08:51:02.343469"
+    },
+    "Should build the reference when no index is given": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "fake_file.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "input_type": "filtered"
+                        },
+                        [
+                            
+                        ]
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test",
+                            "input_type": "raw"
+                        },
+                        [
+                            
+                        ]
+                    ]
+                ],
+                "cellrangerarc_mtx_filtered": [
+                    [
+                        {
+                            "id": "test",
+                            "input_type": "filtered"
+                        },
+                        [
+                            
+                        ]
+                    ]
+                ],
+                "cellrangerarc_mtx_raw": [
+                    [
+                        {
+                            "id": "test",
+                            "input_type": "raw"
+                        },
+                        [
+                            
+                        ]
+                    ]
+                ],
+                "cellrangerarc_out": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "fake_file.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.10.4"
+        },
+        "timestamp": "2026-09-06T08:50:56.92336"
+    }
+}

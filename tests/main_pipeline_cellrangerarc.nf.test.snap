@@ -3,6 +3,12 @@
         "content": [
             14,
             {
+                "ANNDATA_CONVERT": {
+                    "SeuratObject": "5.4.0",
+                    "SingleCellExperiment": "1.32.0",
+                    "anndataR": "1.0.2",
+                    "r-base": "R version 4.5.3 (2026-03-11)"
+                },
                 "CELLRANGERARC_COUNT": {
                     "cellrangerarc": "2.0.2"
                 },
@@ -19,9 +25,9 @@
                     "python": "3.14.5"
                 },
                 "MTX_TO_H5AD": {
-                    "anndata": "0.10.8",
-                    "pandas": "2.2.2",
-                    "python": "3.12.5",
+                    "anndata": "0.12.19",
+                    "pandas": "2.3.3",
+                    "python": "3.12.14",
                     "scanpy": "1.10.2"
                 }
             },
@@ -260,10 +266,10 @@
                 "sjdbList.out.tab:md5,be8b2978e8ac3a2c8266c798c7c34b90",
                 "transcriptInfo.tab:md5,5a6ee447f3efac16042d8c99f653747b",
                 "config:md5,c05a6c4276e54a19a7149b700cf6fbd9",
-                "10k_PBMC_filtered_matrix.h5ad:md5,60b9311d46f756cd2b9fb737628713b3",
+                "10k_PBMC_filtered_matrix.h5ad:md5,a88bf73fd971d9bb80629526657a73fe",
                 "10k_PBMC_filtered_matrix.sce.rds:md5,8409899c40573213cc0cb3da48dfd99c",
                 "10k_PBMC_filtered_matrix.seurat.rds:md5,a2f61027f631ca0fe62167ad37cf0bfe",
-                "10k_PBMC_raw_matrix.h5ad:md5,4ac50d4109bcccd1d82ed83fc00d7580",
+                "10k_PBMC_raw_matrix.h5ad:md5,eff32fb981ee8ad352fc6a3c1f8e7e66",
                 "10k_PBMC_raw_matrix.sce.rds:md5,862283b4babd1aa9b1ab9c364528639e",
                 "10k_PBMC_raw_matrix.seurat.rds:md5,8aff06e0add005677e484864db5774b9",
                 "fastqc-status-check-heatmap.txt:md5,55b658eef7b63c6f8e3d559be41f5df8",
@@ -281,9 +287,9 @@
                 "multiqc_general_stats.txt:md5,fd84f94100989affc666904a2f34c40c"
             ]
         ],
-        "timestamp": "2026-05-29T08:55:55.275563341",
+        "timestamp": "2026-09-22T16:28:15.250798549",
         "meta": {
-            "nf-test": "0.9.4",
+            "nf-test": "0.9.5",
             "nextflow": "26.04.0"
         }
     }

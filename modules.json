@@ -10,6 +10,11 @@
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["h5ad_removebackground_barcodes_cellbender_anndata"]
                     },
+                    "anndata/convert": {
+                        "branch": "master",
+                        "git_sha": "1fcb7c7e29750bd6d1e67663a4bd035d51e92777",
+                        "installed_by": ["modules"]
+                    },
                     "cellbender/removebackground": {
                         "branch": "master",
                         "git_sha": "ffbf6a031bcef2f2bc6b55009e177c814e2faa01",
@@ -82,12 +87,12 @@
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "aa2fa2262e7ffef3035f2a991424d0d4af331627",
+                        "git_sha": "6ef220fd9252b42fb3c50348bbdbcb6246730686",
                         "installed_by": ["modules"]
                     },
                     "kallistobustools/ref": {
                         "branch": "master",
-                        "git_sha": "aa2fa2262e7ffef3035f2a991424d0d4af331627",
+                        "git_sha": "6ef220fd9252b42fb3c50348bbdbcb6246730686",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
@@ -102,12 +107,12 @@
                     },
                     "simpleaf/index": {
                         "branch": "master",
-                        "git_sha": "0863c5e1224f2e5d62a43fe68f8a16a0e8255ad2",
+                        "git_sha": "b803b92468c50da729e14f9fe2edab7cd3cf9ba2",
                         "installed_by": ["modules"]
                     },
                     "simpleaf/quant": {
                         "branch": "master",
-                        "git_sha": "0863c5e1224f2e5d62a43fe68f8a16a0e8255ad2",
+                        "git_sha": "b803b92468c50da729e14f9fe2edab7cd3cf9ba2",
                         "installed_by": ["modules"]
                     },
                     "star/genomegenerate": {

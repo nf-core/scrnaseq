@@ -3,11 +3,24 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v4.2.0 - [unreleased<!-- TODO nf-core: replace with date on release -->]
+
+### Features
+
+- Add the `--gff` parameter to allow the user to specify a GFF file as a reference (instead of a GTF file) ([#451](https://github.com/nf-core/scrnaseq/pull/451))
+- Add json schema validation for `cellrangerarc` aligner ([#584](https://github.com/nf-core/scrnaseq/pull/584)).
+
+### Chore
+
+- Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
+- Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
+- Update `kallistobustools` from nf-core and replace local `anndata/convert` for an nf-core module ([#465](https://github.com/nf-core/scrnaseq/pull/583))
 
 ### Fixes
 
 - Remove the hardcoded `time = { 120.h * task.attempt }` override for `FASTQC` in `conf/modules.config`. FASTQC now falls back to the `process_low` default (`4.h * task.attempt`), which is ample for the process and avoids submission failures on clusters whose QOS/partition wall-time caps are shorter than 120h.
+- Increase runtime limits for cellbender and cellranger in `conf/modules.config` to avoid template updates resetting these limits ([#275](https://github.com/nf-core/scrnaseq/issues/275))
+- Fix pipeline attempts to access igenomes buckets even with `--igenomes_ignore=true` [#568](https://github.com/nf-core/scrnaseq/issues/568)
 
 ## v4.2.0 - 2026-07-03
 
@@ -140,7 +153,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Template update to v2.12 ([#298](https://github.com/nf-core/scrnaseq/pull/298)).
 - Fix that cellranger workflow couldn't be run and enable CI for this workflow ([#288](https://github.com/nf-core/scrnaseq/pull/288)).
-- Update modules ([#288]()https://github.com/nf-core/scrnaseq/pull/288).
+- Update modules ([#288](<>)https://github.com/nf-core/scrnaseq/pull/288).
 
 ## v2.5.0 - 2024-01-02
 

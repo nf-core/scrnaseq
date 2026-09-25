@@ -9,6 +9,7 @@ import platform
 import json
 
 import anndata
+import hdf5plugin
 import pandas as pd
 import scanpy as sc
 
@@ -48,6 +49,26 @@ def dump_versions():
         f.write(format_yaml_like(versions))
 
 
+def remove_runtime_metadata(value):
+    """Remove measured durations while retaining mapping statistics and provenance."""
+    timing_fields = {
+        "runtime_seconds",
+        "mapping_seconds",
+        "busy_nanos",
+        "callback_setup_nanos",
+        "output_flush_nanos",
+    }
+    if isinstance(value, dict):
+        return {
+            key: remove_runtime_metadata(item)
+            for key, item in value.items()
+            if key not in timing_fields
+        }
+    if isinstance(value, list):
+        return [remove_runtime_metadata(item) for item in value]
+    return value
+
+
 def input_to_adata(
     input_data: str,
     output: str,
@@ -76,10 +97,14 @@ def input_to_adata(
     # sort adata column- and row- wise to avoid positional differences
     adata = adata[adata.obs_names.sort_values(), adata.var_names.sort_values()].copy()
 
-    # Remove runtime to prevent hash changes
-    simpleaf_map_info = json.loads(adata.uns['simpleaf_map_info'])
-    simpleaf_map_info.pop('runtime_seconds')
-    adata.uns['simpleaf_map_info'] = json.dumps(simpleaf_map_info, sort_keys=True)
+    # Timing measurements and parallel completion order vary between identical runs.
+    simpleaf_map_info = remove_runtime_metadata(json.loads(adata.uns["simpleaf_map_info"]))
+    adata.uns["simpleaf_map_info"] = json.dumps(simpleaf_map_info, sort_keys=True)
+    if "quant_info" in adata.uns:
+        quant_info = json.loads(adata.uns["quant_info"])
+        if "tiny_cell_resolved_cell_numbers" in quant_info:
+            quant_info["tiny_cell_resolved_cell_numbers"] = sorted(quant_info["tiny_cell_resolved_cell_numbers"])
+        adata.uns["quant_info"] = json.dumps(quant_info, sort_keys=True)
 
     # write results
     adata.write_h5ad(f"{output}")

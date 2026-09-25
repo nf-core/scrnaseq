@@ -29,6 +29,7 @@ workflow SCRNASEQ {
     ch_fastq                    // channel: [ meta, fastq ] from samplesheet
     fasta                       // val: path-like string (or null)
     gtf                         // val: path-like string (or null)
+    gff                         // val: path-like string (or null)
     star_index                  // val: path-like string (or null)
     simpleaf_index              // val: path-like string (or null)
     kallisto_index              // val: path-like string (or null)
@@ -66,6 +67,11 @@ workflow SCRNASEQ {
         ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
     } else {
         ch_barcode_whitelist = []
+    }
+
+    // Warn if both GTF and GFF files are provided
+    if (gtf && gff) {
+        log.warn("Both GTF and GFF files are provided. GTF file will be used.")
     }
 
     // samplesheet - this is passed to the MTX conversion functions to add metadata to the
@@ -107,17 +113,17 @@ workflow SCRNASEQ {
     PREPARE_GENOME(
         fasta,
         gtf,
+        gff,
         gtfSourceFixNeeded(params.aligner, params.genome, params.genomes, gtf)
     )
     ch_genome_fasta = PREPARE_GENOME.out.fasta
-    ch_filter_gtf   = PREPARE_GENOME.out.gtf
-    ch_versions     = ch_versions.mix(PREPARE_GENOME.out.versions)
+    ch_genome_gtf   = PREPARE_GENOME.out.gtf
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
         KALLISTO_BUSTOOLS(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_kallisto_index,
             ch_txp2gene,
             kb_t1c,
@@ -128,7 +134,6 @@ workflow SCRNASEQ {
         )
         ch_mtx_matrices = ch_mtx_matrices.mix( KALLISTO_BUSTOOLS.out.counts_raw, KALLISTO_BUSTOOLS.out.counts_filtered )
         ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
-        ch_versions = ch_versions.mix(KALLISTO_BUSTOOLS.out.ch_versions)
     }
 
     // Run simpleaf pipeline
@@ -136,7 +141,7 @@ workflow SCRNASEQ {
 
         SIMPLEAF(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_transcript_fasta,
             ch_simpleaf_index,
             ch_txp2gene,
@@ -148,7 +153,6 @@ workflow SCRNASEQ {
             ch_fastq,
             [] // for existing map dir; not applicable
         )
-        ch_versions = ch_versions.mix(SIMPLEAF.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(SIMPLEAF.out.quant.map{ _meta, it -> it })
         ch_mtx_matrices = ch_mtx_matrices.mix(
             SIMPLEAF.out.quant.map{
@@ -165,7 +169,7 @@ workflow SCRNASEQ {
     if (params.aligner == "star") {
         STARSOLO(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             star_index,
             star_index_legacy,
             protocol_config['protocol'],
@@ -183,7 +187,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellranger") {
         CELLRANGER_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_cellranger_index,
             ch_fastq,
             protocol_config['protocol']
@@ -198,7 +202,7 @@ workflow SCRNASEQ {
     if (params.aligner == "cellrangerarc") {
         CELLRANGERARC_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_motifs,
             ch_cellranger_index,
             ch_fastq,
@@ -263,7 +267,7 @@ workflow SCRNASEQ {
         // Run cellranger multi
         CELLRANGER_MULTI_ALIGN(
             ch_genome_fasta,
-            ch_filter_gtf,
+            ch_genome_gtf,
             ch_cellrangermulti_collected_channel,
             ch_cellranger_index,
             cellranger_vdj_index,

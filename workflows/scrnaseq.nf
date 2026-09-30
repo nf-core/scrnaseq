@@ -177,8 +177,8 @@ workflow SCRNASEQ {
             ch_fastq,
             params.star_feature,
             protocol_config.get('extra_args', ""),
+            params.star_ignore_sjdbgtf ?: false
         )
-        ch_versions = ch_versions.mix(STARSOLO.out.ch_versions)
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
         ch_mtx_matrices = ch_mtx_matrices.mix( STARSOLO.out.raw_counts, STARSOLO.out.filtered_counts )
     }

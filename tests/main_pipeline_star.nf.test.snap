@@ -20,12 +20,12 @@
                     "python": "3.12.14",
                     "scanpy": "1.10.2"
                 },
-                "STAR_ALIGN": {
-                    "star": "2.7.10b"
-                },
                 "STAR_GENOMEGENERATE": {
                     "gawk": "5.1.0",
                     "samtools": 1.21,
+                    "star": "2.7.11b"
+                },
+                "STAR_STARSOLO": {
                     "star": "2.7.11b"
                 }
             },
@@ -137,7 +137,6 @@
                 "star/Sample_X/Sample_X.Solo.out/Gene/raw/barcodes.tsv.gz",
                 "star/Sample_X/Sample_X.Solo.out/Gene/raw/features.tsv.gz",
                 "star/Sample_X/Sample_X.Solo.out/Gene/raw/matrix.mtx.gz",
-                "star/Sample_X/versions.yml",
                 "star/Sample_Y",
                 "star/Sample_Y/Sample_Y.Aligned.sortedByCoord.out.bam",
                 "star/Sample_Y/Sample_Y.Log.final.out",
@@ -158,7 +157,6 @@
                 "star/Sample_Y/Sample_Y.Solo.out/Gene/raw/barcodes.tsv.gz",
                 "star/Sample_Y/Sample_Y.Solo.out/Gene/raw/features.tsv.gz",
                 "star/Sample_Y/Sample_Y.Solo.out/Gene/raw/matrix.mtx.gz",
-                "star/Sample_Y/versions.yml",
                 "star/mtx_conversions",
                 "star/mtx_conversions/Sample_X",
                 "star/mtx_conversions/Sample_X/Sample_X_filtered_matrix.h5ad",
@@ -208,7 +206,6 @@
                 "barcodes.tsv.gz:md5,f62a276e262fdd85262a889d0f48556b",
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
                 "matrix.mtx.gz:md5,a1721c240079a651870cbb2e76720dc8",
-                "versions.yml:md5,f05605942a23ee8ef331f12a523cbf1e",
                 "Sample_Y.SJ.out.tab:md5,98bd31104a860cf80119dc30d938d163",
                 "Barcodes.stats:md5,2dbf1ae426c1afd97903ee001f0db5ce",
                 "Features.stats:md5,f0d82a316413d3c920c8487b67ee4f40",
@@ -220,7 +217,6 @@
                 "barcodes.tsv.gz:md5,f62a276e262fdd85262a889d0f48556b",
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
                 "matrix.mtx.gz:md5,901ccd41c658cc6485863afff775ea98",
-                "versions.yml:md5,f05605942a23ee8ef331f12a523cbf1e",
                 "Sample_X_filtered_matrix.h5ad:md5,bba8c853168895aabadd0d25ff8abce1",
                 "Sample_X_filtered_matrix.sce.rds:md5,5327486116b6213edad975d7f820c81b",
                 "Sample_X_filtered_matrix.seurat.rds:md5,6d90ae68ae69a527a481836c85d664ea",
@@ -235,10 +231,10 @@
                 "Sample_Y_raw_matrix.seurat.rds:md5,1e366fa8c2ae00e91dc5b1f5101414ce"
             ]
         ],
-        "timestamp": "2026-09-22T16:41:49.527812476",
+        "timestamp": "2026-09-30T20:48:03.341108865",
         "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.04.0"
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
         }
     }
 }

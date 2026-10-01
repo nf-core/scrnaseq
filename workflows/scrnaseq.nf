@@ -91,7 +91,8 @@ workflow SCRNASEQ {
     star_index        = star_index ? file(star_index, checkIfExists: true) : null
 
     //cellranger params
-    ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
+    // [ meta, path ], matching the CELLRANGER*_MKREF reference output expected by the count/multi modules
+    ch_cellranger_index = cellranger_index ? [ [ id: file(cellranger_index).name ], file(cellranger_index, checkIfExists: true) ] : []
 
     //cellrangermulti params
     cellranger_vdj_index = cellranger_vdj_index             ? file(cellranger_vdj_index, checkIfExists: true)             : []

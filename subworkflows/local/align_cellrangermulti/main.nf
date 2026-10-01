@@ -25,6 +25,8 @@ workflow CELLRANGER_MULTI_ALIGN {
         // since we merged all data as a meta, now we have a channel per sample, which
         // every item is a meta map for each data-type
         // now we can split it back for passing as input to the module
+        def empty_fastq = file("$projectDir/assets/EMPTY", checkIfExists: true)
+
         ch_fastq
         .flatten()
         .map{ meta ->
@@ -37,21 +39,27 @@ workflow CELLRANGER_MULTI_ALIGN {
         .branch {
             meta, fastq ->
                 gex: meta.feature_type == "gex"
-                    return [ meta, fastq ]
+                    return [ meta, fastq == empty_fastq ? [] : fastq, meta.options ] // keep meta: it identifies the sample
                 vdj: meta.feature_type == "vdj"
-                    return [ meta, fastq ]
+                    return as_module_input( meta, fastq, empty_fastq )
+                vdj_t: meta.feature_type == "vdj_t"
+                    return as_module_input( meta, fastq, empty_fastq )
+                vdj_t_gd: meta.feature_type == "vdj_t_gd"
+                    return as_module_input( meta, fastq, empty_fastq )
+                vdj_b: meta.feature_type == "vdj_b"
+                    return as_module_input( meta, fastq, empty_fastq )
                 ab: meta.feature_type == "ab"
-                    if ((fastq == file("$projectDir/assets/EMPTY", checkIfExists: true)) || params.fb_reference) { // when empty, should not check for reference
-                        return [ meta, fastq ]
+                    if ((fastq == empty_fastq) || params.fb_reference) { // when empty, should not check for reference
+                        return as_module_input( meta, fastq, empty_fastq )
                     } else {
                         error ("Antibody reference was not specified. Please provide a reference file for feature barcoding (e.g. antibody measurements).\nPlease refer to https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv for more details.")
                     }
                 beam: meta.feature_type == "beam"
-                    return [ meta, fastq ]
+                    return as_module_input( meta, fastq, empty_fastq )
                 crispr: meta.feature_type == "crispr"
-                    return [ meta, fastq ]
+                    return as_module_input( meta, fastq, empty_fastq )
                 cmo: meta.feature_type == "cmo"
-                    return [ meta, fastq ]
+                    return as_module_input( meta, fastq, empty_fastq )
         }
         .set { ch_grouped_fastq }
 
@@ -217,7 +225,10 @@ workflow CELLRANGER_MULTI_ALIGN {
             [],
             ch_frna_sample_csv,
             ch_ocm_barcode_csv,
-            params.skip_cellranger_renaming
+            params.skip_cellranger_renaming,
+            ch_grouped_fastq.vdj_t,
+            ch_grouped_fastq.vdj_t_gd,
+            ch_grouped_fastq.vdj_b
         )
 
         //
@@ -238,6 +249,11 @@ workflow CELLRANGER_MULTI_ALIGN {
         cellrangermulti_out          = CELLRANGER_MULTI.out.outs
         cellrangermulti_mtx_raw      = ch_matrices_raw
         cellrangermulti_mtx_filtered = ch_matrices_filtered
+}
+
+// data types absent from a sample are passed as [ [:], [], [:] ], which the module omits from the multi config
+def as_module_input(meta, fastq, empty_fastq) {
+    return fastq == empty_fastq ? [ [:], [], [:] ] : [ meta, fastq, meta.options ]
 }
 
 def parse_demultiplexed_output_channels(in_ch, pattern) {

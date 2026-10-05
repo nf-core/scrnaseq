@@ -103,7 +103,7 @@ workflow SIMPLEAF {
         ch_chemistry_reads,
         ch_index_t2g,
         // meta, cell filtering method, cell filtering params, whitelist
-        [[:], "unfiltered-pl", [], barcode_whitelist ],
+        barcode_whitelist.map { whitelist -> [[:], "unfiltered-pl", [], whitelist] },
         resolution,
         ch_map_dir
     )

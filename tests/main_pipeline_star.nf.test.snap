@@ -14,6 +14,9 @@
                 "GTF_GENE_FILTER": {
                     "python": "3.14.5"
                 },
+                "GUNZIP_WHITELIST": {
+                    "gunzip": 1.13
+                },
                 "MTX_TO_H5AD": {
                     "anndata": "0.12.19",
                     "pandas": "2.3.3",
@@ -231,9 +234,9 @@
                 "Sample_Y_raw_matrix.seurat.rds:md5,1e366fa8c2ae00e91dc5b1f5101414ce"
             ]
         ],
-        "timestamp": "2026-09-30T20:48:03.341108865",
+        "timestamp": "2026-10-02T21:24:18.004538981",
         "meta": {
-            "nf-test": "0.9.4",
+            "nf-test": "0.9.5",
             "nextflow": "25.10.4"
         }
     }

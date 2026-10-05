@@ -1,8 +1,8 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { STAR_STARSOLO  } from '../../../modules/nf-core/star/starsolo'
 include { STAR_GENOMEPARAMS_UPGRADE } from '../../../modules/local/star_genomeparams_upgrade'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
+include { STAR_STARSOLO       } from '../../../modules/nf-core/star/starsolo'
 include { STAR_GENOMEGENERATE }         from '../../../modules/nf-core/star/genomegenerate/main'
 
 
@@ -18,6 +18,7 @@ workflow STARSOLO {
     star_feature
     other_10x_parameters
     star_ignore_sjdbgtf
+    manifest_file
 
     main:
 
@@ -64,8 +65,9 @@ workflow STARSOLO {
         .combine(channel.of(protocol))
         .combine(channel.of(star_feature))
         .combine(channel.of(other_10x_parameters))
-        .map({ meta, reads, solotype, feature, other_10x_params ->
-            [meta + [star_feature: feature, other_10x_parameters: other_10x_params], solotype, reads]
+        .combine(manifest_file.map { manifest -> [manifest] })
+        .map({ meta, reads, solotype, feature, other_10x_params, manifest ->
+            [meta + [star_feature: feature, other_10x_parameters: other_10x_params], solotype, reads, manifest]
         })
 
     STAR_STARSOLO(

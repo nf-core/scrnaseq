@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { MULTIQC                                           } from '../modules/nf-core/multiqc/main'
+include { GUNZIP as GUNZIP_WHITELIST                         } from '../modules/nf-core/gunzip/main'
 include { paramsSummaryMap                                  } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -60,14 +61,35 @@ workflow SCRNASEQ {
     ch_transcript_fasta     = transcript_fasta ? file(transcript_fasta, checkIfExists: true) : []
     ch_motifs               = motifs           ? file(motifs, checkIfExists: true)           : []
     ch_txp2gene             = txp2gene         ? file(txp2gene, checkIfExists: true)         : []
+    ch_manifest             = channel.value(params.manifest ? file(params.manifest, checkIfExists: true) : [])
 
     if (params.barcode_whitelist) {
-        ch_barcode_whitelist = file(params.barcode_whitelist, checkIfExists: true)
+        // Parse multiple whitelist files in the supplied order.
+        ch_barcode_whitelist = params.barcode_whitelist.contains(',') ?
+            params.barcode_whitelist.split(',').collect { whitelist -> file(whitelist.trim(), checkIfExists: true) } :
+            file(params.barcode_whitelist, checkIfExists: true)
     } else if (protocol_config.containsKey("whitelist")) {
         ch_barcode_whitelist = file("$projectDir/${protocol_config['whitelist']}", checkIfExists: true)
     } else {
         ch_barcode_whitelist = []
     }
+
+    // Decompress each gzip file independently, then restore the original whitelist order.
+    whitelist_files = ch_barcode_whitelist instanceof List ? ch_barcode_whitelist : [ch_barcode_whitelist]
+    ch_whitelist_files = channel.fromList(whitelist_files.withIndex().collect { whitelist, index ->
+        [[id: "whitelist_${index}", order: index], whitelist]
+    }).branch { whitelist ->
+        compressed: whitelist[1].extension == 'gz'
+        plain: true
+    }
+    GUNZIP_WHITELIST(ch_whitelist_files.compressed)
+    ch_barcode_whitelist = ch_whitelist_files.plain
+        .mix(GUNZIP_WHITELIST.out.gunzip)
+        .toSortedList { a, b -> a[0].order <=> b[0].order }
+        .map { entries ->
+            def whitelists = entries.collect { _meta, whitelist -> whitelist }
+            whitelists.size() == 1 ? whitelists[0] : whitelists
+        }
 
     // Warn if both GTF and GFF files are provided
     if (gtf && gff) {
@@ -177,7 +199,8 @@ workflow SCRNASEQ {
             ch_fastq,
             params.star_feature,
             protocol_config.get('extra_args', ""),
-            params.star_ignore_sjdbgtf ?: false
+            params.star_ignore_sjdbgtf ?: false,
+            ch_manifest
         )
         ch_multiqc_files = ch_multiqc_files.mix(STARSOLO.out.for_multiqc)
         ch_mtx_matrices = ch_mtx_matrices.mix( STARSOLO.out.raw_counts, STARSOLO.out.filtered_counts )

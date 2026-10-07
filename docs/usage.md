@@ -259,14 +259,17 @@ If your data already follows the expected naming convention, you can deactivate 
 
 If you are using cellranger-multi you have to add the column _feature_type_ to indicate which of the Feature Barcode Technology your data corresponds to:
 
-| feature_type | description                            |
-| ------------ | -------------------------------------- |
-| `gex`        | Gene expression                        |
-| `vdj`        | TCR/BCR profiling                      |
-| `ab`         | Antibody profiling (feature barcoding) |
-| `crispr`     | CRISPR capture                         |
-| `cmo`        | Cell multiplexing oligos (CMO) tags    |
-| `beam`       | _Currently not supported_              |
+| feature_type | description                                                            |
+| ------------ | ---------------------------------------------------------------------- |
+| `gex`        | Gene expression                                                        |
+| `vdj`        | TCR/BCR profiling (chain type auto-detected by Cell Ranger)            |
+| `vdj_t`      | TCR (alpha/beta) profiling                                             |
+| `vdj_t_gd`   | TCR (gamma/delta) profiling; requires `--vdj_inner_enrichment_primers` |
+| `vdj_b`      | BCR profiling                                                          |
+| `ab`         | Antibody profiling (feature barcoding)                                 |
+| `crispr`     | CRISPR capture                                                         |
+| `cmo`        | Cell multiplexing oligos (CMO) tags                                    |
+| `beam`       | _Currently not supported_                                              |
 
 > More information on the Feature Barcode Technologies can be found here: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi
 
@@ -274,6 +277,7 @@ If you are using cellranger-multi you have to add the column _feature_type_ to i
 
 - It is important that you give the same sample name for the different feature barcode technologies data that correspond to the same and should be analysed together.
 - The pipeline will **automatically** generate the cellranger multi config file based on the given data.
+- All rows of a sample with the same `feature_type` are treated as one library. To analyse several V(D)J libraries of the same sample (e.g. TCR and BCR), give each its chain-specific `feature_type` (`vdj_t`, `vdj_t_gd`, `vdj_b`) instead of `vdj`.
 - When working with multiplexed data (FFPE/CMO/OCM), you'll need a **second samplesheet** relating the multiplexed samples to the corresponding "physical" sample (details below). The `sample` column in the main samplesheet refers to the "physical" sample that may contain multiple multiplexed samples.
 
 The `--cellranger_multi_barcodes` samplesheet is validated before Cell Ranger runs. It must follow these rules:
@@ -293,6 +297,10 @@ The `--cellranger_multi_barcodes` samplesheet is validated before Cell Ranger ru
   and `--cellranger_vdj_index`, for GEX and VDJ, respectively.
 
   > When running cellranger multi, without any VDJ data, users can also skip VDJ automated ref building with: `--skip_cellrangermulti_vdjref`.
+
+- When working with **gamma/delta TCR data** (`vdj_t_gd`), the inner enrichment primers used for the gamma/delta libraries must be provided
+  via `--vdj_inner_enrichment_primers` (a text file with one primer sequence per line). These primers replace Cell Ranger's defaults for all
+  V(D)J libraries in the run, so if a sample also has `vdj_t` or `vdj_b` libraries, the file must include their inner enrichment primers too.
 
 - When working with **FFPE data**:
   - a probe set needs to be specified via `--gex_frna_probe_set`. This file is typically

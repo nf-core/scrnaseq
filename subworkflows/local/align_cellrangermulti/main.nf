@@ -213,6 +213,9 @@ workflow CELLRANGER_MULTI_ALIGN {
             ch_grouped_fastq.cmo,
             ch_grouped_fastq.crispr,
             ch_cellranger_gex_index,
+            ch_grouped_fastq.vdj_t,
+            ch_grouped_fastq.vdj_t_gd,
+            ch_grouped_fastq.vdj_b,
             ch_gex_frna_probeset,
             ch_gex_target_panel,
             ch_cellranger_vdj_index,
@@ -225,10 +228,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             [],
             ch_frna_sample_csv,
             ch_ocm_barcode_csv,
-            params.skip_cellranger_renaming,
-            ch_grouped_fastq.vdj_t,
-            ch_grouped_fastq.vdj_t_gd,
-            ch_grouped_fastq.vdj_b
+            params.skip_cellranger_renaming
         )
 
         //

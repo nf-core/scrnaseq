@@ -187,8 +187,8 @@ workflow CELLRANGER_MULTI_ALIGN {
             if ( !params.skip_cellrangermulti_vdjref  ) { // if user uses cellranger multi but does not have VDJ data
                 // Make reference genome
                 CELLRANGER_MKVDJREF(
-                    ch_fasta.map { _meta, fasta -> fasta }, // module takes plain paths, without meta
-                    CELLRANGER_MKGTF.out.gtf.map { _meta, gtf -> gtf },
+                    ch_fasta,
+                    CELLRANGER_MKGTF.out.gtf,
                     [], // currently ignoring the 'seqs' option
                     "vdj_reference"
                 )

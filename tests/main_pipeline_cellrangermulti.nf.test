@@ -107,7 +107,7 @@ nextflow_pipeline {
             assertAll(
                 {assert !workflow.success},
                 {assert workflow.failed},
-                {assert workflow.stdout.any { it.contains("Parameter 'gex_reference_version' is required when 'gex_frna_probe_set' is provided and 'cellranger_index' is not provided") } }
+                {assert (workflow.stdout + workflow.stderr).any { it.contains("Parameter 'gex_reference_version' is required when 'gex_frna_probe_set' is provided and 'cellranger_index' is not provided") } }
             )
         }
     }
@@ -138,7 +138,7 @@ nextflow_pipeline {
             assertAll(
                 {assert !workflow.success},
                 {assert workflow.failed},
-                {assert workflow.stdout.any { it.contains("Parameter 'gex_reference_version' (GRCm39) does not match the probeset reference genome (GRCh38)") } }
+                {assert (workflow.stdout + workflow.stderr).any { it.contains("Parameter 'gex_reference_version' (GRCm39) does not match the probeset reference genome (GRCh38)") } }
             )
         }
     }
@@ -183,8 +183,8 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stdout.any { it.contains("The following rows have no barcode identifiers") } },
-                { assert workflow.stdout.any { it.contains("row 3 (sample_2)") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("The following rows have no barcode identifiers") } },
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("row 3 (sample_2)") } }
             )
         }
     }
@@ -222,8 +222,8 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stdout.any { it.contains("Each multiplexed_sample_id should use only one type of barcode identifier") } },
-                { assert workflow.stdout.any { it.contains("sample_1") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("Each multiplexed_sample_id should use only one type of barcode identifier") } },
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("sample_1") } }
             )
         }
     }
@@ -261,7 +261,7 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stderr.any { it.contains("Entry 2") && it.contains("Detected duplicate entries") && it.contains("multiplexed_sample_id:duplicate_id") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("Entry 2") && it.contains("Detected duplicate entries") && it.contains("multiplexed_sample_id:duplicate_id") } }
             )
         }
     }
@@ -299,7 +299,7 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stderr.any { it.contains("sample") && it.contains("cannot contain spaces") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("sample") && it.contains("cannot contain spaces") } }
             )
         }
     }
@@ -337,7 +337,7 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stderr.any { it.contains("multiplexed_sample_id") && it.contains("cannot contain spaces") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("multiplexed_sample_id") && it.contains("cannot contain spaces") } }
             )
         }
     }
@@ -375,7 +375,7 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stderr.any { it.contains("cmo_ids") && it.contains("alphanumeric") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("cmo_ids") && it.contains("alphanumeric") } }
             )
         }
     }
@@ -413,7 +413,7 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stderr.any { it.contains("ocm_ids") && it.contains("OB1") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("ocm_ids") && it.contains("OB1") } }
             )
         }
     }
@@ -451,7 +451,7 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stdout.any { it.contains("do not exist in the input samplesheet") && it.contains("NONEXISTENT_SAMPLE") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("do not exist in the input samplesheet") && it.contains("NONEXISTENT_SAMPLE") } }
             )
         }
     }
@@ -488,7 +488,7 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stdout.any { it.contains("cannot combine the generic 'vdj' feature_type with chain-specific ones") && it.contains("'PBMC_10K' uses vdj, vdj_b") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("cannot combine the generic 'vdj' feature_type with chain-specific ones") && it.contains("'PBMC_10K' uses vdj, vdj_b") } }
             )
         }
     }
@@ -526,7 +526,7 @@ nextflow_workflow {
             assertAll(
                 { assert !workflow.success },
                 { assert workflow.failed },
-                { assert workflow.stdout.any { it.contains("cannot combine the generic 'vdj' feature_type with chain-specific ones") && it.contains("'PBMC_10K' uses vdj, vdj_b") } }
+                { assert (workflow.stdout + workflow.stderr).any { it.contains("cannot combine the generic 'vdj' feature_type with chain-specific ones") && it.contains("'PBMC_10K' uses vdj, vdj_b") } }
             )
         }
     }

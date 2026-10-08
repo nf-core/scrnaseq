@@ -39,7 +39,7 @@ workflow CELLRANGER_MULTI_ALIGN {
         .branch {
             meta, fastq ->
                 gex: meta.feature_type == "gex"
-                    return [ meta, fastq == empty_fastq ? [] : fastq, meta.options ] // keep meta: it identifies the sample
+                    return [ meta, fastq ] // every sample has a GEX entry (empty if no GEX data), so it carries the sample meta
                 vdj: meta.feature_type == "vdj"
                     return as_module_input( meta, fastq, empty_fastq )
                 vdj_t: meta.feature_type == "vdj_t"
@@ -205,8 +205,8 @@ workflow CELLRANGER_MULTI_ALIGN {
         // MODULE: cellranger multi
         //
         CELLRANGER_MULTI(
-            ch_grouped_fastq.gex.map{ pair -> pair[0] },
-            ch_grouped_fastq.gex,
+            ch_grouped_fastq.gex.map{ meta, _fastq -> meta },
+            ch_grouped_fastq.gex.map{ meta, fastq -> as_module_input( meta, fastq, empty_fastq ) },
             ch_grouped_fastq.vdj,
             ch_grouped_fastq.ab,
             ch_grouped_fastq.beam,

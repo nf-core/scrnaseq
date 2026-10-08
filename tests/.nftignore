@@ -14,7 +14,7 @@ pipeline_info/*.{html,json,txt,yml}
 **/**.{html,json,bus,ec}
 **/**.Log.*
 **/*.Aligned.sortedByCoord.out.bam
-**/outs/**.{json,txt,yml,csv,tab,bam,bai,h5,fai,cloupe,pb}
+**/outs/**.{json,txt,yml,csv,tab,bam,bai,h5,fai,cloupe,vloupe,pb}
 **/analysis/**
 **/genomeParameters.txt
 **/atac_*.{gz,tbi,bed}

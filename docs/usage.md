@@ -277,7 +277,7 @@ If you are using cellranger-multi you have to add the column _feature_type_ to i
 
 - It is important that you give the same sample name for the different feature barcode technologies data that correspond to the same and should be analysed together.
 - The pipeline will **automatically** generate the cellranger multi config file based on the given data.
-- All rows of a sample with the same `feature_type` are treated as one library. To analyse several V(D)J libraries of the same sample (e.g. TCR and BCR), give each its chain-specific `feature_type` (`vdj_t`, `vdj_t_gd`, `vdj_b`) instead of `vdj`.
+- All rows of a sample with the same `feature_type` are treated as one library. To analyse several V(D)J libraries of the same sample (e.g. TCR and BCR), give each its chain-specific `feature_type` (`vdj_t`, `vdj_t_gd`, `vdj_b`) instead of `vdj`. A sample cannot combine `vdj` with chain-specific feature types, but different samples may use either.
 - When working with multiplexed data (FFPE/CMO/OCM), you'll need a **second samplesheet** relating the multiplexed samples to the corresponding "physical" sample (details below). The `sample` column in the main samplesheet refers to the "physical" sample that may contain multiple multiplexed samples.
 
 The `--cellranger_multi_barcodes` samplesheet is validated before Cell Ranger runs. It must follow these rules:

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add the `--gff` parameter to allow the user to specify a GFF file as a reference (instead of a GTF file) ([#451](https://github.com/nf-core/scrnaseq/pull/451))
 - Add json schema validation for `cellrangerarc` aligner ([#584](https://github.com/nf-core/scrnaseq/pull/584)).
-- Add `vdj_t`, `vdj_t_gd` and `vdj_b` samplesheet `feature_type` values for `cellrangermulti`, so T cell (alpha/beta), T cell (gamma/delta) and B cell V(D)J libraries of the same sample are passed to Cell Ranger as separate `VDJ-T`, `VDJ-T-GD` and `VDJ-B` libraries. `vdj_t_gd` requires `--vdj_inner_enrichment_primers`.
+- Add `vdj_t`, `vdj_t_gd` and `vdj_b` samplesheet `feature_type` values for `cellrangermulti`, so T cell (alpha/beta), T cell (gamma/delta) and B cell V(D)J libraries of the same sample are passed to Cell Ranger as separate `VDJ-T`, `VDJ-T-GD` and `VDJ-B` libraries. `vdj_t_gd` requires `--vdj_inner_enrichment_primers`, and a sample cannot combine `vdj` with the chain-specific types.
 
 ### Chore
 

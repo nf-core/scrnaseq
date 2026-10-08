@@ -455,4 +455,115 @@ nextflow_workflow {
             )
         }
     }
+
+    test("test-dataset_cellrangermulti_mixed_vdj_feature_types") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_mixed_vdj_feature_types"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet_test_mixed_vdj.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stdout.any { it.contains("cannot combine the generic 'vdj' feature_type with chain-specific ones") && it.contains("'PBMC_10K' uses vdj, vdj_b") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_mixed_vdj_feature_types_quoted_padded") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_mixed_vdj_feature_types_quoted_padded"
+                // quoted fields with padded sample name and feature type, which the samplesheet parser normalises
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet_test_mixed_vdj_quoted_padded.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert !workflow.success },
+                { assert workflow.failed },
+                { assert workflow.stdout.any { it.contains("cannot combine the generic 'vdj' feature_type with chain-specific ones") && it.contains("'PBMC_10K' uses vdj, vdj_b") } }
+            )
+        }
+    }
+
+    test("test-dataset_cellrangermulti_vdj_feature_types_per_sample") {
+        tag "validation"
+        tag "cellranger/multi"
+        tag "initialisation"
+
+        when {
+            params {
+                aligner                   = 'cellrangermulti'
+                outdir                    = "${outputDir}/results_cellrangermulti_vdj_feature_types_per_sample"
+                input                     = "${baseDir}/assets/cellrangermulti_samplesheet_test_vdj_chain_types.csv"
+                protocol                  = 'auto'
+                skip_cellbender           = true
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = true   // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                input[6] = false  // help
+                input[7] = false  // help_full
+                input[8] = false  // show_hidden
+                """
+            }
+        }
+
+        then {
+            // different samples may use the generic 'vdj' and chain-specific feature types
+            assertAll(
+                { assert workflow.success }
+            )
+        }
+    }
 }

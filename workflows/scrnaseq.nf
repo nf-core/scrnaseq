@@ -91,7 +91,8 @@ workflow SCRNASEQ {
     star_index        = star_index ? file(star_index, checkIfExists: true) : null
 
     //cellranger params
-    ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
+    // [ meta, path ], matching the CELLRANGER*_MKREF reference output expected by the count/multi modules
+    ch_cellranger_index = cellranger_index ? [ [ id: file(cellranger_index).name ], file(cellranger_index, checkIfExists: true) ] : []
 
     //cellrangermulti params
     cellranger_vdj_index = cellranger_vdj_index             ? file(cellranger_vdj_index, checkIfExists: true)             : []
@@ -229,7 +230,7 @@ workflow SCRNASEQ {
             // the module parses them from the 'gex' options
             if (meta.feature_type.toString() == 'gex') {
                 parsed_meta.options['create-bam'] = params.save_align_intermeds  // force bam creation -- param required by cellranger multi
-                if (meta.expected_cells) { parsed_meta.options['expected-cells'] = meta.expected_cells }
+                if (meta.expected_cells) { parsed_meta.options['expect-cells'] = meta.expected_cells }
                 parsed_meta.options['chemistry'] = protocol_config['protocol']
             }
 
@@ -242,7 +243,7 @@ workflow SCRNASEQ {
             // This to ensure that the sizes of each data channel is the same, and the the order and the data types
             // are used together with its rightful pairs
             //
-            // data.types: gex, vdj, ab, beam, crispr, cmo
+            // data.types: gex, vdj, vdj_t, vdj_t_gd, vdj_b, ab, beam, crispr, cmo
 
             // clone ArrayBag (received from .groupTuple()) to avoid mutating the input
             def map_collection_clone = []
@@ -254,6 +255,9 @@ workflow SCRNASEQ {
             // either empty or populated. It will be branched inside the subworkflow.
             if (!map_collection_clone.any{ m -> m.feature_type == 'gex' })    { map_collection_clone.add( [id: sample_id, feature_type: 'gex'   , gex:    empty_file, options:[:] ] ) }
             if (!map_collection_clone.any{ m -> m.feature_type == 'vdj' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj'   , vdj:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ m -> m.feature_type == 'vdj_t' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj_t'   , vdj_t:    empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ m -> m.feature_type == 'vdj_t_gd' }) { map_collection_clone.add( [id: sample_id, feature_type: 'vdj_t_gd', vdj_t_gd: empty_file, options:[:] ] ) }
+            if (!map_collection_clone.any{ m -> m.feature_type == 'vdj_b' })    { map_collection_clone.add( [id: sample_id, feature_type: 'vdj_b'   , vdj_b:    empty_file, options:[:] ] ) }
             if (!map_collection_clone.any{ m -> m.feature_type == 'ab' })     { map_collection_clone.add( [id: sample_id, feature_type: 'ab'    , ab:     empty_file, options:[:] ] ) }
             if (!map_collection_clone.any{ m -> m.feature_type == 'beam' })   { map_collection_clone.add( [id: sample_id, feature_type: 'beam'  , beam:   empty_file, options:[:] ] ) } // currently not implemented, the input samplesheet checking will not allow it.
             if (!map_collection_clone.any{ m -> m.feature_type == 'crispr' }) { map_collection_clone.add( [id: sample_id, feature_type: 'crispr', crispr: empty_file, options:[:] ] ) }

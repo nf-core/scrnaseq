@@ -42,7 +42,7 @@
                     },
                     "cellranger/multi": {
                         "branch": "master",
-                        "git_sha": "ae6ab25b17d50a9da90e7236115c939f2c453b1e",
+                        "git_sha": "7effa53d6abdeca831d4969839c652986662cc8e",
                         "installed_by": ["modules"]
                     },
                     "cellrangerarc/count": {

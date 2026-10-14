@@ -15,9 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
 - Update `kallistobustools` from nf-core and replace local `anndata/convert` for an nf-core module ([#465](https://github.com/nf-core/scrnaseq/pull/583))
+- Update `cellranger` nf-core modules (`count`, `mkgtf`, `mkref`, `mkvdjref`, `multi`) to Cell Ranger 10.1.0, adapting the `cellranger/multi` call to its new per-library options interface ([#596](https://github.com/nf-core/scrnaseq/pull/596))
 
 ### Fixes
 
+- Fix `--cellranger_index` failing before `CELLRANGER_COUNT`, `CELLRANGERARC_COUNT` and `CELLRANGER_MULTI` start, by passing the index as the `[ meta, reference ]` tuple the modules expect ([#596](https://github.com/nf-core/scrnaseq/pull/596))
 - Remove the hardcoded `time = { 120.h * task.attempt }` override for `FASTQC` in `conf/modules.config`. FASTQC now falls back to the `process_low` default (`4.h * task.attempt`), which is ample for the process and avoids submission failures on clusters whose QOS/partition wall-time caps are shorter than 120h.
 - Increase runtime limits for cellbender and cellranger in `conf/modules.config` to avoid template updates resetting these limits ([#275](https://github.com/nf-core/scrnaseq/issues/275))
 - Fix pipeline attempts to access igenomes buckets even with `--igenomes_ignore=true` [#568](https://github.com/nf-core/scrnaseq/issues/568)

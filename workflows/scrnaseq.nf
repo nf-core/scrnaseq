@@ -91,7 +91,7 @@ workflow SCRNASEQ {
     star_index        = star_index ? file(star_index, checkIfExists: true) : null
 
     //cellranger params
-    ch_cellranger_index = cellranger_index ? file(cellranger_index, checkIfExists: true) : []
+    ch_cellranger_index = cellranger_index ? [ [id: 'cellranger_index'], file(cellranger_index, checkIfExists: true) ] : []
 
     //cellrangermulti params
     cellranger_vdj_index = cellranger_vdj_index             ? file(cellranger_vdj_index, checkIfExists: true)             : []

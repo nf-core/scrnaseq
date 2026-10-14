@@ -53,7 +53,15 @@ workflow CELLRANGER_MULTI_ALIGN {
                 cmo: meta.feature_type == "cmo"
                     return [ meta, fastq ]
         }
-        .set { ch_grouped_fastq }
+        .set { ch_grouped_fastq_branched }
+
+        // the module expects [ meta, fastqs, options ] for every library type
+        ch_gex_fastq    = ch_grouped_fastq_branched.gex.map    { meta, fastq -> [ meta, fastq, meta.options ?: [:] ] }
+        ch_vdj_fastq    = ch_grouped_fastq_branched.vdj.map    { meta, fastq -> [ meta, fastq, meta.options ?: [:] ] }
+        ch_ab_fastq     = ch_grouped_fastq_branched.ab.map     { meta, fastq -> [ meta, fastq, meta.options ?: [:] ] }
+        ch_beam_fastq   = ch_grouped_fastq_branched.beam.map   { meta, fastq -> [ meta, fastq, meta.options ?: [:] ] }
+        ch_cmo_fastq    = ch_grouped_fastq_branched.cmo.map    { meta, fastq -> [ meta, fastq, meta.options ?: [:] ] }
+        ch_crispr_fastq = ch_grouped_fastq_branched.crispr.map { meta, fastq -> [ meta, fastq, meta.options ?: [:] ] }
 
         // Assign other cellranger reference files
         ch_gex_frna_probeset      = params.gex_frna_probe_set            ? file(params.gex_frna_probe_set)            : []
@@ -89,7 +97,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             PARSE_CELLRANGERMULTI_SAMPLESHEET( ch_multi_samplesheet )
 
             // CMO
-            ch_grouped_fastq.gex
+            ch_gex_fastq
             .map{ pair -> [pair[0].id] }
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.cmo.flatten().map { csv -> [ "${csv.baseName}" - "_cmo", csv ] } )
             .groupTuple()
@@ -97,7 +105,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             .set { ch_cmo_barcode_csv }
 
             // OCM
-            ch_grouped_fastq.gex
+            ch_gex_fastq
             .map{ pair -> [pair[0].id] }
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.ocm.flatten().map { csv -> [ "${csv.baseName}" - "_ocm", csv ] } )
             .groupTuple()
@@ -105,7 +113,7 @@ workflow CELLRANGER_MULTI_ALIGN {
             .set { ch_ocm_barcode_csv }
 
             // FRNA
-            ch_grouped_fastq.gex
+            ch_gex_fastq
             .map{ pair -> [pair[0].id] }
             .concat( PARSE_CELLRANGERMULTI_SAMPLESHEET.out.frna.flatten().map { csv -> [ "${csv.baseName}" - "_frna", csv ] } )
             .groupTuple()
@@ -197,14 +205,17 @@ workflow CELLRANGER_MULTI_ALIGN {
         // MODULE: cellranger multi
         //
         CELLRANGER_MULTI(
-            ch_grouped_fastq.gex.map{ pair -> pair[0] },
-            ch_grouped_fastq.gex,
-            ch_grouped_fastq.vdj,
-            ch_grouped_fastq.ab,
-            ch_grouped_fastq.beam,
-            ch_grouped_fastq.cmo,
-            ch_grouped_fastq.crispr,
+            ch_gex_fastq.map{ row -> row[0] },
+            ch_gex_fastq,
+            ch_vdj_fastq,
+            ch_ab_fastq,
+            ch_beam_fastq,
+            ch_cmo_fastq,
+            ch_crispr_fastq,
             ch_cellranger_gex_index,
+            [ [:], [], [:] ], // VDJ-T  libraries, currently not supported by the samplesheet
+            [ [:], [], [:] ], // VDJ-T-GD libraries, currently not supported by the samplesheet
+            [ [:], [], [:] ], // VDJ-B  libraries, currently not supported by the samplesheet
             ch_gex_frna_probeset,
             ch_gex_target_panel,
             ch_cellranger_vdj_index,

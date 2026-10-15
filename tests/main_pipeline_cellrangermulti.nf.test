@@ -562,7 +562,13 @@ nextflow_workflow {
         then {
             // different samples may use the generic 'vdj' and chain-specific feature types
             assertAll(
-                { assert workflow.success }
+                { assert workflow.success },
+                { assert snapshot(
+                    // one entry per sample and feature type: [ sample, feature_type, FASTQ file names ]
+                    workflow.out.samplesheet
+                        .collect { meta, fastqs -> [ meta.id, meta.feature_type, fastqs.collect { fastq -> file(fastq).name } ] }
+                        .sort { entry -> entry.toString() }
+                ).match() }
             )
         }
     }

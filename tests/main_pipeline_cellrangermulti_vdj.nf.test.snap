@@ -4,13 +4,13 @@
             7,
             {
                 "CELLRANGER_MKGTF": {
-                    "cellranger": "cellranger 10.0.0"
+                    "cellranger": "cellranger 10.1.0"
                 },
                 "CELLRANGER_MKREF": {
-                    "cellranger": "cellranger 10.0.0"
+                    "cellranger": "cellranger 10.1.0"
                 },
                 "CELLRANGER_MULTI": {
-                    "cellranger": "10.0.0"
+                    "cellranger": "10.1.0"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -246,7 +246,7 @@
                 "multiqc_general_stats.txt:md5,643837a72ad6873d1dfcf31c69073313"
             ]
         ],
-        "timestamp": "2026-10-08T14:10:09.25896834",
+        "timestamp": "2026-10-20T12:54:09.273395813",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

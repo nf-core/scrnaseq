@@ -22,27 +22,27 @@
                     },
                     "cellranger/count": {
                         "branch": "master",
-                        "git_sha": "c8dedc22e3d32b7213aac563e04c969b34b496fc",
+                        "git_sha": "1c45397a5eaae632234d32a6608731456033091a",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkgtf": {
                         "branch": "master",
-                        "git_sha": "c8dedc22e3d32b7213aac563e04c969b34b496fc",
+                        "git_sha": "1c45397a5eaae632234d32a6608731456033091a",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkref": {
                         "branch": "master",
-                        "git_sha": "c8dedc22e3d32b7213aac563e04c969b34b496fc",
+                        "git_sha": "1c45397a5eaae632234d32a6608731456033091a",
                         "installed_by": ["modules"]
                     },
                     "cellranger/mkvdjref": {
                         "branch": "master",
-                        "git_sha": "21e4662ae927fdbc5fc04eec9bde38b0689d4954",
+                        "git_sha": "1c45397a5eaae632234d32a6608731456033091a",
                         "installed_by": ["modules"]
                     },
                     "cellranger/multi": {
                         "branch": "master",
-                        "git_sha": "7effa53d6abdeca831d4969839c652986662cc8e",
+                        "git_sha": "1c45397a5eaae632234d32a6608731456033091a",
                         "installed_by": ["modules"]
                     },
                     "cellrangerarc/count": {

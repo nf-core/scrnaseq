@@ -375,7 +375,7 @@
                 },
                 "vdj_inner_enrichment_primers": {
                     "type": "string",
-                    "description": "This argument takes a .txt file containing primer sequences that were used to enrich cDNA for V(D)J sequences. This is only necessary if you with to override Cell Ranger's defaults.",
+                    "description": "This argument takes a .txt file containing primer sequences that were used to enrich cDNA for V(D)J sequences. Required for `vdj_t_gd` libraries; otherwise only necessary if you wish to override Cell Ranger's defaults. The primers replace Cell Ranger's defaults for all V(D)J libraries.",
                     "format": "file-path",
                     "exists": true
                 },

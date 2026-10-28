@@ -74,8 +74,7 @@ workflow STARSOLO {
         ch_solotype_fastq,
         barcode_whitelist,
         ch_star_index,
-        gtf,
-        star_ignore_sjdbgtf
+        star_ignore_sjdbgtf ? [] : gtf
     )
 
     raw_counts = STAR_STARSOLO.out.raw_counts

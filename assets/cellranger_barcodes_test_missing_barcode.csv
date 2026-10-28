@@ -1,0 +1,4 @@
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+POOL_A,sample_1,BC001,,,Valid row with probe barcode
+POOL_A,sample_2,,,,Row missing all barcodes
+POOL_A,sample_3,BC002,,,Valid row with probe barcode

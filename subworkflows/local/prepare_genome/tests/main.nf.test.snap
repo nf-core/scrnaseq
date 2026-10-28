@@ -1,0 +1,125 @@
+{
+    "Should prepare genome from GTF": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome_genes.gtf:md5,6f308b3c313ef3af070e48a4c8fd8185"
+                    ]
+                ],
+                "fasta": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta"
+                    ]
+                ],
+                "gtf": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome_genes.gtf:md5,6f308b3c313ef3af070e48a4c8fd8185"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-07-09T11:28:47.438763",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.4"
+        }
+    },
+    "Should prepare genome from GFF": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "/nf-core/test-datasets/modules/data/genomics/sarscov2/genome/genome.fasta"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome_genes.gtf:md5,37d65092afcd8f97aeea359bbfef407e"
+                    ]
+                ],
+                "fasta": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "/nf-core/test-datasets/modules/data/genomics/sarscov2/genome/genome.fasta"
+                    ]
+                ],
+                "gtf": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome_genes.gtf:md5,37d65092afcd8f97aeea359bbfef407e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-07-09T11:28:59.462316",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.4"
+        }
+    },
+    "Should prepare GFF annotation without FASTA": {
+        "content": [
+            {
+                "0": [
+                    [
+                        
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.gtf:md5,37d65092afcd8f97aeea359bbfef407e"
+                    ]
+                ],
+                "fasta": [
+                    [
+                        
+                    ]
+                ],
+                "gtf": [
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.gtf:md5,37d65092afcd8f97aeea359bbfef407e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-07-09T11:29:03.166222",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.4"
+        }
+    }
+}

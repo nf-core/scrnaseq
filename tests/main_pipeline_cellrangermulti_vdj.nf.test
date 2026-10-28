@@ -1,0 +1,70 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test-dataset_cellrangermulti_vdj_t_vdj_b_human") {
+
+        tag 'human'
+
+        when {
+            params {
+                aligner              = 'cellrangermulti'
+                outdir               = "$outputDir"
+                // V(D)J-only sample: TCR data from the airrflow test data and BCR data from the 10k PBMC test data
+                // (different experiments; with no GEX library, Cell Ranger calls V(D)J cells from each library on its own)
+                input                = "${baseDir}/assets/cellrangermulti_vdj_samplesheet.csv"
+                // a GEX reference is still built, but not used without GEX data
+                fasta                = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta'
+                gtf                  = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.gtf'
+                cellranger_vdj_index = "${launchDir}/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0"
+                protocol             = 'auto'
+                skip_cellbender      = true
+            }
+
+            // --cellranger_vdj_index must be a directory, so stage the prebuilt 10x VDJ reference from nf-core/test-datasets into one
+            def vdj_reference_url = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/references/vdj/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0/'
+            ['reference.json', 'fasta/regions.fa', 'fasta/supp_regions.fa'].each { name ->
+                def target = new File("${launchDir}/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0", name)
+                target.parentFile.mkdirs()
+                target.bytes = new URL(vdj_reference_url + name).bytes
+            }
+        }
+
+        then {
+            def outs = "$params.outdir/cellrangermulti/count/TCR_BCR/outs"
+            // set of receptor chains of all assembled contigs of a V(D)J library
+            def contig_chains = { library ->
+                def lines = path("$outs/$library/all_contig_annotations.csv").readLines()
+                def chain_column = lines[0].split(',').toList().indexOf('chain')
+                lines.drop(1).collect { line -> line.split(',', -1)[chain_column] }.toSet() - ['None']
+            }
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                // no GEX data, so no Gene Expression library
+                { assert path("$outs/config.csv").text.contains(',,VDJ-T') },
+                { assert path("$outs/config.csv").text.contains(',,VDJ-B') },
+                { assert !path("$outs/config.csv").text.contains('Gene Expression') },
+                // each chain-specific library is analysed as its own receptor type
+                { assert contig_chains('vdj_t') && contig_chains('vdj_t').every { chain -> chain in ['TRA', 'TRB'] } },
+                { assert contig_chains('vdj_b') && contig_chains('vdj_b').every { chain -> chain in ['IGH', 'IGK', 'IGL'] } },
+                { assert path("$outs/per_sample_outs/TCR_BCR/vdj_t/clonotypes.csv").readLines().size() > 1 },
+                { assert path("$outs/per_sample_outs/TCR_BCR/vdj_b/clonotypes.csv").readLines().size() > 1 },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeFromYamlMap("$params.outdir/pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml", "Workflow"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path
+                ).match() }
+            )
+        }
+    }
+}

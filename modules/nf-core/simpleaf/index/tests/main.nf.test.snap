@@ -1,0 +1,249 @@
+{
+    "Homo sapiens - probe index - direct - probe csv": {
+        "content": [
+            {
+                "versions_alevin_fry": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "alevin-fry",
+                        "0.18.3"
+                    ]
+                ],
+                "versions_piscem": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "piscem",
+                        "0.23.0"
+                    ]
+                ],
+                "versions_simpleaf": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "simpleaf",
+                        "0.30.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-18T16:15:24.732567998",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.0"
+        }
+    },
+    "Homo sapiens - transcriptome index - direct - transcriptome fasta": {
+        "content": [
+            {
+                "versions_alevin_fry": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "alevin-fry",
+                        "0.18.3"
+                    ]
+                ],
+                "versions_piscem": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "piscem",
+                        "0.23.0"
+                    ]
+                ],
+                "versions_simpleaf": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "simpleaf",
+                        "0.30.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-18T16:15:10.907198773",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.0"
+        }
+    },
+    "Homo sapiens - feature index - direct - feature csv": {
+        "content": [
+            {
+                "versions_alevin_fry": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "alevin-fry",
+                        "0.18.3"
+                    ]
+                ],
+                "versions_piscem": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "piscem",
+                        "0.23.0"
+                    ]
+                ],
+                "versions_simpleaf": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "simpleaf",
+                        "0.30.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-18T16:15:35.867787065",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.0"
+        }
+    },
+    "Homo sapiens - transcriptome index - direct - transcriptome fasta - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "stub"
+                        },
+                        [
+                            "piscem_idx.ectab:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "piscem_idx.ssi:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "piscem_idx.ssi.mphf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "piscem_idx_cfish.json:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "piscem_idx_ver.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "stub"
+                        },
+                        [
+                            "roers_ref.fa:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "t2g_3col.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "stub"
+                        },
+                        "t2g_3col.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "alevin-fry",
+                        "0.18.3"
+                    ]
+                ],
+                "4": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "piscem",
+                        "0.23.0"
+                    ]
+                ],
+                "5": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "simpleaf",
+                        "0.30.0"
+                    ]
+                ],
+                "index": [
+                    [
+                        {
+                            "id": "stub"
+                        },
+                        [
+                            "piscem_idx.ectab:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "piscem_idx.ssi:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "piscem_idx.ssi.mphf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "piscem_idx_cfish.json:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "piscem_idx_ver.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "ref": [
+                    [
+                        {
+                            "id": "stub"
+                        },
+                        [
+                            "roers_ref.fa:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "t2g_3col.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "t2g": [
+                    [
+                        {
+                            "id": "stub"
+                        },
+                        "t2g_3col.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_alevin_fry": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "alevin-fry",
+                        "0.18.3"
+                    ]
+                ],
+                "versions_piscem": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "piscem",
+                        "0.23.0"
+                    ]
+                ],
+                "versions_simpleaf": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "simpleaf",
+                        "0.30.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-18T16:15:46.555621427",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.0"
+        }
+    },
+    "Homo sapiens - genome index - expanded - fasta + gtf": {
+        "content": [
+            {
+                "versions_alevin_fry": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "alevin-fry",
+                        "0.18.3"
+                    ]
+                ],
+                "versions_piscem": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "piscem",
+                        "0.23.0"
+                    ]
+                ],
+                "versions_simpleaf": [
+                    [
+                        "SIMPLEAF_INDEX",
+                        "simpleaf",
+                        "0.30.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-09-18T16:14:58.654158018",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.0"
+        }
+    }
+}

@@ -1,0 +1,5 @@
+sample,multiplexed_sample_id,probe_barcode_ids,cmo_ids,ocm_ids,description
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB1,,,OB1,2.5k_Wistar_Rat_PBMCs_gem-x_OB1
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB2,,,OB2,2.5k_Wistar_Rat_PBMCs_gem-x_OB2
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB3,,,OB3,2.5k_Wistar_Rat_PBMCs_gem-x_OB3
+10k_Wistar_Rat,2500_Wistar_Rat_PBMCs_gem-x_OB4,,,OB4,2.5k_Wistar_Rat_PBMCs_gem-x_OB4

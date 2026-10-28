@@ -10,13 +10,13 @@
                     "r-base": "R version 4.5.3 (2026-03-11)"
                 },
                 "CELLRANGER_COUNT": {
-                    "cellranger": "cellranger 10.0.0 "
+                    "cellranger": "cellranger 10.1.0 "
                 },
                 "CELLRANGER_MKGTF": {
-                    "cellranger": "cellranger 10.0.0"
+                    "cellranger": "cellranger 10.1.0"
                 },
                 "CELLRANGER_MKREF": {
-                    "cellranger": "cellranger 10.0.0"
+                    "cellranger": "cellranger 10.1.0"
                 },
                 "FASTQC": {
                     "fastqc": "0.12.1"
@@ -86,9 +86,6 @@
                 "cellranger/count/Sample_X/outs/analysis/pca/gene_expression_10_components/features_selected.csv",
                 "cellranger/count/Sample_X/outs/analysis/pca/gene_expression_10_components/projection.csv",
                 "cellranger/count/Sample_X/outs/analysis/pca/gene_expression_10_components/variance.csv",
-                "cellranger/count/Sample_X/outs/analysis/tsne",
-                "cellranger/count/Sample_X/outs/analysis/tsne/gene_expression_2_components",
-                "cellranger/count/Sample_X/outs/analysis/tsne/gene_expression_2_components/projection.csv",
                 "cellranger/count/Sample_X/outs/analysis/umap",
                 "cellranger/count/Sample_X/outs/analysis/umap/gene_expression_2_components",
                 "cellranger/count/Sample_X/outs/analysis/umap/gene_expression_2_components/projection.csv",
@@ -160,9 +157,6 @@
                 "cellranger/count/Sample_Y/outs/analysis/pca/gene_expression_10_components/features_selected.csv",
                 "cellranger/count/Sample_Y/outs/analysis/pca/gene_expression_10_components/projection.csv",
                 "cellranger/count/Sample_Y/outs/analysis/pca/gene_expression_10_components/variance.csv",
-                "cellranger/count/Sample_Y/outs/analysis/tsne",
-                "cellranger/count/Sample_Y/outs/analysis/tsne/gene_expression_2_components",
-                "cellranger/count/Sample_Y/outs/analysis/tsne/gene_expression_2_components/projection.csv",
                 "cellranger/count/Sample_Y/outs/analysis/umap",
                 "cellranger/count/Sample_Y/outs/analysis/umap/gene_expression_2_components",
                 "cellranger/count/Sample_Y/outs/analysis/umap/gene_expression_2_components/projection.csv",
@@ -328,16 +322,16 @@
             [
                 "barcodes.tsv.gz:md5,fe6e51564b4405b37ca8604a844b1f2e",
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
-                "matrix.mtx.gz:md5,53541adad167e7af8a1c2dcf36b5da00",
+                "matrix.mtx.gz:md5,af837e07cdada5720448bb02e2ffd2f4",
                 "barcodes.tsv.gz:md5,85da6b6e0c78dfe81af8c07c2017ab5e",
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
-                "matrix.mtx.gz:md5,398383fe8a29cdccdf23f036116d7a6c",
+                "matrix.mtx.gz:md5,68686fbef6415729656d2acccec905ea",
                 "barcodes.tsv.gz:md5,77afe9a76631fc7b44236d3962a55aa5",
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
-                "matrix.mtx.gz:md5,99faf91259889de6bd6dbafe9ae1cd25",
+                "matrix.mtx.gz:md5,f109015e5520140909f0acd93b604707",
                 "barcodes.tsv.gz:md5,081f72b5252ccaf5ffd535ffbd235c4c",
                 "features.tsv.gz:md5,99e453cb1443a3e43e99405184e51a5e",
-                "matrix.mtx.gz:md5,0d57e727d649efcd3fc6b4cd0067bfe0",
+                "matrix.mtx.gz:md5,4e6141ec957659c9e323e2cb09e5e6ad",
                 "gencode.vM19.annotation.chr19.filtered.gtf:md5,9930211c09f2de7f4491057b6f7fab0c",
                 "genome.fa:md5,ef1ae316990b7c77fd0baa0a89b75a6d",
                 "genome.fa.fai:md5,729bb811dc9ababd5ee35029b8140f36",
@@ -388,10 +382,10 @@
                 "multiqc_general_stats.txt:md5,92a7a66e313e6ce2d13da53b501b5c0c"
             ]
         ],
-        "timestamp": "2026-09-22T16:22:19.108637365",
+        "timestamp": "2026-10-13T14:52:10.292336",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.0"
+            "nextflow": "26.04.6"
         }
     }
 }

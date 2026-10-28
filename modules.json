@@ -120,6 +120,11 @@
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["modules"]
                     },
+                    "star/starsolo": {
+                        "branch": "master",
+                        "git_sha": "d28b8b9497c367a9af632d643fa48b4e03e3eb2b",
+                        "installed_by": ["modules"]
+                    },
                     "unzip": {
                         "branch": "master",
                         "git_sha": "1c43a7e22f04cf19c9f9d3de7e7e5a3addd9382a",

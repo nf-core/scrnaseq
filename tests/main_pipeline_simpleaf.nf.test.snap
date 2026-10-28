@@ -10,7 +10,7 @@
                     "r-base": "R version 4.5.3 (2026-03-11)"
                 },
                 "FASTQC": {
-                    "fastqc": "0.12.1"
+                    "fastqc": "0.13.0"
                 },
                 "GTF_GENE_FILTER": {
                     "python": "3.14.5"
@@ -180,7 +180,7 @@
                 "fastqc_sequence_counts_plot.txt:md5,a3c8ef25c1126727391c2973a40ca7f7",
                 "fastqc_sequence_duplication_levels_plot.txt:md5,10e456e57df8bcd738fe6a35d3a6c7cf",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "multiqc_fastqc.txt:md5,12027880857508ce5cedc3904a351730",
+                "multiqc_fastqc.txt:md5,b0144c2648616b02302e9a019f247ad4",
                 "multiqc_general_stats.txt:md5,dac8af62b04fd0880801f5d5c503c472",
                 "Sample_X_raw_matrix.h5ad:md5,be0e3f90994f7c8cd36515acddb02fdd",
                 "Sample_X_raw_matrix.sce.rds:md5,83e298351f93b76eefe90c5c21ff0cfa",
@@ -190,10 +190,10 @@
                 "Sample_Y_raw_matrix.seurat.rds:md5,a01d355db6e25c29f60698d6f08913c1"
             ]
         ],
-        "timestamp": "2026-09-22T16:13:07.386522914",
+        "timestamp": "2026-10-28T18:36:16.718678636",
         "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.04.0"
+            "nf-test": "0.9.4",
+            "nextflow": "26.04.6"
         }
     }
 }

@@ -13,7 +13,7 @@
                     "cellranger": "10.1.0"
                 },
                 "FASTQC": {
-                    "fastqc": "0.12.1"
+                    "fastqc": "0.13.0"
                 },
                 "GTF_GENE_FILTER": {
                     "python": "3.14.5"
@@ -233,7 +233,7 @@
                 "transcriptInfo.tab:md5,354f7398284c6d20a7351ba491d5d742",
                 "fastqc-status-check-heatmap.txt:md5,008a9eae4049432cb74bb0ca40b27ba9",
                 "fastqc_adapter_content_plot.txt:md5,7762f16fd2ada2800a9a50e6e55b7624",
-                "fastqc_overrepresented_sequences_plot.txt:md5,277819a00dd3fd879ad7f28e8e682522",
+                "fastqc_overrepresented_sequences_plot.txt:md5,580519ab56554fc44983243ba1baf6f8",
                 "fastqc_per_base_n_content_plot.txt:md5,6fa522119a6048b6bcb52eb2e4cbaf98",
                 "fastqc_per_base_sequence_quality_plot.txt:md5,df72d327c009fbc6b64dacc20391f954",
                 "fastqc_per_sequence_gc_content_plot_Counts.txt:md5,8ad287946f227ea2a4825792cf6ca8af",
@@ -242,13 +242,13 @@
                 "fastqc_sequence_counts_plot.txt:md5,4b6a72905e9fec66192e7c7be3c13d9f",
                 "fastqc_sequence_duplication_levels_plot.txt:md5,7610fcc82d9e53341dc7a8b9974a3c53",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
-                "multiqc_fastqc.txt:md5,79d16526020daf822b9550e926ae9fa0",
+                "multiqc_fastqc.txt:md5,a045b21d3dcc5de267b0ac4b455fb0d7",
                 "multiqc_general_stats.txt:md5,643837a72ad6873d1dfcf31c69073313"
             ]
         ],
-        "timestamp": "2026-10-20T12:54:09.273395813",
+        "timestamp": "2026-10-28T20:11:28.062357287",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.4",
             "nextflow": "26.04.6"
         }
     }

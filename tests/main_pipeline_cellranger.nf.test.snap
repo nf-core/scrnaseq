@@ -19,7 +19,7 @@
                     "cellranger": "cellranger 10.1.0"
                 },
                 "FASTQC": {
-                    "fastqc": "0.12.1"
+                    "fastqc": "0.13.0"
                 },
                 "GTF_GENE_FILTER": {
                     "python": "3.14.5"
@@ -378,13 +378,13 @@
                 "mqc_cellranger_count_saturation.txt:md5,4ce68b5a0b43a212ca07d9592c4174c5",
                 "multiqc_cellranger_count.txt:md5,997745b8a1015fc74ffbe8ec35056f8d",
                 "multiqc_citations.txt:md5,db9f58c039af2923e06a61e46e82c015",
-                "multiqc_fastqc.txt:md5,12027880857508ce5cedc3904a351730",
+                "multiqc_fastqc.txt:md5,b0144c2648616b02302e9a019f247ad4",
                 "multiqc_general_stats.txt:md5,92a7a66e313e6ce2d13da53b501b5c0c"
             ]
         ],
-        "timestamp": "2026-10-13T14:52:10.292336",
+        "timestamp": "2026-10-28T18:52:22.191672694",
         "meta": {
-            "nf-test": "0.9.5",
+            "nf-test": "0.9.4",
             "nextflow": "26.04.6"
         }
     }

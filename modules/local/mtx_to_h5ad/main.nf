@@ -7,8 +7,8 @@ process MTX_TO_H5AD {
     tag "$meta.id"
     label 'process_medium'
 
-    conda "conda-forge::scanpy==1.10.2 conda-forge::python-igraph conda-forge::leidenalg"
-    container "community.wave.seqera.io/library/scanpy:1.10.2--e83da2205b92a538"
+    conda "conda-forge::scanpy==1.10.2 conda-forge::python-igraph conda-forge::leidenalg conda-forge::hdf5plugin=7.1.0"
+    container "community.wave.seqera.io/library/hdf5plugin_leidenalg_python-igraph_scanpy:5ac4f1cde98e0026"
 
     input:
     // inputs from cellranger nf-core module does not come in a single sample dir

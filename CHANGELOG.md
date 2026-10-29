@@ -8,15 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Features
 
 - Add the `--gff` parameter to allow the user to specify a GFF file as a reference (instead of a GTF file) ([#451](https://github.com/nf-core/scrnaseq/pull/451))
+- Add json schema validation for `cellrangerarc` aligner ([#584](https://github.com/nf-core/scrnaseq/pull/584)).
+- Add `vdj_t`, `vdj_t_gd` and `vdj_b` samplesheet `feature_type` values for `cellrangermulti`, so T cell (alpha/beta), T cell (gamma/delta) and B cell V(D)J libraries of the same sample are passed to Cell Ranger as separate `VDJ-T`, `VDJ-T-GD` and `VDJ-B` libraries. `vdj_t_gd` requires `--vdj_inner_enrichment_primers`, and a sample cannot combine `vdj` with the chain-specific types ([#595](https://github.com/nf-core/scrnaseq/pull/595))
 
 ### Chore
 
 - Bump the `nf-schema` plugin from `2.5.1` to `2.8.0`, so that `pattern` validation of samplesheet paths on proxy filesystems (e.g. `lamin://`) is retried against the resolved real path (see [nf-schema#217](https://github.com/nextflow-io/nf-schema/issues/217); [#xxx](https://github.com/nf-core/scrnaseq/pull/xxx))
 - Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
+- Update `kallistobustools` from nf-core and replace local `anndata/convert` for an nf-core module ([#465](https://github.com/nf-core/scrnaseq/pull/583))
+- Update `cellranger` nf-core modules (`count`, `mkgtf`, `mkref`, `mkvdjref`, `multi`) to Cell Ranger 10.1.0, adapting the `cellranger/multi` call to its new per-library options interface ([#596](https://github.com/nf-core/scrnaseq/pull/596))
 
 ### Fixes
 
+- Fix `--cellranger_index` failing before `CELLRANGER_COUNT`, `CELLRANGERARC_COUNT` and `CELLRANGER_MULTI` start, by passing the index as the `[ meta, reference ]` tuple the modules expect ([#596](https://github.com/nf-core/scrnaseq/pull/596))
+- Remove the hardcoded `time = { 120.h * task.attempt }` override for `FASTQC` in `conf/modules.config`. FASTQC now falls back to the `process_low` default (`4.h * task.attempt`), which is ample for the process and avoids submission failures on clusters whose QOS/partition wall-time caps are shorter than 120h.
+- Increase runtime limits for cellbender and cellranger in `conf/modules.config` to avoid template updates resetting these limits ([#275](https://github.com/nf-core/scrnaseq/issues/275))
 - Fix pipeline attempts to access igenomes buckets even with `--igenomes_ignore=true` [#568](https://github.com/nf-core/scrnaseq/issues/568)
 
 ## v4.2.0 - 2026-07-03

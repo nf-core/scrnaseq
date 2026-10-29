@@ -1,0 +1,90 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/scrnaseq/master/assets/schema_input_cellrangerarc.json",
+    "title": "nf-core/scrnaseq pipeline - cellrangerarc params.input schema",
+    "description": "Schema for the file provided with params.input when using Cell Ranger ARC",
+    "type": "array",
+    "items": {
+        "$ref": "#/$defs/requiredFields",
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "meta": ["id"]
+            },
+            "fastq_1": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
+                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+            },
+            "fastq_2": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
+                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+            },
+            "fastq_barcode": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
+                "errorMessage": "Barcode FastQ must be provided for ATAC samples, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
+                "meta": ["fastq_barcode"]
+            },
+            "expected_cells": {
+                "type": "integer",
+                "errorMessage": "Expected cells must be an Integer",
+                "meta": ["expected_cells"]
+            },
+            "seq_center": {
+                "type": "string",
+                "meta": ["seq_center"]
+            },
+            "sample_type": {
+                "type": "string",
+                "enum": ["atac", "gex"],
+                "errorMessage": "Sample type must be provided and must be either 'atac' or 'gex'",
+                "meta": ["sample_type"]
+            },
+            "feature_type": {
+                "type": "string",
+                "enum": ["gex", "vdj", "ab", "crispr", "cmo"],
+                "meta": ["feature_type"]
+            }
+        },
+        "not": {
+            "properties": {
+                "sample_type": {
+                    "const": "atac"
+                }
+            },
+            "required": ["sample_type"],
+            "not": {
+                "required": ["fastq_barcode"]
+            }
+        },
+        "errorMessage": "For samples with sample_type 'atac', the fastq_barcode field is required."
+    },
+    "$defs": {
+        "requiredFields": {
+            "required": ["sample", "fastq_1", "fastq_2", "sample_type"]
+        }
+    },
+    "allOf": [
+        {
+            "items": {
+                "properties": {
+                    "fastq_1": {
+                        "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+_S\\d+_L\\d+_R1_\\d+\\.fastq\\.gz$",
+                        "errorMessage": "Cell Ranger ARC FASTQ filenames must follow the convention 'SampleName_S1_L001_R1_001.fastq.gz'"
+                    }
+                }
+            }
+        }
+    ]
+}

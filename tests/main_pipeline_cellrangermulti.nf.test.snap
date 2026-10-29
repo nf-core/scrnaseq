@@ -1941,56 +1941,5 @@
             "nextflow": "25.04.8"
         },
         "timestamp": "2025-12-03T15:34:21.732309452"
-    },
-    "test-dataset_cellrangermulti_vdj_feature_types_per_sample": {
-        "content": [
-            [
-                [
-                    "PBMC_10K_CHAINS",
-                    "gex",
-                    [
-                        "subsampled_sc5p_v2_hs_PBMC_10k_5gex_S1_L001_R1_001.fastq.gz",
-                        "subsampled_sc5p_v2_hs_PBMC_10k_5gex_S1_L001_R2_001.fastq.gz"
-                    ]
-                ],
-                [
-                    "PBMC_10K_CHAINS",
-                    "vdj_b",
-                    [
-                        "subsampled_sc5p_v2_hs_PBMC_10k_b_S1_L001_R1_001.fastq.gz",
-                        "subsampled_sc5p_v2_hs_PBMC_10k_b_S1_L001_R2_001.fastq.gz"
-                    ]
-                ],
-                [
-                    "PBMC_10K_CHAINS",
-                    "vdj_t",
-                    [
-                        "subsampled_sc5p_v2_hs_PBMC_10k_t_S1_L001_R1_001.fastq.gz",
-                        "subsampled_sc5p_v2_hs_PBMC_10k_t_S1_L001_R2_001.fastq.gz"
-                    ]
-                ],
-                [
-                    "PBMC_10K_VDJ",
-                    "gex",
-                    [
-                        "subsampled_sc5p_v2_hs_PBMC_10k_5gex_S1_L001_R1_001.fastq.gz",
-                        "subsampled_sc5p_v2_hs_PBMC_10k_5gex_S1_L001_R2_001.fastq.gz"
-                    ]
-                ],
-                [
-                    "PBMC_10K_VDJ",
-                    "vdj",
-                    [
-                        "subsampled_sc5p_v2_hs_PBMC_10k_b_S1_L001_R1_001.fastq.gz",
-                        "subsampled_sc5p_v2_hs_PBMC_10k_b_S1_L001_R2_001.fastq.gz"
-                    ]
-                ]
-            ]
-        ],
-        "timestamp": "2026-10-15T13:27:56.307423317",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.04.6"
-        }
     }
 }

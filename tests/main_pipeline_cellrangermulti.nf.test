@@ -19,9 +19,18 @@ nextflow_pipeline {
                 fb_reference              = "${baseDir}/assets/fb_reference.csv"
                 fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
                 gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                cellranger_vdj_index      = "${launchDir}/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0"
                 aligner                   = 'cellrangermulti'
                 protocol                  = 'auto'
                 skip_cellbender           = true
+            }
+
+            // --cellranger_vdj_index must be a directory, so stage the prebuilt 10x VDJ reference from nf-core/test-datasets into one
+            def vdj_reference_url = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/references/vdj/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0/'
+            ['reference.json', 'fasta/regions.fa', 'fasta/supp_regions.fa'].each { name ->
+                def target = new File("${launchDir}/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0", name)
+                target.parentFile.mkdirs()
+                target.bytes = new URL(vdj_reference_url + name).bytes
             }
         }
 
@@ -59,6 +68,7 @@ nextflow_pipeline {
                 fasta                     = 'https://ftp.ensembl.org/pub/release-114/fasta/rattus_norvegicus/dna/Rattus_norvegicus.GRCr8.dna.primary_assembly.6.fa.gz'
                 gtf                       = 'https://ftp.ensembl.org/pub/release-114/gtf/rattus_norvegicus/Rattus_norvegicus.GRCr8.114.chr.gtf.gz'
                 protocol                  = 'auto'
+                skip_cellrangermulti_vdjref = true
                 skip_cellbender           = true
             }
         }
@@ -142,432 +152,67 @@ nextflow_pipeline {
             )
         }
     }
-}
 
-nextflow_workflow {
+    test("test-dataset_cellrangermulti_vdj_t_vdj_b_human") {
 
-    name "Test PIPELINE_INITIALISATION for cellranger multi"
-    script "subworkflows/local/utils_nfcore_scrnaseq_pipeline/main.nf"
-    workflow "PIPELINE_INITIALISATION"
-
-    test("test-dataset_cellrangermulti_barcodes_missing_barcode") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
+        tag 'human'
 
         when {
             params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_missing_barcode"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
-                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_missing_barcode.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
+                aligner              = 'cellrangermulti'
+                outdir               = "$outputDir"
+                // V(D)J-only sample: TCR data from the airrflow test data and BCR data from the 10k PBMC test data
+                // (different experiments; with no GEX library, Cell Ranger calls V(D)J cells from each library on its own)
+                input                = "${baseDir}/assets/cellrangermulti_vdj_samplesheet.csv"
+                // a GEX reference is still built, but not used without GEX data
+                fasta                = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta'
+                gtf                  = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.gtf'
+                cellranger_vdj_index = "${launchDir}/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0"
+                protocol             = 'auto'
+                skip_cellbender      = true
             }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
+
+            // --cellranger_vdj_index must be a directory, so stage the prebuilt 10x VDJ reference from nf-core/test-datasets into one
+            def vdj_reference_url = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/references/vdj/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0/'
+            ['reference.json', 'fasta/regions.fa', 'fasta/supp_regions.fa'].each { name ->
+                def target = new File("${launchDir}/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0", name)
+                target.parentFile.mkdirs()
+                target.bytes = new URL(vdj_reference_url + name).bytes
             }
         }
 
         then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("The following rows have no barcode identifiers") } },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("row 3 (sample_2)") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_barcodes_mixed_types") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_mixed_types"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
-                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_mixed_types.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
+            def outs = "$params.outdir/cellrangermulti/count/TCR_BCR/outs"
+            // set of receptor chains of all assembled contigs of a V(D)J library
+            def contig_chains = { library ->
+                def lines = path("$outs/$library/all_contig_annotations.csv").readLines()
+                def chain_column = lines[0].split(',').toList().indexOf('chain')
+                lines.drop(1).collect { line -> line.split(',', -1)[chain_column] }.toSet() - ['None']
             }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("Each multiplexed_sample_id should use only one type of barcode identifier") } },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("sample_1") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_barcodes_duplicate_id") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_duplicate_id"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
-                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_duplicate_id.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("Entry 2") && it.contains("Detected duplicate entries") && it.contains("multiplexed_sample_id:duplicate_id") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_barcodes_sample_with_spaces") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_sample_spaces"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
-                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_sample_with_spaces.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("sample") && it.contains("cannot contain spaces") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_barcodes_multiplexed_id_with_spaces") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_multiplexed_id_spaces"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
-                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_multiplexed_id_with_spaces.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("multiplexed_sample_id") && it.contains("cannot contain spaces") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_barcodes_invalid_cmo") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_invalid_cmo"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
-                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_invalid_cmo.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("cmo_ids") && it.contains("alphanumeric") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_barcodes_invalid_ocm") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_invalid_ocm"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
-                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_invalid_ocm.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("ocm_ids") && it.contains("OB1") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_barcodes_unknown_sample") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_unknown_sample"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet.csv"
-                cellranger_multi_barcodes = "${baseDir}/assets/cellranger_barcodes_test_unknown_sample.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("do not exist in the input samplesheet") && it.contains("NONEXISTENT_SAMPLE") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_mixed_vdj_feature_types") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_mixed_vdj_feature_types"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet_test_mixed_vdj.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("cannot combine the generic 'vdj' feature_type with chain-specific ones") && it.contains("'PBMC_10K' uses vdj, vdj_b") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_mixed_vdj_feature_types_quoted_padded") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_mixed_vdj_feature_types_quoted_padded"
-                // quoted fields with padded sample name and feature type, which the samplesheet parser normalises
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet_test_mixed_vdj_quoted_padded.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert !workflow.success },
-                { assert workflow.failed },
-                { assert (workflow.stdout + workflow.stderr).any { it.contains("cannot combine the generic 'vdj' feature_type with chain-specific ones") && it.contains("'PBMC_10K' uses vdj, vdj_b") } }
-            )
-        }
-    }
-
-    test("test-dataset_cellrangermulti_vdj_feature_types_per_sample") {
-        tag "validation"
-        tag "cellranger/multi"
-        tag "initialisation"
-
-        when {
-            params {
-                aligner                   = 'cellrangermulti'
-                outdir                    = "${outputDir}/results_cellrangermulti_vdj_feature_types_per_sample"
-                input                     = "${baseDir}/assets/cellrangermulti_samplesheet_test_vdj_chain_types.csv"
-                protocol                  = 'auto'
-                skip_cellbender           = true
-            }
-            workflow {
-                """
-                input[0] = false  // version
-                input[1] = true   // validate_params
-                input[2] = false  // monochrome_logs
-                input[3] = []     // nextflow_cli_args
-                input[4] = params.outdir
-                input[5] = params.input
-                input[6] = false  // help
-                input[7] = false  // help_full
-                input[8] = false  // show_hidden
-                """
-            }
-        }
-
-        then {
-            // different samples may use the generic 'vdj' and chain-specific feature types
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
             assertAll(
                 { assert workflow.success },
+                // no GEX data, so no Gene Expression library
+                { assert path("$outs/config.csv").text.contains(',,VDJ-T') },
+                { assert path("$outs/config.csv").text.contains(',,VDJ-B') },
+                { assert !path("$outs/config.csv").text.contains('Gene Expression') },
+                // each chain-specific library is analysed as its own receptor type
+                { assert contig_chains('vdj_t') && contig_chains('vdj_t').every { chain -> chain in ['TRA', 'TRB'] } },
+                { assert contig_chains('vdj_b') && contig_chains('vdj_b').every { chain -> chain in ['IGH', 'IGK', 'IGL'] } },
+                { assert path("$outs/per_sample_outs/TCR_BCR/vdj_t/clonotypes.csv").readLines().size() > 1 },
+                { assert path("$outs/per_sample_outs/TCR_BCR/vdj_b/clonotypes.csv").readLines().size() > 1 },
                 { assert snapshot(
-                    // one entry per sample and feature type: [ sample, feature_type, FASTQ file names ]
-                    workflow.out.samplesheet
-                        .collect { meta, fastqs -> [ meta.id, meta.feature_type, fastqs.collect { fastq -> file(fastq).name } ] }
-                        .sort { entry -> entry.toString() }
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeFromYamlMap("$params.outdir/pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml", "Workflow"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path
                 ).match() }
             )
         }

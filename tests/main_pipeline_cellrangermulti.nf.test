@@ -19,9 +19,18 @@ nextflow_pipeline {
                 fb_reference              = "${baseDir}/assets/fb_reference.csv"
                 fasta                     = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
                 gtf                       = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                cellranger_vdj_index      = "${launchDir}/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0"
                 aligner                   = 'cellrangermulti'
                 protocol                  = 'auto'
                 skip_cellbender           = true
+            }
+
+            // --cellranger_vdj_index must be a directory, so stage the prebuilt 10x VDJ reference from nf-core/test-datasets into one
+            def vdj_reference_url = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/10xgenomics/cellranger/references/vdj/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0/'
+            ['reference.json', 'fasta/regions.fa', 'fasta/supp_regions.fa'].each { name ->
+                def target = new File("${launchDir}/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0", name)
+                target.parentFile.mkdirs()
+                target.bytes = new URL(vdj_reference_url + name).bytes
             }
         }
 
@@ -59,6 +68,7 @@ nextflow_pipeline {
                 fasta                     = 'https://ftp.ensembl.org/pub/release-114/fasta/rattus_norvegicus/dna/Rattus_norvegicus.GRCr8.dna.primary_assembly.6.fa.gz'
                 gtf                       = 'https://ftp.ensembl.org/pub/release-114/gtf/rattus_norvegicus/Rattus_norvegicus.GRCr8.114.chr.gtf.gz'
                 protocol                  = 'auto'
+                skip_cellrangermulti_vdjref = true
                 skip_cellbender           = true
             }
         }

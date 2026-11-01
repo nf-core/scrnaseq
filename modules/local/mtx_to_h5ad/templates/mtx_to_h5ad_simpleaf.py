@@ -83,16 +83,31 @@ def input_to_adata(
     adata = sc.read_h5ad(simpleaf_h5ad_path)
     adata.obs_names = adata.obs["barcodes"].values
     adata.var_names = adata.var["gene_id"].values
+    adata.var["gene_id"] = adata.var["gene_id"].astype(str)
     adata.obs["sample"] = sample
 
     # sort adata column- and row- wise to avoid positional differences
     adata = adata[adata.obs_names.sort_values(), adata.var_names.sort_values()].copy()
 
-    # standard format
-    # index are gene IDs and symbols are a column
+    if "gene_symbol" not in adata.var:
+        if "gene_name" in adata.var:
+            adata.var["gene_symbol"] = adata.var["gene_name"]
+        elif "gene_symbols" in adata.var:
+            adata.var["gene_symbol"] = adata.var["gene_symbols"]
+        else:
+            gene_id_to_name = pd.read_table(
+                os.path.join(input_data, "gene_id_to_name.tsv"),
+                header=None,
+                usecols=[0, 1],
+                names=["gene_id", "gene_symbol"],
+            )
+            if gene_id_to_name.iloc[0]["gene_id"] == "gene_id":
+                gene_id_to_name = gene_id_to_name.iloc[1:]
+            gene_id_to_name = gene_id_to_name.drop_duplicates(subset="gene_id").set_index("gene_id")
+            adata.var = adata.var.join(gene_id_to_name, on="gene_id", how="left")
+
     adata.var["gene_versions"] = adata.var["gene_id"]
-    adata.var.index = adata.var["gene_versions"].str.split(".").str[0].values
-    adata.var_names_make_unique()
+    adata.var.index = adata.var["gene_id"].astype(str)
 
     # sort adata column- and row- wise to avoid positional differences
     adata = adata[adata.obs_names.sort_values(), adata.var_names.sort_values()].copy()

@@ -35,13 +35,11 @@ def _add_metadata(adata: AnnData, t2g: str, sample: str):
 
     txp2gene = pd.read_table(t2g, header=None, names=["gene_id", "gene_symbol"], usecols=[1, 2])
     txp2gene = txp2gene.drop_duplicates(subset="gene_id").set_index("gene_id")
+    adata.var["gene_id"] = adata.var_names
     adata.var = adata.var.join(txp2gene, how="left")
 
-    # sanitize gene IDs into standard format
-    # index are gene IDs and symbols are a column
-    adata.var["gene_versions"] = adata.var.index
-    adata.var.index = adata.var["gene_versions"].str.split(".").str[0].values
-    adata.var_names_make_unique()  # in case user does not use ensembl references, names might not be unique
+    adata.var["gene_versions"] = adata.var["gene_id"]
+    adata.var.index = adata.var["gene_id"].astype(str)
 
 
 def format_yaml_like(data: dict, indent: int = 0) -> str:

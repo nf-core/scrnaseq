@@ -18,7 +18,8 @@ def _mtx_to_adata(
     sample: str,
 ):
     adata = sc.read_10x_h5(input)
-    adata.var["gene_symbols"] = adata.var_names
+    adata.var["gene_symbol"] = adata.var["gene_symbols"]
+    adata.var["gene_id"] = adata.var["gene_ids"]
     adata.var.set_index("gene_ids", inplace=True)
     adata.obs["sample"] = sample
 
@@ -75,9 +76,8 @@ def input_to_adata(
 
     # standard format
     # index are gene IDs and symbols are a column
-    adata.var["gene_versions"] = adata.var.index
-    adata.var.index = adata.var["gene_versions"].str.split(".").str[0].values
-    adata.var_names_make_unique()
+    adata.var["gene_versions"] = adata.var["gene_id"]
+    adata.var.index = adata.var["gene_id"].astype(str)
 
     # write results
     adata.write_h5ad(f"{output}")

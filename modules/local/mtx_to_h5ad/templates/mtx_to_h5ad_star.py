@@ -18,9 +18,11 @@ def _mtx_to_adata(
     input: str,
     sample: str,
 ):
-    adata = sc.read_10x_mtx(input)
+    adata = sc.read_10x_mtx(input, var_names="gene_ids", make_unique=False)
     adata.obs["sample"] = sample
     adata.layers["count"] = adata.X.copy()
+    adata.var["gene_symbol"] = adata.var["gene_symbols"]
+    adata.var["gene_id"] = adata.var_names.astype(str)
 
     velocyto_dir = f"velocyto_{input}"
     if os.path.exists(velocyto_dir):
@@ -40,7 +42,7 @@ def _mtx_to_adata(
                 var=adata_state.var,
             )
             adata_state = concat([adata_state, adata_missing], join="outer")
-            adata_state = adata_state[adata.obs_names, adata.var["gene_ids"]].copy()
+            adata_state = adata_state[adata.obs_names, adata.var["gene_id"]].copy()
 
             adata.layers[matrix] = adata_state.X
 
@@ -92,12 +94,8 @@ def input_to_adata(
     # open main data
     adata = _mtx_to_adata(input_data, sample)
 
-    # standard format
-    # index are gene IDs and symbols are a column
-    adata.var["gene_symbol"] = adata.var.index
-    adata.var["gene_versions"] = adata.var["gene_ids"]
-    adata.var.index = adata.var["gene_versions"].str.split(".").str[0].values
-    adata.var_names_make_unique()  # in case user does not use ensembl references, names might not be unique
+    adata.var["gene_versions"] = adata.var["gene_id"]
+    adata.var.index = adata.var["gene_id"].astype(str)
 
     # write results
     adata.write_h5ad(f"{output}")

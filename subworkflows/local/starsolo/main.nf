@@ -3,8 +3,7 @@ include { STAR_GENOMEPARAMS_UPGRADE } from '../../../modules/local/star_genomepa
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
 include { STAR_STARSOLO       } from '../../../modules/nf-core/star/starsolo'
-include { STAR_GENOMEGENERATE }         from '../../../modules/nf-core/star/genomegenerate/main'
-
+include { STAR_GENOMEGENERATE } from '../../../modules/nf-core/star/genomegenerate/main'
 
 workflow STARSOLO {
     take:

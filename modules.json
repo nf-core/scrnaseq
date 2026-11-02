@@ -122,7 +122,7 @@
                     },
                     "star/starsolo": {
                         "branch": "master",
-                        "git_sha": "d28b8b9497c367a9af632d643fa48b4e03e3eb2b",
+                        "git_sha": "b4070340f85cc0822351c854733820811ac4339a",
                         "installed_by": ["modules"]
                     },
                     "unzip": {

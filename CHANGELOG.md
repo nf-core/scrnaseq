@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- Bump the `nf-schema` plugin from `2.5.1` to `2.8.0`, so that `pattern` validation of samplesheet paths on proxy filesystems (e.g. `lamin://`) is retried against the resolved real path, and require Nextflow `26.04.9` or later to include the latest 26.04 bugfixes (see [nf-schema#217](https://github.com/nextflow-io/nf-schema/issues/217); [#573](https://github.com/nf-core/scrnaseq/pull/573))
 - Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
 - Update `kallistobustools` from nf-core and replace local `anndata/convert` for an nf-core module ([#465](https://github.com/nf-core/scrnaseq/pull/583))
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
+- Fix nf-test discovery of cellrangermulti pipeline tests by separating initialization workflow tests and consolidating the V(D)J pipeline test ([#600](https://github.com/nf-core/scrnaseq/issues/600))
 - Fix `--cellranger_index` failing before `CELLRANGER_COUNT`, `CELLRANGERARC_COUNT` and `CELLRANGER_MULTI` start, by passing the index as the `[ meta, reference ]` tuple the modules expect ([#596](https://github.com/nf-core/scrnaseq/pull/596))
 - Remove the hardcoded `time = { 120.h * task.attempt }` override for `FASTQC` in `conf/modules.config`. FASTQC now falls back to the `process_low` default (`4.h * task.attempt`), which is ample for the process and avoids submission failures on clusters whose QOS/partition wall-time caps are shorter than 120h.
 - Increase runtime limits for cellbender and cellranger in `conf/modules.config` to avoid template updates resetting these limits ([#275](https://github.com/nf-core/scrnaseq/issues/275))

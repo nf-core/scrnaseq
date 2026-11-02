@@ -87,8 +87,13 @@ workflow SCRNASEQ {
         .mix(GUNZIP_WHITELIST.out.gunzip)
         .toSortedList { a, b -> a[0].order <=> b[0].order }
         .map { entries ->
+            if (entries.isEmpty()) {
+                return [ [:], [] ]
+            }
+            def meta = entries[0][0]
             def whitelists = entries.collect { _meta, whitelist -> whitelist }
-            whitelists.size() == 1 ? whitelists[0] : whitelists
+
+            [ meta, whitelists.size() == 1 ? whitelists[0] : whitelists ]
         }
 
     // Warn if both GTF and GFF files are provided

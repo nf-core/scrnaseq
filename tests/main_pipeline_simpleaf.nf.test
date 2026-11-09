@@ -2,6 +2,7 @@ nextflow_pipeline {
 
     name "Test Workflow main.nf"
     script "main.nf"
+    tag "simpleaf"
 
     test("test-dataset_simpleaf_aligner") {
 

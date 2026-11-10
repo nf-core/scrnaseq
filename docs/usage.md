@@ -47,7 +47,7 @@ Note that since cellranger v7, it is **not recommended** anymore to supply the `
 
 ### Custom barcode whitelists
 
-For protocols that require a custom barcode whitelist, provide one file with `--barcode_whitelist`. Multiple files can be supplied as a comma-separated list; the pipeline processes them in the order given and automatically decompresses gzip-compressed files. 
+For protocols that require a custom barcode whitelist, provide one file with `--barcode_whitelist`. Multiple files can be supplied as a comma-separated list; the pipeline processes them in the order given and automatically decompresses gzip-compressed files.
 
 ```bash
 --barcode_whitelist whitelist1.txt,whitelist2.txt.gz

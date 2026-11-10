@@ -50,10 +50,9 @@
             "properties": {
                 "barcode_whitelist": {
                     "type": "string",
-                    "description": "If not using the 10X Genomics platform, a custom barcode whitelist can be used with `--barcode_whitelist`.",
-                    "fa_icon": "fas fa-barcode",
-                    "format": "file-path",
-                    "exists": true
+                    "description": "Path to a custom barcode whitelist. Multiple files can be provided as a comma-separated list.",
+                    "help_text": "If omitted, the pipeline uses a protocol-specific whitelist when one is available.",
+                    "fa_icon": "fas fa-barcode"
                 },
                 "aligner": {
                     "type": "string",
@@ -250,6 +249,14 @@
                     "enum": ["Gene", "GeneFull", "Gene Velocyto"],
                     "description": "Quantification type of different transcriptomic feature. Use `GeneFull` on pre-mRNA count for single-nucleus RNA-seq reads. Use `Gene Velocyto` to generate RNA velocity matrix.",
                     "fa_icon": "fas fa-asterisk"
+                },
+                "manifest": {
+                    "type": "string",
+                    "description": "Path to a STARsolo read-files manifest for Smart-seq input.",
+                    "help_text": "The tab-separated manifest must contain three columns per row: read 1 FASTQ, read 2 FASTQ, and cell ID. The FASTQ paths must correspond to files in the input samplesheet.",
+                    "fa_icon": "fas fa-file-alt",
+                    "format": "file-path",
+                    "exists": true
                 }
             },
             "fa_icon": "fas fa-star"

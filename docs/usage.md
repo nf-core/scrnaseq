@@ -45,6 +45,17 @@ This parameter is currently supported by
 
 Note that since cellranger v7, it is **not recommended** anymore to supply the `--expected-cells` parameter.
 
+### Custom barcode whitelists
+
+For protocols that require a custom barcode whitelist, provide one file with `--barcode_whitelist`. Multiple files can be supplied as a comma-separated list; the pipeline processes them in the order given and automatically decompresses gzip-compressed files. 
+
+```bash
+--barcode_whitelist whitelist1.txt,whitelist2.txt.gz
+```
+
+> [!NOTE]
+> Please not that while the pipeline supports multiple barcode whitelists, this should only be used with `--aligner star` and the `CB_UMI_Complex` protocol.
+
 ## Aligning options
 
 By default (i.e. `--aligner simpleaf`), the pipeline uses [piscem](https://github.com/COMBINE-lab/piscem) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with [qcatch](https://github.com/COMBINE-lab/qcatch). You can disable qcatch QC with `--skip_qcatch`.
@@ -55,6 +66,7 @@ Other aligner options for running the pipeline are:
   - `--aligner kallisto`
 - [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md) to perform both alignment and downstream analysis.
   - `--aligner star`
+  - For Smart-seq data, provide `--manifest` with a tab-separated row for each cell and three columns: read 1 FASTQ, read 2 FASTQ, and cell ID. The FASTQ paths must correspond to the files listed in the input samplesheet.
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
   - `--aligner cellranger`
 - [Cellranger Multi](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-5p-multi#what) to perform the alignment and downstream analysis of samples with multiple libraries at the same time using Feature Barcode technology that enables simultaneous profiling of the V(D)J repertoire, cell surface protein, antigen, and gene expression (GEX) data.

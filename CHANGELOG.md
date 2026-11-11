@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
+- Add more input validation warnings so that the pipeline rejects conflicting `expected_cells` or `seq_center` values in grouped sample rows ([#603](https://github.com/nf-core/scrnaseq/issues/603)).
 - Fix nf-test discovery of cellrangermulti pipeline tests by separating initialization workflow tests and consolidating the V(D)J pipeline test ([#600](https://github.com/nf-core/scrnaseq/issues/600))
 - Fix `--cellranger_index` failing before `CELLRANGER_COUNT`, `CELLRANGERARC_COUNT` and `CELLRANGER_MULTI` start, by passing the index as the `[ meta, reference ]` tuple the modules expect ([#596](https://github.com/nf-core/scrnaseq/pull/596))
 - Remove the hardcoded `time = { 120.h * task.attempt }` override for `FASTQC` in `conf/modules.config`. FASTQC now falls back to the `process_low` default (`4.h * task.attempt`), which is ample for the process and avoids submission failures on clusters whose QOS/partition wall-time caps are shorter than 120h.

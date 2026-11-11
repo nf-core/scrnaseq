@@ -10,3 +10,7 @@ null/
 .lineage/
 .nf-test/
 .nf-test.log
+log/
+reports/
+testme.sh
+.nf-test*

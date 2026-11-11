@@ -3,7 +3,6 @@ description: "Suggested text and references to use when describing pipeline usag
 section_name: "nf-core/scrnaseq Methods Description"
 section_href: "https://github.com/nf-core/scrnaseq"
 plot_type: "html"
-## TODO nf-core: Update the HTML below to your preferred methods description, e.g. add publication citation for this pipeline
 ## You inject any metadata in the Nextflow '${workflow}' object
 data: |
   <h4>Methods</h4>

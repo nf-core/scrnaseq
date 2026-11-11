@@ -1,0 +1,21 @@
+Feb-27 21:54:09.971 [main] INFO  com.askimed.nf.test.App - nf-test 0.8.4
+Feb-27 21:54:09.988 [main] INFO  com.askimed.nf.test.App - Arguments: [test, tests/main_pipeline_kallisto.test, --update-snapshot]
+Feb-27 21:54:10.670 [main] INFO  com.askimed.nf.test.App - Nextflow Version: 23.10.1
+Feb-27 21:54:10.674 [main] WARN  com.askimed.nf.test.commands.RunTestsCommand - No nf-test config file found.
+Feb-27 21:54:10.674 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Detected 1 test files.
+Feb-27 21:54:10.676 [main] ERROR com.askimed.nf.test.commands.RunTestsCommand - Running tests failed.
+java.lang.Exception: Test file '/home/ec2-user/scrnaseq/tests/tests/main_pipeline_kallisto.test' not found.
+	at com.askimed.nf.test.core.TestExecutionEngine.parse(TestExecutionEngine.java:116)
+	at com.askimed.nf.test.core.TestExecutionEngine.execute(TestExecutionEngine.java:159)
+	at com.askimed.nf.test.commands.RunTestsCommand.execute(RunTestsCommand.java:184)
+	at com.askimed.nf.test.commands.AbstractCommand.call(AbstractCommand.java:43)
+	at com.askimed.nf.test.commands.AbstractCommand.call(AbstractCommand.java:18)
+	at picocli.CommandLine.executeUserObject(CommandLine.java:1953)
+	at picocli.CommandLine.access$1300(CommandLine.java:145)
+	at picocli.CommandLine$RunLast.executeUserObjectOfLastSubcommandWithSameParent(CommandLine.java:2352)
+	at picocli.CommandLine$RunLast.handle(CommandLine.java:2346)
+	at picocli.CommandLine$RunLast.handle(CommandLine.java:2311)
+	at picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2179)
+	at picocli.CommandLine.execute(CommandLine.java:2078)
+	at com.askimed.nf.test.App.run(App.java:44)
+	at com.askimed.nf.test.App.main(App.java:51)

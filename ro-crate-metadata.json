@@ -1,5 +1,8 @@
 {
-    "@context": ["https://w3id.org/ro/crate/1.3/context", "https://w3id.org/ro/terms/test"],
+    "@context": [
+        "https://w3id.org/ro/crate/1.3/context",
+        "https://w3id.org/ro/terms/test"
+    ],
     "@graph": [
         {
             "@id": "./",
@@ -23,6 +26,9 @@
                     "@id": "assets/"
                 },
                 {
+                    "@id": "bin/"
+                },
+                {
                     "@id": "conf/"
                 },
                 {
@@ -32,7 +38,13 @@
                     "@id": "docs/images/"
                 },
                 {
+                    "@id": "lib/"
+                },
+                {
                     "@id": "modules/"
+                },
+                {
+                    "@id": "modules/local/"
                 },
                 {
                     "@id": "modules/nf-core/"
@@ -107,8 +119,15 @@
         },
         {
             "@id": "main.nf",
-            "@type": ["File", "SoftwareSourceCode", "ComputationalWorkflow"],
-            "contributor": [
+            "@type": [
+                "File",
+                "SoftwareSourceCode",
+                "ComputationalWorkflow"
+            ],
+            "creator": [
+                {
+                    "@id": "https://orcid.org/0000-0001-9584-7842"
+                },
                 {
                     "@id": "#ae819e42-a7c4-42ab-b728-d01ff785be4d"
                 },
@@ -116,7 +135,7 @@
                     "@id": "#66b451c5-f1a2-440c-931e-3aed511b6bbd"
                 },
                 {
-                    "@id": "https://orcid.org/0000-0002-2956-9060"
+                    "@id": "#rob.syme@gmail.com"
                 },
                 {
                     "@id": "#8cdf67b4-b68e-4ae4-b72e-b90e3105b2ad"
@@ -144,16 +163,25 @@
                 "single-cell",
                 "star-solo"
             ],
-            "license": ["MIT"],
-            "name": ["nf-core/scrnaseq"],
+            "license": [
+                "MIT"
+            ],
+            "name": [
+                "nf-core/scrnaseq"
+            ],
             "programmingLanguage": {
                 "@id": "https://w3id.org/workflowhub/workflow-ro-crate#nextflow"
             },
             "sdPublisher": {
                 "@id": "https://nf-co.re/"
             },
-            "url": ["https://github.com/nf-core/scrnaseq", "https://nf-co.re/scrnaseq/4.2.0/"],
-            "version": ["4.2.0"]
+            "url": [
+                "https://github.com/nf-core/scrnaseq",
+                "https://nf-co.re/scrnaseq/4.2.0/"
+            ],
+            "version": [
+                "4.2.0"
+            ]
         },
         {
             "@id": "https://w3id.org/workflowhub/workflow-ro-crate#nextflow",
@@ -165,11 +193,14 @@
             "url": {
                 "@id": "https://www.nextflow.io/"
             },
-            "version": "!>=25.10.4"
+            "version": "!>=26.04.9"
         },
         {
             "@id": "https://w3id.org/workflowhub/workflow-ro-crate/1.1",
-            "@type": ["CreativeWork", "Profile"],
+            "@type": [
+                "CreativeWork",
+                "Profile"
+            ],
             "name": "Workflow RO-Crate",
             "version": "1.1"
         },
@@ -188,7 +219,10 @@
         },
         {
             "@id": "https://w3id.org/ro/wftest/0.2",
-            "@type": ["CreativeWork", "Profile"],
+            "@type": [
+                "CreativeWork",
+                "Profile"
+            ],
             "name": "Workflow Testing RO-Crate",
             "version": "0.2"
         },
@@ -216,6 +250,11 @@
             "description": "Additional files"
         },
         {
+            "@id": "bin/",
+            "@type": "Dataset",
+            "description": "Scripts that must be callable from a pipeline process"
+        },
+        {
             "@id": "conf/",
             "@type": "Dataset",
             "description": "Configuration files"
@@ -231,9 +270,19 @@
             "description": "Images for the documentation files"
         },
         {
+            "@id": "lib/",
+            "@type": "Dataset",
+            "description": "Groovy utility functions"
+        },
+        {
             "@id": "modules/",
             "@type": "Dataset",
             "description": "Modules used by the pipeline"
+        },
+        {
+            "@id": "modules/local/",
+            "@type": "Dataset",
+            "description": "Pipeline-specific modules"
         },
         {
             "@id": "modules/nf-core/",
@@ -324,32 +373,38 @@
         {
             "@id": "#ae819e42-a7c4-42ab-b728-d01ff785be4d",
             "@type": "Person",
-            "name": "Bailey PJ"
+            "email": "rob.syme@gmail.com",
+            "name": "Rob Syme"
         },
         {
             "@id": "#66b451c5-f1a2-440c-931e-3aed511b6bbd",
             "@type": "Person",
-            "name": "Botvinnik O"
+            "email": "nictru32@gmail.com",
+            "name": "Nico Trummer"
         },
         {
-            "@id": "https://orcid.org/0000-0002-2956-9060",
+            "@id": "https://orcid.org/0000-0001-5010-9539",
             "@type": "Person",
-            "name": "Marques de Almeida F"
+            "email": "sangramsahu15@gmail.com",
+            "name": "Sangram Keshari Sahu"
         },
         {
             "@id": "#8cdf67b4-b68e-4ae4-b72e-b90e3105b2ad",
             "@type": "Person",
-            "name": "Peltzer A"
+            "email": "drpatelhh@gmail.com",
+            "name": "Harshil Patel"
         },
         {
             "@id": "#9b7d0ab4-c66e-4d37-9241-25421ef59560",
             "@type": "Person",
-            "name": "Sturm G"
+            "email": "felipemarques89@gmail.com",
+            "name": "Felipe Marques de Almeida"
         },
         {
             "@id": "#62653618-8ce6-4583-98ce-2b569fa88f16",
             "@type": "Person",
-            "name": "Dongze H"
+            "email": "olga.botvinnik@gmail.com",
+            "name": "Olga Botvinnik"
         }
     ]
 }

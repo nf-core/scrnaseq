@@ -12,7 +12,7 @@ include { gtfSourceFixNeeded                                } from '../subworkfl
 include { isStarIndexLegacy                                 } from '../subworkflows/local/utils_nfcore_scrnaseq_pipeline'
 include { PREPARE_GENOME                                    } from '../subworkflows/local/prepare_genome'
 include { FASTQC_CHECK                                      } from '../subworkflows/local/fastqc'
-include { KALLISTO_BUSTOOLS                                 } from '../subworkflows/local/kallisto_bustools'
+include { FASTQ_QUANT_KALLISTOBUSTOOLS                      } from '../subworkflows/nf-core/fastq_quant_kallistobustools'
 include { SIMPLEAF                                          } from '../subworkflows/local/simpleaf'
 include { STARSOLO                                          } from '../subworkflows/local/starsolo'
 include { CELLRANGER_ALIGN                                  } from "../subworkflows/local/align_cellranger"
@@ -79,7 +79,7 @@ workflow SCRNASEQ {
     ch_input = file(params.input)
 
     //kallisto params
-    ch_kallisto_index = kallisto_index ? file(kallisto_index, checkIfExists: true) : []
+    ch_kallisto_index = kallisto_index ? channel.value(file(kallisto_index, checkIfExists: true)) : []
     kb_t1c            = params.kb_t1c  ? file(params.kb_t1c, checkIfExists: true)  : []
     kb_t2c            = params.kb_t2c  ? file(params.kb_t2c, checkIfExists: true)  : []
 
@@ -121,7 +121,7 @@ workflow SCRNASEQ {
 
     // Run kallisto bustools pipeline
     if (params.aligner == "kallisto") {
-        KALLISTO_BUSTOOLS(
+        FASTQ_QUANT_KALLISTOBUSTOOLS(
             ch_genome_fasta,
             ch_genome_gtf,
             ch_kallisto_index,
@@ -132,8 +132,8 @@ workflow SCRNASEQ {
             params.kb_workflow,
             ch_fastq
         )
-        ch_mtx_matrices = ch_mtx_matrices.mix( KALLISTO_BUSTOOLS.out.counts_raw, KALLISTO_BUSTOOLS.out.counts_filtered )
-        ch_txp2gene = KALLISTO_BUSTOOLS.out.txp2gene
+        ch_mtx_matrices = ch_mtx_matrices.mix( FASTQ_QUANT_KALLISTOBUSTOOLS.out.counts_raw, FASTQ_QUANT_KALLISTOBUSTOOLS.out.counts_filtered )
+        ch_txp2gene = FASTQ_QUANT_KALLISTOBUSTOOLS.out.txp2gene
     }
 
     // Run simpleaf pipeline

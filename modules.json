@@ -87,7 +87,7 @@
                     },
                     "kallistobustools/count": {
                         "branch": "master",
-                        "git_sha": "6ef220fd9252b42fb3c50348bbdbcb6246730686",
+                        "git_sha": "4091d2d945b46c49c432b1c2d99eec1e31c6d021",
                         "installed_by": ["fastq_quant_kallistobustools", "modules"]
                     },
                     "kallistobustools/ref": {

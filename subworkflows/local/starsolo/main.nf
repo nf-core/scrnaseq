@@ -1,10 +1,9 @@
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
-include { STAR_ALIGN  } from '../../../modules/local/star_align'
 include { STAR_GENOMEPARAMS_UPGRADE } from '../../../modules/local/star_genomeparams_upgrade'
 
 /* --    IMPORT NF-CORE MODULES/SUBWORKFLOWS   -- */
-include { STAR_GENOMEGENERATE }         from '../../../modules/nf-core/star/genomegenerate/main'
-
+include { STAR_STARSOLO       } from '../../../modules/nf-core/star/starsolo'
+include { STAR_GENOMEGENERATE } from '../../../modules/nf-core/star/genomegenerate/main'
 
 workflow STARSOLO {
     take:
@@ -17,9 +16,10 @@ workflow STARSOLO {
     ch_fastq
     star_feature
     other_10x_parameters
+    star_ignore_sjdbgtf
+    manifest_file
 
     main:
-    ch_versions = channel.empty()
 
     assert star_index || (genome_fasta && gtf):
         "Must provide a genome fasta file ('--fasta') and a gtf file ('--gtf') if no index is given!"
@@ -60,36 +60,41 @@ workflow STARSOLO {
     /*
     * Perform mapping with STAR
     */
-    STAR_ALIGN(
-        ch_fastq,
-        ch_star_index,
-        gtf,
-        barcode_whitelist,
-        protocol,
-        star_feature,
-        other_10x_parameters
-    )
-    ch_versions = ch_versions.mix(STAR_ALIGN.out.versions)
+    ch_solotype_fastq = ch_fastq
+        .combine(channel.of(protocol))
+        .combine(channel.of(star_feature))
+        .combine(channel.of(other_10x_parameters))
+        .combine(manifest_file.map { manifest -> [manifest] })
+        .map({ meta, reads, solotype, feature, other_10x_params, manifest ->
+            [meta + [star_feature: feature, other_10x_parameters: other_10x_params], solotype, reads, manifest]
+        })
 
-    raw_counts = STAR_ALIGN.out.raw_counts
-        .join(STAR_ALIGN.out.raw_velocyto, remainder: true)
+    STAR_STARSOLO(
+        ch_solotype_fastq,
+        barcode_whitelist,
+        ch_star_index,
+        star_ignore_sjdbgtf ? [] : gtf,
+        channel.value([[],[]])
+    )
+
+    raw_counts = STAR_STARSOLO.out.raw_counts
+        .join(STAR_STARSOLO.out.raw_velocyto, remainder: true)
         .map{
             meta, count, velocity ->
                 [meta + [input_type: 'raw'], velocity ? [count, velocity] : [count]]
         }
 
-    filtered_counts = STAR_ALIGN.out.filtered_counts
-        .join(STAR_ALIGN.out.filtered_velocyto, remainder: true)
+    filtered_counts = STAR_STARSOLO.out.filtered_counts
+        .join(STAR_STARSOLO.out.filtered_velocyto, remainder: true)
         .map{ meta, count, velocity ->
             [meta + [input_type: 'filtered'], velocity ? [count, velocity] : [count]]
         }
 
     emit:
-    ch_versions
     // get rid of meta for star index
-    star_result     = STAR_ALIGN.out.tab
-    star_counts     = STAR_ALIGN.out.counts
+    star_result     = STAR_STARSOLO.out.tab
+    star_counts     = STAR_STARSOLO.out.counts
     raw_counts      = raw_counts
     filtered_counts = filtered_counts
-    for_multiqc     = STAR_ALIGN.out.log_final.map{ _meta, logFinal -> logFinal }
+    for_multiqc     = STAR_STARSOLO.out.log_final.map{ _meta, logFinal -> logFinal }
 }

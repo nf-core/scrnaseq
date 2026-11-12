@@ -1,0 +1,122 @@
+nextflow_function {
+
+    name "Test samplesheet validation"
+    script "../main.nf"
+    tag "samplesheet_validation"
+
+    test("matching metadata") {
+        function "validateInputSamplesheet"
+
+        when {
+            function {
+                """
+                input[0] = [ 'sample_a', [ [ id: 'sample_a', single_end: false, expected_cells: 5000, seq_center: 'center_a' ], [ id: 'sample_a', single_end: false, expected_cells: 5000, seq_center: 'center_a' ] ], [ [ 'read1', 'read2' ], [ 'read3', 'read4' ] ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result[0].id == 'sample_a' },
+                { assert function.result[1] == [['read1', 'read2'], ['read3', 'read4']] }
+            )
+        }
+    }
+
+    test("missing optional metadata") {
+        function "validateInputSamplesheet"
+
+        when {
+            function {
+                """
+                input[0] = [ 'sample_a', [ [ id: 'sample_a', single_end: false ], [ id: 'sample_a', single_end: false ] ], [ [ 'read1', 'read2' ], [ 'read3', 'read4' ] ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result[0].id == 'sample_a' },
+                { assert function.result[1] == [['read1', 'read2'], ['read3', 'read4']] }
+            )
+        }
+    }
+
+    test("different expected cells") {
+        function "validateInputSamplesheet"
+
+        when {
+            function {
+                """
+                input[0] = [ 'sample_a', [ [ id: 'sample_a', single_end: false, expected_cells: 5000, seq_center: 'center_a' ], [ id: 'sample_a', single_end: false, expected_cells: 10000, seq_center: 'center_a' ] ], [ [ 'read1', 'read2' ], [ 'read3', 'read4' ] ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.failed },
+                { assert (function.stdout + function.stderr).any { it.contains("Multiple runs of a sample must have the same expected_cells: sample_a") } }
+            )
+        }
+    }
+
+    test("missing expected cells") {
+        function "validateInputSamplesheet"
+
+        when {
+            function {
+                """
+                input[0] = [ 'sample_a', [ [ id: 'sample_a', single_end: false, expected_cells: 5000 ], [ id: 'sample_a', single_end: false ] ], [ [ 'read1', 'read2' ], [ 'read3', 'read4' ] ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.failed },
+                { assert (function.stdout + function.stderr).any { it.contains("Multiple runs of a sample must have the same expected_cells: sample_a") } }
+            )
+        }
+    }
+
+    test("different sequencing centers") {
+        function "validateInputSamplesheet"
+
+        when {
+            function {
+                """
+                input[0] = [ 'sample_a', [ [ id: 'sample_a', single_end: false, seq_center: 'center_a' ], [ id: 'sample_a', single_end: false, seq_center: 'center_b' ] ], [ [ 'read1', 'read2' ], [ 'read3', 'read4' ] ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.failed },
+                { assert (function.stdout + function.stderr).any { it.contains("Multiple runs of a sample must have the same seq_center: sample_a") } }
+            )
+        }
+    }
+
+    test("missing sequencing center") {
+        function "validateInputSamplesheet"
+
+        when {
+            function {
+                """
+                input[0] = [ 'sample_a', [ [ id: 'sample_a', single_end: false, seq_center: 'center_a' ], [ id: 'sample_a', single_end: false ] ], [ [ 'read1', 'read2' ], [ 'read3', 'read4' ] ] ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.failed },
+                { assert (function.stdout + function.stderr).any { it.contains("Multiple runs of a sample must have the same seq_center: sample_a") } }
+            )
+        }
+    }
+}

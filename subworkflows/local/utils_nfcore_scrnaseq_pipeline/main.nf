@@ -334,6 +334,18 @@ def validateInputSamplesheet(input) {
         error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
     }
 
+    // Check that multiple runs of the same sample have the same expected cell count
+    def expected_cells_ok = metas.collect { meta -> meta.expected_cells }.unique().size == 1
+    if (!expected_cells_ok) {
+        error("Please check input samplesheet -> Multiple runs of a sample must have the same expected_cells: ${metas[0].id}")
+    }
+
+    // Check that multiple runs of the same sample have the same sequencing center
+    def seq_center_ok = metas.collect { meta -> meta.seq_center ?: '' }.unique().size == 1
+    if (!seq_center_ok) {
+        error("Please check input samplesheet -> Multiple runs of a sample must have the same seq_center: ${metas[0].id}")
+    }
+
     return [ metas[0], fastqs ]
 }
 //

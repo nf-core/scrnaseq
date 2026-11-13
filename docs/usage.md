@@ -114,6 +114,36 @@ The command `kb --list` shows all supported, preconfigured protocols. All of the
 
 For more details, please refer to the [Kallisto/bustools documentation](https://pachterlab.github.io/kallisto/manual#bus).
 
+##### Additional `kb count` options
+
+For general guidance on `ext.args`, see [Custom Tool Arguments](#custom-tool-arguments).
+
+Use `ext.args` in a custom Nextflow configuration to supply tool options that the pipeline does not expose as parameters. For example, to request native H5AD output from `kb count`, create `custom.config`:
+
+```nextflow title="custom.config"
+process {
+    withName: KALLISTOBUSTOOLS_COUNT {
+        ext.args = { "--workflow ${params.kb_workflow} --filter --h5ad" }
+    }
+}
+```
+
+An `ext.args` assignment replaces the module's configured arguments. This example retains the pipeline defaults, `--workflow ${params.kb_workflow}` and `--filter`, and adds `--h5ad`. The pipeline also produces H5AD files through its standard matrix conversion without this option.
+
+Pass the custom configuration with Nextflow's `-c` option:
+
+```bash
+nextflow run nf-core/scrnaseq \
+    -profile docker \
+    -c custom.config \
+    --input samplesheet.csv \
+    --outdir results \
+    --genome GRCh38 \
+    --aligner kallisto
+```
+
+To pass other `kb count` options, add them to the same `ext.args` string. For example, `--tcc` requests transcript-compatibility counts. The downstream Kallisto matrix conversion expects gene annotation files (`*.genes.txt`), so changes to the output structure can require changes to that conversion. Passing an option through `ext.args` does not establish compatibility with downstream steps.
+
 #### Simpleaf
 
 Simpleaf has the ability to pass custom chemistries to Alevin-fry, in a slightly different format, e.g. `1{b[16]u[12]x:}2{r:}`.

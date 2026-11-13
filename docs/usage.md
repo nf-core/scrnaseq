@@ -76,6 +76,8 @@ For more details, see
 
 As a sanity check, we verify that filenames of a pair of FASTQ files only differ by `R1`/`R2`.
 
+For a configuration example that disables intron counting, see [Cell Ranger count arguments](#cell-ranger-count-arguments).
+
 ### Support for different scRNA-seq protocols
 
 The single-cell protocol used in the experiment can be specified using the `--protocol` flag.
@@ -562,6 +564,44 @@ To use a different container from the default container or conda environment spe
 A pipeline might not always support every possible argument or option of a particular tool used in pipeline. Fortunately, nf-core pipelines provide some freedom to users to insert additional parameters that the pipeline does not include by default.
 
 To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) section of the nf-core website.
+
+#### Cell Ranger count arguments
+
+For `--aligner cellranger`, you can disable intron counting with `--include-introns false` in a custom configuration file.
+The pipeline does not expose a parameter for this option.
+
+The pipeline defines `ext.args` for `CELLRANGER_COUNT` in [`conf/modules.config`](../conf/modules.config).
+Any custom definition of `ext.args` replaces the pipeline arguments.
+The example below preserves the chemistry, BAM creation, and expected cell count options from the pipeline.
+
+1. Save this configuration as `custom_cellranger.config`:
+
+   ```groovy
+   process {
+       withName: CELLRANGER_COUNT {
+           ext.args = {
+               "--chemistry ${meta.chemistry} --create-bam ${params.save_align_intermeds}" +
+               " " + (meta.expected_cells ? "--expect-cells ${meta.expected_cells}" : '') +
+               " --include-introns false"
+           }
+       }
+   }
+   ```
+
+2. Add `-c custom_cellranger.config` to your pipeline command:
+
+   ```bash
+   nextflow run nf-core/scrnaseq \
+       --input samplesheet.csv \
+       --aligner cellranger \
+       --genome GRCh38 \
+       --outdir results \
+       -profile docker \
+       -c custom_cellranger.config
+   ```
+
+Use `-c` for module arguments such as `ext.args`.
+Keep pipeline parameters, such as `--input` and `--aligner`, on the command line or in a parameter file.
 
 ### nf-core/configs
 

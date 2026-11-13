@@ -271,7 +271,9 @@ If your data already follows the expected naming convention, you can deactivate 
 
 #### Sample sheet definition
 
-If you are using cellranger-multi you have to add the column _feature_type_ to indicate which of the Feature Barcode Technology your data corresponds to:
+For `--aligner cellrangermulti`, the samplesheet must contain a non-empty `feature_type` value on every row.
+The pipeline validates these values against a dedicated samplesheet schema before it creates the input channels.
+The supported values identify the library type:
 
 | feature_type | description                                                            |
 | ------------ | ---------------------------------------------------------------------- |

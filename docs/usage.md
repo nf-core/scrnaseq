@@ -45,6 +45,17 @@ This parameter is currently supported by
 
 Note that since cellranger v7, it is **not recommended** anymore to supply the `--expected-cells` parameter.
 
+### Custom barcode whitelists
+
+For protocols that require a custom barcode whitelist, provide one file with `--barcode_whitelist`. Multiple files can be supplied as a comma-separated list; the pipeline processes them in the order given and automatically decompresses gzip-compressed files.
+
+```bash
+--barcode_whitelist whitelist1.txt,whitelist2.txt.gz
+```
+
+> [!NOTE]
+> Please not that while the pipeline supports multiple barcode whitelists, this should only be used with `--aligner star` and the `CB_UMI_Complex` protocol.
+
 ## Aligning options
 
 By default (i.e. `--aligner simpleaf`), the pipeline uses [piscem](https://github.com/COMBINE-lab/piscem) to perform pseudo-alignment of reads to the reference genome and [Alevin-fry](https://alevin-fry.readthedocs.io/en/latest/) to perform the downstream BAM-level quantification. Then QC reports are generated with [qcatch](https://github.com/COMBINE-lab/qcatch). You can disable qcatch QC with `--skip_qcatch`.
@@ -55,6 +66,7 @@ Other aligner options for running the pipeline are:
   - `--aligner kallisto`
 - [STARsolo](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md) to perform both alignment and downstream analysis.
   - `--aligner star`
+  - For Smart-seq data, provide `--manifest` with a tab-separated row for each cell and three columns: read 1 FASTQ, read 2 FASTQ, and cell ID. The FASTQ paths must correspond to the files listed in the input samplesheet.
 - [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) to perform both alignment and downstream analysis.
   - `--aligner cellranger`
 - [Cellranger Multi](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-5p-multi#what) to perform the alignment and downstream analysis of samples with multiple libraries at the same time using Feature Barcode technology that enables simultaneous profiling of the V(D)J repertoire, cell surface protein, antigen, and gene expression (GEX) data.
@@ -75,6 +87,8 @@ For more details, see
 - [the code for renaming files in the cellranger/count module](https://github.com/nf-core/modules/blob/master/modules/nf-core/cellranger/count/templates/cellranger_count.py)
 
 As a sanity check, we verify that filenames of a pair of FASTQ files only differ by `R1`/`R2`.
+
+For a configuration example that disables intron counting, see [Cell Ranger count arguments](#cell-ranger-count-arguments).
 
 ### Support for different scRNA-seq protocols
 
@@ -592,6 +606,44 @@ To use a different container from the default container or conda environment spe
 A pipeline might not always support every possible argument or option of a particular tool used in pipeline. Fortunately, nf-core pipelines provide some freedom to users to insert additional parameters that the pipeline does not include by default.
 
 To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) section of the nf-core website.
+
+#### Cell Ranger count arguments
+
+For `--aligner cellranger`, you can disable intron counting with `--include-introns false` in a custom configuration file.
+The pipeline does not expose a parameter for this option.
+
+The pipeline defines `ext.args` for `CELLRANGER_COUNT` in [`conf/modules.config`](../conf/modules.config).
+Any custom definition of `ext.args` replaces the pipeline arguments.
+The example below preserves the chemistry, BAM creation, and expected cell count options from the pipeline.
+
+1. Save this configuration as `custom_cellranger.config`:
+
+   ```groovy
+   process {
+       withName: CELLRANGER_COUNT {
+           ext.args = {
+               "--chemistry ${meta.chemistry} --create-bam ${params.save_align_intermeds}" +
+               " " + (meta.expected_cells ? "--expect-cells ${meta.expected_cells}" : '') +
+               " --include-introns false"
+           }
+       }
+   }
+   ```
+
+2. Add `-c custom_cellranger.config` to your pipeline command:
+
+   ```bash
+   nextflow run nf-core/scrnaseq \
+       --input samplesheet.csv \
+       --aligner cellranger \
+       --genome GRCh38 \
+       --outdir results \
+       -profile docker \
+       -c custom_cellranger.config
+   ```
+
+Use `-c` for module arguments such as `ext.args`.
+Keep pipeline parameters, such as `--input` and `--aligner`, on the command line or in a parameter file.
 
 ### nf-core/configs
 

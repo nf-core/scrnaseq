@@ -21,7 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
 - Update `kallistobustools` from nf-core and replace local `anndata/convert` for an nf-core module ([#465](https://github.com/nf-core/scrnaseq/pull/583))
 - Update `cellranger` nf-core modules (`count`, `mkgtf`, `mkref`, `mkvdjref`, `multi`) to Cell Ranger 10.1.0, adapting the `cellranger/multi` call to its new per-library options interface ([#596](https://github.com/nf-core/scrnaseq/pull/596))
-- The usage guide now includes a custom configuration example to disable intron counting for Cell Ranger count and preserve the pipeline arguments ([#475](https://github.com/nf-core/scrnaseq/issues/475)).
+- Document how to pass additional `kb count` options through `ext.args` in a custom configuration, with an example in the Kallisto/bustools usage section ([#167](https://github.com/nf-core/scrnaseq/issues/167)).
+- Document how to disable intron counting for Cell Ranger count and preserve the pipeline arguments ([#475](https://github.com/nf-core/scrnaseq/issues/475)).
 
 ### Fixes
 

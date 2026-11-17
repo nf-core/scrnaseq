@@ -19,7 +19,7 @@ include { STARSOLO                                          } from '../subworkfl
 include { CELLRANGER_ALIGN                                  } from "../subworkflows/local/align_cellranger"
 include { CELLRANGER_MULTI_ALIGN                            } from "../subworkflows/local/align_cellrangermulti"
 include { CELLRANGERARC_ALIGN                               } from "../subworkflows/local/align_cellrangerarc"
-include { MTX_TO_H5AD                                       } from '../modules/local/mtx_to_h5ad'
+include { CUSTOM_MTX2H5AD                                       } from '../modules/nf-core/mtx2h5ad'
 include { H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA } from '../subworkflows/nf-core/h5ad_removebackground_barcodes_cellbender_anndata'
 include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
 
@@ -314,14 +314,14 @@ workflow SCRNASEQ {
     //
     // MODULE: Convert mtx matrices to h5ad
     //
-    MTX_TO_H5AD (
-        ch_mtx_matrices,
+    CUSTOM_MTX2H5AD (
+        ch_mtx_matrices.map { meta, mtx ->
+            [meta, mtx, meta.input_type] },
         ch_txp2gene,
-        star_index ?: [],
-        params.aligner
+        params.aligner,
+        params.kb_workflow
     )
-    ch_versions = ch_versions.mix(MTX_TO_H5AD.out.versions.first())
-    ch_h5ads = MTX_TO_H5AD.out.h5ad
+    ch_h5ads = CUSTOM_MTX2H5AD.out.h5ad
 
     //
     // SUBWORKFLOW: Run cellbender remove background subworkflow

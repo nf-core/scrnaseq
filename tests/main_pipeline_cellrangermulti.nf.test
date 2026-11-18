@@ -2,6 +2,8 @@ nextflow_pipeline {
 
     name "Test Workflow main.nf"
     script "main.nf"
+    tag "cellrangermulti"
+    tag "pipeline"
 
     test("test-dataset_cellrangermulti_aligner_human") {
 

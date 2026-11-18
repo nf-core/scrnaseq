@@ -3,6 +3,7 @@ nextflow_pipeline {
     name "Test Workflow main.nf"
     script "main.nf"
     tag "kallisto"
+    tag "pipeline"
 
     test("test-dataset_kallisto_aligner") {
 

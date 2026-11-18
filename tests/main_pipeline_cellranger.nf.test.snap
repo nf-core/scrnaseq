@@ -18,17 +18,22 @@
                 "CELLRANGER_MKREF": {
                     "cellranger": "cellranger 10.1.0"
                 },
+                "CUSTOM_MTX2H5AD": {
+                    "anndata": "0.12.19",
+                    "h5py": "3.16.0",
+                    "hdf5plugin": "7.1.0",
+                    "leidenalg": "0.12.0",
+                    "pandas": "2.3.3",
+                    "python": "3.12.15",
+                    "python-igraph": "1.0.0",
+                    "scanpy": "1.10.2",
+                    "scipy": "1.16.3"
+                },
                 "FASTQC": {
                     "fastqc": "0.13.0"
                 },
                 "GTF_GENE_FILTER": {
                     "python": "3.14.5"
-                },
-                "MTX_TO_H5AD": {
-                    "anndata": "0.12.19",
-                    "pandas": "2.3.3",
-                    "python": "3.12.14",
-                    "scanpy": "1.10.2"
                 }
             },
             [
@@ -382,10 +387,10 @@
                 "multiqc_general_stats.txt:md5,92a7a66e313e6ce2d13da53b501b5c0c"
             ]
         ],
-        "timestamp": "2026-10-28T18:52:22.191672694",
+        "timestamp": "2026-11-16T17:59:44.532968385",
         "meta": {
-            "nf-test": "0.9.4",
-            "nextflow": "26.04.6"
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.5"
         }
     }
 }

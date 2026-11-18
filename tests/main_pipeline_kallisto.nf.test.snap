@@ -9,6 +9,17 @@
                     "anndataR": "1.0.2",
                     "r-base": "R version 4.5.3 (2026-03-11)"
                 },
+                "CUSTOM_MTX2H5AD": {
+                    "anndata": "0.12.19",
+                    "h5py": "3.16.0",
+                    "hdf5plugin": "7.1.0",
+                    "leidenalg": "0.12.0",
+                    "pandas": "2.3.3",
+                    "python": "3.12.15",
+                    "python-igraph": "1.0.0",
+                    "scanpy": "1.10.2",
+                    "scipy": "1.16.3"
+                },
                 "FASTQC": {
                     "fastqc": "0.13.0"
                 },
@@ -20,12 +31,6 @@
                 },
                 "KALLISTOBUSTOOLS_REF": {
                     "kallistobustools": "0.28.2"
-                },
-                "MTX_TO_H5AD": {
-                    "anndata": "0.12.19",
-                    "pandas": "2.3.3",
-                    "python": "3.12.14",
-                    "scanpy": "1.10.2"
                 }
             },
             [
@@ -217,10 +222,10 @@
                 "multiqc_general_stats.txt:md5,dac8af62b04fd0880801f5d5c503c472"
             ]
         ],
-        "timestamp": "2026-10-28T18:37:47.041776214",
+        "timestamp": "2026-11-16T19:07:47.886540486",
         "meta": {
-            "nf-test": "0.9.4",
-            "nextflow": "26.04.6"
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.5"
         }
     },
     "test-dataset_kallisto_nac": {
@@ -233,6 +238,17 @@
                     "anndataR": "1.0.2",
                     "r-base": "R version 4.5.3 (2026-03-11)"
                 },
+                "CUSTOM_MTX2H5AD": {
+                    "anndata": "0.12.19",
+                    "h5py": "3.16.0",
+                    "hdf5plugin": "7.1.0",
+                    "leidenalg": "0.12.0",
+                    "pandas": "2.3.3",
+                    "python": "3.12.15",
+                    "python-igraph": "1.0.0",
+                    "scanpy": "1.10.2",
+                    "scipy": "1.16.3"
+                },
                 "FASTQC": {
                     "fastqc": "0.13.0"
                 },
@@ -244,12 +260,6 @@
                 },
                 "KALLISTOBUSTOOLS_REF": {
                     "kallistobustools": "0.28.2"
-                },
-                "MTX_TO_H5AD": {
-                    "anndata": "0.12.19",
-                    "pandas": "2.3.3",
-                    "python": "3.12.14",
-                    "scanpy": "1.10.2"
                 }
             },
             [
@@ -453,7 +463,7 @@
                 "multiqc_general_stats.txt:md5,dac8af62b04fd0880801f5d5c503c472"
             ]
         ],
-        "timestamp": "2026-11-12T14:01:45.305549122",
+        "timestamp": "2026-11-17T16:20:02.554616961",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.10.5"

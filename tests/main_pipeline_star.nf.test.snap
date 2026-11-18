@@ -8,6 +8,17 @@
                     "anndataR": "1.0.2",
                     "r-base": "R version 4.5.3 (2026-03-11)"
                 },
+                "CUSTOM_MTX2H5AD": {
+                    "anndata": "0.12.19",
+                    "h5py": "3.16.0",
+                    "hdf5plugin": "7.1.0",
+                    "leidenalg": "0.12.0",
+                    "pandas": "2.3.3",
+                    "python": "3.12.15",
+                    "python-igraph": "1.0.0",
+                    "scanpy": "1.10.2",
+                    "scipy": "1.16.3"
+                },
                 "FASTQC": {
                     "fastqc": "0.13.0"
                 },
@@ -16,12 +27,6 @@
                 },
                 "GUNZIP_WHITELIST": {
                     "gunzip": 1.13
-                },
-                "MTX_TO_H5AD": {
-                    "anndata": "0.12.19",
-                    "pandas": "2.3.3",
-                    "python": "3.12.14",
-                    "scanpy": "1.10.2"
                 },
                 "STAR_GENOMEGENERATE": {
                     "gawk": "5.1.0",
@@ -250,10 +255,10 @@
                 "Sample_Y_raw_matrix.seurat.rds:md5,1e366fa8c2ae00e91dc5b1f5101414ce"
             ]
         ],
-        "timestamp": "2026-11-02T17:02:48.708395598",
+        "timestamp": "2026-11-16T19:18:12.545264537",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "25.10.4"
+            "nextflow": "26.10.5"
         }
     }
 }

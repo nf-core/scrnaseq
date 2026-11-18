@@ -3,8 +3,9 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { CUSTOM_MTX2H5AD                                   } from '../modules/nf-core/custom/mtx2h5ad'
 include { MULTIQC                                           } from '../modules/nf-core/multiqc/main'
-include { GUNZIP as GUNZIP_WHITELIST                         } from '../modules/nf-core/gunzip/main'
+include { GUNZIP as GUNZIP_WHITELIST                        } from '../modules/nf-core/gunzip/main'
 include { paramsSummaryMap                                  } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc                              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML                            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -19,7 +20,6 @@ include { STARSOLO                                          } from '../subworkfl
 include { CELLRANGER_ALIGN                                  } from "../subworkflows/local/align_cellranger"
 include { CELLRANGER_MULTI_ALIGN                            } from "../subworkflows/local/align_cellrangermulti"
 include { CELLRANGERARC_ALIGN                               } from "../subworkflows/local/align_cellrangerarc"
-include { CUSTOM_MTX2H5AD                                       } from '../modules/nf-core/mtx2h5ad'
 include { H5AD_REMOVEBACKGROUND_BARCODES_CELLBENDER_ANNDATA } from '../subworkflows/nf-core/h5ad_removebackground_barcodes_cellbender_anndata'
 include { H5AD_CONVERSION                                   } from '../subworkflows/local/h5ad_conversion'
 

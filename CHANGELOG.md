@@ -15,12 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- Replace the local Kallisto subworkflow with `nf-core/fastq_quant_kallistobustools` and add a pipeline test for `--kb_workflow nac`. [#610](https://github.com/nf-core/scrnaseq/pull/610)
 - Replace the local STARsolo alignment module with the maintained nf-core `star/starsolo` module ([#590](https://github.com/nf-core/scrnaseq/pull/590)).
 - Bump the `nf-schema` plugin from `2.5.1` to `2.8.0`, so that `pattern` validation of samplesheet paths on proxy filesystems (e.g. `lamin://`) is retried against the resolved real path, and require Nextflow `26.04.9` or later to include the latest 26.04 bugfixes (see [nf-schema#217](https://github.com/nextflow-io/nf-schema/issues/217); [#573](https://github.com/nf-core/scrnaseq/pull/573))
 - Remove orphaned `GFFREAD_TRANSCRIPTOME` local module (unused since simpleaf replaced Salmon index building in 2022) ([#565](https://github.com/nf-core/scrnaseq/pull/565))
 - Replace the local `GTF_GENE_FILTER` module with the shared nf-core `custom/gtffilter` module ([#465](https://github.com/nf-core/scrnaseq/issues/465))
 - Update `kallistobustools` from nf-core and replace local `anndata/convert` for an nf-core module ([#465](https://github.com/nf-core/scrnaseq/pull/583))
 - Update `cellranger` nf-core modules (`count`, `mkgtf`, `mkref`, `mkvdjref`, `multi`) to Cell Ranger 10.1.0, adapting the `cellranger/multi` call to its new per-library options interface ([#596](https://github.com/nf-core/scrnaseq/pull/596))
+- Document how to pass additional `kb count` options through `ext.args` in a custom configuration, with an example in the Kallisto/bustools usage section ([#167](https://github.com/nf-core/scrnaseq/issues/167)).
+- Document how to disable intron counting for Cell Ranger count and preserve the pipeline arguments ([#475](https://github.com/nf-core/scrnaseq/issues/475)).
 
 ### Fixes
 

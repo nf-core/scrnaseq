@@ -105,9 +105,9 @@ if __name__ == "__main__":
 
         # The barcodes of spliced / non-spliced are not necessarily the same.
         # We fill the missing barcodes with zeros
-        all_barcodes = list(set(unspliced.obs_names) | set(spliced.obs_names))
-        missing_spliced = list(set(all_barcodes) - set(spliced.obs_names))
-        missing_unspliced = list(set(all_barcodes) - set(unspliced.obs_names))
+        all_barcodes = sorted(set(unspliced.obs_names) | set(spliced.obs_names))
+        missing_spliced = sorted(set(all_barcodes) - set(spliced.obs_names))
+        missing_unspliced = sorted(set(all_barcodes) - set(unspliced.obs_names))
         ad_missing_spliced = AnnData(
             X=csr_matrix((len(missing_spliced), spliced.shape[1])),
             obs=pd.DataFrame(index=missing_spliced),
@@ -153,10 +153,10 @@ if __name__ == "__main__":
 
         # The barcodes of nascent / mature / ambiguous are not necessarily the same.
         # We fill the missing barcodes with zeros
-        all_barcodes = list(set(nascent.obs_names) | set(mature.obs_names) | set(ambiguous.obs_names))
-        missing_nascent = list(set(all_barcodes) - set(nascent.obs_names))
-        missing_mature = list(set(all_barcodes) - set(mature.obs_names))
-        missing_ambiguous = list(set(all_barcodes) - set(ambiguous.obs_names))
+        all_barcodes = sorted(set(nascent.obs_names) | set(mature.obs_names) | set(ambiguous.obs_names))
+        missing_nascent = sorted(set(all_barcodes) - set(nascent.obs_names))
+        missing_mature = sorted(set(all_barcodes) - set(mature.obs_names))
+        missing_ambiguous = sorted(set(all_barcodes) - set(ambiguous.obs_names))
 
         ad_missing_nascent = AnnData(
             X=csr_matrix((len(missing_nascent), nascent.shape[1])),

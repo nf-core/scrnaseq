@@ -107,7 +107,11 @@ workflow PIPELINE_INITIALISATION {
     //
     // Create channel from input file provided through params.input
     //
-    def samplesheet_schema = params.aligner == 'cellrangerarc' ? "${projectDir}/assets/schema_input_cellrangerarc.json" : "${projectDir}/assets/schema_input.json"
+    def samplesheet_schemas = [
+        cellrangerarc: "${projectDir}/assets/schema_input_cellrangerarc.json",
+        cellrangermulti: "${projectDir}/assets/schema_input_cellrangermulti.json",
+    ]
+    def samplesheet_schema = samplesheet_schemas[params.aligner] ?: "${projectDir}/assets/schema_input.json"
 
     if (params.aligner == 'cellrangermulti') { // the cellrangermulti sub-workflow logic needs that channels have reads separated by feature_type. Cannot merge all.
         def samplesheet = samplesheetToList(params.input, samplesheet_schema)

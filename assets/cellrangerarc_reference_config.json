@@ -1,0 +1,6 @@
+{
+    "organism": "Homo_sapiens",
+    "genome": ["chr21_test_reference"],
+    "input_fasta": ["genome.fasta"],
+    "input_gtf": ["chr21_gencode.filtered.gtf"]
+}

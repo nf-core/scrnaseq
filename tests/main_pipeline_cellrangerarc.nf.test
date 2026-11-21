@@ -40,4 +40,45 @@ nextflow_pipeline {
         }
     }
 
+    test("test-dataset_cellrangerarc_aligner_user_supplied_config") {
+
+        tag "cellrangerarc_user_config"
+
+        when {
+            // the rest is taken from shared config
+            params {
+                aligner                 = 'cellrangerarc'
+                outdir                  = "$outputDir"
+                input                   = "${baseDir}/assets/cellrangerarc_samplesheet.csv"
+                fasta                   = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/chr21/sequence/genome.fasta'
+                gtf                     = 'https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/chr21/sequence/chr21_gencode.gtf'
+                protocol                = 'auto'
+                skip_cellbender         = true
+                cellrangerarc_config    = "${baseDir}/assets/cellrangerarc_reference_config.json"
+                cellrangerarc_reference = 'chr21_test_reference'
+            }
+        }
+
+        then {
+            // The reference directory must be named after the `genome` entry of the
+            // user-supplied config (--cellrangerarc_reference), not `<reference>_reference`.
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success},
+                { assert stable_name.contains("cellrangerarc/mkref/chr21_test_reference") },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeFromYamlMap("$params.outdir/pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml", "Workflow"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path
+                ).match() }
+            )
+        }
+    }
+
 }

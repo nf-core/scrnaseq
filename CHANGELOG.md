@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove the hardcoded `time = { 120.h * task.attempt }` override for `FASTQC` in `conf/modules.config`. FASTQC now falls back to the `process_low` default (`4.h * task.attempt`), which is ample for the process and avoids submission failures on clusters whose QOS/partition wall-time caps are shorter than 120h.
 - Increase runtime limits for cellbender and cellranger in `conf/modules.config` to avoid template updates resetting these limits ([#275](https://github.com/nf-core/scrnaseq/issues/275))
 - Fix pipeline attempts to access igenomes buckets even with `--igenomes_ignore=true` [#568](https://github.com/nf-core/scrnaseq/issues/568)
+- Fix `CELLRANGERARC_MKREF` failing with `Missing output file(s) ... expected` when building a reference from a user-supplied `--cellrangerarc_config`: the reference directory is now named after `--cellrangerarc_reference` (which must match the `genome` entry of the config) instead of expecting an extra `_reference` suffix. The default name for pipeline-generated configs (`cellrangerarc_reference`) is unchanged ([#574](https://github.com/nf-core/scrnaseq/issues/574))
 
 ## v4.2.0 - 2026-07-03
 

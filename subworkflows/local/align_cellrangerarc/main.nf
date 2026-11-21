@@ -25,7 +25,7 @@ workflow CELLRANGERARC_ALIGN {
                     ( params.cellrangerarc_reference && cellrangerarc_config ) ) :
                 "If you provide a config file you also have to specific the reference name and vice versa."
 
-            def cellrangerarc_reference = params.cellrangerarc_reference ?: 'cellrangerarc'
+            def cellrangerarc_reference = params.cellrangerarc_reference ?: 'cellrangerarc_reference'
 
             // Filter GTF based on gene biotypes passed in params.modules
             CELLRANGERARC_MKGTF( gtf )

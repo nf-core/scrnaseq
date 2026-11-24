@@ -1,0 +1,62 @@
+nextflow_workflow {
+
+    name "Test Workflow CELLRANGERARC_ALIGN"
+    script "../main.nf"
+    workflow "CELLRANGERARC_ALIGN"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "align_cellrangerarc"
+
+    test("Should build the reference when no index is given") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                input[0] = channel.value([ [ id: 'genome' ], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true) ])
+                input[1] = channel.value([ [ id: 'genome' ], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.gtf', checkIfExists: true) ])
+                input[2] = []
+                input[3] = []
+                input[4] = channel.of([ [ id: 'test' ], [ 'gex', 'atac' ], [ 'test_gex', 'test_atac' ], [] ])
+                input[5] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Should accept a pre-built reference passed with --cellranger_index") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                def reference = file("${outputDir}/cellrangerarc_reference")
+                reference.mkdirs()
+
+                input[0] = []
+                input[1] = []
+                input[2] = []
+                input[3] = reference
+                input[4] = channel.of([ [ id: 'test' ], [ 'gex', 'atac' ], [ 'test_gex', 'test_atac' ], [] ])
+                input[5] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}

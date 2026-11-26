@@ -219,4 +219,69 @@ nextflow_pipeline {
             )
         }
     }
+
+    test("test-dataset_cellrangermulti_barcode_sample_assignment_human") {
+
+        tag 'human'
+        tag 'cellranger/multi'
+        tag 'barcode_sample_assignment'
+
+        when {
+            params {
+                aligner                       = 'cellrangermulti'
+                outdir                        = "$outputDir"
+                input                         = "${launchDir}/cellrangermulti_samplesheet_cmo.csv"
+                cellranger_multi_barcodes     = "${launchDir}/cellranger_barcodes_samplesheet_cmo.csv"
+                gex_barcode_sample_assignment = "${baseDir}/assets/cellrangermulti_barcode_sample_assignment.csv"
+                gex_reference_version         = "GRCh38"
+                fasta                         = 'https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.14.fa.gz'
+                gtf                           = 'https://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz'
+                protocol                      = 'auto'
+                skip_cellrangermulti_vdjref   = true
+                skip_cellbender               = true
+            }
+
+            // barcode-sample assignment only applies to CMO samples, so only PBMC_10K_CMO is run
+            ['cellrangermulti_samplesheet.csv', 'cellranger_barcodes_samplesheet.csv'].each { name ->
+                def lines = new File("${baseDir}/assets/${name}").readLines()
+                new File("${launchDir}/${name.replace('.csv', '_cmo.csv')}").text =
+                    ([lines[0]] + lines.findAll { line -> line.startsWith('PBMC_10K_CMO,') }).join('\n') + '\n'
+            }
+        }
+
+        then {
+            def outs = "$params.outdir/cellrangermulti/count/PBMC_10K_CMO/outs"
+            def cells = { sample ->
+                def line = path("$outs/per_sample_outs/$sample/metrics_summary.csv").readLines()
+                    .find { l -> l.startsWith('Cells,Gene Expression,,,Cells,') }
+                assert line : "No 'Cells' metric found for ${sample}"
+                line.tokenize(',').last().toInteger()
+            }
+            def assigned = { cmo ->
+                new File("${baseDir}/assets/cellrangermulti_barcode_sample_assignment.csv").readLines()
+                    .count { l -> l.endsWith(",${cmo}") }
+            }
+            // stable_name: All files + folders in ${params.outdir}/ with a stable name
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            // stable_path: All files in ${params.outdir}/ with stable content
+            def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert path("$outs/config.csv").text.contains('barcode-sample-assignment') },
+                // the CSV swaps CMO301 and CMO302, so these only pass if Cell Ranger applies it
+                { assert cells('PBMC_10K_CMO_PBMCs_human_1') == assigned('CMO301') },
+                { assert cells('PBMC_10K_CMO_PBMCs_human_2') == assigned('CMO302') },
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeFromYamlMap("$params.outdir/pipeline_info/nf_core_scrnaseq_software_mqc_versions.yml", "Workflow"),
+                    // All stable path name, with a relative path
+                    stable_name,
+                    // All files with stable contents
+                    stable_path
+                ).match() }
+            )
+        }
+    }
 }

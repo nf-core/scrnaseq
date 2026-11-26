@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
+- Require a supported `feature_type` on every input samplesheet row for `cellrangermulti` ([#461](https://github.com/nf-core/scrnaseq/issues/461)).
 - Pass `--gex_barcode_sample_assignment` to `CELLRANGER_MULTI`, so Cell Ranger applies the provided barcode-sample assignment instead of ignoring it, and add a pipeline test for it ([#615](https://github.com/nf-core/scrnaseq/pull/615)).
 - Add more input validation warnings so that the pipeline rejects conflicting `expected_cells` or `seq_center` values in grouped sample rows ([#603](https://github.com/nf-core/scrnaseq/issues/603)).
 - Fix nf-test discovery of cellrangermulti pipeline tests by separating initialization workflow tests and consolidating the V(D)J pipeline test ([#600](https://github.com/nf-core/scrnaseq/issues/600))

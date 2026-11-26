@@ -1600,6 +1600,17 @@
                 "CELLRANGER_MULTI": {
                     "cellranger": "10.1.0"
                 },
+                "CUSTOM_MTX2H5AD": {
+                    "anndata": "0.12.19",
+                    "h5py": "3.16.0",
+                    "hdf5plugin": "7.1.0",
+                    "leidenalg": "0.12.0",
+                    "pandas": "2.3.3",
+                    "python": "3.12.15",
+                    "python-igraph": "1.0.0",
+                    "scanpy": "1.10.2",
+                    "scipy": "1.16.3"
+                },
                 "FASTQC": {
                     "fastqc": "0.13.0"
                 },
@@ -1611,12 +1622,6 @@
                 },
                 "GUNZIP_GTF": {
                     "gunzip": 1.13
-                },
-                "MTX_TO_H5AD": {
-                    "anndata": "0.12.19",
-                    "pandas": "2.3.3",
-                    "python": "3.12.14",
-                    "scanpy": "1.10.2"
                 }
             },
             [
@@ -2011,7 +2016,7 @@
                 "multiqc_general_stats.txt:md5,2b8b856c6eab64c12cb36484582a4265"
             ]
         ],
-        "timestamp": "2026-11-15T19:36:29.892564001",
+        "timestamp": "2026-11-26T15:23:47.104010439",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.10.5"

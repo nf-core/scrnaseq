@@ -3,6 +3,7 @@ nextflow_pipeline {
     name "Test Workflow main.nf"
     script "main.nf"
     tag "starsolo"
+    tag "pipeline"
 
     test("test-dataset_star_aligner") {
 

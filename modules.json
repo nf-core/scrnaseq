@@ -65,6 +65,11 @@
                         "git_sha": "d95d53e0355903a16d2d7c2d54134591c5aa4467",
                         "installed_by": ["modules"]
                     },
+                    "custom/mtx2h5ad": {
+                        "branch": "master",
+                        "git_sha": "7df7b960fcccb63920a369ee817b26f3893d5b42",
+                        "installed_by": ["modules"]
+                    },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "18eb358065b06f2d3419e37383b002fe7db3da02",
